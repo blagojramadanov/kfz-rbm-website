@@ -32,21 +32,26 @@ A modern, professional web platform for KFZ RBM, Germany's premium used-car deal
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd kfzrbm
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    ```
+
    Then edit `.env.local` with your Supabase credentials:
+
    ```
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
@@ -55,9 +60,11 @@ A modern, professional web platform for KFZ RBM, Germany's premium used-car deal
    ```
 
 4. **Run the development server**
+
    ```bash
    npm run dev
    ```
+
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 5. **Set up the database**
@@ -116,17 +123,20 @@ Detailed schema documentation available in migrations.
 ## Development
 
 ### Running Tests
+
 ```bash
 npm run test
 ```
 
 ### Building for Production
+
 ```bash
 npm run build
 npm run start
 ```
 
 ### Code Quality
+
 - TypeScript for type safety
 - ESLint for code standards
 - Prettier for code formatting
@@ -134,6 +144,7 @@ npm run start
 ## Deployment
 
 Recommended platforms:
+
 - [Vercel](https://vercel.com/) (official Next.js hosting)
 - [AWS Amplify](https://aws.amazon.com/amplify/)
 - [Netlify](https://www.netlify.com/)
