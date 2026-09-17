@@ -1,0 +1,570 @@
+"use server";
+
+import { getSupabaseServerClient } from "@/lib/supabase-server";
+
+// Helper function to verify admin role before executing admin operations
+async function verifyAdminRole() {
+  try {
+    const { supabase, session } = await getSupabaseServerClient();
+    if (!session?.user) {
+      throw new Error("Unauthorized: User not authenticated");
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .single();
+
+    if (profileError || !profile || profile.role !== "ADMIN") {
+      throw new Error("Unauthorized: Admin role required");
+    }
+
+    return true;
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : "Unauthorized");
+  }
+}
+
+// Helper function to log detailed error information for debugging
+function logAdminError(operation: string, error: unknown, context?: Record<string, any>) {
+  const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+  const errorCode = error instanceof Error && "code" in error ? (error as any).code : "unknown";
+  const errorDetails = error instanceof Error && "details" in error ? (error as any).details : null;
+
+  console.error(`[ADMIN_ERROR] ${operation}`, {
+    message: errorMessage,
+    code: errorCode,
+    details: errorDetails,
+    context,
+    fullError: error,
+  });
+
+  return errorMessage;
+}
+
+// ============================================================================
+// VEHICLE MANAGEMENT
+// ============================================================================
+
+export async function createVehicle(
+  vehicleData: {
+    vin: string;
+    brand: string;
+    model: string;
+    year: number;
+    mileage: number;
+    price: number;
+    transmission: string;
+    fuel_type: string;
+    body_type: string;
+    color_exterior: string;
+    color_interior?: string;
+    engine_cc?: number;
+    power_hp?: number;
+    description: string;
+  }
+) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { data, error } = await supabase
+      .from("vehicles")
+      .insert({
+        ...vehicleData,
+        status: "draft",
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, vehicleId: data.id };
+  } catch (error) {
+    console.error("Error creating vehicle:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Erstellen des Fahrzeugs");
+  }
+}
+
+export async function updateVehicle(vehicleId: string, updates: Record<string, any>) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { error } = await supabase
+      .from("vehicles")
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq("id", vehicleId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating vehicle:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Aktualisieren des Fahrzeugs");
+  }
+}
+
+export async function deleteVehicle(vehicleId: string) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { error } = await supabase.from("vehicles").delete().eq("id", vehicleId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    const msg = logAdminError("deleteVehicle", error, { vehicleId });
+    throw new Error(`Fehler beim Löschen des Fahrzeugs: ${msg}`);
+  }
+}
+
+export async function getVehicles(
+  filters?: {
+    status?: string;
+    search?: string;
+  }
+) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    let query = supabase.from("vehicles").select("*").order("created_at", { ascending: false });
+
+    if (filters?.status) {
+      query = query.eq("status", filters.status);
+    }
+
+    if (filters?.search) {
+      query = query.or(
+        `brand.ilike.%${filters.search}%,model.ilike.%${filters.search}%,vin.ilike.%${filters.search}%`
+      );
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching vehicles:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Abrufen der Fahrzeuge");
+  }
+}
+
+export async function getVehicleById(vehicleId: string) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { data: vehicle, error: vehicleError } = await supabase
+      .from("vehicles")
+      .select("*")
+      .eq("id", vehicleId)
+      .single();
+
+    if (vehicleError) throw vehicleError;
+
+    const { data: images, error: imagesError } = await supabase
+      .from("vehicle_images")
+      .select("*")
+      .eq("vehicle_id", vehicleId)
+      .order("sort_order");
+
+    if (imagesError) throw imagesError;
+
+    return { vehicle, images: images || [] };
+  } catch (error) {
+    console.error("Error fetching vehicle:", error);
+    throw new Error(error instanceof Error ? error.message : "Fahrzeug nicht gefunden");
+  }
+}
+
+// ============================================================================
+// SUBMITTED VEHICLES MANAGEMENT
+// ============================================================================
+
+export async function getSubmittedVehicles(
+  filters?: {
+    status?: string;
+    search?: string;
+  }
+) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    let query = supabase
+      .from("submitted_vehicles")
+      .select(
+        `
+        *,
+        user:user_id (id, email, full_name)
+      `
+      )
+      .order("created_at", { ascending: false });
+
+    if (filters?.status) {
+      query = query.eq("status", filters.status);
+    }
+
+    if (filters?.search) {
+      query = query.or(
+        `brand.ilike.%${filters.search}%,model.ilike.%${filters.search}%`
+      );
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    // Fetch images for each vehicle
+    const vehiclesWithImages = await Promise.all(
+      (data || []).map(async (vehicle) => {
+        const { data: images, error: imagesError } = await supabase
+          .from("submitted_vehicle_images")
+          .select("image_url")
+          .eq("submitted_vehicle_id", vehicle.id)
+          .order("sort_order", { ascending: true });
+
+        if (imagesError) {
+          console.error("Error fetching images:", imagesError);
+          return {
+            ...vehicle,
+            images: [],
+          };
+        }
+
+        return {
+          ...vehicle,
+          images: images?.map((img) => img.image_url) || [],
+        };
+      })
+    );
+
+    return vehiclesWithImages;
+  } catch (error) {
+    const msg = logAdminError("getSubmittedVehicles", error, { statusFilter: filters?.status });
+    throw new Error(`Fehler beim Abrufen der Fahrzeuge: ${msg}`);
+  }
+}
+
+export async function approveSubmittedVehicle(vehicleId: string, internalNotes?: string) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { error } = await supabase
+      .from("submitted_vehicles")
+      .update({
+        status: "approved",
+        status_reason: internalNotes || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", vehicleId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error("Error approving vehicle:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Genehmigen des Fahrzeugs");
+  }
+}
+
+export async function rejectSubmittedVehicle(vehicleId: string, reason: string) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { error } = await supabase
+      .from("submitted_vehicles")
+      .update({
+        status: "rejected",
+        status_reason: reason,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", vehicleId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error("Error rejecting vehicle:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Ablehnen des Fahrzeugs");
+  }
+}
+
+// ============================================================================
+// INQUIRIES MANAGEMENT
+// ============================================================================
+
+export async function getInquiries(
+  filters?: {
+    status?: string;
+  }
+) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    let query = supabase
+      .from("customer_inquiries")
+      .select(
+        `
+        *,
+        vehicle:vehicle_id (id, brand, model, year, price)
+      `
+      )
+      .order("created_at", { ascending: false });
+
+    if (filters?.status) {
+      query = query.eq("status", filters.status);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching inquiries:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Abrufen der Anfragen");
+  }
+}
+
+export async function updateInquiryStatus(inquiryId: string, status: string) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { error } = await supabase
+      .from("customer_inquiries")
+      .update({
+        status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", inquiryId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating inquiry:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Aktualisieren der Anfrage");
+  }
+}
+
+// ============================================================================
+// TRADE-IN REQUESTS MANAGEMENT
+// ============================================================================
+
+export async function getTradeInRequests(
+  filters?: {
+    status?: string;
+  }
+) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    let query = supabase
+      .from("trade_in_requests")
+      .select(
+        `
+        *,
+        user:user_id (id, email, full_name),
+        desired_vehicle:desired_vehicle_id (id, brand, model, year, mileage, price, transmission, fuel_type, body_type, color_exterior, description)
+      `
+      )
+      .order("created_at", { ascending: false });
+
+    if (filters?.status) {
+      query = query.eq("status", filters.status);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    const msg = logAdminError("getTradeInRequests", error, { statusFilter: filters?.status });
+    throw new Error(`Fehler beim Abrufen der Anfragen: ${msg}`);
+  }
+}
+
+export async function updateTradeInRequest(
+  requestId: string,
+  updates: {
+    status?: string;
+    admin_notes?: string;
+  }
+) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { error } = await supabase
+      .from("trade_in_requests")
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", requestId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating trade-in request:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Aktualisieren der Anfrage");
+  }
+}
+
+// ============================================================================
+// DASHBOARD STATISTICS
+// ============================================================================
+
+export async function getDashboardStats() {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    // Count vehicles by status
+    const statuses = ["draft", "available", "reserved", "sold"];
+    const vehicleCounts: Record<string, number> = {};
+    for (const status of statuses) {
+      const { count } = await supabase
+        .from("vehicles")
+        .select("*", { count: "exact", head: true })
+        .eq("status", status);
+      vehicleCounts[status] = count || 0;
+    }
+
+    // Count submitted vehicles by status
+    const submittedStatuses = ["draft", "submitted", "under_review", "approved", "rejected"];
+    const submittedCounts: Record<string, number> = {};
+    for (const status of submittedStatuses) {
+      const { count } = await supabase
+        .from("submitted_vehicles")
+        .select("*", { count: "exact", head: true })
+        .eq("status", status);
+      submittedCounts[status] = count || 0;
+    }
+
+    // Count inquiries by status
+    const inquiryStatuses = ["new", "read", "responded", "closed"];
+    const inquiryCounts: Record<string, number> = {};
+    for (const status of inquiryStatuses) {
+      const { count } = await supabase
+        .from("customer_inquiries")
+        .select("*", { count: "exact", head: true })
+        .eq("status", status);
+      inquiryCounts[status] = count || 0;
+    }
+
+    // Count trade-in requests by status
+    const tradeInStatuses = ["new", "reviewing", "contact_made", "completed", "cancelled"];
+    const tradeInCounts: Record<string, number> = {};
+    for (const status of tradeInStatuses) {
+      const { count } = await supabase
+        .from("trade_in_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("status", status);
+      tradeInCounts[status] = count || 0;
+    }
+
+    // Count customers
+    const { count: totalCustomers } = await supabase
+      .from("user_profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("role", "CUSTOMER");
+
+    return {
+      total_vehicles: Object.values(vehicleCounts).reduce((a, b) => a + b, 0),
+      vehicles_draft: vehicleCounts.draft || 0,
+      vehicles_available: vehicleCounts.available || 0,
+      vehicles_reserved: vehicleCounts.reserved || 0,
+      vehicles_sold: vehicleCounts.sold || 0,
+      total_submitted_vehicles: Object.values(submittedCounts).reduce((a, b) => a + b, 0),
+      submitted_vehicles_submitted: submittedCounts.submitted || 0,
+      submitted_vehicles_under_review: submittedCounts.under_review || 0,
+      submitted_vehicles_approved: submittedCounts.approved || 0,
+      submitted_vehicles_rejected: submittedCounts.rejected || 0,
+      inquiries_new: inquiryCounts.new || 0,
+      inquiries_read: inquiryCounts.read || 0,
+      inquiries_responded: inquiryCounts.responded || 0,
+      inquiries_closed: inquiryCounts.closed || 0,
+      trade_in_requests_new: tradeInCounts.new || 0,
+      trade_in_requests_reviewing: tradeInCounts.reviewing || 0,
+      trade_in_requests_contact_made: tradeInCounts.contact_made || 0,
+      trade_in_requests_completed: tradeInCounts.completed || 0,
+      trade_in_requests_cancelled: tradeInCounts.cancelled || 0,
+      total_customers: totalCustomers || 0,
+      avg_vehicle_price: 0,
+    };
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Abrufen der Statistiken");
+  }
+}
+
+// ============================================================================
+// CUSTOMER MANAGEMENT
+// ============================================================================
+
+export async function getCustomers() {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { data, error } = await supabase
+      .from("user_profiles")
+      .select("*")
+      .eq("role", "CUSTOMER")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching customers:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Abrufen der Kunden");
+  }
+}
+
+export async function getCustomerDetails(customerId: string) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { data: customer, error: customerError } = await supabase
+      .from("user_profiles")
+      .select("*")
+      .eq("id", customerId)
+      .single();
+
+    if (customerError) throw customerError;
+
+    // Get customer's submitted vehicles
+    const { data: vehicles } = await supabase
+      .from("submitted_vehicles")
+      .select("*")
+      .eq("user_id", customerId);
+
+    // Get customer's inquiries
+    const { data: inquiries } = await supabase
+      .from("customer_inquiries")
+      .select("*")
+      .eq("customer_email", customer.email);
+
+    // Get customer's trade-in requests
+    const { data: tradeIns } = await supabase
+      .from("trade_in_requests")
+      .select("*")
+      .eq("user_id", customerId);
+
+    return {
+      customer,
+      vehicles: vehicles || [],
+      inquiries: inquiries || [],
+      tradeIns: tradeIns || [],
+    };
+  } catch (error) {
+    console.error("Error fetching customer details:", error);
+    throw new Error(error instanceof Error ? error.message : "Kunde nicht gefunden");
+  }
+}
