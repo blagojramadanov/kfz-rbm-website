@@ -308,15 +308,22 @@ export async function approveSubmittedVehicle(submittedVehicleId: string, intern
       throw new Error("Eingereichte Fahrzeug nicht gefunden");
     }
 
-    // Get admin profile for approval tracking
-    const { data: adminProfile, error: profileError } = await supabase
-      .from("user_profiles")
-      .select("full_name")
-      .eq("id", session.user.id)
-      .single();
+    // Get admin profile for approval tracking (with fallback)
+    let adminName = "Admin";
+    try {
+      const { supabase: authSupabase } = await getSupabaseServerClient();
+      const { data: adminProfile } = await authSupabase
+        .from("user_profiles")
+        .select("full_name")
+        .eq("id", session.user.id)
+        .single();
 
-    if (profileError) {
-      throw new Error("Admin Profil nicht gefunden");
+      if (adminProfile?.full_name) {
+        adminName = adminProfile.full_name;
+      }
+    } catch (err) {
+      // Fallback to default admin name if profile not found
+      console.warn("Could not fetch admin profile, using default name");
     }
 
     // Create a new vehicle in the vehicles table with source_type='customer'
@@ -386,7 +393,7 @@ export async function approveSubmittedVehicle(submittedVehicleId: string, intern
         vehicle_id: newVehicle.id,
         approved_at: now,
         approved_by: session.user.id,
-        approver_name: adminProfile?.full_name || "Admin",
+        approver_name: adminName,
         approval_notes: internalNotes || null,
         status_reason: internalNotes || null,
         updated_at: now,
