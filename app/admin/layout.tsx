@@ -68,7 +68,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!loading && !isAdmin) {
-      router.push("/admin-access-denied");
+      // Redirect non-admins to dashboard
+      router.push("/dashboard");
     }
   }, [loading, isAdmin, router]);
 

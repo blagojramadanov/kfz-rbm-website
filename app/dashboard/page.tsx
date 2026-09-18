@@ -10,13 +10,20 @@ import { SubmissionWorkflowInfo } from "@/components/submission-workflow-info";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { profile, loading, isAuthenticated, signOut } = useAuth();
+  const { profile, loading, isAuthenticated, isAdmin, signOut } = useAuth();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push("/login");
+    if (!loading) {
+      // Redirect to admin panel if user is admin
+      if (isAdmin) {
+        router.push("/admin");
+      }
+      // Redirect to login if not authenticated
+      if (!isAuthenticated) {
+        router.push("/login");
+      }
     }
-  }, [loading, isAuthenticated, router]);
+  }, [loading, isAuthenticated, isAdmin, router]);
 
   if (loading) {
     return (

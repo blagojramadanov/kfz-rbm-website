@@ -20,6 +20,14 @@ export function Navbar() {
     router.push("/");
   };
 
+  // Determine dashboard link based on user role
+  const getDashboardLink = () => {
+    if (!profile) return "/dashboard";
+    return profile.role === "ADMIN" ? "/admin" : "/dashboard";
+  };
+
+  const dashboardLink = getDashboardLink();
+
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -91,11 +99,11 @@ export function Navbar() {
                     {/* Profile Dropdown */}
                     {isProfileOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-10">
-                        <Link href="/dashboard" className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
+                        <Link href={dashboardLink} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
                           <User className="w-4 h-4 text-kfz-blue" />
-                          <span>Dashboard</span>
+                          <span>{profile.role === "ADMIN" ? "Admin Dashboard" : "Dashboard"}</span>
                         </Link>
-                        <Link href="/dashboard/profil" className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
+                        <Link href={profile.role === "ADMIN" ? "/admin" : "/dashboard/profil"} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
                           <Settings className="w-4 h-4 text-kfz-blue" />
                           <span>Einstellungen</span>
                         </Link>
@@ -166,9 +174,9 @@ export function Navbar() {
                 <>
                   {isAuthenticated && profile ? (
                     <>
-                      <Link href="/dashboard" className="block w-full">
+                      <Link href={dashboardLink} className="block w-full">
                         <Button variant="outline" className="w-full border-kfz-blue text-kfz-blue">
-                          Dashboard
+                          {profile.role === "ADMIN" ? "Admin Dashboard" : "Dashboard"}
                         </Button>
                       </Link>
                       <Button
