@@ -6,7 +6,6 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Car, MessageSquare, Heart, Plus, FileText, LogOut, ArrowRight, Repeat2 } from "lucide-react";
 import Link from "next/link";
-import { SubmissionWorkflowInfo } from "@/components/submission-workflow-info";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -60,10 +59,6 @@ export default function DashboardPage() {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Workflow Info */}
-        <div className="mb-12">
-          <SubmissionWorkflowInfo />
-        </div>
         {/* Quick Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-12">
           <Link href="/dashboard/fahrzeuge">

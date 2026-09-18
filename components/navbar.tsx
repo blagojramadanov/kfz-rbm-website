@@ -103,7 +103,7 @@ export function Navbar() {
                           <User className="w-4 h-4 text-kfz-blue" />
                           <span>{profile.role === "ADMIN" ? "Admin Dashboard" : "Dashboard"}</span>
                         </Link>
-                        <Link href={profile.role === "ADMIN" ? "/admin" : "/dashboard/profil"} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
+                        <Link href="/dashboard/profil" className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
                           <Settings className="w-4 h-4 text-kfz-blue" />
                           <span>Einstellungen</span>
                         </Link>
