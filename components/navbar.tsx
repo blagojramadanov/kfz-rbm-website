@@ -59,6 +59,13 @@ export function Navbar() {
               Fahrzeuge
             </Link>
             <Link
+              href="/fahrzeuge/export"
+              className="text-gray-700 hover:text-kfz-blue transition-colors font-medium flex items-center gap-1"
+            >
+              <span>🌍</span>
+              <span>Export</span>
+            </Link>
+            <Link
               href="/about"
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
             >
@@ -150,6 +157,12 @@ export function Navbar() {
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               Fahrzeuge
+            </Link>
+            <Link
+              href="/fahrzeuge/export"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+            >
+              🌍 Export
             </Link>
             <Link
               href="/about"

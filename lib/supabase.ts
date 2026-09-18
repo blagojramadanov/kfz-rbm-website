@@ -28,6 +28,12 @@ export interface Vehicle {
   status: "available" | "sold" | "reserved" | "draft";
   featured: boolean;
   primary_image_id?: string;
+  listing_type?: "verkauf" | "export"; // Verkauf (sale) or Export (export abroad)
+  zustand?: string; // fahrbereit, nicht fahrbereit, Unfallwagen
+  zielland?: string; // Target country for export
+  export_notes?: string; // Export-specific notes
+  source_type?: "rbm" | "customer";
+  submitted_vehicle_id?: string;
   created_at: string;
   updated_at: string;
 }
