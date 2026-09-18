@@ -31,7 +31,7 @@ export default function ExportFahrzeugeListingPage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch export vehicles from database
+  // Fetch export vehicles from database with images
   useEffect(() => {
     const fetchExportVehicles = async () => {
       try {
@@ -44,11 +44,37 @@ export default function ExportFahrzeugeListingPage() {
 
         if (error) {
           console.error("Error fetching export vehicles:", error);
-          // Fallback to mock data
-          setVehicles(MOCK_VEHICLES.filter(v => v.listingType === "export" || !v.listingType));
+          setVehicles(MOCK_VEHICLES);
+        } else if (data && data.length > 0) {
+          // Fetch images for each vehicle
+          const vehiclesWithImages = await Promise.all(
+            data.map(async (vehicle) => {
+              const { data: images, error: imagesError } = await supabase
+                .from("vehicle_images")
+                .select("image_url")
+                .eq("vehicle_id", vehicle.id)
+                .order("sort_order", { ascending: true });
+
+              if (imagesError || !images) {
+                console.warn(`No images for vehicle ${vehicle.id}`);
+                return { ...vehicle, images: [] };
+              }
+
+              // Generate slug for links
+              const slug = `${vehicle.brand}-${vehicle.model}`.toLowerCase().replace(/\s+/g, '-');
+
+              return {
+                ...vehicle,
+                slug,
+                images: images.map((img) => img.image_url),
+              };
+            })
+          );
+
+          setVehicles(vehiclesWithImages);
         } else {
-          // Combine real vehicles with mock as fallback
-          setVehicles(data && data.length > 0 ? data : MOCK_VEHICLES);
+          // No real vehicles, use mock data
+          setVehicles(MOCK_VEHICLES);
         }
       } catch (err) {
         console.error("Error loading vehicles:", err);
