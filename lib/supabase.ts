@@ -76,7 +76,7 @@ export interface AuthUser {
   };
 }
 
-export type VehicleStatus = "draft" | "submitted" | "under_review" | "approved" | "rejected" | "sold";
+export type VehicleStatus = "available" | "sold" | "reserved" | "draft" | "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "abgelehnt";
 
 export interface SubmittedVehicle {
   id: string;

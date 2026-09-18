@@ -570,7 +570,7 @@ export async function createSubmittedVehicle(
     console.log(`[CREATE_VEHICLE] Supabase client initialized`);
 
     // Create vehicle
-    console.log(`[CREATE_VEHICLE] Creating vehicle with status: ${isDraft ? "draft" : "submitted"}`);
+    console.log(`[CREATE_VEHICLE] Creating vehicle with status: ${isDraft ? "draft" : "eingereicht"}`);
     console.log(`[CREATE_VEHICLE] Vehicle data:`, {
       brand: vehicleData.brand,
       model: vehicleData.model,
@@ -582,7 +582,7 @@ export async function createSubmittedVehicle(
       .insert({
         user_id: userId,
         ...vehicleData,
-        status: isDraft ? "draft" : "submitted",
+        status: isDraft ? "draft" : "eingereicht",
       })
       .select()
       .single();

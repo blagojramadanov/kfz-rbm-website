@@ -384,18 +384,14 @@ export async function approveSubmittedVehicle(submittedVehicleId: string, intern
       }
     }
 
-    // Update the submitted vehicle with approval info
+    // Update the submitted vehicle status to angebot_gesendet (offer sent)
     const now = new Date().toISOString();
     const { error: updateError } = await supabase
       .from("submitted_vehicles")
       .update({
-        status: "approved",
+        status: "angebot_gesendet",
         vehicle_id: newVehicle.id,
-        approved_at: now,
-        approved_by: session.user.id,
-        approver_name: adminName,
-        approval_notes: internalNotes || null,
-        status_reason: internalNotes || null,
+        admin_notes: internalNotes || null,
         updated_at: now,
       })
       .eq("id", submittedVehicleId);
@@ -407,7 +403,7 @@ export async function approveSubmittedVehicle(submittedVehicleId: string, intern
     return {
       success: true,
       vehicleId: newVehicle.id,
-      message: "Fahrzeug genehmigt. Es ist jetzt als Entwurf verfügbar und kann vom Admin veröffentlicht werden.",
+      message: "Fahrzeug genehmigt. Ein Angebot wurde gesendet und das Fahrzeug ist als Entwurf in der Admin-Verwaltung verfügbar.",
     };
   } catch (error) {
     const msg = logAdminError("approveSubmittedVehicle", error, { submittedVehicleId });
@@ -423,8 +419,8 @@ export async function rejectSubmittedVehicle(vehicleId: string, reason: string) 
     const { error } = await supabase
       .from("submitted_vehicles")
       .update({
-        status: "rejected",
-        status_reason: reason,
+        status: "abgelehnt",
+        rejection_reason: reason,
         updated_at: new Date().toISOString(),
       })
       .eq("id", vehicleId);
@@ -581,7 +577,7 @@ export async function getDashboardStats() {
     }
 
     // Count submitted vehicles by status
-    const submittedStatuses = ["draft", "submitted", "under_review", "approved", "rejected"];
+    const submittedStatuses = ["eingereicht", "in_bearbeitung", "angebot_gesendet", "abgelehnt"];
     const submittedCounts: Record<string, number> = {};
     for (const status of submittedStatuses) {
       const { count } = await supabase
@@ -626,10 +622,10 @@ export async function getDashboardStats() {
       vehicles_reserved: vehicleCounts.reserved || 0,
       vehicles_sold: vehicleCounts.sold || 0,
       total_submitted_vehicles: Object.values(submittedCounts).reduce((a, b) => a + b, 0),
-      submitted_vehicles_submitted: submittedCounts.submitted || 0,
-      submitted_vehicles_under_review: submittedCounts.under_review || 0,
-      submitted_vehicles_approved: submittedCounts.approved || 0,
-      submitted_vehicles_rejected: submittedCounts.rejected || 0,
+      submitted_vehicles_eingereicht: submittedCounts.eingereicht || 0,
+      submitted_vehicles_in_bearbeitung: submittedCounts.in_bearbeitung || 0,
+      submitted_vehicles_angebot_gesendet: submittedCounts.angebot_gesendet || 0,
+      submitted_vehicles_abgelehnt: submittedCounts.abgelehnt || 0,
       inquiries_new: inquiryCounts.new || 0,
       inquiries_read: inquiryCounts.read || 0,
       inquiries_responded: inquiryCounts.responded || 0,

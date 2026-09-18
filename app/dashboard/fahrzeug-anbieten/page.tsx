@@ -453,13 +453,14 @@ export default function SubmitVehicleWizardPage() {
             sales_type: formData.verkaufsart,
           },
           imagesToPass,
-          true  // Create as draft so images can be uploaded (RLS policy requires draft status for image inserts)
+          false  // Create with status 'eingereicht' - submit directly
         );
 
         console.log(`[FORM] createSubmittedVehicle returned:`, result);
       }
 
-      router.push("/dashboard/fahrzeuge");
+      // Redirect to success page
+      router.push("/dashboard/fahrzeug-angeboten");
     } catch (error) {
       setError(error instanceof Error ? error.message : "Fehler beim Absenden des Fahrzeugs");
     } finally {
@@ -947,7 +948,7 @@ export default function SubmitVehicleWizardPage() {
             <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Bereit zum Absenden?</h2>
             <p className="text-gray-600 mb-8">
-              Ihr Fahrzeug wird nach der Überprüfung in unsere Angebotsliste aufgenommen.
+              Ihr Fahrzeug wird direkt an KFZ RBM gesendet. Wir melden uns bei Ihnen.
             </p>
           </div>
         )}

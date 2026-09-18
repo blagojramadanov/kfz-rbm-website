@@ -12,7 +12,7 @@ export default function AdminSubmittedVehiclesPage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const [error, setError] = useState("");
-  const [statusFilter, setStatusFilter] = useState("under_review");
+  const [statusFilter, setStatusFilter] = useState("eingereicht");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
@@ -96,17 +96,17 @@ export default function AdminSubmittedVehiclesPage() {
   }
 
   const statuses = [
-    { value: "submitted", label: "Eingereicht" },
-    { value: "under_review", label: "Zur Überprüfung" },
-    { value: "approved", label: "Genehmigt" },
-    { value: "rejected", label: "Abgelehnt" },
+    { value: "eingereicht", label: "Eingereicht" },
+    { value: "in_bearbeitung", label: "In Bearbeitung" },
+    { value: "angebot_gesendet", label: "Angebot gesendet" },
+    { value: "abgelehnt", label: "Abgelehnt" },
   ];
 
   const STATUS_COLORS: Record<string, string> = {
-    submitted: "bg-blue-100 text-blue-800",
-    under_review: "bg-yellow-100 text-yellow-800",
-    approved: "bg-green-100 text-green-800",
-    rejected: "bg-red-100 text-red-800",
+    eingereicht: "bg-blue-100 text-blue-800",
+    in_bearbeitung: "bg-yellow-100 text-yellow-800",
+    angebot_gesendet: "bg-green-100 text-green-800",
+    abgelehnt: "bg-red-100 text-red-800",
   };
 
   return (
@@ -274,7 +274,7 @@ export default function AdminSubmittedVehiclesPage() {
                 </div>
               )}
 
-              {(vehicle.status === "submitted" || vehicle.status === "under_review") && (
+              {(vehicle.status === "eingereicht" || vehicle.status === "in_bearbeitung") && (
                 <>
                   <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-900">

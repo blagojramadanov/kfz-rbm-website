@@ -13,10 +13,10 @@ interface DashboardStats {
   vehicles_reserved: number;
   vehicles_sold: number;
   total_submitted_vehicles: number;
-  submitted_vehicles_submitted: number;
-  submitted_vehicles_under_review: number;
-  submitted_vehicles_approved: number;
-  submitted_vehicles_rejected: number;
+  submitted_vehicles_eingereicht: number;
+  submitted_vehicles_in_bearbeitung: number;
+  submitted_vehicles_angebot_gesendet: number;
+  submitted_vehicles_abgelehnt: number;
   inquiries_new: number;
   trade_in_requests_new: number;
   total_customers: number;
@@ -117,7 +117,7 @@ export default function AdminDashboardPage() {
                   {stats.total_submitted_vehicles}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {stats.submitted_vehicles_under_review} zur Überprüfung
+                  {stats.submitted_vehicles_eingereicht} eingereicht
                 </p>
               </div>
             </Link>
@@ -192,27 +192,27 @@ export default function AdminDashboardPage() {
               <h3 className="text-lg font-bold text-gray-900 mb-4">Eingereichte Fahrzeuge</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Zur Überprüfung</span>
-                  <span className="text-2xl font-bold text-yellow-600">
-                    {stats.submitted_vehicles_under_review}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Genehmigt</span>
-                  <span className="text-2xl font-bold text-green-600">
-                    {stats.submitted_vehicles_approved}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
                   <span className="text-gray-700">Eingereicht</span>
                   <span className="text-2xl font-bold text-blue-600">
-                    {stats.submitted_vehicles_submitted}
+                    {stats.submitted_vehicles_eingereicht}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700">In Bearbeitung</span>
+                  <span className="text-2xl font-bold text-yellow-600">
+                    {stats.submitted_vehicles_in_bearbeitung}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700">Angebot gesendet</span>
+                  <span className="text-2xl font-bold text-green-600">
+                    {stats.submitted_vehicles_angebot_gesendet}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700">Abgelehnt</span>
                   <span className="text-2xl font-bold text-red-600">
-                    {stats.submitted_vehicles_rejected}
+                    {stats.submitted_vehicles_abgelehnt}
                   </span>
                 </div>
               </div>
@@ -233,7 +233,7 @@ export default function AdminDashboardPage() {
               </Link>
               <Link href="/admin/fahrzeuge/eingereicht">
                 <button className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                  Zur Überprüfung ({stats.submitted_vehicles_under_review})
+                  Eingereichte ({stats.submitted_vehicles_eingereicht})
                 </button>
               </Link>
               <Link href="/admin/anfragen">

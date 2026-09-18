@@ -132,19 +132,19 @@ export default function AdminStatisticsPage() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Eingereicht</span>
-                  <span className="font-medium text-gray-900">{stats.submitted_vehicles_submitted || 0}</span>
+                  <span className="font-medium text-gray-900">{stats.submitted_vehicles_eingereicht || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Zur Überprüfung</span>
-                  <span className="font-medium text-yellow-600">{stats.submitted_vehicles_under_review || 0}</span>
+                  <span className="text-sm text-gray-600">In Bearbeitung</span>
+                  <span className="font-medium text-yellow-600">{stats.submitted_vehicles_in_bearbeitung || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Genehmigt</span>
-                  <span className="font-medium text-green-600">{stats.submitted_vehicles_approved || 0}</span>
+                  <span className="text-sm text-gray-600">Angebot gesendet</span>
+                  <span className="font-medium text-green-600">{stats.submitted_vehicles_angebot_gesendet || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Abgelehnt</span>
-                  <span className="font-medium text-red-600">{stats.submitted_vehicles_rejected || 0}</span>
+                  <span className="font-medium text-red-600">{stats.submitted_vehicles_abgelehnt || 0}</span>
                 </div>
               </div>
             </div>
