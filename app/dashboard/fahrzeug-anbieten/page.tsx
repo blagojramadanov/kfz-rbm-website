@@ -453,10 +453,16 @@ export default function SubmitVehicleWizardPage() {
             sales_type: formData.verkaufsart,
           },
           imagesToPass,
-          false  // Create with status 'eingereicht' - submit directly
+          true  // Create as draft first (RLS requires draft for image upload)
         );
 
         console.log(`[FORM] createSubmittedVehicle returned:`, result);
+
+        // Update status to eingereicht after images are uploaded
+        if (result.vehicleId) {
+          const { updateVehicleStatus } = await import("@/app/actions/vehicles");
+          await updateVehicleStatus(result.vehicleId, user.id, "eingereicht");
+        }
       }
 
       // Redirect to success page

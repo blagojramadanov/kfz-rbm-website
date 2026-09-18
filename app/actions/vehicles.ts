@@ -255,8 +255,8 @@ export async function updateVehicleStatus(vehicleId: string, userId: string, new
       throw new Error("Sie sind nicht berechtigt, dieses Fahrzeug zu ändern");
     }
 
-    // Only allow draft -> submitted transition by user
-    if (vehicle.status === "draft" && newStatus === "submitted") {
+    // Allow draft -> eingereicht (or other new statuses) transition
+    if (vehicle.status === "draft") {
       const { data: updateData, error } = await supabase
         .from("submitted_vehicles")
         .update({ status: newStatus, updated_at: new Date().toISOString() })
@@ -570,7 +570,7 @@ export async function createSubmittedVehicle(
     console.log(`[CREATE_VEHICLE] Supabase client initialized`);
 
     // Create vehicle
-    console.log(`[CREATE_VEHICLE] Creating vehicle with status: ${isDraft ? "draft" : "eingereicht"}`);
+    console.log(`[CREATE_VEHICLE] Creating vehicle with status: draft (will be updated to eingereicht after upload)`);
     console.log(`[CREATE_VEHICLE] Vehicle data:`, {
       brand: vehicleData.brand,
       model: vehicleData.model,
@@ -582,7 +582,7 @@ export async function createSubmittedVehicle(
       .insert({
         user_id: userId,
         ...vehicleData,
-        status: isDraft ? "draft" : "eingereicht",
+        status: "draft",
       })
       .select()
       .single();
