@@ -92,8 +92,16 @@ export default function AdminCreateVehiclePage() {
       return;
     }
 
-    // Generate VIN if not provided
-    const vin = formData.vin || `TEST-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    // Generate VIN if not provided (17 chars - standard VIN length)
+    const generateTestVIN = () => {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let vin = 'TEST';
+      for (let i = 0; i < 13; i++) {
+        vin += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return vin; // Exactly 17 characters
+    };
+    const vin = formData.vin || generateTestVIN();
     const submitData = { ...formData, vin };
 
     try {
