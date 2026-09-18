@@ -275,24 +275,31 @@ export default function AdminSubmittedVehiclesPage() {
               )}
 
               {(vehicle.status === "submitted" || vehicle.status === "under_review") && (
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleApprove(vehicle.id)}
-                    disabled={actionInProgress === vehicle.id}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Check className="w-4 h-4" />
-                    {actionInProgress === vehicle.id ? "Wird genehmigt..." : "Genehmigen"}
-                  </button>
-                  <button
-                    onClick={() => setRejectingId(rejectingId === vehicle.id ? null : vehicle.id)}
-                    disabled={actionInProgress === vehicle.id}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <X className="w-4 h-4" />
-                    Ablehnen
-                  </button>
-                </div>
+                <>
+                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-900">
+                      <span className="font-medium">ℹ️ Bei Genehmigung:</span> Ein neues Fahrzeug vom Typ "Kundenfahrzeug" wird erstellt. Es wird zunächst als Entwurf gespeichert und muss vom Admin veröffentlicht werden.
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleApprove(vehicle.id)}
+                      disabled={actionInProgress === vehicle.id}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Check className="w-4 h-4" />
+                      {actionInProgress === vehicle.id ? "Wird genehmigt..." : "Genehmigen"}
+                    </button>
+                    <button
+                      onClick={() => setRejectingId(rejectingId === vehicle.id ? null : vehicle.id)}
+                      disabled={actionInProgress === vehicle.id}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <X className="w-4 h-4" />
+                      Ablehnen
+                    </button>
+                  </div>
+                </>
               )}
 
               {rejectingId === vehicle.id && (

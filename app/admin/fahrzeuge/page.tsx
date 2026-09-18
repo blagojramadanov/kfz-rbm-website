@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Edit2, Trash2, Plus, Search, AlertCircle, Eye, Star } from "lucide-react";
 import Link from "next/link";
+import { VehicleSourceBadge } from "@/components/vehicle-source-badge";
 
 interface Vehicle {
   id: string;
@@ -15,6 +16,7 @@ interface Vehicle {
   price: number;
   status: string;
   featured: boolean;
+  source_type?: string;
 }
 
 export default function AdminVehiclesPage() {
@@ -169,6 +171,7 @@ export default function AdminVehiclesPage() {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Jahr</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Kilometer</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Preis</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Quelle</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Aktionen</th>
                 </tr>
@@ -194,6 +197,9 @@ export default function AdminVehiclesPage() {
                     </td>
                     <td className="px-6 py-4 font-semibold text-kfz-blue">
                       € {vehicle.price?.toLocaleString("de-DE")}
+                    </td>
+                    <td className="px-6 py-4">
+                      <VehicleSourceBadge sourceType={vehicle.source_type || "rbm"} />
                     </td>
                     <td className="px-6 py-4">
                       <span

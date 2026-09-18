@@ -69,11 +69,24 @@ export async function createVehicle(
     await verifyAdminRole();
     const { supabase } = await getSupabaseServerClient();
 
+    // Verify VIN is unique
+    const { data: existingVehicle } = await supabase
+      .from("vehicles")
+      .select("id")
+      .eq("vin", vehicleData.vin)
+      .single();
+
+    if (existingVehicle) {
+      throw new Error("Ein Fahrzeug mit dieser VIN existiert bereits");
+    }
+
     const { data, error } = await supabase
       .from("vehicles")
       .insert({
         ...vehicleData,
         status: "draft",
+        source_type: "rbm", // RBM Fahrzeug (directly created by admin)
+        submitted_vehicle_id: null, // No linked submitted vehicle
       })
       .select()
       .single();
@@ -248,25 +261,123 @@ export async function getSubmittedVehicles(
   }
 }
 
-export async function approveSubmittedVehicle(vehicleId: string, internalNotes?: string) {
+export async function approveSubmittedVehicle(submittedVehicleId: string, internalNotes?: string) {
   try {
     await verifyAdminRole();
-    const { supabase } = await getSupabaseServerClient();
+    const { supabase, session } = await getSupabaseServerClient();
 
-    const { error } = await supabase
+    if (!session?.user) {
+      throw new Error("User session required");
+    }
+
+    // Get the submitted vehicle
+    const { data: submittedVehicle, error: fetchError } = await supabase
+      .from("submitted_vehicles")
+      .select("*")
+      .eq("id", submittedVehicleId)
+      .single();
+
+    if (fetchError || !submittedVehicle) {
+      throw new Error("Eingereichte Fahrzeug nicht gefunden");
+    }
+
+    // Get admin profile for approval tracking
+    const { data: adminProfile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("full_name")
+      .eq("id", session.user.id)
+      .single();
+
+    if (profileError) {
+      throw new Error("Admin Profil nicht gefunden");
+    }
+
+    // Create a new vehicle in the vehicles table with source_type='customer'
+    const newVehicleData = {
+      brand: submittedVehicle.brand,
+      model: submittedVehicle.model,
+      year: submittedVehicle.year,
+      mileage: submittedVehicle.mileage,
+      price: submittedVehicle.price,
+      transmission: submittedVehicle.transmission,
+      fuel_type: submittedVehicle.fuel_type,
+      body_type: submittedVehicle.body_type,
+      color_exterior: submittedVehicle.color || "Nicht angegeben",
+      color_interior: null,
+      engine_cc: null,
+      power_hp: submittedVehicle.power_hp,
+      description: submittedVehicle.description,
+      status: "draft", // Start as draft, admin needs to publish
+      featured: false,
+      source_type: "customer",
+      submitted_vehicle_id: submittedVehicleId,
+      vin: `TEMP-${submittedVehicleId.substring(0, 8)}`, // Temporary VIN, admin should update
+    };
+
+    const { data: newVehicle, error: createError } = await supabase
+      .from("vehicles")
+      .insert(newVehicleData)
+      .select()
+      .single();
+
+    if (createError) {
+      throw new Error(`Fehler beim Erstellen des Fahrzeugs: ${createError.message}`);
+    }
+
+    // Copy images from submitted vehicle to new vehicle
+    if (submittedVehicle.id) {
+      const { data: submittedImages, error: imagesError } = await supabase
+        .from("submitted_vehicle_images")
+        .select("image_url, alt_text, sort_order")
+        .eq("submitted_vehicle_id", submittedVehicleId)
+        .order("sort_order", { ascending: true });
+
+      if (!imagesError && submittedImages && submittedImages.length > 0) {
+        const imagesToInsert = submittedImages.map((img) => ({
+          vehicle_id: newVehicle.id,
+          image_url: img.image_url,
+          alt_text: img.alt_text,
+          sort_order: img.sort_order,
+        }));
+
+        const { error: insertImagesError } = await supabase
+          .from("vehicle_images")
+          .insert(imagesToInsert);
+
+        if (insertImagesError) {
+          console.error("Error copying images:", insertImagesError);
+        }
+      }
+    }
+
+    // Update the submitted vehicle with approval info
+    const now = new Date().toISOString();
+    const { error: updateError } = await supabase
       .from("submitted_vehicles")
       .update({
         status: "approved",
+        vehicle_id: newVehicle.id,
+        approved_at: now,
+        approved_by: session.user.id,
+        approver_name: adminProfile?.full_name || "Admin",
+        approval_notes: internalNotes || null,
         status_reason: internalNotes || null,
-        updated_at: new Date().toISOString(),
+        updated_at: now,
       })
-      .eq("id", vehicleId);
+      .eq("id", submittedVehicleId);
 
-    if (error) throw error;
-    return { success: true };
+    if (updateError) {
+      throw new Error(`Fehler beim Aktualisieren der eingereichten Fahrzeug: ${updateError.message}`);
+    }
+
+    return {
+      success: true,
+      vehicleId: newVehicle.id,
+      message: "Fahrzeug genehmigt. Es ist jetzt als Entwurf verfügbar und kann vom Admin veröffentlicht werden.",
+    };
   } catch (error) {
-    console.error("Error approving vehicle:", error);
-    throw new Error(error instanceof Error ? error.message : "Fehler beim Genehmigen des Fahrzeugs");
+    const msg = logAdminError("approveSubmittedVehicle", error, { submittedVehicleId });
+    throw new Error(msg || "Fehler beim Genehmigen des Fahrzeugs");
   }
 }
 
