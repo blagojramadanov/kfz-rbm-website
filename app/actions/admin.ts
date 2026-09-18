@@ -67,7 +67,8 @@ export async function createVehicle(
 ) {
   try {
     await verifyAdminRole();
-    const { supabase } = await getSupabaseServerClient();
+    const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
+    const supabase = getSupabaseAdminClient();
 
     // Verify VIN is unique
     const { data: existingVehicle } = await supabase
@@ -210,7 +211,28 @@ export async function getSubmittedVehicles(
       .from("submitted_vehicles")
       .select(
         `
-        *,
+        id,
+        user_id,
+        brand,
+        model,
+        year,
+        mileage,
+        price,
+        transmission,
+        fuel_type,
+        body_type,
+        color,
+        power_hp,
+        description,
+        status,
+        status_reason,
+        created_at,
+        updated_at,
+        vehicle_id,
+        approved_at,
+        approved_by,
+        approver_name,
+        approval_notes,
         user:user_id (id, email, full_name)
       `
       )
@@ -228,7 +250,10 @@ export async function getSubmittedVehicles(
 
     const { data, error } = await query;
 
-    if (error) throw error;
+    if (error) {
+      console.error("Error fetching submitted vehicles:", error);
+      throw error;
+    }
 
     // Fetch images for each vehicle
     const vehiclesWithImages = await Promise.all(
@@ -264,7 +289,9 @@ export async function getSubmittedVehicles(
 export async function approveSubmittedVehicle(submittedVehicleId: string, internalNotes?: string) {
   try {
     await verifyAdminRole();
-    const { supabase, session } = await getSupabaseServerClient();
+    const { session } = await getSupabaseServerClient();
+    const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
+    const supabase = getSupabaseAdminClient();
 
     if (!session?.user) {
       throw new Error("User session required");

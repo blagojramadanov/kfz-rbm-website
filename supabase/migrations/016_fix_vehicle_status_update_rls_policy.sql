@@ -20,5 +20,6 @@ CREATE POLICY "Users can update their own draft vehicles"
     -- After update, the vehicle must still belong to the authenticated user
     -- and the new status must be valid (draft for continuing edits, submitted for submission)
     auth.uid() = user_id
+    
     AND status IN ('draft', 'submitted')
   );

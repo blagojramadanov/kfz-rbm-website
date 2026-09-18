@@ -19,8 +19,15 @@ CREATE INDEX IF NOT EXISTS idx_submitted_vehicles_approved_at ON submitted_vehic
 ALTER TABLE submitted_vehicles ADD COLUMN IF NOT EXISTS approver_name VARCHAR(100);
 
 -- Update RLS Policy: Only admins can create vehicles with source_type 'rbm'
--- Drop the old policy if it exists and create a new one
+-- Drop all old policies and create new ones
 DROP POLICY IF EXISTS "Allow public to view available vehicles" ON vehicles;
+DROP POLICY IF EXISTS "Allow admins to manage vehicles" ON vehicles;
+DROP POLICY IF EXISTS "Admins can create vehicles" ON vehicles;
+DROP POLICY IF EXISTS "Admins can create rbm vehicles" ON vehicles;
+DROP POLICY IF EXISTS "Admins can create customer vehicles from submissions" ON vehicles;
+DROP POLICY IF EXISTS "Admins can update vehicles" ON vehicles;
+DROP POLICY IF EXISTS "Admins can delete vehicles" ON vehicles;
+DROP POLICY IF EXISTS "Prevent customers from creating vehicles" ON vehicles;
 
 -- New policy: Allow public to view available/featured vehicles
 CREATE POLICY "Allow public to view available vehicles"
@@ -28,7 +35,6 @@ CREATE POLICY "Allow public to view available vehicles"
   USING (status IN ('available', 'featured'));
 
 -- Policy: Admins can create RBM vehicles directly
-DROP POLICY IF EXISTS "Admins can create vehicles" ON vehicles;
 CREATE POLICY "Admins can create rbm vehicles"
   ON vehicles FOR INSERT
   TO authenticated
@@ -52,7 +58,6 @@ CREATE POLICY "Admins can create customer vehicles from submissions"
   );
 
 -- Policy: Admins can update any vehicle
-DROP POLICY IF EXISTS "Allow admins to manage vehicles" ON vehicles;
 CREATE POLICY "Admins can update vehicles"
   ON vehicles FOR UPDATE
   TO authenticated
