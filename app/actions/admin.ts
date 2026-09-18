@@ -391,7 +391,6 @@ export async function approveSubmittedVehicle(submittedVehicleId: string, intern
       .update({
         status: "angebot_gesendet",
         vehicle_id: newVehicle.id,
-        admin_notes: internalNotes || null,
         updated_at: now,
       })
       .eq("id", submittedVehicleId);
