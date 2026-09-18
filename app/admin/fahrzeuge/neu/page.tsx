@@ -54,16 +54,20 @@ export default function AdminCreateVehiclePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.vin || !formData.brand || !formData.model) {
-      setError("Bitte füllen Sie alle erforderlichen Felder aus");
+    if (!formData.brand || !formData.model) {
+      setError("Bitte füllen Sie Marke und Modell aus");
       return;
     }
+
+    // Generate VIN if not provided
+    const vin = formData.vin || `TEST-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    const submitData = { ...formData, vin };
 
     try {
       setFormLoading(true);
       setError("");
       const { createVehicle } = await import("@/app/actions/admin");
-      const result = await createVehicle(formData);
+      const result = await createVehicle(submitData);
       setSuccess(true);
       setTimeout(() => {
         router.push(`/admin/fahrzeuge/${result.vehicleId}`);
@@ -117,15 +121,14 @@ export default function AdminCreateVehiclePage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                VIN *
+                VIN (optional)
               </label>
               <input
                 type="text"
                 name="vin"
                 value={formData.vin}
                 onChange={handleInputChange}
-                placeholder="Fahrzeug-Identifizierungsnummer"
-                required
+                placeholder="Fahrzeug-Identifizierungsnummer (wird generiert, wenn leer)"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
               />
             </div>
