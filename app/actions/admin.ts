@@ -74,37 +74,67 @@ export async function createVehicle(
     const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
     const supabase = getSupabaseAdminClient();
 
-    // Verify VIN is unique
-    const { data: existingVehicle } = await supabase
+    console.log("[CREATE_VEHICLE] Starting with data:", { brand: vehicleData.brand, model: vehicleData.model, listing_type: vehicleData.listing_type });
+
+    // Verify VIN is unique (catch not found error gracefully)
+    const { data: existingVehicle, error: vinCheckError } = await supabase
       .from("vehicles")
       .select("id")
       .eq("vin", vehicleData.vin)
-      .single();
+      .maybeSingle();
 
     if (existingVehicle) {
       throw new Error("Ein Fahrzeug mit dieser VIN existiert bereits");
     }
 
+    const insertData = {
+      vin: vehicleData.vin,
+      brand: vehicleData.brand,
+      model: vehicleData.model,
+      year: vehicleData.year,
+      mileage: vehicleData.mileage,
+      price: vehicleData.price,
+      transmission: vehicleData.transmission,
+      fuel_type: vehicleData.fuel_type,
+      body_type: vehicleData.body_type,
+      color_exterior: vehicleData.color_exterior,
+      color_interior: vehicleData.color_interior || null,
+      engine_cc: vehicleData.engine_cc || 0,
+      power_hp: vehicleData.power_hp || 0,
+      description: vehicleData.description,
+      status: "available",
+      source_type: "rbm",
+      submitted_vehicle_id: null,
+      listing_type: vehicleData.listing_type || "verkauf",
+      zustand: vehicleData.zustand || null,
+      zielland: vehicleData.zielland || null,
+      export_notes: vehicleData.export_notes || null,
+    };
+
+    console.log("[CREATE_VEHICLE] Insert data prepared:", { vin: insertData.vin, brand: insertData.brand });
+
     const { data, error } = await supabase
       .from("vehicles")
-      .insert({
-        ...vehicleData,
-        status: "draft",
-        source_type: "rbm", // RBM Fahrzeug (directly created by admin)
-        submitted_vehicle_id: null, // No linked submitted vehicle
-        listing_type: vehicleData.listing_type || "verkauf",
-        zustand: vehicleData.zustand || null,
-        zielland: vehicleData.zielland || null,
-        export_notes: vehicleData.export_notes || null,
-      })
+      .insert(insertData)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("[CREATE_VEHICLE] Database error:", {
+        message: error.message,
+        code: (error as any).code,
+        details: (error as any).details,
+        hint: (error as any).hint,
+      });
+      throw error;
+    }
+
+    console.log("[CREATE_VEHICLE] ✅ Vehicle created:", data.id);
     return { success: true, vehicleId: data.id };
   } catch (error) {
-    console.error("Error creating vehicle:", error);
-    throw new Error(error instanceof Error ? error.message : "Fehler beim Erstellen des Fahrzeugs");
+    const errorMsg = error instanceof Error ? error.message : "Fehler beim Erstellen des Fahrzeugs";
+    console.error("[CREATE_VEHICLE] ❌ Error:", errorMsg, error);
+    throw new Error(errorMsg);
   }
 }
 
