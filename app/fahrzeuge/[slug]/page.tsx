@@ -280,7 +280,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
               </div>
 
               {/* Features */}
-              {vehicle.features.length > 0 && (
+              {vehicle.features && vehicle.features.length > 0 && (
                 <div className="mb-12">
                   <h3 className="text-2xl font-bold text-gray-900 mb-6">
                     Ausstattung & Features
