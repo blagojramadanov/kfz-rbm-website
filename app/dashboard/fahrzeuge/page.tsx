@@ -72,6 +72,36 @@ export default function MyVehiclesPage() {
     }
   };
 
+  const handleAcceptOffer = async (vehicleId: string) => {
+    if (!user || !confirm("Möchten Sie dieses Angebot annehmen?")) {
+      return;
+    }
+
+    try {
+      const { acceptOffer } = await import("@/app/actions/admin");
+      await acceptOffer(vehicleId, user.id);
+      await fetchVehicles();
+    } catch (error) {
+      console.error("Error accepting offer:", error);
+      alert(error instanceof Error ? error.message : "Fehler beim Annehmen des Angebots");
+    }
+  };
+
+  const handleRejectOffer = async (vehicleId: string) => {
+    if (!user || !confirm("Möchten Sie dieses Angebot ablehnen?")) {
+      return;
+    }
+
+    try {
+      const { rejectOffer } = await import("@/app/actions/admin");
+      await rejectOffer(vehicleId, user.id);
+      await fetchVehicles();
+    } catch (error) {
+      console.error("Error rejecting offer:", error);
+      alert(error instanceof Error ? error.message : "Fehler beim Ablehnen des Angebots");
+    }
+  };
+
 
   if (loading || !isAuthenticated) {
     return (
@@ -196,6 +226,41 @@ export default function MyVehiclesPage() {
                         <span className="font-semibold">Trans:</span> {vehicle.transmission}
                       </div>
                     </div>
+
+                    {/* Offer Section */}
+                    {status === "angebot_gesendet" && vehicle.offered_price && (
+                      <div className="border-t pt-3 mt-3">
+                        <div className="bg-green-50 p-3 rounded mb-3">
+                          <p className="text-sm text-gray-600 mb-1">💰 <span className="font-semibold">Angebotspreis:</span></p>
+                          <p className="text-2xl font-bold text-green-600">€{vehicle.offered_price.toLocaleString("de-DE")}</p>
+                          {vehicle.offer_terms && (
+                            <p className="text-xs text-gray-600 mt-2">{vehicle.offer_terms}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleAcceptOffer(vehicle.id)}
+                            className="flex-1 px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 font-medium"
+                          >
+                            ✓ Annehmen
+                          </button>
+                          <button
+                            onClick={() => handleRejectOffer(vehicle.id)}
+                            className="flex-1 px-3 py-2 border border-red-300 text-red-600 text-sm rounded hover:bg-red-50 font-medium"
+                          >
+                            ✗ Ablehnen
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Accepted/Rejected Status */}
+                    {status === "akzeptiert" && (
+                      <div className="border-t pt-3 mt-3 bg-green-50 p-3 rounded">
+                        <p className="text-sm text-green-700">✓ <span className="font-semibold">Angebot angenommen!</span></p>
+                        <p className="text-xs text-gray-600 mt-1">Kontaktieren Sie uns für die nächsten Schritte.</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               );

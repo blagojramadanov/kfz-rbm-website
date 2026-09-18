@@ -351,6 +351,35 @@ export async function approveSubmittedVehicle(submittedVehicleId: string, intern
   }
 }
 
+export async function sendOffer(vehicleId: string, offeredPrice: number, offerTerms?: string) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const now = new Date().toISOString();
+    const { error } = await supabase
+      .from("submitted_vehicles")
+      .update({
+        status: "angebot_gesendet",
+        offered_price: offeredPrice,
+        offered_at: now,
+        offer_terms: offerTerms || null,
+        updated_at: now,
+      })
+      .eq("id", vehicleId);
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      message: "Angebot wurde gesendet. Kunde wird benachrichtigt."
+    };
+  } catch (error) {
+    console.error("Error sending offer:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Senden des Angebots");
+  }
+}
+
 export async function rejectSubmittedVehicle(vehicleId: string, reason: string) {
   try {
     await verifyAdminRole();
@@ -370,6 +399,98 @@ export async function rejectSubmittedVehicle(vehicleId: string, reason: string) 
   } catch (error) {
     console.error("Error rejecting vehicle:", error);
     throw new Error(error instanceof Error ? error.message : "Fehler beim Ablehnen des Fahrzeugs");
+  }
+}
+
+export async function acceptOffer(vehicleId: string, userId: string) {
+  try {
+    const { supabase } = await getSupabaseServerClient();
+
+    // Verify ownership
+    const { data: vehicle, error: fetchError } = await supabase
+      .from("submitted_vehicles")
+      .select("user_id, status")
+      .eq("id", vehicleId)
+      .single();
+
+    if (fetchError || !vehicle) {
+      throw new Error("Fahrzeug nicht gefunden");
+    }
+
+    if (vehicle.user_id !== userId) {
+      throw new Error("Sie sind nicht berechtigt, dieses Angebot anzunehmen");
+    }
+
+    if (vehicle.status !== "angebot_gesendet") {
+      throw new Error("Dieses Fahrzeug hat kein ausstehend Angebot");
+    }
+
+    const now = new Date().toISOString();
+    const { error } = await supabase
+      .from("submitted_vehicles")
+      .update({
+        status: "akzeptiert",
+        offer_accepted_at: now,
+        updated_at: now,
+      })
+      .eq("id", vehicleId)
+      .eq("user_id", userId);
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      message: "Angebot akzeptiert. Kontaktieren Sie uns für die nächsten Schritte."
+    };
+  } catch (error) {
+    console.error("Error accepting offer:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Akzeptieren des Angebots");
+  }
+}
+
+export async function rejectOffer(vehicleId: string, userId: string, reason?: string) {
+  try {
+    const { supabase } = await getSupabaseServerClient();
+
+    // Verify ownership
+    const { data: vehicle, error: fetchError } = await supabase
+      .from("submitted_vehicles")
+      .select("user_id, status")
+      .eq("id", vehicleId)
+      .single();
+
+    if (fetchError || !vehicle) {
+      throw new Error("Fahrzeug nicht gefunden");
+    }
+
+    if (vehicle.user_id !== userId) {
+      throw new Error("Sie sind nicht berechtigt, dieses Angebot abzulehnen");
+    }
+
+    if (vehicle.status !== "angebot_gesendet") {
+      throw new Error("Dieses Fahrzeug hat kein ausstehend Angebot");
+    }
+
+    const now = new Date().toISOString();
+    const { error } = await supabase
+      .from("submitted_vehicles")
+      .update({
+        status: "eingereicht", // Back to submitted state
+        offer_rejected_at: now,
+        updated_at: now,
+      })
+      .eq("id", vehicleId)
+      .eq("user_id", userId);
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      message: "Angebot abgelehnt. Sie können erneut mit dem Admin Kontakt aufnehmen."
+    };
+  } catch (error) {
+    console.error("Error rejecting offer:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Ablehnen des Angebots");
   }
 }
 
