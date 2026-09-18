@@ -743,3 +743,41 @@ export async function createSubmittedVehicle(
     throw new Error(error instanceof Error ? error.message : "Fehler beim Erstellen des Fahrzeugs");
   }
 }
+
+export async function finalizeSubmission(vehicleId: string, userId: string) {
+  try {
+    const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
+    const supabase = getSupabaseAdminClient();
+
+    // Verify ownership
+    const { data: vehicle, error: fetchError } = await supabase
+      .from("submitted_vehicles")
+      .select("user_id, status")
+      .eq("id", vehicleId)
+      .single();
+
+    if (fetchError || !vehicle) {
+      throw new Error("Fahrzeug nicht gefunden");
+    }
+
+    if (vehicle.user_id !== userId) {
+      throw new Error("Sie sind nicht berechtigt, dieses Fahrzeug zu ändern");
+    }
+
+    // Update status to eingereicht using admin client (bypass RLS)
+    const { error } = await supabase
+      .from("submitted_vehicles")
+      .update({
+        status: "eingereicht",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", vehicleId);
+
+    if (error) throw error;
+
+    return { success: true, message: "Fahrzeug erfolgreich eingereicht" };
+  } catch (error) {
+    console.error("Error finalizing submission:", error);
+    throw new Error(error instanceof Error ? error.message : "Fehler beim Einreichen des Fahrzeugs");
+  }
+}

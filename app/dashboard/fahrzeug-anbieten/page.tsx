@@ -458,10 +458,10 @@ export default function SubmitVehicleWizardPage() {
 
         console.log(`[FORM] createSubmittedVehicle returned:`, result);
 
-        // Update status to eingereicht after images are uploaded
+        // Update status to eingereicht after images are uploaded (server-side action)
         if (result.vehicleId) {
-          const { updateVehicleStatus } = await import("@/app/actions/vehicles");
-          await updateVehicleStatus(result.vehicleId, user.id, "eingereicht");
+          const { finalizeSubmission } = await import("@/app/actions/vehicles");
+          await finalizeSubmission(result.vehicleId, user.id);
         }
       }
 
