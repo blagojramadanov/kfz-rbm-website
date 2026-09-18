@@ -1,7 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { VehicleGallery } from "@/components/vehicle-gallery";
+import { ListingTypeBadge } from "@/components/listing-type-badge";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 import { MOCK_VEHICLES } from "@/lib/vehicle-data";
 import { ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 import Link from "next/link";
@@ -14,7 +17,78 @@ interface VehicleDetailPageProps {
 }
 
 export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
-  const vehicle = MOCK_VEHICLES.find((v) => v.slug === params.slug);
+  const [vehicle, setVehicle] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVehicle = async () => {
+      try {
+        // Try to find vehicle by ID or slug in database
+        const { data, error } = await supabase
+          .from("vehicles")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(100);
+
+        if (error || !data) {
+          console.error("Error fetching vehicles:", error);
+          // Fallback to mock data
+          const mockVehicle = MOCK_VEHICLES.find((v) => v.slug === params.slug);
+          setVehicle(mockVehicle);
+          setLoading(false);
+          return;
+        }
+
+        // Find vehicle by matching slug pattern (brand-model)
+        const foundVehicle = data.find((v) => {
+          const slug = `${v.brand}-${v.model}`.toLowerCase().replace(/\s+/g, '-');
+          return slug === params.slug;
+        });
+
+        if (!foundVehicle) {
+          // Fallback to mock data
+          const mockVehicle = MOCK_VEHICLES.find((v) => v.slug === params.slug);
+          setVehicle(mockVehicle);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch images for the vehicle
+        const { data: images, error: imagesError } = await supabase
+          .from("vehicle_images")
+          .select("image_url")
+          .eq("vehicle_id", foundVehicle.id)
+          .order("sort_order", { ascending: true });
+
+        const vehicleWithImages = {
+          ...foundVehicle,
+          images: images?.map((img) => img.image_url) || [],
+        };
+
+        setVehicle(vehicleWithImages);
+      } catch (err) {
+        console.error("Error loading vehicle:", err);
+        // Fallback to mock data
+        const mockVehicle = MOCK_VEHICLES.find((v) => v.slug === params.slug);
+        setVehicle(mockVehicle);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehicle();
+  }, [params.slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
+          <p className="text-gray-600">Fahrzeugdetails werden geladen...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!vehicle) {
     notFound();
@@ -48,20 +122,30 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
 
             {/* Title and Key Stats */}
             <div className="mt-12">
+              {/* Listing Type Badge */}
+              {vehicle.listing_type === "export" && (
+                <div className="mb-4">
+                  <ListingTypeBadge type={vehicle.listing_type} />
+                </div>
+              )}
+
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <h1 className="text-4xl font-bold text-gray-900 mb-2">
                     {vehicle.brand} {vehicle.model}
                   </h1>
                   <p className="text-gray-600 text-lg">
-                    {vehicle.year} • {vehicle.firstRegistration}
+                    {vehicle.year}
+                    {vehicle.firstRegistration ? ` • ${vehicle.firstRegistration}` : ""}
                   </p>
                 </div>
                 <div className="text-right">
                   <div className="text-4xl font-bold text-kfz-blue mb-2">
-                    €{vehicle.price.toLocaleString("de-DE")}
+                    €{vehicle.price?.toLocaleString("de-DE") || "—"}
                   </div>
-                  <p className="text-gray-600">Netto-Verkaufspreis</p>
+                  <p className="text-gray-600">
+                    {vehicle.listing_type === "export" ? "Exportpreis (netto)" : "Netto-Verkaufspreis"}
+                  </p>
                 </div>
               </div>
 
@@ -70,27 +154,66 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
                 <div>
                   <p className="text-gray-600 text-sm mb-1">Kilometer</p>
                   <p className="text-xl font-bold text-gray-900">
-                    {(vehicle.mileage / 1000).toFixed(0)}k km
+                    {vehicle.mileage ? (vehicle.mileage / 1000).toFixed(0) + "k km" : "—"}
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-600 text-sm mb-1">Leistung</p>
-                  <p className="text-xl font-bold text-gray-900">{vehicle.powerHp} PS</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {vehicle.power_hp || vehicle.powerHp || "—"} PS
+                  </p>
                 </div>
                 <div>
                   <p className="text-gray-600 text-sm mb-1">Getriebe</p>
-                  <p className="text-xl font-bold text-gray-900">{vehicle.transmission}</p>
+                  <p className="text-xl font-bold text-gray-900">{vehicle.transmission || "—"}</p>
                 </div>
                 <div>
                   <p className="text-gray-600 text-sm mb-1">Kraftstoff</p>
-                  <p className="text-xl font-bold text-gray-900">{vehicle.fuelType}</p>
+                  <p className="text-xl font-bold text-gray-900">{vehicle.fuel_type || vehicle.fuelType || "—"}</p>
                 </div>
               </div>
+
+              {/* Export-Specific Fields */}
+              {vehicle.listing_type === "export" && (
+                <div className="mb-12 p-6 bg-blue-50 rounded-lg border border-blue-200">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">🌍 Exportinformationen</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    {vehicle.zustand && (
+                      <div>
+                        <p className="text-gray-600 text-sm mb-1">Zustand</p>
+                        <p className="text-lg font-semibold text-gray-900">
+                          {vehicle.zustand === "fahrbereit" && "Fahrbereit"}
+                          {vehicle.zustand === "nicht_fahrbereit" && "Nicht fahrbereit"}
+                          {vehicle.zustand === "unfallwagen" && "Unfallwagen"}
+                        </p>
+                      </div>
+                    )}
+                    {vehicle.zielland && (
+                      <div>
+                        <p className="text-gray-600 text-sm mb-1">Zielland</p>
+                        <p className="text-lg font-semibold text-gray-900">{vehicle.zielland}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-gray-600 text-sm mb-1">Preistyp</p>
+                      <p className="text-lg font-semibold text-gray-900">Netto (§25a)</p>
+                    </div>
+                  </div>
+                  {vehicle.export_notes && (
+                    <div className="mt-6 pt-6 border-t border-blue-200">
+                      <p className="text-gray-600 text-sm mb-2">Exportnoten</p>
+                      <p className="text-gray-700">{vehicle.export_notes}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Description */}
               <div className="mb-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Beschreibung</h2>
-                <p className="text-gray-700 text-lg leading-relaxed">{vehicle.description}</p>
+                <p className="text-gray-700 text-lg leading-relaxed">
+                  {vehicle.description || "Keine Beschreibung verfügbar"}
+                </p>
               </div>
 
               {/* Detailed Specs */}
@@ -102,19 +225,19 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
                   <dl className="space-y-3">
                     <div>
                       <dt className="text-gray-600 text-sm">Fahrzeugart</dt>
-                      <dd className="text-gray-900 font-semibold">{vehicle.bodyType}</dd>
+                      <dd className="text-gray-900 font-semibold">{vehicle.body_type || vehicle.bodyType || "—"}</dd>
                     </div>
                     <div>
                       <dt className="text-gray-600 text-sm">Farbe (Außen)</dt>
-                      <dd className="text-gray-900 font-semibold">{vehicle.color}</dd>
+                      <dd className="text-gray-900 font-semibold">{vehicle.color_exterior || vehicle.color || "—"}</dd>
                     </div>
                     <div>
                       <dt className="text-gray-600 text-sm">Erstzulassung</dt>
-                      <dd className="text-gray-900 font-semibold">{vehicle.firstRegistration}</dd>
+                      <dd className="text-gray-900 font-semibold">{vehicle.firstRegistration || vehicle.year || "—"}</dd>
                     </div>
                     <div>
                       <dt className="text-gray-600 text-sm">Hubraum</dt>
-                      <dd className="text-gray-900 font-semibold">Auf Anfrage</dd>
+                      <dd className="text-gray-900 font-semibold">{vehicle.engine_cc || "Auf Anfrage"}</dd>
                     </div>
                   </dl>
                 </div>
