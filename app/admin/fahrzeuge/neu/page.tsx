@@ -50,8 +50,25 @@ export default function AdminCreateVehiclePage() {
       setUploadingImages(true);
       setUploadError("");
 
-      const { uploadVehicleImages } = await import("@/app/actions/vehicles");
-      await uploadVehicleImages(successVehicleId, selectedFiles);
+      // Convert files to base64 (plain objects, serializable for server actions)
+      const filePromises = selectedFiles.map(file => {
+        return new Promise<{ name: string; data: string }>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            resolve({
+              name: file.name,
+              data: reader.result as string,
+            });
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      });
+
+      const filesAsBase64 = await Promise.all(filePromises);
+
+      const { uploadVehicleImagesBase64 } = await import("@/app/actions/vehicles");
+      await uploadVehicleImagesBase64(successVehicleId, filesAsBase64);
 
       setSelectedFiles([]);
       // Redirect after successful upload
