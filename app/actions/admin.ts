@@ -63,6 +63,10 @@ export async function createVehicle(
     engine_cc?: number;
     power_hp?: number;
     description: string;
+    listing_type?: "verkauf" | "export";
+    zustand?: string;
+    zielland?: string;
+    export_notes?: string;
   }
 ) {
   try {
@@ -88,6 +92,10 @@ export async function createVehicle(
         status: "draft",
         source_type: "rbm", // RBM Fahrzeug (directly created by admin)
         submitted_vehicle_id: null, // No linked submitted vehicle
+        listing_type: vehicleData.listing_type || "verkauf",
+        zustand: vehicleData.zustand || null,
+        zielland: vehicleData.zielland || null,
+        export_notes: vehicleData.export_notes || null,
       })
       .select()
       .single();

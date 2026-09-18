@@ -24,6 +24,10 @@ export default function AdminCreateVehiclePage() {
     engine_cc: 0,
     power_hp: 0,
     description: "",
+    listing_type: "verkauf" as "verkauf" | "export",
+    zustand: "",
+    zielland: "",
+    export_notes: "",
   });
   const [formLoading, setFormLoading] = useState(false);
   const [error, setError] = useState("");
@@ -323,6 +327,77 @@ export default function AdminCreateVehiclePage() {
             />
           </div>
 
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Fahrzeugtyp</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-1">
+                  Typ
+                </label>
+                <select
+                  name="listing_type"
+                  value={formData.listing_type}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                >
+                  <option value="verkauf">🏪 Verkauf (Normalverkauf)</option>
+                  <option value="export">🌍 Export (Für Export ins Ausland)</option>
+                </select>
+              </div>
+            </div>
+
+            {formData.listing_type === "export" && (
+              <div className="mt-6 space-y-6 bg-blue-50 rounded-lg p-4">
+                <p className="text-sm text-gray-600 italic">Exportspezifische Felder</p>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
+                      Zustand
+                    </label>
+                    <select
+                      name="zustand"
+                      value={formData.zustand}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                    >
+                      <option value="">-- Wählen --</option>
+                      <option value="fahrbereit">Fahrbereit</option>
+                      <option value="nicht_fahrbereit">Nicht fahrbereit</option>
+                      <option value="unfallwagen">Unfallwagen</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
+                      Zielland (optional)
+                    </label>
+                    <input
+                      type="text"
+                      name="zielland"
+                      value={formData.zielland}
+                      onChange={handleInputChange}
+                      placeholder="z.B. Marokko, Ägypten"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
+                    Export-Notizen (optional)
+                  </label>
+                  <textarea
+                    name="export_notes"
+                    value={formData.export_notes}
+                    onChange={handleInputChange}
+                    placeholder="z.B. 'Netto-Preis gemäß §25a', 'Ausfuhrlieferung'..."
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="flex gap-3 pt-6 border-t border-gray-200">
             <button
