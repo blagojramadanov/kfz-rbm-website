@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { VehicleCard } from "@/components/vehicle-card";
 import { VehicleFilters } from "@/components/vehicle-filters";
 import { MOCK_VEHICLES } from "@/lib/vehicle-data";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Search, SlidersHorizontal, Globe } from "lucide-react";
 
@@ -27,22 +28,54 @@ export default function ExportFahrzeugeListingPage() {
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [filters, setFilters] = useState<Filters>({});
   const [showFilters, setShowFilters] = useState(false);
+  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch export vehicles from database
+  useEffect(() => {
+    const fetchExportVehicles = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("vehicles")
+          .select("*")
+          .eq("listing_type", "export")
+          .eq("status", "available")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching export vehicles:", error);
+          // Fallback to mock data
+          setVehicles(MOCK_VEHICLES.filter(v => v.listingType === "export" || !v.listingType));
+        } else {
+          // Combine real vehicles with mock as fallback
+          setVehicles(data && data.length > 0 ? data : MOCK_VEHICLES);
+        }
+      } catch (err) {
+        console.error("Error loading vehicles:", err);
+        setVehicles(MOCK_VEHICLES);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExportVehicles();
+  }, []);
 
   // Extract unique filter options from export vehicles
   const filterOptions: FilterOptions = useMemo(() => {
-    const brands = [...new Set(MOCK_VEHICLES.map((v) => v.brand))].sort();
-    const models = [...new Set(MOCK_VEHICLES.map((v) => v.model))].sort();
-    const fuelTypes = [...new Set(MOCK_VEHICLES.map((v) => v.fuelType))].sort();
-    const transmissions = [...new Set(MOCK_VEHICLES.map((v) => v.transmission))].sort();
-    const bodyTypes = [...new Set(MOCK_VEHICLES.map((v) => v.bodyType))].sort();
-    const colors = [...new Set(MOCK_VEHICLES.map((v) => v.color))].sort();
+    const brands = [...new Set(vehicles.map((v) => v.brand))].sort();
+    const models = [...new Set(vehicles.map((v) => v.model))].sort();
+    const fuelTypes = [...new Set(vehicles.map((v) => v.fuel_type))].sort();
+    const transmissions = [...new Set(vehicles.map((v) => v.transmission))].sort();
+    const bodyTypes = [...new Set(vehicles.map((v) => v.body_type))].sort();
+    const colors = [...new Set(vehicles.map((v) => v.color_exterior))].sort();
 
     return { brands, models, fuelTypes, transmissions, bodyTypes, colors };
-  }, []);
+  }, [vehicles]);
 
   // Filter and sort export vehicles
   const filteredAndSortedVehicles = useMemo(() => {
-    let filtered = MOCK_VEHICLES.filter((vehicle) => {
+    let filtered = vehicles.filter((vehicle) => {
       // Search query
       if (
         searchQuery &&
@@ -53,17 +86,17 @@ export default function ExportFahrzeugeListingPage() {
         return false;
       }
 
-      // Apply filters (same as normal fahrzeuge)
+      // Apply filters (map to database field names)
       if (filters.brand && vehicle.brand !== filters.brand) return false;
-      if (filters.fuelType && vehicle.fuelType !== filters.fuelType) return false;
+      if (filters.fuelType && vehicle.fuel_type !== filters.fuelType) return false;
       if (filters.transmission && vehicle.transmission !== filters.transmission) return false;
-      if (filters.bodyType && vehicle.bodyType !== filters.bodyType) return false;
-      if (filters.color && vehicle.color !== filters.color) return false;
+      if (filters.bodyType && vehicle.body_type !== filters.bodyType) return false;
+      if (filters.color && vehicle.color_exterior !== filters.color) return false;
 
       return true;
     });
 
-    // Sort vehicles
+    // Sort vehicles (map to database field names)
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "price-asc":
@@ -76,12 +109,12 @@ export default function ExportFahrzeugeListingPage() {
           return b.year - a.year;
         case "newest":
         default:
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
     });
 
     return filtered;
-  }, [searchQuery, sortBy, filters]);
+  }, [searchQuery, sortBy, filters, vehicles]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -153,7 +186,12 @@ export default function ExportFahrzeugeListingPage() {
         </div>
 
         {/* Vehicle Grid */}
-        {filteredAndSortedVehicles.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-500">Wird geladen...</p>
+          </div>
+        ) : filteredAndSortedVehicles.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">Keine Exportfahrzeuge gefunden</p>
           </div>
