@@ -326,71 +326,13 @@ export async function approveSubmittedVehicle(submittedVehicleId: string, intern
       console.warn("Could not fetch admin profile, using default name");
     }
 
-    // Create a new vehicle in the vehicles table with source_type='customer'
-    const newVehicleData = {
-      brand: submittedVehicle.brand,
-      model: submittedVehicle.model,
-      year: submittedVehicle.year,
-      mileage: submittedVehicle.mileage,
-      price: submittedVehicle.price,
-      transmission: submittedVehicle.transmission,
-      fuel_type: submittedVehicle.fuel_type,
-      body_type: submittedVehicle.body_type,
-      color_exterior: submittedVehicle.color || "Nicht angegeben",
-      color_interior: null,
-      engine_cc: null,
-      power_hp: submittedVehicle.power_hp,
-      description: submittedVehicle.description,
-      status: "draft", // Start as draft, admin needs to publish
-      featured: false,
-      source_type: "customer",
-      submitted_vehicle_id: submittedVehicleId,
-      vin: `TEMP-${submittedVehicleId.substring(0, 8)}`, // Temporary VIN, admin should update
-    };
-
-    const { data: newVehicle, error: createError } = await supabase
-      .from("vehicles")
-      .insert(newVehicleData)
-      .select()
-      .single();
-
-    if (createError) {
-      throw new Error(`Fehler beim Erstellen des Fahrzeugs: ${createError.message}`);
-    }
-
-    // Copy images from submitted vehicle to new vehicle
-    if (submittedVehicle.id) {
-      const { data: submittedImages, error: imagesError } = await supabase
-        .from("submitted_vehicle_images")
-        .select("image_url, alt_text, sort_order")
-        .eq("submitted_vehicle_id", submittedVehicleId)
-        .order("sort_order", { ascending: true });
-
-      if (!imagesError && submittedImages && submittedImages.length > 0) {
-        const imagesToInsert = submittedImages.map((img) => ({
-          vehicle_id: newVehicle.id,
-          image_url: img.image_url,
-          alt_text: img.alt_text,
-          sort_order: img.sort_order,
-        }));
-
-        const { error: insertImagesError } = await supabase
-          .from("vehicle_images")
-          .insert(imagesToInsert);
-
-        if (insertImagesError) {
-          console.error("Error copying images:", insertImagesError);
-        }
-      }
-    }
-
     // Update the submitted vehicle status to angebot_gesendet (offer sent)
+    // Note: Vehicle creation is done separately by admin when needed
     const now = new Date().toISOString();
     const { error: updateError } = await supabase
       .from("submitted_vehicles")
       .update({
         status: "angebot_gesendet",
-        vehicle_id: newVehicle.id,
         updated_at: now,
       })
       .eq("id", submittedVehicleId);
@@ -401,8 +343,7 @@ export async function approveSubmittedVehicle(submittedVehicleId: string, intern
 
     return {
       success: true,
-      vehicleId: newVehicle.id,
-      message: "Fahrzeug genehmigt. Ein Angebot wurde gesendet und das Fahrzeug ist als Entwurf in der Admin-Verwaltung verfügbar.",
+      message: "Angebot wurde gesendet. Der Kunde wird über den Status benachrichtigt.",
     };
   } catch (error) {
     const msg = logAdminError("approveSubmittedVehicle", error, { submittedVehicleId });
