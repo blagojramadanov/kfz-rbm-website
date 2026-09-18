@@ -744,6 +744,78 @@ export async function createSubmittedVehicle(
   }
 }
 
+export async function uploadVehicleImages(vehicleId: string, files: File[]) {
+  try {
+    const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
+    const supabase = getSupabaseAdminClient();
+
+    // Verify vehicle exists
+    const { data: vehicle, error: fetchError } = await supabase
+      .from("vehicles")
+      .select("id, brand, model")
+      .eq("id", vehicleId)
+      .single();
+
+    if (fetchError || !vehicle) {
+      throw new Error("Fahrzeug nicht gefunden");
+    }
+
+    const uploadResults: any[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const imageUrl = `${vehicleId}/${Date.now()}-${i}-${file.name.replace(/[^a-z0-9.]/gi, '_')}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from("vehicle-images")
+        .upload(imageUrl, file, { cacheControl: "3600" });
+
+      if (uploadError) {
+        uploadResults.push({ index: i, success: false, error: uploadError.message });
+        continue;
+      }
+
+      // Get public URL
+      const { data: publicUrl } = supabase.storage
+        .from("vehicle-images")
+        .getPublicUrl(imageUrl);
+
+      // Save image record to database
+      const { error: insertError } = await supabase
+        .from("vehicle_images")
+        .insert({
+          vehicle_id: vehicleId,
+          image_url: publicUrl.publicUrl,
+          sort_order: i,
+        });
+
+      if (insertError) {
+        uploadResults.push({ index: i, success: false, error: insertError.message });
+        continue;
+      }
+
+      uploadResults.push({ index: i, success: true, url: publicUrl.publicUrl });
+    }
+
+    const successCount = uploadResults.filter((r) => r.success).length;
+    const failedCount = uploadResults.filter((r) => !r.success).length;
+
+    if (failedCount > 0) {
+      throw new Error(`${failedCount} von ${files.length} Bilder konnten nicht hochgeladen werden`);
+    }
+
+    return {
+      success: true,
+      message: `${successCount} Bilder erfolgreich hochgeladen`,
+      uploadedCount: successCount,
+    };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : "Fehler beim Hochladen";
+    throw new Error(errorMsg);
+  }
+}
+
 export async function finalizeSubmission(vehicleId: string, userId: string) {
   try {
     console.log(`[FINALIZE] Starting finalizeSubmission for vehicle ${vehicleId}, user ${userId}`);

@@ -32,6 +32,39 @@ export default function AdminCreateVehiclePage() {
   const [formLoading, setFormLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [successVehicleId, setSuccessVehicleId] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  const handleImageSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedFiles(files);
+    setUploadError("");
+  };
+
+  const handleUploadImages = async () => {
+    if (!successVehicleId || selectedFiles.length === 0) return;
+
+    try {
+      setUploadingImages(true);
+      setUploadError("");
+
+      const { uploadVehicleImages } = await import("@/app/actions/vehicles");
+      await uploadVehicleImages(successVehicleId, selectedFiles);
+
+      setSelectedFiles([]);
+      // Redirect after successful upload
+      setTimeout(() => {
+        router.push(`/admin/fahrzeuge/${successVehicleId}`);
+      }, 1000);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Fehler beim Hochladen";
+      setUploadError(errorMsg);
+    } finally {
+      setUploadingImages(false);
+    }
+  };
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -69,12 +102,10 @@ export default function AdminCreateVehiclePage() {
       const { createVehicle } = await import("@/app/actions/admin");
       const result = await createVehicle(submitData);
       setSuccess(true);
-      setTimeout(() => {
-        router.push(`/admin/fahrzeuge/${result.vehicleId}`);
-      }, 1000);
+      setSuccessVehicleId(result.vehicleId);
     } catch (err) {
-      console.error("Error creating vehicle:", err);
-      setError("Fehler beim Erstellen des Fahrzeugs: " + (err instanceof Error ? err.message : "Unbekannter Fehler"));
+      const errorMsg = err instanceof Error ? err.message : "Unbekannter Fehler";
+      setError("Fehler beim Erstellen des Fahrzeugs: " + errorMsg);
     } finally {
       setFormLoading(false);
     }
@@ -86,6 +117,91 @@ export default function AdminCreateVehiclePage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
           <p className="text-gray-600">Wird geladen...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Success screen with image upload
+  if (success && successVehicleId) {
+    return (
+      <div className="space-y-6">
+        <Link href="/admin/fahrzeuge">
+          <button className="flex items-center gap-2 text-kfz-blue hover:text-kfz-blue-dark font-medium">
+            <ArrowLeft className="w-4 h-4" />
+            Zurück zur Fahrzeugliste
+          </button>
+        </Link>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-green-800 font-medium">✓ Fahrzeug erfolgreich erstellt!</p>
+          </div>
+
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Bilder hochladen</h2>
+            <p className="text-gray-600 mb-6">Laden Sie Fotos des Fahrzeugs hoch. (optional)</p>
+
+            {uploadError && (
+              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-800">{uploadError}</p>
+              </div>
+            )}
+
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-6 hover:border-kfz-blue transition-colors">
+              <input
+                type="file"
+                id="image-input"
+                multiple
+                accept="image/*"
+                onChange={handleImageSelection}
+                className="hidden"
+              />
+              <label
+                htmlFor="image-input"
+                className="cursor-pointer"
+              >
+                <div className="text-4xl mb-2">📷</div>
+                <p className="font-medium text-gray-900">Bilder auswählen</p>
+                <p className="text-sm text-gray-600">Oder hierher ziehen</p>
+                <p className="text-xs text-gray-500 mt-2">{selectedFiles.length} Datei(en) ausgewählt</p>
+              </label>
+            </div>
+
+            {selectedFiles.length > 0 && (
+              <div className="mb-6">
+                <p className="text-sm font-medium text-gray-900 mb-3">Vorschau:</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {selectedFiles.map((file, idx) => (
+                    <div key={idx} className="relative group">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Preview ${idx}`}
+                        className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                      />
+                      <p className="text-xs text-gray-600 mt-1 truncate">{file.name}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleUploadImages}
+                disabled={uploadingImages || selectedFiles.length === 0}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-kfz-blue text-white rounded-lg hover:bg-kfz-blue-dark font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {uploadingImages ? "Wird hochgeladen..." : `Bilder hochladen (${selectedFiles.length})`}
+              </button>
+              <Link href={`/admin/fahrzeuge/${successVehicleId}`} className="flex-1">
+                <button className="w-full px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium transition-colors">
+                  Überspringen
+                </button>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     );
