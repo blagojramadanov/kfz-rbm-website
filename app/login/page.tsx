@@ -9,17 +9,22 @@ import { ArrowRight, Mail, Lock, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn, isAuthenticated } = useAuth();
+  const { signIn, isAuthenticated, profile } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/dashboard");
+    if (isAuthenticated && profile) {
+      // Redirect based on user role
+      if (profile.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, profile, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +33,7 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password);
-      router.push("/dashboard");
+      // Redirect will happen via useEffect above
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Anmeldung fehlgeschlagen"

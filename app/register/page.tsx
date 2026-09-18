@@ -9,7 +9,7 @@ import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-r
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { signUp, isAuthenticated } = useAuth();
+  const { signUp, isAuthenticated, profile } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,10 +19,15 @@ export default function RegisterPage() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/dashboard");
+    if (isAuthenticated && profile) {
+      // Redirect based on user role
+      if (profile.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, profile, router]);
 
   const validatePassword = (pwd: string) => pwd.length >= 8;
 
