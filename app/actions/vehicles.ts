@@ -746,8 +746,11 @@ export async function createSubmittedVehicle(
 
 export async function finalizeSubmission(vehicleId: string, userId: string) {
   try {
+    console.log(`[FINALIZE] Starting finalizeSubmission for vehicle ${vehicleId}, user ${userId}`);
+
     const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
     const supabase = getSupabaseAdminClient();
+    console.log(`[FINALIZE] Admin client initialized`);
 
     // Verify ownership
     const { data: vehicle, error: fetchError } = await supabase
@@ -756,16 +759,20 @@ export async function finalizeSubmission(vehicleId: string, userId: string) {
       .eq("id", vehicleId)
       .single();
 
+    console.log(`[FINALIZE] Fetch result:`, { vehicle, fetchError });
+
     if (fetchError || !vehicle) {
-      throw new Error("Fahrzeug nicht gefunden");
+      throw new Error(`Fahrzeug nicht gefunden: ${fetchError?.message || "no data"}`);
     }
 
     if (vehicle.user_id !== userId) {
       throw new Error("Sie sind nicht berechtigt, dieses Fahrzeug zu ändern");
     }
 
+    console.log(`[FINALIZE] Ownership verified. Current status: ${vehicle.status}. Updating to eingereicht...`);
+
     // Update status to eingereicht using admin client (bypass RLS)
-    const { error } = await supabase
+    const { data: updateData, error } = await supabase
       .from("submitted_vehicles")
       .update({
         status: "eingereicht",
@@ -773,11 +780,16 @@ export async function finalizeSubmission(vehicleId: string, userId: string) {
       })
       .eq("id", vehicleId);
 
-    if (error) throw error;
+    console.log(`[FINALIZE] Update result:`, { updateData, error });
 
+    if (error) {
+      throw new Error(`Update failed: ${error.message}`);
+    }
+
+    console.log(`[FINALIZE] ✅ Successfully finalized submission`);
     return { success: true, message: "Fahrzeug erfolgreich eingereicht" };
   } catch (error) {
-    console.error("Error finalizing submission:", error);
+    console.error("[FINALIZE] Error finalizing submission:", error);
     throw new Error(error instanceof Error ? error.message : "Fehler beim Einreichen des Fahrzeugs");
   }
 }

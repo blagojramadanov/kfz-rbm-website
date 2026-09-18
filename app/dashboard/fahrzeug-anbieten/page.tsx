@@ -460,8 +460,15 @@ export default function SubmitVehicleWizardPage() {
 
         // Update status to eingereicht after images are uploaded (server-side action)
         if (result.vehicleId) {
-          const { finalizeSubmission } = await import("@/app/actions/vehicles");
-          await finalizeSubmission(result.vehicleId, user.id);
+          try {
+            console.log(`[FORM] Calling finalizeSubmission for vehicle ${result.vehicleId}`);
+            const { finalizeSubmission } = await import("@/app/actions/vehicles");
+            const finalizeResult = await finalizeSubmission(result.vehicleId, user.id);
+            console.log(`[FORM] finalizeSubmission returned:`, finalizeResult);
+          } catch (finalizeError) {
+            console.error(`[FORM] finalizeSubmission error:`, finalizeError);
+            throw finalizeError;
+          }
         }
       }
 
