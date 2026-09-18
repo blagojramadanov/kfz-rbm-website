@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { VehicleCard } from "@/components/vehicle-card";
 import { VehicleFilters } from "@/components/vehicle-filters";
 import { MOCK_VEHICLES } from "@/lib/vehicle-data";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Search, SlidersHorizontal } from "lucide-react";
 
@@ -27,22 +28,74 @@ export default function FahrzeugeListingPage() {
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [filters, setFilters] = useState<Filters>({});
   const [showFilters, setShowFilters] = useState(false);
+  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch vehicles from database
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("vehicles")
+          .select("*")
+          .eq("listing_type", "verkauf")
+          .eq("status", "available")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching vehicles:", error);
+          setVehicles(MOCK_VEHICLES);
+        } else if (data && data.length > 0) {
+          // Fetch images for each vehicle
+          const vehiclesWithImages = await Promise.all(
+            data.map(async (vehicle) => {
+              const { data: images, error: imagesError } = await supabase
+                .from("vehicle_images")
+                .select("image_url")
+                .eq("vehicle_id", vehicle.id)
+                .order("sort_order", { ascending: true });
+
+              const slug = `${vehicle.brand}-${vehicle.model}`.toLowerCase().replace(/\s+/g, '-');
+
+              return {
+                ...vehicle,
+                slug,
+                images: images?.map((img) => img.image_url) || [],
+              };
+            })
+          );
+
+          setVehicles(vehiclesWithImages);
+        } else {
+          // No real vehicles, use mock data
+          setVehicles(MOCK_VEHICLES);
+        }
+      } catch (err) {
+        console.error("Error loading vehicles:", err);
+        setVehicles(MOCK_VEHICLES);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehicles();
+  }, []);
 
   // Extract unique filter options from vehicles
   const filterOptions: FilterOptions = useMemo(() => {
-    const brands = [...new Set(MOCK_VEHICLES.map((v) => v.brand))].sort();
-    const models = [...new Set(MOCK_VEHICLES.map((v) => v.model))].sort();
-    const fuelTypes = [...new Set(MOCK_VEHICLES.map((v) => v.fuelType))].sort();
-    const transmissions = [...new Set(MOCK_VEHICLES.map((v) => v.transmission))].sort();
-    const bodyTypes = [...new Set(MOCK_VEHICLES.map((v) => v.bodyType))].sort();
-    const colors = [...new Set(MOCK_VEHICLES.map((v) => v.color))].sort();
+    const brands = [...new Set(vehicles.map((v) => v.brand))].sort();
+    const models = [...new Set(vehicles.map((v) => v.model))].sort();
+    const fuelTypes = [...new Set(vehicles.map((v) => v.fuel_type))].sort();
+    const transmissions = [...new Set(vehicles.map((v) => v.transmission))].sort();
+    const bodyTypes = [...new Set(vehicles.map((v) => v.body_type))].sort();
+    const colors = [...new Set(vehicles.map((v) => v.color_exterior))].sort();
 
     return { brands, models, fuelTypes, transmissions, bodyTypes, colors };
-  }, []);
+  }, [vehicles]);
 
   // Filter and sort vehicles
   const filteredAndSortedVehicles = useMemo(() => {
-    let filtered = MOCK_VEHICLES.filter((vehicle) => {
+    let filtered = vehicles.filter((vehicle) => {
       // Search query
       if (
         searchQuery &&
@@ -53,7 +106,7 @@ export default function FahrzeugeListingPage() {
         return false;
       }
 
-      // Apply filters
+      // Apply filters (map to database field names)
       if (
         filters.brand &&
         vehicle.brand !== filters.brand
@@ -62,7 +115,7 @@ export default function FahrzeugeListingPage() {
       }
       if (
         filters.fuelType &&
-        vehicle.fuelType !== filters.fuelType
+        vehicle.fuel_type !== filters.fuelType
       ) {
         return false;
       }
@@ -74,13 +127,13 @@ export default function FahrzeugeListingPage() {
       }
       if (
         filters.bodyType &&
-        vehicle.bodyType !== filters.bodyType
+        vehicle.body_type !== filters.bodyType
       ) {
         return false;
       }
       if (
         filters.color &&
-        vehicle.color !== filters.color
+        vehicle.color_exterior !== filters.color
       ) {
         return false;
       }
@@ -133,12 +186,12 @@ export default function FahrzeugeListingPage() {
           return b.year - a.year;
         case "newest":
         default:
-          return 0;
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
     });
 
     return sorted;
-  }, [searchQuery, filters, sortBy]);
+  }, [searchQuery, filters, sortBy, vehicles]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -237,7 +290,12 @@ export default function FahrzeugeListingPage() {
             </div>
 
             {/* Vehicle Cards Grid */}
-            {filteredAndSortedVehicles.length > 0 ? (
+            {loading ? (
+              <div className="bg-white rounded-lg shadow p-12 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
+                <p className="text-gray-600">Fahrzeuge werden geladen...</p>
+              </div>
+            ) : filteredAndSortedVehicles.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
                 {filteredAndSortedVehicles.map((vehicle) => (
                   <VehicleCard key={vehicle.id} vehicle={vehicle} />
