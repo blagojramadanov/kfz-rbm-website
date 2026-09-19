@@ -10,7 +10,6 @@ export default function AdminCreateVehiclePage() {
   const router = useRouter();
   const { loading, isAdmin } = useAuth();
   const [formData, setFormData] = useState({
-    vin: "",
     brand: "",
     model: "",
     year: new Date().getFullYear(),
@@ -109,17 +108,15 @@ export default function AdminCreateVehiclePage() {
       return;
     }
 
-    // Generate VIN if not provided (17 chars - standard VIN length)
     const generateTestVIN = () => {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       let vin = 'TEST';
       for (let i = 0; i < 13; i++) {
         vin += chars.charAt(Math.floor(Math.random() * chars.length));
       }
-      return vin; // Exactly 17 characters
+      return vin;
     };
-    const vin = formData.vin || generateTestVIN();
-    const submitData = { ...formData, vin };
+    const submitData = { ...formData, vin: generateTestVIN() };
 
     try {
       setFormLoading(true);
@@ -262,19 +259,6 @@ export default function AdminCreateVehiclePage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                VIN (optional)
-              </label>
-              <input
-                type="text"
-                name="vin"
-                value={formData.vin}
-                onChange={handleInputChange}
-                placeholder="Fahrzeug-Identifizierungsnummer (wird generiert, wenn leer)"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
                 Marke *
               </label>
               <input
@@ -287,9 +271,6 @@ export default function AdminCreateVehiclePage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
               />
             </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
                 Modell *
