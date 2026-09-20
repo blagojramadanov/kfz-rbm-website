@@ -55,7 +55,7 @@ export default function ExportFahrzeugeListingPage() {
                 .eq("vehicle_id", vehicle.id)
                 .order("sort_order", { ascending: true });
 
-              if (imagesError || !images) {
+              if (!images) {
                 console.warn(`No images for vehicle ${vehicle.id}`);
                 return { ...vehicle, images: [] };
               }
@@ -187,7 +187,7 @@ export default function ExportFahrzeugeListingPage() {
           <div className="mb-8 bg-white rounded-lg shadow-md p-6">
             <VehicleFilters
               filterOptions={filterOptions}
-              filters={filters}
+              initialFilters={filters}
               onFiltersChange={setFilters}
             />
           </div>

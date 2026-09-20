@@ -286,7 +286,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
                     Ausstattung & Features
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {vehicle.features.map((feature, index) => (
+                    {vehicle.features.map((feature: string, index: number) => (
                       <div
                         key={index}
                         className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg"

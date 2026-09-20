@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Clock, CheckCircle, Eye } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 export function SubmissionWorkflowInfo() {
   return (

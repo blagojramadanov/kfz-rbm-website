@@ -8,7 +8,6 @@ import {
   Users,
   MessageSquare,
   BarChart3,
-  FileText,
   Repeat2,
   LogOut,
   ChevronDown,
@@ -53,11 +52,6 @@ const ADMIN_NAVIGATION = [
     label: "Statistiken",
     href: "/admin/statistik",
     icon: BarChart3,
-  },
-  {
-    label: "Export",
-    href: "/admin/export",
-    icon: FileText,
   },
 ];
 

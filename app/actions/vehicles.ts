@@ -26,11 +26,6 @@ export async function getSubmittedVehicleById(vehicleId: string, userId: string)
       .eq("submitted_vehicle_id", vehicleId)
       .order("sort_order", { ascending: true });
 
-    
-      
-      
-    }
-
     return { vehicle, images: images || [] };
   } catch (error) {
     console.error("Error fetching vehicle:", error);
@@ -109,14 +104,10 @@ export async function debugStorageAndVehicle(vehicleId: string) {
       .select("id, image_url, sort_order")
       .eq("submitted_vehicle_id", vehicleId);
 
-    
-      console.error("[VEHICLE] ❌ Failed to fetch images:", imagesError);
-    } else {
-      console.log(`[VEHICLE] Images for this vehicle: ${images?.length || 0}`);
-      images?.forEach((img, idx) => {
-        console.log(`  [${idx}] ${img.image_url}`);
-      });
-    }
+    console.log(`[VEHICLE] Images for this vehicle: ${images?.length || 0}`);
+    images?.forEach((img, idx) => {
+      console.log(`  [${idx}] ${img.image_url}`);
+    });
 
     console.log("\n========== RLS POLICY CHECK ==========");
     console.log("[RLS] Vehicle status for image insert policy: MUST be 'draft'");
@@ -159,14 +150,6 @@ export async function getSubmittedVehicles(userId: string): Promise<SubmittedVeh
           .select("image_url")
           .eq("submitted_vehicle_id", vehicle.id)
           .order("sort_order", { ascending: true });
-
-        
-          console.error("Error fetching images for vehicle", vehicle.id, ":", imagesError);
-          return {
-            ...vehicle,
-            images: [],
-          };
-        }
 
         const vehicleImages = images?.map((img) => img.image_url) || [];
         console.log(`[DEBUG] Vehicle ${vehicle.id} (${vehicle.brand} ${vehicle.model}): Found ${vehicleImages.length} images`);

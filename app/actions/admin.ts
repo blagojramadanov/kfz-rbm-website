@@ -763,3 +763,109 @@ export async function getCustomerDetails(customerId: string) {
     throw new Error(error instanceof Error ? error.message : "Kunde nicht gefunden");
   }
 }
+
+export async function getSubmittedVehicleById(submittedVehicleId: string) {
+  try {
+    await verifyAdminRole();
+    const { supabase } = await getSupabaseServerClient();
+
+    const { data: vehicle, error: vehicleError } = await supabase
+      .from("submitted_vehicles")
+      .select("*")
+      .eq("id", submittedVehicleId)
+      .single();
+
+    if (vehicleError || !vehicle) {
+      throw new Error("Eingereichte Fahrzeug nicht gefunden");
+    }
+
+    const { data: images } = await supabase
+      .from("submitted_vehicle_images")
+      .select("image_url")
+      .eq("submitted_vehicle_id", submittedVehicleId)
+      .order("sort_order", { ascending: true });
+
+    return {
+      ...vehicle,
+      images: images?.map((img) => img.image_url) || [],
+    };
+  } catch (error) {
+    const msg = logAdminError("getSubmittedVehicleById", error, { submittedVehicleId });
+    throw new Error(msg || "Fehler beim Abrufen des Fahrzeugs");
+  }
+}
+
+export async function publishSubmittedVehicle(
+  submittedVehicleId: string,
+  overrides?: {
+    price?: number;
+    description?: string;
+    featured?: boolean;
+  }
+) {
+  try {
+    await verifyAdminRole();
+    const { session } = await getSupabaseServerClient();
+    const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
+    const supabase = getSupabaseAdminClient();
+
+    if (!session?.user) {
+      throw new Error("User session required");
+    }
+
+    const { data: submittedVehicle, error: fetchError } = await supabase
+      .from("submitted_vehicles")
+      .select("*")
+      .eq("id", submittedVehicleId)
+      .single();
+
+    if (fetchError || !submittedVehicle) {
+      throw new Error("Eingereichte Fahrzeug nicht gefunden");
+    }
+
+    const generatedVin = `VIN-${submittedVehicle.brand.toUpperCase()}-${submittedVehicle.model.toUpperCase()}-${Date.now()}`;
+
+    const { data: newVehicle, error: createError } = await supabase
+      .from("vehicles")
+      .insert({
+        vin: generatedVin,
+        brand: submittedVehicle.brand,
+        model: submittedVehicle.model,
+        year: submittedVehicle.year,
+        mileage: submittedVehicle.mileage,
+        price: overrides?.price ?? submittedVehicle.price,
+        fuel_type: submittedVehicle.fuel_type,
+        transmission: submittedVehicle.transmission,
+        color_exterior: submittedVehicle.color,
+        description: overrides?.description ?? submittedVehicle.description,
+        body_type: submittedVehicle.body_type,
+        power_hp: submittedVehicle.power,
+        status: "draft",
+        featured: overrides?.featured ?? false,
+      })
+      .select()
+      .single();
+
+    if (createError || !newVehicle) {
+      throw new Error(`Fehler beim Erstellen der Fahrzeugangebot: ${createError?.message}`);
+    }
+
+    const now = new Date().toISOString();
+    await supabase
+      .from("submitted_vehicles")
+      .update({
+        status: "akzeptiert",
+        updated_at: now,
+      })
+      .eq("id", submittedVehicleId);
+
+    return {
+      success: true,
+      vehicleId: newVehicle.id,
+      message: "Fahrzeug erfolgreich in Fahrzeuge-Liste veröffentlicht",
+    };
+  } catch (error) {
+    const msg = logAdminError("publishSubmittedVehicle", error, { submittedVehicleId });
+    throw new Error(msg || "Fehler beim Veröffentlichen des Fahrzeugs");
+  }
+}
