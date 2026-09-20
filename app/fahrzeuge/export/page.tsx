@@ -49,7 +49,7 @@ export default function ExportFahrzeugeListingPage() {
           // Fetch images for each vehicle
           const vehiclesWithImages = await Promise.all(
             data.map(async (vehicle) => {
-              const { data: images, error: imagesError } = await supabase
+              const { data: images } = await supabase
                 .from("vehicle_images")
                 .select("image_url")
                 .eq("vehicle_id", vehicle.id)

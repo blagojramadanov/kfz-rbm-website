@@ -199,13 +199,11 @@ export async function getVehicleById(vehicleId: string) {
 
     if (vehicleError) throw vehicleError;
 
-    const { data: images, error: imagesError } = await supabase
+    const { data: images } = await supabase
       .from("vehicle_images")
       .select("*")
       .eq("vehicle_id", vehicleId)
       .order("sort_order");
-
-    if (imagesError) throw imagesError;
 
     return { vehicle, images: images || [] };
   } catch (error) {
@@ -279,19 +277,11 @@ export async function getSubmittedVehicles(
     // Fetch images for each vehicle
     const vehiclesWithImages = await Promise.all(
       (data || []).map(async (vehicle) => {
-        const { data: images, error: imagesError } = await supabase
+        const { data: images } = await supabase
           .from("submitted_vehicle_images")
           .select("image_url")
           .eq("submitted_vehicle_id", vehicle.id)
           .order("sort_order", { ascending: true });
-
-        if (imagesError) {
-          console.error("Error fetching images:", imagesError);
-          return {
-            ...vehicle,
-            images: [],
-          };
-        }
 
         return {
           ...vehicle,
@@ -307,7 +297,7 @@ export async function getSubmittedVehicles(
   }
 }
 
-export async function approveSubmittedVehicle(submittedVehicleId: string, internalNotes?: string) {
+export async function approveSubmittedVehicle(submittedVehicleId: string) {
   try {
     await verifyAdminRole();
     const { session } = await getSupabaseServerClient();
@@ -327,24 +317,6 @@ export async function approveSubmittedVehicle(submittedVehicleId: string, intern
 
     if (fetchError || !submittedVehicle) {
       throw new Error("Eingereichte Fahrzeug nicht gefunden");
-    }
-
-    // Get admin profile for approval tracking (with fallback)
-    let adminName = "Admin";
-    try {
-      const { supabase: authSupabase } = await getSupabaseServerClient();
-      const { data: adminProfile } = await authSupabase
-        .from("user_profiles")
-        .select("full_name")
-        .eq("id", session.user.id)
-        .single();
-
-      if (adminProfile?.full_name) {
-        adminName = adminProfile.full_name;
-      }
-    } catch (err) {
-      // Fallback to default admin name if profile not found
-      console.warn("Could not fetch admin profile, using default name");
     }
 
     // Update the submitted vehicle status to angebot_gesendet (offer sent)
@@ -469,7 +441,7 @@ export async function acceptOffer(vehicleId: string, userId: string) {
   }
 }
 
-export async function rejectOffer(vehicleId: string, userId: string, reason?: string) {
+export async function rejectOffer(vehicleId: string, userId: string) {
   try {
     const { supabase } = await getSupabaseServerClient();
 

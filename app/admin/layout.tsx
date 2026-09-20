@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { COMPANY } from "@/lib/company";
 
 const ADMIN_NAVIGATION = [
   {
@@ -95,7 +96,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="hidden md:flex flex-col w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white">
         {/* Header */}
         <div className="p-6 border-b border-gray-700">
-          <h1 className="text-2xl font-bold">KFZ RBM</h1>
+          <h1 className="text-2xl font-bold">{COMPANY.name}</h1>
           <p className="text-sm text-gray-400">Admin Panel</p>
         </div>
 

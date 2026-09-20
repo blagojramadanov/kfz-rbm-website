@@ -213,7 +213,7 @@ export default function TradeInRequestsPage() {
                           </span>
                         </div>
                         <p className="text-xs text-gray-500 mt-2 italic">
-                          Die endgültige Fahrzeugbewertung und Zuzahlung wird individuell durch KFZ RBM festgelegt.
+                          Die endgültige Fahrzeugbewertung und Zuzahlung wird individuell durch unser Team festgelegt.
                         </p>
                       </div>
                     )}

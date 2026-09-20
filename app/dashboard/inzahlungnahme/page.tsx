@@ -459,7 +459,7 @@ export default function InzahlungnahmePage() {
                 <div className="bg-white rounded p-4 border border-blue-200">
                   <p className="text-xs text-gray-600 italic">
                     ⓘ <strong>Wichtig:</strong> Die endgültige Fahrzeugbewertung und Zuzahlung wird individuell durch
-                    KFZ RBM festgelegt.
+                    unser Team festgelegt.
                   </p>
                 </div>
               </div>

@@ -124,7 +124,7 @@ export default function DashboardPage() {
                 </h2>
               </div>
               <p className="text-gray-600 mb-6">
-                Verkaufen Sie Ihr Fahrzeug über KFZ RBM. Einfach, schnell und sicher.
+                Verkaufen Sie Ihr Fahrzeug über unsere Plattform. Einfach, schnell und sicher.
               </p>
               <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold w-full">
                 <Plus className="mr-2 w-4 h-4" />

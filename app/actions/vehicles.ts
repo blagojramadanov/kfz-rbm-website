@@ -20,15 +20,15 @@ export async function getSubmittedVehicleById(vehicleId: string, userId: string)
     }
 
     // Fetch images
-    const { data: images, error: imagesError } = await supabase
+    const { data: images } = await supabase
       .from("submitted_vehicle_images")
       .select("*")
       .eq("submitted_vehicle_id", vehicleId)
       .order("sort_order", { ascending: true });
 
-    if (imagesError) {
-      console.error("Error fetching images:", imagesError);
-      return { vehicle, images: [] };
+    
+      
+      
     }
 
     return { vehicle, images: images || [] };
@@ -104,12 +104,12 @@ export async function debugStorageAndVehicle(vehicleId: string) {
     }
 
     // Check for images related to this vehicle
-    const { data: images, error: imagesError } = await supabase
+    const { data: images } = await supabase
       .from("submitted_vehicle_images")
       .select("id, image_url, sort_order")
       .eq("submitted_vehicle_id", vehicleId);
 
-    if (imagesError) {
+    
       console.error("[VEHICLE] ❌ Failed to fetch images:", imagesError);
     } else {
       console.log(`[VEHICLE] Images for this vehicle: ${images?.length || 0}`);
@@ -154,13 +154,13 @@ export async function getSubmittedVehicles(userId: string): Promise<SubmittedVeh
     // Fetch images for each vehicle
     const vehiclesWithImages = await Promise.all(
       vehicles.map(async (vehicle) => {
-        const { data: images, error: imagesError } = await supabase
+        const { data: images } = await supabase
           .from("submitted_vehicle_images")
           .select("image_url")
           .eq("submitted_vehicle_id", vehicle.id)
           .order("sort_order", { ascending: true });
 
-        if (imagesError) {
+        
           console.error("Error fetching images for vehicle", vehicle.id, ":", imagesError);
           return {
             ...vehicle,

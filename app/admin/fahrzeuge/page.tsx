@@ -178,7 +178,11 @@ export default function AdminVehiclesPage() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {vehicles.map((vehicle) => (
-                  <tr key={vehicle.id} className="hover:bg-gray-50">
+                  <tr
+                    key={vehicle.id}
+                    className="hover:bg-blue-50 cursor-pointer transition-colors"
+                    onClick={() => router.push(`/admin/fahrzeuge/${vehicle.id}`)}
+                  >
                     <td className="px-6 py-4">
                       <div>
                         <div className="flex items-center gap-2">
@@ -210,7 +214,7 @@ export default function AdminVehiclesPage() {
                         {STATUS_LABELS[vehicle.status] || vehicle.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                       <div className="flex gap-2">
                         <Link href={`/admin/fahrzeuge/${vehicle.id}`}>
                           <button className="p-2 text-gray-600 hover:text-kfz-blue hover:bg-gray-100 rounded transition-colors">

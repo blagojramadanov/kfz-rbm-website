@@ -72,7 +72,7 @@ export default function SubmitVehicleWizardPage() {
     scheckheft: "Ja",
     preisvorstellung: "",
     beschreibung: "",
-    verkaufsart: "Direktverkauf an KFZ RBM",
+    verkaufsart: "Direktverkauf",
   });
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [saving, setSaving] = useState(false);
@@ -117,7 +117,7 @@ export default function SubmitVehicleWizardPage() {
             scheckheft: "Ja",
             preisvorstellung: result.vehicle.price?.toString() || "",
             beschreibung: result.vehicle.description || "",
-            verkaufsart: result.vehicle.sales_type || "Direktverkauf an KFZ RBM",
+            verkaufsart: result.vehicle.sales_type || "Direktverkauf",
           });
 
           if (result.images && result.images.length > 0) {
@@ -850,24 +850,24 @@ export default function SubmitVehicleWizardPage() {
             <p className="text-gray-600 mb-8">Wählen Sie, wie Sie Ihr Fahrzeug verkaufen möchten:</p>
 
             <div className="space-y-4">
-              {/* Direktverkauf an KFZ RBM */}
+              {/* Direktverkauf */}
               <label className={`flex items-start p-6 border-2 rounded-lg cursor-pointer transition-colors ${
-                formData.verkaufsart === "Direktverkauf an KFZ RBM"
+                formData.verkaufsart === "Direktverkauf"
                   ? "border-kfz-blue bg-blue-50"
                   : "border-gray-300 hover:bg-gray-50"
               }`}>
                 <input
                   type="radio"
                   name="verkaufsart"
-                  value="Direktverkauf an KFZ RBM"
-                  checked={formData.verkaufsart === "Direktverkauf an KFZ RBM"}
+                  value="Direktverkauf"
+                  checked={formData.verkaufsart === "Direktverkauf"}
                   onChange={handleInputChange}
                   className="w-4 h-4 text-kfz-blue mt-1 flex-shrink-0"
                 />
                 <div className="ml-4 flex-1">
-                  <p className="font-semibold text-gray-900">Direktverkauf an KFZ RBM</p>
+                  <p className="font-semibold text-gray-900">Direktverkauf</p>
                   <p className="text-sm text-gray-600 mt-1">
-                    Sie verkaufen Ihr Fahrzeug direkt an KFZ RBM. Wir übernehmen den Kauf und Sie erhalten den vereinbarten Preis.
+                    Sie verkaufen Ihr Fahrzeug direkt. Wir übernehmen den Kauf und Sie erhalten den vereinbarten Preis.
                   </p>
                 </div>
               </label>
@@ -911,7 +911,7 @@ export default function SubmitVehicleWizardPage() {
                 <div className="ml-4 flex-1">
                   <p className="font-semibold text-gray-900">Verkauf im Kundenauftrag</p>
                   <p className="text-sm text-gray-600 mt-1">
-                    KFZ RBM verkauft Ihr Fahrzeug in Ihrem Namen. Sie erhalten den Verkaufspreis abzüglich einer Kommission, die wir mit Ihnen abstimmen. Dies ist ideal, wenn Sie maximale Kontrolle über den Verkauf behalten möchten.
+                    Wir verkaufen Ihr Fahrzeug in Ihrem Namen. Sie erhalten den Verkaufspreis abzüglich einer Kommission, die wir mit Ihnen abstimmen. Dies ist ideal, wenn Sie maximale Kontrolle über den Verkauf behalten möchten.
                   </p>
                 </div>
               </label>
@@ -961,7 +961,7 @@ export default function SubmitVehicleWizardPage() {
             <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Bereit zum Absenden?</h2>
             <p className="text-gray-600 mb-8">
-              Ihr Fahrzeug wird direkt an KFZ RBM gesendet. Wir melden uns bei Ihnen.
+              Ihr Fahrzeug wird direkt an uns gesendet. Wir melden uns bei Ihnen.
             </p>
           </div>
         )}

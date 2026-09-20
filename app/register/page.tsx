@@ -99,7 +99,7 @@ export default function RegisterPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Konto erstellen</h1>
             <p className="text-blue-100">
-              Werden Sie KFZ RBM Mitglied und entdecken Sie Ihre Traumautos
+              Registrieren Sie sich und entdecken Sie Ihre Traumautos
             </p>
           </div>
 

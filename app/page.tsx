@@ -5,6 +5,7 @@ import { SearchBar } from "@/components/search-bar";
 import { LatestVehicles } from "@/components/latest-vehicles";
 import { ServicesGrid } from "@/components/services-grid";
 import { ArrowRight, CheckCircle, Users, Award, Shield, Zap } from "lucide-react";
+import { COMPANY } from "@/lib/company";
 
 export default function Home() {
   return (
@@ -36,7 +37,7 @@ export default function Home() {
               <div className="relative w-16 h-16 bg-white rounded-lg p-2">
                 <Image
                   src="/assets/logo.png"
-                  alt="KFZ RBM Logo"
+                  alt={`${COMPANY.name} Logo`}
                   width={64}
                   height={64}
                   className="object-contain"
@@ -44,8 +45,8 @@ export default function Home() {
                 />
               </div>
               <div>
-                <h1 className="text-4xl font-bold">KFZ RBM</h1>
-                <p className="text-blue-100">Premium Gebrauchtwagen</p>
+                <h1 className="text-4xl font-bold">{COMPANY.name}</h1>
+                <p className="text-blue-100">{COMPANY.tagline}</p>
               </div>
             </div>
 
@@ -169,7 +170,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Warum KFZ RBM?
+              Why Choose Us?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Mit über 20 Jahren Erfahrung haben wir uns einen Namen für Qualität, Transparenz und Kundenzufriedenheit gemacht.
@@ -269,7 +270,7 @@ export default function Home() {
             <div className="relative h-96 rounded-lg overflow-hidden shadow-lg">
               <Image
                 src="https://picsum.photos/seed/kfzrbm-about/600/400"
-                alt="KFZ RBM Showroom"
+                alt="Premium Showroom"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
@@ -279,10 +280,10 @@ export default function Home() {
             {/* Right: Content */}
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                Über KFZ RBM
+                About Our Company
               </h2>
               <p className="text-lg text-gray-600 mb-4">
-                KFZ RBM ist seit über 20 Jahren Ihr vertrauenswürdiger Partner für Premium-Gebrauchtwagen in Deutschland. Wir haben es uns zur Aufgabe gemacht, unseren Kunden die besten Fahrzeuge mit höchster Qualität und Transparenz anzubieten.
+                Wir sind Ihr vertrauenswürdiger Partner für Premium-Gebrauchtwagen. Wir haben es uns zur Aufgabe gemacht, unseren Kunden die besten Fahrzeuge mit höchster Qualität und Transparenz anzubieten.
               </p>
               <p className="text-lg text-gray-600 mb-6">
                 Unser erfahrenes Team wählt jedes Fahrzeug sorgfältig aus und inspiziert es gründlich, um sicherzustellen, dass Sie ein Auto erhalten, das Ihren Erwartungen entspricht.

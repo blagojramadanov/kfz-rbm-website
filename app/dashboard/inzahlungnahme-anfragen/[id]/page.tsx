@@ -240,7 +240,7 @@ export default function TradeInRequestDetailPage() {
                 <div className="mt-6 p-4 bg-white border border-blue-300 rounded">
                   <p className="text-sm text-gray-700">
                     <strong>ⓘ Wichtig:</strong> Die endgültige Fahrzeugbewertung und Zuzahlung wird individuell durch
-                    KFZ RBM festgelegt. Der oben angezeigte Betrag ist unverbindlich und dient nur zur Schätzung.
+                    unser Team festgelegt. Der oben angezeigte Betrag ist unverbindlich und dient nur zur Schätzung.
                   </p>
                 </div>
               </div>
@@ -249,7 +249,7 @@ export default function TradeInRequestDetailPage() {
             {/* Admin Notes */}
             {request.admin_notes && (
               <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Notizen von KFZ RBM</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Admin Notes</h3>
                 <p className="text-gray-700">{request.admin_notes}</p>
               </div>
             )}
@@ -262,11 +262,11 @@ export default function TradeInRequestDetailPage() {
                   Diese Schätzung ist <strong>unverbindlich</strong> und basiert auf Ihren Angaben.
                 </li>
                 <li>
-                  Die tatsächliche Fahrzeugbewertung wird nach einer Inspektion durch KFZ RBM festgelegt.
+                  Die tatsächliche Fahrzeugbewertung wird nach einer Inspektion durch unser Team festgelegt.
                 </li>
                 <li>Der endgültige Kaufpreis kann von der Schätzung abweichen.</li>
                 <li>
-                  KFZ RBM wird sich mit Ihnen in Verbindung setzen, um die genauen Bedingungen zu besprechen.
+                  Wir werden sich mit Ihnen in Verbindung setzen, um die genauen Bedingungen zu besprechen.
                 </li>
               </ul>
             </div>

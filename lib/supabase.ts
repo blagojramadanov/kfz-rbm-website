@@ -82,7 +82,7 @@ export interface AuthUser {
   };
 }
 
-export type VehicleStatus = "available" | "sold" | "reserved" | "draft" | "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "abgelehnt";
+export type VehicleStatus = "available" | "sold" | "reserved" | "draft" | "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "akzeptiert" | "abgelehnt";
 
 export interface SubmittedVehicle {
   id: string;
@@ -103,6 +103,9 @@ export interface SubmittedVehicle {
   status_reason?: string;
   sales_type?: string;
   commission?: number; // Commission percentage for "Verkauf im Kundenauftrag"
+  offered_price?: number; // Admin's offered price for angebot_gesendet status
+  offered_at?: string; // When offer was sent
+  offer_terms?: string; // Payment terms and conditions
   created_at: string;
   updated_at: string;
 }

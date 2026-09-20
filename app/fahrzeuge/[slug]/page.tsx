@@ -54,7 +54,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
         }
 
         // Fetch images for the vehicle
-        const { data: images, error: imagesError } = await supabase
+        const { data: images } = await supabase
           .from("vehicle_images")
           .select("image_url")
           .eq("vehicle_id", foundVehicle.id)

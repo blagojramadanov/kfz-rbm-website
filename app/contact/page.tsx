@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import { FormEvent, useState } from "react";
+import { COMPANY, getFormattedAddress } from "@/lib/company";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
         <p className="text-lg text-gray-600 mb-12">
-          Get in touch with KFZ RBM for any inquiries
+          Get in touch with {COMPANY.name} for any inquiries
         </p>
 
         <div className="grid md:grid-cols-2 gap-12">
@@ -40,7 +41,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Phone</h3>
-                  <p className="text-gray-600">+49 (0) 123 456789</p>
+                  <p className="text-gray-600">{COMPANY.phone}</p>
                 </div>
               </div>
 
@@ -50,7 +51,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Email</h3>
-                  <p className="text-gray-600">info@kfz-rbm.de</p>
+                  <p className="text-gray-600">{COMPANY.email}</p>
                 </div>
               </div>
 
@@ -61,8 +62,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900">Location</h3>
                   <p className="text-gray-600">
-                    Main Street 123<br />
-                    12345 Berlin, Germany
+                    {getFormattedAddress()}
                   </p>
                 </div>
               </div>

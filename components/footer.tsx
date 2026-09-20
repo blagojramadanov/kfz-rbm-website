@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { COMPANY, getFormattedAddress } from "@/lib/company";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -10,9 +11,12 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* About */}
           <div>
-            <h3 className="text-lg font-bold mb-4">KFZ RBM</h3>
+            <h3 className="text-lg font-bold mb-4">{COMPANY.name}</h3>
             <p className="text-blue-100 text-sm">
               Premium used-car dealership offering quality vehicles, expert service, and transparent pricing.
+            </p>
+            <p className="text-blue-200 text-xs mt-3 italic">
+              {COMPANY.demoNotice.en}
             </p>
           </div>
 
@@ -21,7 +25,7 @@ export function Footer() {
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-blue-100">
               <li>
-                <Link href="/vehicles" className="hover:text-white transition-colors">
+                <Link href="/fahrzeuge" className="hover:text-white transition-colors">
                   Browse Vehicles
                 </Link>
               </li>
@@ -47,10 +51,10 @@ export function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
             <ul className="space-y-2 text-blue-100 text-sm">
-              <li>Phone: +49 123 456789</li>
-              <li>Email: info@kfz-rbm.de</li>
+              <li>Phone: {COMPANY.phone}</li>
+              <li>Email: {COMPANY.email}</li>
+              <li>Address: {getFormattedAddress()}</li>
               <li>Hours: Mon-Fri 9am-6pm</li>
-              <li>Saturday 10am-4pm</li>
             </ul>
           </div>
 
@@ -59,7 +63,7 @@ export function Footer() {
             <h4 className="text-lg font-semibold mb-4">Follow Us</h4>
             <div className="flex gap-4">
               <a
-                href="https://facebook.com"
+                href={COMPANY.social.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-100 hover:text-white transition-colors"
@@ -67,7 +71,7 @@ export function Footer() {
                 <Facebook className="w-6 h-6" />
               </a>
               <a
-                href="https://instagram.com"
+                href={COMPANY.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-100 hover:text-white transition-colors"
@@ -75,7 +79,7 @@ export function Footer() {
                 <Instagram className="w-6 h-6" />
               </a>
               <a
-                href="https://linkedin.com"
+                href={COMPANY.social.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-100 hover:text-white transition-colors"
@@ -83,7 +87,7 @@ export function Footer() {
                 <Linkedin className="w-6 h-6" />
               </a>
               <a
-                href="https://twitter.com"
+                href={COMPANY.social.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-100 hover:text-white transition-colors"
@@ -111,7 +115,7 @@ export function Footer() {
           {/* Copyright */}
           <div className="text-center text-blue-100 text-sm">
             <p>
-              © {currentYear} KFZ RBM. All rights reserved. | Premium Used Cars Germany
+              © {currentYear} {COMPANY.name}. All rights reserved. | Premium Used Cars
             </p>
           </div>
         </div>

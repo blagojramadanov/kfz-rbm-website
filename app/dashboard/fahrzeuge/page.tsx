@@ -9,9 +9,9 @@ import Link from "next/link";
 import Image from "next/image";
 import type { SubmittedVehicle } from "@/lib/supabase";
 
-type VehicleStatus = "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "abgelehnt";
+type DashboardVehicleStatus = "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "akzeptiert" | "abgelehnt";
 
-const statusConfig: Record<VehicleStatus, { label: string; color: string; icon: React.ReactNode; bgColor: string }> = {
+const statusConfig: Record<DashboardVehicleStatus, { label: string; color: string; icon: React.ReactNode; bgColor: string }> = {
   eingereicht: {
     label: "Eingereicht",
     color: "text-blue-600",
@@ -29,6 +29,12 @@ const statusConfig: Record<VehicleStatus, { label: string; color: string; icon: 
     color: "text-green-600",
     icon: <CheckCircle className="w-4 h-4" />,
     bgColor: "bg-green-100",
+  },
+  akzeptiert: {
+    label: "Angebot angenommen",
+    color: "text-green-700",
+    icon: <CheckCircle className="w-4 h-4" />,
+    bgColor: "bg-green-200",
   },
   abgelehnt: {
     label: "Abgelehnt",
@@ -174,7 +180,7 @@ export default function MyVehiclesPage() {
           // Vehicle Grid
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {vehicles.map((vehicle) => {
-              const status = (vehicle.status as VehicleStatus) || "eingereicht";
+              const status = (vehicle.status as DashboardVehicleStatus) || "eingereicht";
               const config = statusConfig[status] || statusConfig["eingereicht"];
 
               return (

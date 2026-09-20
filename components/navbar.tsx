@@ -7,6 +7,7 @@ import { Menu, X, LogOut, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
+import { COMPANY } from "@/lib/company";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +38,7 @@ export function Navbar() {
             <div className="relative w-12 h-12">
               <Image
                 src="/assets/logo.png"
-                alt="KFZ RBM Logo"
+                alt={`${COMPANY.name} Logo`}
                 width={48}
                 height={48}
                 className="object-contain"
@@ -45,7 +46,7 @@ export function Navbar() {
               />
             </div>
             <div className="hidden sm:block">
-              <div className="text-xl font-bold text-kfz-blue">KFZ RBM</div>
+              <div className="text-xl font-bold text-kfz-blue">{COMPANY.name}</div>
               <div className="text-xs text-gray-600">Premium Cars</div>
             </div>
           </Link>
