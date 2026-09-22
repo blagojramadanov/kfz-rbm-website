@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Lock, AlertCircle, CheckCircle } from "lucide-react";
@@ -11,6 +12,9 @@ export const dynamic = "force-dynamic";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
+  const t = useTranslations();
   const { updatePassword } = useAuth();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

@@ -2,11 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function ForgotPasswordPage() {
+  const params = useParams();
+  const locale = params.locale as string || 'de';
+  const t = useTranslations();
   const { resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -25,7 +30,7 @@ export default function ForgotPasswordPage() {
       setError(
         err instanceof Error
           ? err.message
-          : "Fehler beim Zurücksetzen des Passworts"
+          : t("auth.passwordResetSent")
       );
     } finally {
       setLoading(false);
@@ -42,12 +47,11 @@ export default function ForgotPasswordPage() {
                 <CheckCircle className="w-12 h-12 text-green-300" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold mb-2">E-Mail gesendet!</h2>
+            <h2 className="text-2xl font-bold mb-2">{t("auth.passwordResetSent")}</h2>
             <p className="text-blue-100 mb-6">
-              Bitte überprüfen Sie Ihr E-Mail-Postfach auf Anweisungen zum
-              Zurücksetzen Ihres Passworts.
+              {t("auth.passwordResetSent")}
             </p>
-            <Link href="/login">
+            <Link href={`/${locale}/login`}>
               <Button className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold">
                 Zur Anmeldung zurück
               </Button>
