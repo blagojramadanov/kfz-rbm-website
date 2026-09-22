@@ -1,7 +1,9 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import {
   Car,
@@ -17,56 +19,58 @@ import Link from "next/link";
 import { useState } from "react";
 import { COMPANY } from "@/lib/company";
 
-const ADMIN_NAVIGATION = [
-  {
-    label: "Übersicht",
-    href: "/admin",
-    icon: BarChart3,
-  },
-  {
-    label: "Fahrzeuge",
-    href: "/admin/fahrzeuge",
-    icon: Car,
-    submenu: [
-      { label: "Alle Fahrzeuge", href: "/admin/fahrzeuge" },
-      { label: "Neues Fahrzeug", href: "/admin/fahrzeuge/neu" },
-      { label: "Eingereichte Fahrzeuge", href: "/admin/fahrzeuge/eingereicht" },
-    ],
-  },
-  {
-    label: "Anfragen",
-    href: "/admin/anfragen",
-    icon: MessageSquare,
-  },
-  {
-    label: "Inzahlungnahmen",
-    href: "/admin/inzahlungnahmen",
-    icon: Repeat2,
-  },
-  {
-    label: "Kunden",
-    href: "/admin/kunden",
-    icon: Users,
-  },
-  {
-    label: "Statistiken",
-    href: "/admin/statistik",
-    icon: BarChart3,
-  },
-];
-
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
   const { loading, isAdmin, profile, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
 
+  const ADMIN_NAVIGATION = [
+    {
+      label: "Übersicht",
+      href: `/${locale}/admin`,
+      icon: BarChart3,
+    },
+    {
+      label: "Fahrzeuge",
+      href: `/${locale}/admin/fahrzeuge`,
+      icon: Car,
+      submenu: [
+        { label: "Alle Fahrzeuge", href: `/${locale}/admin/fahrzeuge` },
+        { label: "Neues Fahrzeug", href: `/${locale}/admin/fahrzeuge/neu` },
+        { label: "Eingereichte Fahrzeuge", href: `/${locale}/admin/fahrzeuge/eingereicht` },
+      ],
+    },
+    {
+      label: "Anfragen",
+      href: `/${locale}/admin/anfragen`,
+      icon: MessageSquare,
+    },
+    {
+      label: "Inzahlungnahmen",
+      href: `/${locale}/admin/inzahlungnahmen`,
+      icon: Repeat2,
+    },
+    {
+      label: "Kunden",
+      href: `/${locale}/admin/kunden`,
+      icon: Users,
+    },
+    {
+      label: "Statistiken",
+      href: `/${locale}/admin/statistik`,
+      icon: BarChart3,
+    },
+  ];
+
   useEffect(() => {
     if (!loading && !isAdmin) {
       // Redirect non-admins to dashboard
-      router.push("/dashboard");
+      router.push(`/${locale}/dashboard`);
     }
-  }, [loading, isAdmin, router]);
+  }, [loading, isAdmin, router, locale]);
 
   if (loading || !isAdmin) {
     return (
@@ -81,7 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const handleLogout = async () => {
     await signOut();
-    router.push("/");
+    router.push(`/${locale}`);
   };
 
   return (

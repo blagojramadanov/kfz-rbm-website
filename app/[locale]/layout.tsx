@@ -32,7 +32,13 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  const messages = await getMessages();
+  let messages = {};
+  try {
+    messages = await getMessages();
+  } catch (error) {
+    console.error('Failed to get messages:', error);
+    messages = {};
+  }
 
   return (
     <html lang={locale} suppressHydrationWarning>
