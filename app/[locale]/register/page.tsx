@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
+  const t = useTranslations();
   const { signUp, isAuthenticated, profile } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -22,12 +26,12 @@ export default function RegisterPage() {
     if (isAuthenticated && profile) {
       // Redirect based on user role
       if (profile.role === "ADMIN") {
-        router.push("/admin");
+        router.push(`/${locale}/admin`);
       } else {
-        router.push("/dashboard");
+        router.push(`/${locale}/dashboard`);
       }
     }
-  }, [isAuthenticated, profile, router]);
+  }, [isAuthenticated, profile, router, locale]);
 
   const validatePassword = (pwd: string) => pwd.length >= 8;
 
@@ -37,19 +41,19 @@ export default function RegisterPage() {
     setLoading(true);
 
     if (!fullName.trim()) {
-      setError("Bitte geben Sie Ihren Namen ein");
+      setError(t("validation.required"));
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwörter stimmen nicht überein");
+      setError(t("auth.passwordsNotMatch"));
       setLoading(false);
       return;
     }
 
     if (!validatePassword(password)) {
-      setError("Passwort muss mindestens 8 Zeichen lang sein");
+      setError(t("validation.passwordTooShort"));
       setLoading(false);
       return;
     }
@@ -59,7 +63,7 @@ export default function RegisterPage() {
       setSubmitted(true);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Registrierung fehlgeschlagen"
+        err instanceof Error ? err.message : t("auth.signUpFailed")
       );
     } finally {
       setLoading(false);
@@ -76,13 +80,13 @@ export default function RegisterPage() {
                 <CheckCircle className="w-12 h-12 text-green-300" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold mb-2">Registrierung erfolgreich!</h2>
+            <h2 className="text-2xl font-bold mb-2">{t("auth.registrationSuccess")}</h2>
             <p className="text-blue-100 mb-6">
-              Bitte überprüfen Sie Ihr E-Mail-Postfach, um Ihr Konto zu bestätigen.
+              {t("pages.contact.contactInfo")}
             </p>
-            <Link href="/login">
+            <Link href={`/${locale}/login`}>
               <Button className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold">
-                Zur Anmeldung
+                {t("auth.signIn")}
               </Button>
             </Link>
           </div>
@@ -97,9 +101,9 @@ export default function RegisterPage() {
         <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl p-8 border border-white/20">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Konto erstellen</h1>
+            <h1 className="text-3xl font-bold mb-2">{t("auth.createAccount")}</h1>
             <p className="text-blue-100">
-              Registrieren Sie sich und entdecken Sie Ihre Traumautos
+              {t("auth.createAccountMessage")}
             </p>
           </div>
 
@@ -116,7 +120,7 @@ export default function RegisterPage() {
             {/* Full Name */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Vollständiger Name
+                {t("forms.fullName")}
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
@@ -134,7 +138,7 @@ export default function RegisterPage() {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                E-Mail
+                {t("forms.email")}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
@@ -152,7 +156,7 @@ export default function RegisterPage() {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Passwort
+                {t("auth.password")}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
@@ -161,19 +165,19 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder="Mindestens 8 Zeichen"
+                  placeholder="••••••••"
                   className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
                 />
               </div>
               <p className="text-xs text-blue-200 mt-1">
-                Mindestens 8 Zeichen erforderlich
+                {t("validation.passwordTooShort")}
               </p>
             </div>
 
             {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Passwort wiederholen
+                {t("auth.confirmPassword")}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
@@ -194,7 +198,7 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold py-2 rounded-lg transition-all disabled:opacity-50 mt-6"
             >
-              {loading ? "Wird registriert..." : "Konto erstellen"}
+              {loading ? t("common.loading") : t("auth.createAccount")}
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </form>
