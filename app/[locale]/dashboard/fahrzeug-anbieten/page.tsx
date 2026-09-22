@@ -1,4 +1,8 @@
 "use client";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -52,6 +56,9 @@ interface UploadedImage {
 }
 
 export default function SubmitVehicleWizardPage() {
+  const t = useTranslations();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState<Step>("fahrzeugdaten");

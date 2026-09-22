@@ -1,4 +1,8 @@
 "use client";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -7,6 +11,9 @@ import { AlertCircle, CheckCircle, Mail } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminInquiriesPage() {
+  const t = useTranslations();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
   const router = useRouter();
   const { loading, isAdmin } = useAuth();
   const [inquiries, setInquiries] = useState<any[]>([]);

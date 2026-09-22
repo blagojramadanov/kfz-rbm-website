@@ -1,4 +1,8 @@
 "use client";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,6 +12,9 @@ import { User, Lock, AlertCircle, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function ProfilePage() {
+  const t = useTranslations();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
   const router = useRouter();
   const { profile, loading, isAuthenticated, updateProfile, changePassword } = useAuth();
 

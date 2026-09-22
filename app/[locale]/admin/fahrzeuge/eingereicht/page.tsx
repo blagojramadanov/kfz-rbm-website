@@ -1,4 +1,8 @@
 "use client";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -7,6 +11,9 @@ import { Check, X, AlertCircle, Car, MapPin, Calendar, Gauge } from "lucide-reac
 import Image from "next/image";
 
 export default function AdminSubmittedVehiclesPage() {
+  const t = useTranslations();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
   const router = useRouter();
   const { loading, isAdmin } = useAuth();
   const [vehicles, setVehicles] = useState<any[]>([]);

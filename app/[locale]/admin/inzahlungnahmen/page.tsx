@@ -1,4 +1,8 @@
 "use client";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -6,6 +10,9 @@ import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, Edit2, X } from "lucide-react";
 
 export default function AdminTradeInRequestsPage() {
+  const t = useTranslations();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
   const router = useRouter();
   const { loading, isAdmin } = useAuth();
   const [requests, setRequests] = useState<any[]>([]);
