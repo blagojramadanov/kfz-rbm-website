@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Car, Users, MessageSquare, Repeat2, TrendingUp, AlertCircle } from "lucide-react";
 import Link from "next/link";
@@ -22,8 +23,13 @@ interface DashboardStats {
   total_customers: number;
 }
 
+export const dynamic = "force-dynamic";
+
 export default function AdminDashboardPage() {
+  const t = useTranslations();
   const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
   const { loading, isAdmin } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -43,7 +49,7 @@ export default function AdminDashboardPage() {
         setStats(data);
       } catch (err) {
         console.error("Error loading stats:", err);
-        setError("Fehler beim Laden der Statistiken");
+        setError(t("admin.loading_stats"));
       } finally {
         setStatsLoading(false);
       }
@@ -59,7 +65,7 @@ export default function AdminDashboardPage() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -69,8 +75,8 @@ export default function AdminDashboardPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600">Übersicht über Fahrzeuge, Kunden und Anfragen</p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{t("admin.title")}</h1>
+        <p className="text-gray-600">{t("admin.overview")}</p>
       </div>
 
       {/* Error Alert */}
@@ -91,17 +97,17 @@ export default function AdminDashboardPage() {
           {/* Quick Stats */}
           <div className="grid md:grid-cols-5 gap-4">
             {/* Total Vehicles */}
-            <Link href="/admin/fahrzeuge">
+            <Link href={`/${locale}/admin/fahrzeuge`}>
               <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
                 <div className="flex items-center justify-between mb-2">
                   <Car className="w-10 h-10 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-600">Fahrzeuge</span>
+                  <span className="text-sm font-medium text-gray-600">{t("admin.vehicles")}</span>
                 </div>
                 <p className="text-3xl font-bold text-gray-900">
                   {stats.total_vehicles}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {stats.vehicles_available} verfügbar
+                  {stats.vehicles_available} {t("admin.available")}
                 </p>
               </div>
             </Link>
