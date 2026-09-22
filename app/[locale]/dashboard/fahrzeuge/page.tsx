@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Plus, Car, Clock, CheckCircle, AlertCircle } from "lucide-react";
@@ -44,7 +45,10 @@ const statusConfig: Record<DashboardVehicleStatus, { label: string; color: strin
   },
 };
 
+export const dynamic = "force-dynamic";
+
 export default function MyVehiclesPage() {
+  const t = useTranslations();
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
   const [vehicles, setVehicles] = useState<SubmittedVehicle[]>([]);
