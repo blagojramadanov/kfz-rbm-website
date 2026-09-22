@@ -198,6 +198,84 @@
     "cookiePolicy": "Cookie-Richtlinie",
     "dataProtection": "Datenschutz"
   },
+  "auth": {
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "signOut": "Abmelden",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "welcomeBack": "Willkommen zurück",
+    "signInMessage": "Melden Sie sich an, um fortzufahren",
+    "createAccount": "Konto erstellen",
+    "createAccountMessage": "Registrieren Sie sich für ein neues Konto",
+    "alreadyHaveAccount": "Sie haben bereits ein Konto?",
+    "dontHaveAccount": "Sie haben kein Konto?",
+    "forgotPassword": "Passwort vergessen?",
+    "resetPassword": "Passwort zurücksetzen",
+    "enterEmail": "Geben Sie Ihre E-Mail-Adresse ein",
+    "sendResetLink": "Zurücksetzen-Link senden",
+    "enterNewPassword": "Neues Passwort eingeben",
+    "passwordResetSent": "Ein Link zum Zurücksetzen des Passworts wurde an Ihre E-Mail gesendet",
+    "passwordResetSuccess": "Ihr Passwort wurde erfolgreich zurückgesetzt",
+    "loginFailed": "Anmeldung fehlgeschlagen",
+    "signUpFailed": "Registrierung fehlgeschlagen",
+    "invalidCredentials": "Ungültige E-Mail oder Passwort",
+    "userExists": "Benutzer mit dieser E-Mail existiert bereits",
+    "passwordsNotMatch": "Passwörter stimmen nicht überein"
+  },
+  "pages": {
+    "about": {
+      "title": "Über uns",
+      "subtitle": "Premium-Gebrauchtwagen-Händler",
+      "comingSoon": "Die Seite kommt bald...",
+      "description": "Premium used-car dealership offering quality vehicles and expert service"
+    },
+    "services": {
+      "title": "Unsere Dienstleistungen",
+      "subtitle": "Umfassende automative Services und Lösungen",
+      "comingSoon": "Services Seite kommt bald..."
+    },
+    "contact": {
+      "title": "Kontaktieren Sie uns",
+      "getInTouch": "Treten Sie mit uns in Kontakt",
+      "fullName": "Vollständiger Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "subject": "Betreff",
+      "message": "Nachricht",
+      "send": "Senden",
+      "messageSent": "Nachricht erfolgreich gesendet",
+      "messageError": "Fehler beim Senden der Nachricht",
+      "contactInfo": "Kontaktinformationen",
+      "monToFri": "Montag - Freitag: 09:00 - 18:00",
+      "satSun": "Samstag - Sonntag: Geschlossen",
+      "address": "Musterstraße 1, 12345 Musterstadt"
+    },
+    "fahrzeuge": {
+      "title": "Fahrzeuge",
+      "browseVehicles": "Fahrzeuge durchsuchen",
+      "noVehicles": "Keine Fahrzeuge gefunden",
+      "filters": "Filter",
+      "sort": "Sortieren",
+      "details": "Details",
+      "export": "Exportieren"
+    },
+    "login": {
+      "title": "Anmelden",
+      "subtitle": "Melden Sie sich an, um fortzufahren"
+    },
+    "register": {
+      "title": "Registrieren",
+      "subtitle": "Erstellen Sie ein neues Konto"
+    },
+    "resetPassword": {
+      "title": "Passwort zurücksetzen"
+    },
+    "forgotPassword": {
+      "title": "Passwort vergessen"
+    }
+  },
   "common": {
     "welcome": "Willkommen",
     "loading": "Wird geladen...",
@@ -208,6 +286,11 @@
     "german": "Deutsch",
     "english": "English",
     "macedonian": "Македонски",
-    "closed": "Geschlossen"
+    "closed": "Geschlossen",
+    "orElse": "oder",
+    "and": "und",
+    "yes": "Ja",
+    "no": "Nein",
+    "required": "Erforderlich"
   }
 }

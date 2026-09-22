@@ -198,6 +198,84 @@
     "cookiePolicy": "Политика за колачи",
     "dataProtection": "Заштита на податоци"
   },
+  "auth": {
+    "signIn": "Пријави се",
+    "signUp": "Регистрирај се",
+    "signOut": "Одјави се",
+    "email": "Е-пошта",
+    "password": "Лозинка",
+    "confirmPassword": "Потврди лозинка",
+    "welcomeBack": "Добредојде назад",
+    "signInMessage": "Пријавете се за да продолжите",
+    "createAccount": "Создај сметачно",
+    "createAccountMessage": "Регистрирајте се за ново сметачно",
+    "alreadyHaveAccount": "Веќе имате сметачно?",
+    "dontHaveAccount": "Немате сметачно?",
+    "forgotPassword": "Заборавивте лозинка?",
+    "resetPassword": "Рестартирај лозинка",
+    "enterEmail": "Внесете ја вашата е-пошта",
+    "sendResetLink": "Испрати врска за рестартирање",
+    "enterNewPassword": "Внесете нова лозинка",
+    "passwordResetSent": "Врска за рестартирање на лозинка е испратена на вашата е-пошта",
+    "passwordResetSuccess": "Вашата лозинка е успешно рестартирана",
+    "loginFailed": "Пријавата не успеа",
+    "signUpFailed": "Регистрацијата не успеа",
+    "invalidCredentials": "Неважечка е-пошта или лозинка",
+    "userExists": "Корисник со оваа е-пошта веќе постои",
+    "passwordsNotMatch": "Лозинките не се совпаѓаат"
+  },
+  "pages": {
+    "about": {
+      "title": "За нас",
+      "subtitle": "Премиум трговец на користени автомобили",
+      "comingSoon": "Страната доаѓа наскоро...",
+      "description": "Premium used-car dealership offering quality vehicles and expert service"
+    },
+    "services": {
+      "title": "Нашите услуги",
+      "subtitle": "Сеопфатни автомотивни услуги и решенија",
+      "comingSoon": "Страната за услуги доаѓа наскоро..."
+    },
+    "contact": {
+      "title": "Контактирај нас",
+      "getInTouch": "Контактирај се со нас",
+      "fullName": "Полно име",
+      "email": "Е-пошта",
+      "phone": "Телефон",
+      "subject": "Предмет",
+      "message": "Порака",
+      "send": "Испрати",
+      "messageSent": "Порака успешно испратена",
+      "messageError": "Грешка при слање на порака",
+      "contactInfo": "Информации за контакт",
+      "monToFri": "Понеделник - Петок: 09:00 - 18:00",
+      "satSun": "Сабота - Недела: Затворено",
+      "address": "Примерна улица 1, 12345 Примерен град"
+    },
+    "fahrzeuge": {
+      "title": "Возила",
+      "browseVehicles": "Разгледај возила",
+      "noVehicles": "Нема пронајдени возила",
+      "filters": "Филтри",
+      "sort": "Сортирај",
+      "details": "Детали",
+      "export": "Извези"
+    },
+    "login": {
+      "title": "Пријави се",
+      "subtitle": "Пријавете се за да продолжите"
+    },
+    "register": {
+      "title": "Регистрирај се",
+      "subtitle": "Создајте ново сметачно"
+    },
+    "resetPassword": {
+      "title": "Рестартирај лозинка"
+    },
+    "forgotPassword": {
+      "title": "Заборавивте лозинка"
+    }
+  },
   "common": {
     "welcome": "Добредојде",
     "loading": "Се вчитува...",
@@ -208,6 +286,11 @@
     "german": "Deutsch",
     "english": "English",
     "macedonian": "Македонски",
-    "closed": "Затворено"
+    "closed": "Затворено",
+    "orElse": "или",
+    "and": "и",
+    "yes": "Да",
+    "no": "Не",
+    "required": "Задолжително"
   }
 }

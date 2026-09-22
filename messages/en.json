@@ -62,20 +62,20 @@
     "passwordsNotMatch": "Passwords do not match",
     "invalidPhone": "Please enter a valid phone number",
     "invalidZipCode": "Please enter a valid zip code",
-    "minLength": "At least {min} characters required",
+    "minLength": "Minimum {min} characters required",
     "maxLength": "Maximum {max} characters allowed",
     "minValue": "Value must be at least {min}",
     "maxValue": "Value must not exceed {max}",
-    "onlyNumbers": "This field must contain only numbers"
+    "onlyNumbers": "This field can only contain numbers"
   },
   "errors": {
     "generic": "An error occurred",
     "loading": "Loading...",
-    "notFound": "Not Found",
+    "notFound": "Not found",
     "unauthorized": "Unauthorized",
-    "forbidden": "Access Denied",
-    "serverError": "Server Error",
-    "networkError": "Network Error",
+    "forbidden": "Access denied",
+    "serverError": "Server error",
+    "networkError": "Network error",
     "tryAgain": "Please try again later",
     "goHome": "Go to Home",
     "contactSupport": "Contact Support"
@@ -86,8 +86,8 @@
     "updated": "Successfully updated",
     "deleted": "Successfully deleted",
     "published": "Successfully published",
-    "loginSuccess": "Successfully logged in",
-    "logoutSuccess": "Successfully logged out",
+    "loginSuccess": "Successfully signed in",
+    "logoutSuccess": "Successfully signed out",
     "registrationSuccess": "Registration successful"
   },
   "vehicles": {
@@ -165,7 +165,7 @@
   },
   "contact": {
     "title": "Contact Us",
-    "getInTouch": "Get in Touch",
+    "getInTouch": "Get In Touch",
     "phone": "Phone",
     "email": "Email",
     "address": "Address",
@@ -198,6 +198,84 @@
     "cookiePolicy": "Cookie Policy",
     "dataProtection": "Data Protection"
   },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "welcomeBack": "Welcome Back",
+    "signInMessage": "Sign in to continue",
+    "createAccount": "Create Account",
+    "createAccountMessage": "Sign up for a new account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset Password",
+    "enterEmail": "Enter your email address",
+    "sendResetLink": "Send Reset Link",
+    "enterNewPassword": "Enter your new password",
+    "passwordResetSent": "Password reset link has been sent to your email",
+    "passwordResetSuccess": "Your password has been reset successfully",
+    "loginFailed": "Login failed",
+    "signUpFailed": "Sign up failed",
+    "invalidCredentials": "Invalid email or password",
+    "userExists": "User with this email already exists",
+    "passwordsNotMatch": "Passwords do not match"
+  },
+  "pages": {
+    "about": {
+      "title": "About Us",
+      "subtitle": "Premium Used Car Dealership",
+      "comingSoon": "Page coming soon...",
+      "description": "Premium used-car dealership offering quality vehicles and expert service"
+    },
+    "services": {
+      "title": "Our Services",
+      "subtitle": "Comprehensive automotive services and solutions",
+      "comingSoon": "Services page coming soon..."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "getInTouch": "Get In Touch",
+      "fullName": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send",
+      "messageSent": "Message sent successfully",
+      "messageError": "Error sending message",
+      "contactInfo": "Contact Information",
+      "monToFri": "Monday - Friday: 09:00 - 18:00",
+      "satSun": "Saturday - Sunday: Closed",
+      "address": "Sample Street 1, 12345 Sample City"
+    },
+    "fahrzeuge": {
+      "title": "Vehicles",
+      "browseVehicles": "Browse Vehicles",
+      "noVehicles": "No vehicles found",
+      "filters": "Filters",
+      "sort": "Sort",
+      "details": "Details",
+      "export": "Export"
+    },
+    "login": {
+      "title": "Sign In",
+      "subtitle": "Sign in to continue"
+    },
+    "register": {
+      "title": "Register",
+      "subtitle": "Create a new account"
+    },
+    "resetPassword": {
+      "title": "Reset Password"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password"
+    }
+  },
   "common": {
     "welcome": "Welcome",
     "loading": "Loading...",
@@ -208,6 +286,11 @@
     "german": "Deutsch",
     "english": "English",
     "macedonian": "Македонски",
-    "closed": "Closed"
+    "closed": "Closed",
+    "orElse": "or",
+    "and": "and",
+    "yes": "Yes",
+    "no": "No",
+    "required": "Required"
   }
 }
