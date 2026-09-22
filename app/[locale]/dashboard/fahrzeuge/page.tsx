@@ -48,7 +48,6 @@ const statusConfig: Record<DashboardVehicleStatus, { label: string; color: strin
 export const dynamic = "force-dynamic";
 
 export default function MyVehiclesPage() {
-  const t = useTranslations();
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
   const [vehicles, setVehicles] = useState<SubmittedVehicle[]>([]);

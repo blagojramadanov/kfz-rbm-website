@@ -56,7 +56,6 @@ interface UploadedImage {
 }
 
 export default function SubmitVehicleWizardPage() {
-  const t = useTranslations();
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();

@@ -12,7 +12,6 @@ import { User, Lock, AlertCircle, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function ProfilePage() {
-  const t = useTranslations();
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();

@@ -12,7 +12,6 @@ import { Heart, Search } from "lucide-react";
 import Link from "next/link";
 
 export default function FavoritesPage() {
-  const t = useTranslations();
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();

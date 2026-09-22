@@ -10,7 +10,6 @@ import { useAuth } from "@/lib/auth-context";
 import { AlertCircle } from "lucide-react";
 
 export default function AdminStatisticsPage() {
-  const t = useTranslations();
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();

@@ -29,7 +29,6 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function TradeInRequestsPage() {
-  const t = useTranslations();
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();

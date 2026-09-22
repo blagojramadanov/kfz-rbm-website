@@ -11,7 +11,6 @@ import { Check, X, AlertCircle, Car, MapPin, Calendar, Gauge } from "lucide-reac
 import Image from "next/image";
 
 export default function AdminSubmittedVehiclesPage() {
-  const t = useTranslations();
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();

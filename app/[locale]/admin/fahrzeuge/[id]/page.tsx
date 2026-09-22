@@ -1,21 +1,18 @@
 "use client";
-import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
-
-export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, ArrowLeft, Edit2, Trash2, Star } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default function AdminVehicleDetailPage() {
-  const t = useTranslations();
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
-  const params = useParams();
   const vehicleId = params?.id as string;
   const { loading, isAdmin } = useAuth();
   const [vehicle, setVehicle] = useState<any>(null);

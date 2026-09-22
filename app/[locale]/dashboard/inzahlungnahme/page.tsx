@@ -32,7 +32,6 @@ interface TradeInForm {
 }
 
 export default function InzahlungnahmePage() {
-  const t = useTranslations();
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
