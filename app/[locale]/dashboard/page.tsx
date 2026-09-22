@@ -1,14 +1,20 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Car, MessageSquare, Heart, Plus, FileText, LogOut, ArrowRight, Repeat2 } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default function DashboardPage() {
+  const t = useTranslations();
   const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
   const { profile, loading, isAuthenticated, isAdmin, signOut } = useAuth();
 
   useEffect(() => {
@@ -29,7 +35,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -50,10 +56,10 @@ export default function DashboardPage() {
       <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h1 className="text-4xl font-bold mb-2">
-            Willkommen, {profile.full_name}!
+            {t("common.welcome")}, {profile.full_name}!
           </h1>
           <p className="text-blue-100 text-lg">
-            Verwalten Sie Ihre Fahrzeuge und Profil
+            {t("dashboard.welcome")}
           </p>
         </div>
       </div>
@@ -61,7 +67,7 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Quick Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <Link href="/dashboard/fahrzeuge">
+          <Link href={`/${locale}/dashboard/fahrzeuge`}>
             <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
