@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 const handleI18nRouting = createMiddleware({
   locales: ['de', 'en', 'mk'],
   defaultLocale: 'de',
-  localePrefix: 'as-needed',
+  localePrefix: 'always',
 });
 
 export function middleware(request: NextRequest) {
@@ -13,7 +13,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/',
-    '/(de|en|mk)/:path*',
+    '/((?!_next|api|.*\\..*|favicon\\.ico).*)',
   ],
 };
