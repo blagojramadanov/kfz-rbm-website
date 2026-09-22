@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Lock, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string || 'de';
+  const t = useTranslations();
   const { signIn, isAuthenticated, profile } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,12 +23,12 @@ export default function LoginPage() {
     if (isAuthenticated && profile) {
       // Redirect based on user role
       if (profile.role === "ADMIN") {
-        router.push("/admin");
+        router.push(`/${locale}/admin`);
       } else {
-        router.push("/dashboard");
+        router.push(`/${locale}/dashboard`);
       }
     }
-  }, [isAuthenticated, profile, router]);
+  }, [isAuthenticated, profile, router, locale]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +40,7 @@ export default function LoginPage() {
       // Redirect will happen via useEffect above
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Anmeldung fehlgeschlagen"
+        err instanceof Error ? err.message : t("auth.loginFailed")
       );
     } finally {
       setLoading(false);
@@ -50,9 +54,9 @@ export default function LoginPage() {
         <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl p-8 border border-white/20">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Willkommen zurück</h1>
+            <h1 className="text-3xl font-bold mb-2">{t("auth.welcomeBack")}</h1>
             <p className="text-blue-100">
-              Melden Sie sich an, um fortzufahren
+              {t("auth.signInMessage")}
             </p>
           </div>
 
@@ -69,7 +73,7 @@ export default function LoginPage() {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                E-Mail
+                {t("forms.email")}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
@@ -78,7 +82,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="ihre@email.com"
+                  placeholder="user@example.com"
                   className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
                 />
               </div>
@@ -87,7 +91,7 @@ export default function LoginPage() {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Passwort
+                {t("auth.password")}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
@@ -105,10 +109,10 @@ export default function LoginPage() {
             {/* Forgot Password Link */}
             <div className="text-right">
               <Link
-                href="/forgot-password"
+                href={`/${locale}/forgot-password`}
                 className="text-sm text-blue-100 hover:text-white transition-colors"
               >
-                Passwort vergessen?
+                {t("auth.forgotPassword")}
               </Link>
             </div>
 
@@ -118,7 +122,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold py-2 rounded-lg transition-all disabled:opacity-50"
             >
-              {loading ? "Wird angemeldet..." : "Anmelden"}
+              {loading ? t("common.loading") : t("auth.signIn")}
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </form>
@@ -126,15 +130,15 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="flex-1 h-px bg-white/20"></div>
-            <span className="text-sm text-blue-100">oder</span>
+            <span className="text-sm text-blue-100">{t("common.orElse")}</span>
             <div className="flex-1 h-px bg-white/20"></div>
           </div>
 
           {/* Sign Up Link */}
           <p className="text-center text-blue-100">
-            Noch kein Konto?{" "}
-            <Link href="/register" className="text-white font-semibold hover:underline">
-              Registrieren Sie sich
+            {t("auth.dontHaveAccount")}{" "}
+            <Link href={`/${locale}/register`} className="text-white font-semibold hover:underline">
+              {t("auth.signUp")}
             </Link>
           </p>
         </div>
