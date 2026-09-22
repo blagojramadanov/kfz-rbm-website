@@ -1,11 +1,19 @@
-import { NextResponse } from "next/server";
+import createMiddleware from 'next-intl/middleware';
+import type { NextRequest } from 'next/server';
 
-export function middleware() {
-  // Admin role checks are handled by individual pages using useAuth() hook
-  // This prevents the middleware from blocking admins before auth context loads
-  return NextResponse.next();
+const handleI18nRouting = createMiddleware({
+  locales: ['de', 'en', 'mk'],
+  defaultLocale: 'de',
+  localePrefix: 'as-needed',
+});
+
+export function middleware(request: NextRequest) {
+  return handleI18nRouting(request);
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*"],
+  matcher: [
+    '/',
+    '/(de|en|mk)/:path*',
+  ],
 };
