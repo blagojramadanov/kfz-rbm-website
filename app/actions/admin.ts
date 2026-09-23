@@ -5,15 +5,15 @@ import { getSupabaseServerClient } from "@/lib/supabase-server";
 // Helper function to verify admin role before executing admin operations
 async function verifyAdminRole() {
   try {
-    const { supabase, session } = await getSupabaseServerClient();
-    if (!session?.user) {
+    const { supabase, user } = await getSupabaseServerClient();
+    if (!user) {
       throw new Error("Unauthorized: User not authenticated");
     }
 
     const { data: profile, error: profileError } = await supabase
       .from("user_profiles")
       .select("role")
-      .eq("id", session.user.id)
+      .eq("id", user.id)
       .single();
 
     if (profileError || !profile || profile.role !== "ADMIN") {
@@ -300,11 +300,11 @@ export async function getSubmittedVehicles(
 export async function approveSubmittedVehicle(submittedVehicleId: string) {
   try {
     await verifyAdminRole();
-    const { session } = await getSupabaseServerClient();
+    const { user } = await getSupabaseServerClient();
     const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
     const supabase = getSupabaseAdminClient();
 
-    if (!session?.user) {
+    if (!user) {
       throw new Error("User session required");
     }
 
@@ -805,11 +805,11 @@ export async function publishSubmittedVehicle(
 ) {
   try {
     await verifyAdminRole();
-    const { session } = await getSupabaseServerClient();
+    const { user } = await getSupabaseServerClient();
     const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
     const supabase = getSupabaseAdminClient();
 
-    if (!session?.user) {
+    if (!user) {
       throw new Error("User session required");
     }
 
@@ -848,6 +848,64 @@ export async function publishSubmittedVehicle(
 
     if (createError || !newVehicle) {
       throw new Error(`Fehler beim Erstellen der Fahrzeugangebot: ${createError?.message}`);
+    }
+
+    // Copy images from private customer-submitted-photos bucket to public vehicle-images bucket
+    const { data: submittedImages } = await supabase
+      .from("submitted_vehicle_images")
+      .select("image_url, sort_order, is_main")
+      .eq("submitted_vehicle_id", submittedVehicleId)
+      .order("sort_order", { ascending: true });
+
+    if (submittedImages && submittedImages.length > 0) {
+      for (const submittedImage of submittedImages) {
+        try {
+          // Download from private bucket
+          const { data: fileData, error: downloadError } = await supabase.storage
+            .from("customer-submitted-photos")
+            .download(submittedImage.image_url);
+
+          if (downloadError || !fileData) {
+            console.error(`Failed to download image ${submittedImage.image_url}:`, downloadError);
+            continue;
+          }
+
+          // Upload to public bucket with new path
+          const fileName = submittedImage.image_url.split("/").pop() || `image-${Date.now()}.jpg`;
+          const publicPath = `${newVehicle.id}/${fileName}`;
+          const { error: uploadError } = await supabase.storage
+            .from("vehicle-images")
+            .upload(publicPath, fileData, { upsert: false });
+
+          if (uploadError) {
+            console.error(`Failed to upload image to public bucket:`, uploadError);
+            continue;
+          }
+
+          // Get public URL
+          const { data: publicUrl } = supabase.storage
+            .from("vehicle-images")
+            .getPublicUrl(publicPath);
+
+          // Store public URL in vehicle_images table
+          const { error: insertError } = await supabase
+            .from("vehicle_images")
+            .insert({
+              vehicle_id: newVehicle.id,
+              image_url: publicUrl.publicUrl,
+              sort_order: submittedImage.sort_order,
+              is_main: submittedImage.is_main,
+            });
+
+          if (insertError) {
+            console.error(`Failed to insert image record:`, insertError);
+            continue;
+          }
+        } catch (imgError) {
+          console.error(`Error processing image ${submittedImage.image_url}:`, imgError);
+          continue;
+        }
+      }
     }
 
     const now = new Date().toISOString();

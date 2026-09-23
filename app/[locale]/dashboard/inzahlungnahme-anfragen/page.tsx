@@ -36,7 +36,6 @@ export default function TradeInRequestsPage() {
   const [requests, setRequests] = useState<TradeInRequest[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -50,7 +49,7 @@ export default function TradeInRequestsPage() {
 
       try {
         const { getTradeInRequests } = await import("@/app/actions/trade-in");
-        const data = await getTradeInRequests(user.id);
+        const data = await getTradeInRequests();
         setRequests(data);
       } catch (err) {
         console.error("Error loading requests:", err);
@@ -65,23 +64,6 @@ export default function TradeInRequestsPage() {
     }
   }, [isAuthenticated, user]);
 
-  const handleCancelRequest = async (requestId: string) => {
-    if (!confirm("Möchten Sie diese Anfrage wirklich stornieren?")) return;
-
-    try {
-      setDeleting(requestId);
-      const { cancelTradeInRequest } = await import("@/app/actions/trade-in");
-      await cancelTradeInRequest(requestId, user!.id);
-
-      setRequests((prev) =>
-        prev.map((req) => (req.id === requestId ? { ...req, status: "cancelled" } : req))
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Fehler beim Stornieren");
-    } finally {
-      setDeleting(null);
-    }
-  };
 
   if (loading || !isAuthenticated) {
     return (
@@ -233,17 +215,6 @@ export default function TradeInRequestsPage() {
                         <ArrowRight className="ml-2 w-4 h-4" />
                       </Button>
                     </Link>
-
-                    {request.status === "new" && (
-                      <button
-                        onClick={() => handleCancelRequest(request.id)}
-                        disabled={deleting === request.id}
-                        className="w-full px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        {deleting === request.id ? "Wird storniert..." : "Stornieren"}
-                      </button>
-                    )}
 
                     <div className="text-xs text-gray-500 text-center pt-2">
                       {new Date(request.created_at).toLocaleDateString("de-DE")}

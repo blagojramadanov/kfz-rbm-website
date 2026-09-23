@@ -85,7 +85,6 @@ export default function SubmitVehicleWizardPage() {
   const [error, setError] = useState("");
   const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
   const [editingVehicleId, setEditingVehicleId] = useState<string | null>(null);
-  const [removedImageIds, setRemovedImageIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -234,21 +233,6 @@ export default function SubmitVehicleWizardPage() {
     e.target.value = "";
   };
 
-  const removeImage = (id: string) => {
-    setImages((prev) => {
-      const imageToRemove = prev.find((img) => img.id === id);
-      if (imageToRemove?.dbId) {
-        setRemovedImageIds((prev) => [...prev, imageToRemove.dbId!]);
-      }
-      const filtered = prev.filter((img) => img.id !== id);
-      // If removed image was main, make first image main
-      if (filtered.length > 0 && !filtered.some((img) => img.isMain)) {
-        filtered[0].isMain = true;
-      }
-      return filtered;
-    });
-  };
-
   const setMainImage = (id: string) => {
     setImages((prev) =>
       prev.map((img) => ({
@@ -382,56 +366,11 @@ export default function SubmitVehicleWizardPage() {
       })));
       console.log(`[FORM] Editing vehicle ID: ${editingVehicleId || 'NEW'}`);
 
-      const { createSubmittedVehicle, updateVehicleDraft, updateVehicleImages } = await import("@/app/actions/vehicles");
+      const { createSubmittedVehicle } = await import("@/app/actions/vehicles");
 
       if (editingVehicleId) {
-        // Update existing draft
-        const newImages = images.filter((img) => !img.dbId);
-        const newImageData = newImages.map((img) => img.data);
-
-        // Update vehicle data
-        await updateVehicleDraft(
-          editingVehicleId,
-          user.id,
-          {
-            brand: formData.marke,
-            model: formData.modell,
-            year: parseInt(formData.erstzulassung),
-            mileage: parseInt(formData.kilometerstand) || 0,
-            price: formData.preisvorstellung ? parseFloat(formData.preisvorstellung) : undefined,
-            transmission: formData.getriebe,
-            fuel_type: formData.kraftstoff,
-            body_type: formData.karosserie,
-            color: formData.farbe,
-            power_hp: formData.leistung ? parseInt(formData.leistung) : undefined,
-            description: formData.beschreibung,
-            sales_type: formData.verkaufsart,
-          }
-        );
-
-        // Update images if there are changes
-        if (newImageData.length > 0 || removedImageIds.length > 0 || images.length > 0) {
-          // Separate existing and new images
-          const existingImages = images.filter((img) => img.dbId && !removedImageIds.includes(img.dbId));
-          const newImages = images.filter((img) => !img.dbId);
-
-          // Determine main image - prefer existing DB image
-          const mainImage = images.find((img) => img.isMain);
-          const mainImageId = mainImage?.dbId;
-          const mainIsNewImage = mainImage && !mainImage.dbId;
-          const mainNewImageIndex = mainIsNewImage ? newImages.indexOf(mainImage) : -1;
-
-          // Only include existing (DB) images in order
-          const imageOrder = existingImages.length > 0 ? existingImages.map((img) => img.dbId!) : undefined;
-
-          await updateVehicleImages(editingVehicleId, user.id, {
-            newImages: newImageData.length > 0 ? newImageData : undefined,
-            imagesToRemove: removedImageIds.length > 0 ? removedImageIds : undefined,
-            imageOrder: imageOrder,
-            mainImageId: mainImageId,
-            mainNewImageIndex: mainNewImageIndex >= 0 ? mainNewImageIndex : undefined,
-          });
-        }
+        // Direct submission only - no editing after submit
+        throw new Error("Submitted vehicles cannot be edited. Please create a new submission.");
       } else {
         // Create new vehicle as draft first (so images can be uploaded due to RLS policy)
         const imagesToPass = images.map((img) => img.data);
@@ -443,7 +382,6 @@ export default function SubmitVehicleWizardPage() {
         })));
 
         const result = await createSubmittedVehicle(
-          user.id,
           {
             brand: formData.marke,
             model: formData.modell,
@@ -458,24 +396,9 @@ export default function SubmitVehicleWizardPage() {
             description: formData.beschreibung,
             sales_type: formData.verkaufsart,
           },
-          imagesToPass,
-          true  // Create as draft first (RLS requires draft for image upload)
+          imagesToPass
         );
 
-        console.log(`[FORM] createSubmittedVehicle returned:`, result);
-
-        // Update status to eingereicht after images are uploaded (server-side action)
-        if (result.vehicleId) {
-          try {
-            console.log(`[FORM] Calling finalizeSubmission for vehicle ${result.vehicleId}`);
-            const { finalizeSubmission } = await import("@/app/actions/vehicles");
-            const finalizeResult = await finalizeSubmission(result.vehicleId, user.id);
-            console.log(`[FORM] finalizeSubmission returned:`, finalizeResult);
-          } catch (finalizeError) {
-            console.error(`[FORM] finalizeSubmission error:`, finalizeError);
-            throw finalizeError;
-          }
-        }
       }
 
       // Redirect to success page
@@ -813,12 +736,6 @@ export default function SubmitVehicleWizardPage() {
                             Als Hauptbild
                           </button>
                         )}
-                        <button
-                          onClick={() => removeImage(image.id)}
-                          className="bg-red-600 text-white px-3 py-1 rounded text-sm font-medium hover:bg-red-700"
-                        >
-                          Löschen
-                        </button>
                       </div>
 
                       {/* Drag Handle */}

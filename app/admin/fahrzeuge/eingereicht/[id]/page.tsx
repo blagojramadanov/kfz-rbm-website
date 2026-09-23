@@ -43,6 +43,7 @@ export default function SubmittedVehicleDetailPage() {
   const [publishing, setPublishing] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
   const vehicleId = params?.id as string;
 
   useEffect(() => {
@@ -63,6 +64,14 @@ export default function SubmittedVehicleDetailPage() {
         setPublishPrice(data.price);
         setPublishDescription(data.description || "");
         setError("");
+
+        // Fetch signed URLs for all images
+        if (data.images && data.images.length > 0) {
+          const { getSignedImageUrls } = await import("@/app/actions/storage");
+          const urls = await getSignedImageUrls(data.images);
+          const urlMap = Object.fromEntries(urls.filter(u => u.url).map(u => [u.path, u.url!]));
+          setImageUrls(urlMap);
+        }
       } catch (err) {
         console.error("Error loading vehicle:", err);
         setError(err instanceof Error ? err.message : "Fehler beim Laden des Fahrzeugs");
@@ -171,9 +180,9 @@ export default function SubmittedVehicleDetailPage() {
           {/* Images */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="relative w-full aspect-video bg-gray-200">
-              {vehicle.images && vehicle.images.length > 0 ? (
+              {vehicle.images && vehicle.images.length > 0 && imageUrls[vehicle.images[currentImageIndex]] ? (
                 <Image
-                  src={vehicle.images[currentImageIndex]}
+                  src={imageUrls[vehicle.images[currentImageIndex]]}
                   alt={`${vehicle.brand} ${vehicle.model}`}
                   fill
                   className="object-cover"

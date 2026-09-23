@@ -153,7 +153,7 @@ export default function InzahlungnahmePage() {
       setSaving(true);
       const { createTradeInRequest } = await import("@/app/actions/trade-in");
 
-      const result = await createTradeInRequest(user.id, {
+      const result = await createTradeInRequest({
         current_vehicle_brand: formData.current_vehicle_brand,
         current_vehicle_model: formData.current_vehicle_model,
         current_vehicle_year: parseInt(formData.current_vehicle_year),

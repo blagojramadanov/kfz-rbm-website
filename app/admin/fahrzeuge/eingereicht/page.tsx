@@ -17,6 +17,7 @@ export default function AdminSubmittedVehiclesPage() {
   const [rejectReason, setRejectReason] = useState("");
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState<Record<string, number>>({});
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
 
   const getSelectedImageIndex = (vehicleId: string) => selectedImageIndex[vehicleId] ?? 0;
   const setImageIndex = (vehicleId: string, index: number) => {
@@ -39,6 +40,17 @@ export default function AdminSubmittedVehiclesPage() {
         });
         setVehicles(data);
         setError("");
+
+        // Fetch signed URLs for all images
+        if (data && data.length > 0) {
+          const allPaths = data.flatMap(v => v.images || []);
+          if (allPaths.length > 0) {
+            const { getSignedImageUrls } = await import("@/app/actions/storage");
+            const urls = await getSignedImageUrls(allPaths);
+            const urlMap = Object.fromEntries(urls.filter(u => u.url).map(u => [u.path, u.url!]));
+            setImageUrls(urlMap);
+          }
+        }
       } catch (err) {
         console.error("Error loading vehicles:", err);
         setError("Fehler beim Laden der Fahrzeuge");
@@ -171,9 +183,9 @@ export default function AdminSubmittedVehiclesPage() {
                 {/* Image Section */}
                 <div className="relative overflow-hidden bg-gray-100">
                   <div className="relative w-full aspect-video">
-                    {vehicle.images && vehicle.images.length > 0 ? (
+                    {vehicle.images && vehicle.images.length > 0 && imageUrls[vehicle.images[getSelectedImageIndex(vehicle.id)]] ? (
                       <Image
-                        src={vehicle.images[getSelectedImageIndex(vehicle.id)]}
+                        src={imageUrls[vehicle.images[getSelectedImageIndex(vehicle.id)]]}
                         alt={`${vehicle.brand} ${vehicle.model}`}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-200"
@@ -209,13 +221,15 @@ export default function AdminSubmittedVehiclesPage() {
                               : "border-white/40 opacity-70 hover:opacity-100"
                           }`}
                         >
-                          <Image
-                            src={image}
-                            alt={`${vehicle.brand} ${vehicle.model} ${index + 1}`}
-                            width={40}
-                            height={40}
-                            className="w-full h-full object-cover"
-                          />
+                          {imageUrls[image] ? (
+                            <Image
+                              src={imageUrls[image]}
+                              alt={`${vehicle.brand} ${vehicle.model} ${index + 1}`}
+                              width={40}
+                              height={40}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : null}
                         </button>
                       ))}
                     </div>

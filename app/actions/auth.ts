@@ -1,6 +1,6 @@
 "use server";
 
-import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getSupabaseUser } from "@/lib/supabase-server";
 
 interface UpdateProfileInput {
   full_name?: string;
@@ -8,20 +8,9 @@ interface UpdateProfileInput {
   company_name?: string;
 }
 
-export async function updateUserProfile(userId: string, updates: UpdateProfileInput) {
-  if (!userId) {
-    throw new Error("User ID is required");
-  }
-
+export async function updateUserProfile(updates: UpdateProfileInput) {
   try {
-    const { supabase, session } = await getSupabaseServerClient();
-
-    // Verify user is updating their own profile
-    const user = session?.user;
-
-    if (!user || user.id !== userId) {
-      throw new Error("Unauthorized: Can only update your own profile");
-    }
+    const { supabase, user } = await getSupabaseUser();
 
     // Filter out any attempt to update protected fields
     const safeUpdates = {
@@ -39,7 +28,7 @@ export async function updateUserProfile(userId: string, updates: UpdateProfileIn
     const { error } = await supabase
       .from("user_profiles")
       .update(updateData)
-      .eq("id", userId);
+      .eq("id", user.id);
 
     if (error) {
       if (error.code === "PGRST100") {
@@ -56,13 +45,7 @@ export async function updateUserProfile(userId: string, updates: UpdateProfileIn
 
 export async function changePassword(newPassword: string) {
   try {
-    const { supabase, session } = await getSupabaseServerClient();
-
-    const user = session?.user;
-
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
+    const { supabase } = await getSupabaseUser();
 
     if (newPassword.length < 8) {
       throw new Error("Password must be at least 8 characters");
@@ -82,22 +65,12 @@ export async function changePassword(newPassword: string) {
   }
 }
 
-/**
- * Only admins can assign roles (typically done by super-admin)
- * This function should NEVER be exposed to client
- */
 export async function assignUserRole(
   targetUserId: string,
   newRole: "CUSTOMER" | "ADMIN"
 ) {
   try {
-    const { supabase, session } = await getSupabaseServerClient();
-
-    const user = session?.user;
-
-    if (!user) {
-      throw new Error("Not authenticated");
-    }
+    const { supabase, user } = await getSupabaseUser();
 
     // Verify requester is admin
     const { data: requesterProfile } = await supabase

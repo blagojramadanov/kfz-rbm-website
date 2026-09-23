@@ -53,7 +53,7 @@ export default function TradeInRequestDetailPage() {
 
       try {
         const { getTradeInRequestById } = await import("@/app/actions/trade-in");
-        const data = await getTradeInRequestById(requestId, user.id);
+        const data = await getTradeInRequestById(requestId);
         setRequest(data);
       } catch (err) {
         console.error("Error loading request:", err);

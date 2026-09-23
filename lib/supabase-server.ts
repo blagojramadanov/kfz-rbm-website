@@ -24,12 +24,45 @@ export async function getSupabaseServerClient() {
   );
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) {
-    throw new Error("No authenticated session found. User must be logged in.");
+  if (!user) {
+    throw new Error("No authenticated user found. User must be logged in.");
   }
 
-  return { supabase, session };
+  return { supabase, user };
+}
+
+export async function getSupabaseUser() {
+  const cookieStore = await cookies();
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options),
+            );
+          } catch {}
+        },
+      },
+    },
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("No authenticated user found. User must be logged in.");
+  }
+
+  return { supabase, user };
 }

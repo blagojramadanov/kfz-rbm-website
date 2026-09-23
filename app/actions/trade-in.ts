@@ -1,6 +1,6 @@
 "use server";
 
-import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getSupabaseServerClient, getSupabaseUser } from "@/lib/supabase-server";
 import type { TradeInRequest } from "@/lib/supabase";
 
 export async function getAvailableVehicles() {
@@ -24,7 +24,6 @@ export async function getAvailableVehicles() {
 }
 
 export async function createTradeInRequest(
-  userId: string,
   tradeInData: {
     current_vehicle_brand: string;
     current_vehicle_model: string;
@@ -35,12 +34,12 @@ export async function createTradeInRequest(
   }
 ) {
   try {
-    const { supabase } = await getSupabaseServerClient();
+    const { supabase, user } = await getSupabaseUser();
 
     const { data: request, error } = await supabase
       .from("trade_in_requests")
       .insert({
-        user_id: userId,
+        user_id: user.id,
         ...tradeInData,
         status: "new",
       })
@@ -58,9 +57,9 @@ export async function createTradeInRequest(
   }
 }
 
-export async function getTradeInRequests(userId: string): Promise<TradeInRequest[]> {
+export async function getTradeInRequests(): Promise<TradeInRequest[]> {
   try {
-    const { supabase } = await getSupabaseServerClient();
+    const { supabase, user } = await getSupabaseUser();
 
     const { data: requests, error } = await supabase
       .from("trade_in_requests")
@@ -82,7 +81,7 @@ export async function getTradeInRequests(userId: string): Promise<TradeInRequest
         )
       `
       )
-      .eq("user_id", userId)
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -114,9 +113,9 @@ export async function getTradeInRequests(userId: string): Promise<TradeInRequest
   }
 }
 
-export async function getTradeInRequestById(requestId: string, userId: string) {
+export async function getTradeInRequestById(requestId: string) {
   try {
-    const { supabase } = await getSupabaseServerClient();
+    const { supabase, user } = await getSupabaseUser();
 
     const { data: request, error } = await supabase
       .from("trade_in_requests")
@@ -139,7 +138,7 @@ export async function getTradeInRequestById(requestId: string, userId: string) {
       `
       )
       .eq("id", requestId)
-      .eq("user_id", userId)
+      .eq("user_id", user.id)
       .single();
 
     if (error) throw error;
@@ -171,94 +170,6 @@ export async function getTradeInRequestById(requestId: string, userId: string) {
     console.error("Error fetching trade-in request:", error);
     throw new Error(
       error instanceof Error ? error.message : "Fehler beim Abrufen der Anfrage"
-    );
-  }
-}
-
-export async function updateTradeInRequest(
-  requestId: string,
-  userId: string,
-  updates: Partial<TradeInRequest>
-) {
-  try {
-    const { supabase } = await getSupabaseServerClient();
-
-    // Verify ownership
-    const { data: request, error: fetchError } = await supabase
-      .from("trade_in_requests")
-      .select("user_id, status")
-      .eq("id", requestId)
-      .single();
-
-    if (fetchError || !request) {
-      throw new Error("Anfrage nicht gefunden");
-    }
-
-    if (request.user_id !== userId) {
-      throw new Error("Sie sind nicht berechtigt, diese Anfrage zu bearbeiten");
-    }
-
-    // Only allow editing new or reviewing requests
-    if (!["new", "reviewing"].includes(request.status)) {
-      throw new Error("Diese Anfrage kann nicht mehr bearbeitet werden");
-    }
-
-    // Remove fields that shouldn't be user-editable
-    const { user_id, id, admin_notes, status, ...editableUpdates } = updates;
-
-    const { error: updateError } = await supabase
-      .from("trade_in_requests")
-      .update({ ...editableUpdates, updated_at: new Date().toISOString() })
-      .eq("id", requestId)
-      .eq("user_id", userId);
-
-    if (updateError) throw updateError;
-
-    return { success: true, message: "Anfrage aktualisiert" };
-  } catch (error) {
-    console.error("Error updating trade-in request:", error);
-    throw new Error(
-      error instanceof Error ? error.message : "Fehler beim Aktualisieren der Anfrage"
-    );
-  }
-}
-
-export async function cancelTradeInRequest(requestId: string, userId: string) {
-  try {
-    const { supabase } = await getSupabaseServerClient();
-
-    // Verify ownership and status
-    const { data: request, error: fetchError } = await supabase
-      .from("trade_in_requests")
-      .select("user_id, status")
-      .eq("id", requestId)
-      .single();
-
-    if (fetchError || !request) {
-      throw new Error("Anfrage nicht gefunden");
-    }
-
-    if (request.user_id !== userId) {
-      throw new Error("Sie sind nicht berechtigt, diese Anfrage zu stornieren");
-    }
-
-    if (request.status !== "new") {
-      throw new Error("Diese Anfrage kann nicht mehr storniert werden");
-    }
-
-    const { error } = await supabase
-      .from("trade_in_requests")
-      .update({ status: "cancelled", updated_at: new Date().toISOString() })
-      .eq("id", requestId)
-      .eq("user_id", userId);
-
-    if (error) throw error;
-
-    return { success: true, message: "Anfrage storniert" };
-  } catch (error) {
-    console.error("Error cancelling trade-in request:", error);
-    throw new Error(
-      error instanceof Error ? error.message : "Fehler beim Stornieren der Anfrage"
     );
   }
 }

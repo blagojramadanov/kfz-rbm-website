@@ -184,7 +184,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { updateUserProfile } = await import("@/app/actions/auth");
 
     // Call server action which enforces RLS and prevents role updates
-    await updateUserProfile(user.id, updates as any);
+    await updateUserProfile(updates as any);
 
     // Update local state only with safe fields (filter out undefined)
     const safeUpdates: Record<string, any> = {};

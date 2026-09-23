@@ -10,6 +10,8 @@ import { AuthProvider } from "@/lib/auth-context";
 import { COMPANY } from "@/lib/company";
 import { locales } from "@/lib/locales";
 
+export const dynamic = "force-dynamic";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

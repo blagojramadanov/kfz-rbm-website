@@ -52,6 +52,7 @@ export default function MyVehiclesPage() {
   const { loading, isAuthenticated, user } = useAuth();
   const [vehicles, setVehicles] = useState<SubmittedVehicle[]>([]);
   const [loadingVehicles, setLoadingVehicles] = useState(true);
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -72,6 +73,17 @@ export default function MyVehiclesPage() {
       const { getSubmittedVehicles } = await import("@/app/actions/vehicles");
       const data = await getSubmittedVehicles(user.id);
       setVehicles(data || []);
+
+      // Fetch signed URLs for all images
+      if (data && data.length > 0) {
+        const allPaths = data.flatMap(v => v.images || []);
+        if (allPaths.length > 0) {
+          const { getSignedImageUrls } = await import("@/app/actions/storage");
+          const urls = await getSignedImageUrls(allPaths);
+          const urlMap = Object.fromEntries(urls.filter(u => u.url).map(u => [u.path, u.url!]));
+          setImageUrls(urlMap);
+        }
+      }
     } catch (error) {
       console.error("Error fetching vehicles:", error);
       const errorMsg = error instanceof Error ? error.message : "Fehler beim Laden der Fahrzeuge";
@@ -87,8 +99,8 @@ export default function MyVehiclesPage() {
     }
 
     try {
-      const { acceptOffer } = await import("@/app/actions/admin");
-      await acceptOffer(vehicleId, user.id);
+      const { acceptOffer } = await import("@/app/actions/vehicles");
+      await acceptOffer(vehicleId);
       await fetchVehicles();
     } catch (error) {
       console.error("Error accepting offer:", error);
@@ -102,8 +114,8 @@ export default function MyVehiclesPage() {
     }
 
     try {
-      const { rejectOffer } = await import("@/app/actions/admin");
-      await rejectOffer(vehicleId, user.id);
+      const { rejectOffer } = await import("@/app/actions/vehicles");
+      await rejectOffer(vehicleId);
       await fetchVehicles();
     } catch (error) {
       console.error("Error rejecting offer:", error);
@@ -190,9 +202,9 @@ export default function MyVehiclesPage() {
                 <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                   {/* Image */}
                   <div className="relative w-full aspect-video bg-gray-200 overflow-hidden">
-                    {vehicle.images && vehicle.images.length > 0 ? (
+                    {vehicle.images && vehicle.images.length > 0 && imageUrls[vehicle.images[0]] ? (
                       <Image
-                        src={vehicle.images[0]}
+                        src={imageUrls[vehicle.images[0]]}
                         alt={`${vehicle.brand} ${vehicle.model}`}
                         fill
                         className="object-cover"
