@@ -294,6 +294,10 @@
                    "required":  "Required"
                },
     "admin":  {
-
+                   "title":  "Admin Overview",
+                   "overview":  "Overview of vehicles, inquiries and customers",
+                   "loading_stats":  "Loading statistics...",
+                   "vehicles":  "Vehicles",
+                   "available":  "Available"
               }
 }

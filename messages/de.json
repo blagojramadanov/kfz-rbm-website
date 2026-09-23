@@ -294,6 +294,10 @@
                    "required":  "Erforderlich"
                },
     "admin":  {
-
+                   "title":  "Admin-Übersicht",
+                   "overview":  "Übersicht über Fahrzeuge, Anfragen und Kunden",
+                   "loading_stats":  "Statistiken werden geladen...",
+                   "vehicles":  "Fahrzeuge",
+                   "available":  "Verfügbar"
               }
 }
