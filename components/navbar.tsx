@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { Menu, X, LogOut, Settings, User } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
@@ -15,24 +15,9 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations();
   const { isAuthenticated, profile, loading, signOut } = useAuth();
-
-  // Fallback translations if context is not available
-  const navText = {
-    de: { vehicles: "Fahrzeuge", about: "Über uns", services: "Dienstleistungen", contact: "Kontakt", admin: "Admin-Dashboard", dashboard: "Dashboard", login: "Anmelden", logout: "Abmelden" },
-    en: { vehicles: "Vehicles", about: "About", services: "Services", contact: "Contact", admin: "Admin Dashboard", dashboard: "Dashboard", login: "Sign In", logout: "Sign Out" },
-    mk: { vehicles: "Возила", about: "За нас", services: "Услуги", contact: "Контакт", admin: "Админ контролна табла", dashboard: "Контролна табла", login: "Пријави се", logout: "Одјави се" }
-  };
-
-  let locale: string;
-
-  try {
-    locale = useLocale();
-  } catch (e) {
-    locale = "de";
-  }
-
-  const current = navText[locale as keyof typeof navText] || navText.de;
 
   const handleLogout = async () => {
     await signOut();
@@ -76,32 +61,32 @@ export function Navbar() {
               href={`/${locale}/fahrzeuge`}
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
             >
-              {current.vehicles}
+              {t("navigation.vehicles")}
             </Link>
             <Link
               href={`/${locale}/fahrzeuge/export`}
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium flex items-center gap-1"
             >
               <span>🌍</span>
-              <span>Export</span>
+              <span>{t("navigation.export")}</span>
             </Link>
             <Link
               href={`/${locale}/about`}
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
             >
-              {current.about}
+              {t("navigation.about")}
             </Link>
             <Link
               href={`/${locale}/services`}
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
             >
-              {current.services}
+              {t("navigation.services")}
             </Link>
             <Link
               href={`/${locale}/contact`}
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
             >
-              {current.contact}
+              {t("navigation.contact")}
             </Link>
           </div>
 
@@ -129,18 +114,18 @@ export function Navbar() {
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-10">
                         <Link href={dashboardLink} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
                           <User className="w-4 h-4 text-kfz-blue" />
-                          <span>{profile.role === "ADMIN" ? current.admin : current.dashboard}</span>
+                          <span>{profile.role === "ADMIN" ? t("navigation.admin") : t("navigation.dashboard")}</span>
                         </Link>
                         <Link href={`/${locale}/dashboard/profil`} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
                           <Settings className="w-4 h-4 text-kfz-blue" />
-                          <span>Einstellungen</span>
+                          <span>{t("navigation.settings")}</span>
                         </Link>
                         <button
                           onClick={handleLogout}
                           className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-50 text-red-600"
                         >
                           <LogOut className="w-4 h-4" />
-                          <span>{current.logout}</span>
+                          <span>{t("auth.signOut")}</span>
                         </button>
                       </div>
                     )}
@@ -148,7 +133,7 @@ export function Navbar() {
                 ) : (
                   <Link href={`/${locale}/login`}>
                     <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white">
-                      {current.login}
+                      {t("auth.signIn")}
                     </Button>
                   </Link>
                 )}
@@ -177,31 +162,31 @@ export function Navbar() {
               href={`/${locale}/fahrzeuge`}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
-              {current.vehicles}
+              {t("navigation.vehicles")}
             </Link>
             <Link
               href={`/${locale}/fahrzeuge/export`}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
-              🌍 Export
+              🌍 {t("navigation.export")}
             </Link>
             <Link
               href={`/${locale}/about`}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
-              {current.about}
+              {t("navigation.about")}
             </Link>
             <Link
               href={`/${locale}/services`}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
-              {current.services}
+              {t("navigation.services")}
             </Link>
             <Link
               href={`/${locale}/contact`}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
-              {current.contact}
+              {t("navigation.contact")}
             </Link>
             <div className="px-4 py-2 border-t space-y-3">
               <LanguageSwitcher />
@@ -211,20 +196,20 @@ export function Navbar() {
                     <>
                       <Link href={dashboardLink} className="block w-full">
                         <Button variant="outline" className="w-full border-kfz-blue text-kfz-blue">
-                          {profile.role === "ADMIN" ? current.admin : current.dashboard}
+                          {profile.role === "ADMIN" ? t("navigation.admin") : t("navigation.dashboard")}
                         </Button>
                       </Link>
                       <Button
                         onClick={handleLogout}
                         className="w-full bg-red-600 hover:bg-red-700 text-white"
                       >
-                        {current.logout}
+                        {t("auth.signOut")}
                       </Button>
                     </>
                   ) : (
                     <Link href={`/${locale}/login`} className="block w-full">
                       <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white">
-                        {current.login}
+                        {t("auth.signIn")}
                       </Button>
                     </Link>
                   )}

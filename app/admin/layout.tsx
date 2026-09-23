@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import {
   Car,
@@ -17,49 +18,51 @@ import Link from "next/link";
 import { useState } from "react";
 import { COMPANY } from "@/lib/company";
 
-const ADMIN_NAVIGATION = [
+const getAdminNavigation = (t: ReturnType<typeof useTranslations>) => [
   {
-    label: "Übersicht",
+    label: t("admin.sidebar.overview"),
     href: "/admin",
     icon: BarChart3,
   },
   {
-    label: "Fahrzeuge",
+    label: t("admin.sidebar.vehicles"),
     href: "/admin/fahrzeuge",
     icon: Car,
     submenu: [
-      { label: "Alle Fahrzeuge", href: "/admin/fahrzeuge" },
-      { label: "Neues Fahrzeug", href: "/admin/fahrzeuge/neu" },
-      { label: "Eingereichte Fahrzeuge", href: "/admin/fahrzeuge/eingereicht" },
+      { label: t("admin.sidebar.allVehicles"), href: "/admin/fahrzeuge" },
+      { label: t("admin.sidebar.newVehicle"), href: "/admin/fahrzeuge/neu" },
+      { label: t("admin.sidebar.submittedVehicles"), href: "/admin/fahrzeuge/eingereicht" },
     ],
   },
   {
-    label: "Anfragen",
+    label: t("admin.sidebar.inquiries"),
     href: "/admin/anfragen",
     icon: MessageSquare,
   },
   {
-    label: "Inzahlungnahmen",
+    label: t("admin.sidebar.tradeIns"),
     href: "/admin/inzahlungnahmen",
     icon: Repeat2,
   },
   {
-    label: "Kunden",
+    label: t("admin.sidebar.customers"),
     href: "/admin/kunden",
     icon: Users,
   },
   {
-    label: "Statistiken",
+    label: t("admin.sidebar.statistics"),
     href: "/admin/statistik",
     icon: BarChart3,
   },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const t = useTranslations();
   const router = useRouter();
   const { loading, isAdmin, profile, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+  const adminNavigation = getAdminNavigation(t);
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -73,7 +76,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -91,13 +94,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Header */}
         <div className="p-6 border-b border-gray-700">
           <h1 className="text-2xl font-bold">{COMPANY.name}</h1>
-          <p className="text-sm text-gray-400">Admin Panel</p>
+          <p className="text-sm text-gray-400">{t("admin.sidebar.adminPanel")}</p>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-4">
           <div className="space-y-2">
-            {ADMIN_NAVIGATION.map((item) => (
+            {adminNavigation.map((item) => (
               <div key={item.href}>
                 <Link href={item.href}>
                   <button
@@ -148,7 +151,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 transition-colors font-medium"
           >
             <LogOut className="w-4 h-4" />
-            Abmelden
+            {t("auth.signOut")}
           </button>
         </div>
       </aside>
@@ -164,7 +167,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h2 className="text-2xl font-bold text-gray-900">Admin Dashboard</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{t("admin.sidebar.adminDashboard")}</h2>
           </div>
           <div className="text-sm text-gray-600">{profile?.full_name}</div>
         </div>
@@ -180,7 +183,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="bg-gray-900 text-white w-64 h-screen overflow-y-auto p-4">
             <nav className="space-y-2">
-              {ADMIN_NAVIGATION.map((item) => (
+              {adminNavigation.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}

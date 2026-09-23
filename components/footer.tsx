@@ -1,22 +1,14 @@
 'use client';
 
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import { COMPANY, getFormattedAddress } from "@/lib/company";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const locale = useLocale();
-
-  // Fallback translations if context is not available
-  const footerText = {
-    de: { allRightsReserved: "Alle Rechte vorbehalten", vehicles: "Fahrzeuge", about: "Über uns", services: "Dienstleistungen", contact: "Kontakt" },
-    en: { allRightsReserved: "All rights reserved", vehicles: "Vehicles", about: "About", services: "Services", contact: "Contact" },
-    mk: { allRightsReserved: "Сите права се задржани", vehicles: "Возила", about: "За нас", services: "Услуги", contact: "Контакт" }
-  };
-
-  const current = footerText[locale as keyof typeof footerText] || footerText.de;
+  const t = useTranslations();
 
   return (
     <footer className="bg-kfz-blue-dark text-white">
@@ -26,7 +18,7 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">{COMPANY.name}</h3>
             <p className="text-blue-100 text-sm">
-              Premium used-car dealership offering quality vehicles, expert service, and transparent pricing.
+              {t("footer.description")}
             </p>
             <p className="text-blue-200 text-xs mt-3 italic">
               {COMPANY.demoNotice.en}
@@ -35,26 +27,26 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-lg font-semibold mb-4">{t("footer.quickLinks")}</h4>
             <ul className="space-y-2 text-blue-100">
               <li>
                 <Link href={`/${locale}/fahrzeuge`} className="hover:text-white transition-colors">
-                  {current.vehicles}
+                  {t("navigation.vehicles")}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}/about`} className="hover:text-white transition-colors">
-                  {current.about}
+                  {t("navigation.about")}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}/services`} className="hover:text-white transition-colors">
-                  {current.services}
+                  {t("navigation.services")}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}/contact`} className="hover:text-white transition-colors">
-                  {current.contact}
+                  {t("navigation.contact")}
                 </Link>
               </li>
             </ul>
@@ -62,18 +54,18 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
+            <h4 className="text-lg font-semibold mb-4">{t("footer.contactInfo")}</h4>
             <ul className="space-y-2 text-blue-100 text-sm">
-              <li>Phone: {COMPANY.phone}</li>
-              <li>Email: {COMPANY.email}</li>
-              <li>Address: {getFormattedAddress()}</li>
-              <li>Hours: Mon-Fri 9am-6pm</li>
+              <li>{t("contact.phone")}: {COMPANY.phone}</li>
+              <li>{t("contact.email")}: {COMPANY.email}</li>
+              <li>{t("contact.address")}: {getFormattedAddress()}</li>
+              <li>{t("footer.businessHours")}</li>
             </ul>
           </div>
 
           {/* Social Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Follow Us</h4>
+            <h4 className="text-lg font-semibold mb-4">{t("footer.followUs")}</h4>
             <div className="flex gap-4">
               <a
                 href={COMPANY.social.facebook}
@@ -115,20 +107,20 @@ export function Footer() {
         <div className="border-t border-blue-700 pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-blue-100">
             <Link href={`/${locale}/privacy`} className="hover:text-white transition-colors">
-              Privacy Policy
+              {t("footer.privacyPolicy")}
             </Link>
             <Link href={`/${locale}/terms`} className="hover:text-white transition-colors">
-              Terms & Conditions
+              {t("footer.termsConditions")}
             </Link>
             <Link href={`/${locale}/impressum`} className="hover:text-white transition-colors">
-              Impressum
+              {t("footer.impressum")}
             </Link>
           </div>
 
           {/* Copyright */}
           <div className="text-center text-blue-100 text-sm">
             <p>
-              © {currentYear} {COMPANY.name}. {current.allRightsReserved} | Premium Used Cars
+              © {currentYear} {COMPANY.name}. {t("footer.allRightsReserved")} | {t("footer.premiumCars")}
             </p>
           </div>
         </div>

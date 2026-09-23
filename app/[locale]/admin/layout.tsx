@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { useTranslations } from "next-intl";
 import {
   Car,
   Users,
@@ -19,51 +20,53 @@ import Link from "next/link";
 import { useState } from "react";
 import { COMPANY } from "@/lib/company";
 
+const getAdminNavigation = (t: ReturnType<typeof useTranslations>, locale: string) => [
+  {
+    label: t("admin.sidebar.overview"),
+    href: `/${locale}/admin`,
+    icon: BarChart3,
+  },
+  {
+    label: t("admin.sidebar.vehicles"),
+    href: `/${locale}/admin/fahrzeuge`,
+    icon: Car,
+    submenu: [
+      { label: t("admin.sidebar.allVehicles"), href: `/${locale}/admin/fahrzeuge` },
+      { label: t("admin.sidebar.newVehicle"), href: `/${locale}/admin/fahrzeuge/neu` },
+      { label: t("admin.sidebar.submittedVehicles"), href: `/${locale}/admin/fahrzeuge/eingereicht` },
+    ],
+  },
+  {
+    label: t("admin.sidebar.inquiries"),
+    href: `/${locale}/admin/anfragen`,
+    icon: MessageSquare,
+  },
+  {
+    label: t("admin.sidebar.tradeIns"),
+    href: `/${locale}/admin/inzahlungnahmen`,
+    icon: Repeat2,
+  },
+  {
+    label: t("admin.sidebar.customers"),
+    href: `/${locale}/admin/kunden`,
+    icon: Users,
+  },
+  {
+    label: t("admin.sidebar.statistics"),
+    href: `/${locale}/admin/statistik`,
+    icon: BarChart3,
+  },
+];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string || 'de';
+  const t = useTranslations();
   const { loading, isAdmin, profile, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
-
-  const ADMIN_NAVIGATION = [
-    {
-      label: "Übersicht",
-      href: `/${locale}/admin`,
-      icon: BarChart3,
-    },
-    {
-      label: "Fahrzeuge",
-      href: `/${locale}/admin/fahrzeuge`,
-      icon: Car,
-      submenu: [
-        { label: "Alle Fahrzeuge", href: `/${locale}/admin/fahrzeuge` },
-        { label: "Neues Fahrzeug", href: `/${locale}/admin/fahrzeuge/neu` },
-        { label: "Eingereichte Fahrzeuge", href: `/${locale}/admin/fahrzeuge/eingereicht` },
-      ],
-    },
-    {
-      label: "Anfragen",
-      href: `/${locale}/admin/anfragen`,
-      icon: MessageSquare,
-    },
-    {
-      label: "Inzahlungnahmen",
-      href: `/${locale}/admin/inzahlungnahmen`,
-      icon: Repeat2,
-    },
-    {
-      label: "Kunden",
-      href: `/${locale}/admin/kunden`,
-      icon: Users,
-    },
-    {
-      label: "Statistiken",
-      href: `/${locale}/admin/statistik`,
-      icon: BarChart3,
-    },
-  ];
+  const adminNavigation = getAdminNavigation(t, locale);
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -77,7 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -95,13 +98,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Header */}
         <div className="p-6 border-b border-gray-700">
           <h1 className="text-2xl font-bold">{COMPANY.name}</h1>
-          <p className="text-sm text-gray-400">Admin Panel</p>
+          <p className="text-sm text-gray-400">{t("admin.sidebar.adminPanel")}</p>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-4">
           <div className="space-y-2">
-            {ADMIN_NAVIGATION.map((item) => (
+            {adminNavigation.map((item) => (
               <div key={item.href}>
                 <Link href={item.href}>
                   <button
@@ -152,7 +155,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 transition-colors font-medium"
           >
             <LogOut className="w-4 h-4" />
-            Abmelden
+            {t("auth.signOut")}
           </button>
         </div>
       </aside>
@@ -168,7 +171,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h2 className="text-2xl font-bold text-gray-900">Admin Dashboard</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{t("admin.sidebar.adminDashboard")}</h2>
           </div>
           <div className="text-sm text-gray-600">{profile?.full_name}</div>
         </div>
@@ -184,7 +187,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="bg-gray-900 text-white w-64 h-screen overflow-y-auto p-4">
             <nav className="space-y-2">
-              {ADMIN_NAVIGATION.map((item) => (
+              {adminNavigation.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
