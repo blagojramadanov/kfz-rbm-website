@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useFormatter } from "next-intl";
 import { Heart, MapPin, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -88,6 +88,7 @@ const FEATURED_VEHICLES: Vehicle[] = [
 
 export function FeaturedVehicles() {
   const t = useTranslations("pages.home");
+  const format = useFormatter();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {FEATURED_VEHICLES.map((vehicle) => (
@@ -125,10 +126,10 @@ export function FeaturedVehicles() {
             {/* Price */}
             <div className="mb-4">
               <p className="text-3xl font-bold text-kfz-blue">
-                €{vehicle.price.toLocaleString()}
+                €{format.number(vehicle.price, { notation: "standard" })}
               </p>
               <p className="text-sm text-gray-600">
-                {vehicle.year} • {vehicle.mileage.toLocaleString()} km
+                {vehicle.year} • {format.number(vehicle.mileage)} km
               </p>
             </div>
 
@@ -136,11 +137,11 @@ export function FeaturedVehicles() {
             <div className="grid grid-cols-2 gap-3 mb-4 pb-4 border-b">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Zap className="w-4 h-4 text-kfz-accent" />
-                {vehicle.fuelType}
+                {t(`vehicles.fuelTypes.${vehicle.fuelType}` as any) || vehicle.fuelType}
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <MapPin className="w-4 h-4 text-kfz-accent" />
-                Germany
+                {t("vehicles.location")}
               </div>
             </div>
 

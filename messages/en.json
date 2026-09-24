@@ -252,10 +252,6 @@
                 "viewDetails": "View Details",
                 "testDrive": "Test Drive"
             },
-            "services": {
-                "title": "Our Services",
-                "description": "Comprehensive solutions for buying and selling used cars"
-            },
             "trustSection": {
                 "title": "Why Choose Us?",
                 "description": "With over 20 years of experience, we have built a reputation for quality, transparency, and customer satisfaction."
@@ -311,6 +307,8 @@
                 "search": "Search"
             },
             "services": {
+                "title": "Our Services",
+                "description": "Comprehensive solutions for buying and selling used cars",
                 "buy": {
                     "title": "Buy Used Cars",
                     "description": "Wide selection of certified premium vehicles with warranty and full transparency. Easy and secure transaction.",
@@ -326,7 +324,7 @@
                     "description": "Sell your vehicle on a commission basis. We handle marketing, viewings, and sales process.",
                     "cta": "Request Quote"
                 },
-                "tradeIn": {
+                "trade-in": {
                     "title": "Trade-In",
                     "description": "Trade your old vehicle when buying a new one. We handle the entire process.",
                     "cta": "Learn More"
@@ -336,7 +334,22 @@
                     "description": "International vehicle exports with complete documentation and logistics support worldwide.",
                     "cta": "Request Export"
                 }
-            }
+            },
+            "vehicles": {
+                "fuelTypes": {
+                    "Diesel": "Diesel",
+                    "Petrol": "Petrol",
+                    "Elektro": "Electric",
+                    "Electric": "Electric",
+                    "Hybrid": "Hybrid"
+                },
+                "transmission": {
+                    "Manual": "Manual",
+                    "Automatic": "Automatic"
+                },
+                "location": "Germany"
+            },
+            "heroSubtitle": "Premium used cars from trusted partners"
         },
         "about": {
             "title": "About Us",

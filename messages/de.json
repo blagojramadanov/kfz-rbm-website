@@ -252,10 +252,6 @@
                 "viewDetails": "Fahrzeugdetails anzeigen",
                 "testDrive": "Probefahrt"
             },
-            "services": {
-                "title": "Unsere Dienstleistungen",
-                "description": "Umfassende Lösungen für den Kauf und Verkauf von Gebrauchtwagen"
-            },
             "trustSection": {
                 "title": "Why Choose Us?",
                 "description": "Mit über 20 Jahren Erfahrung haben wir uns einen Namen für Qualität, Transparenz und Kundenzufriedenheit gemacht."
@@ -311,6 +307,8 @@
                 "search": "Suchen"
             },
             "services": {
+                "title": "Unsere Dienstleistungen",
+                "description": "Umfassende Lösungen für den Kauf und Verkauf von Gebrauchtwagen",
                 "buy": {
                     "title": "Gebrauchtwagen kaufen",
                     "description": "Breite Auswahl an geprüften Premium-Fahrzeugen mit Garantie und voller Transparenz. Einfache und sichere Abwicklung.",
@@ -326,7 +324,7 @@
                     "description": "Verkaufen Sie Ihr Fahrzeug in unserem Namen auf Provisionsbasis. Wir kümmern uns um Marketing, Besichtigungen und Verkaufsabwicklung.",
                     "cta": "Angebot anfragen"
                 },
-                "tradeIn": {
+                "trade-in": {
                     "title": "Inzahlungnahme",
                     "description": "Tauschen Sie Ihr altes Fahrzeug beim Kauf eines neuen ein. Wir kümmern uns um den gesamten Prozess.",
                     "cta": "Mehr erfahren"
@@ -336,7 +334,22 @@
                     "description": "Internationale Fahrzeugexporte mit vollständiger Dokumentation und Logistikunterstützung weltweit.",
                     "cta": "Export anfragen"
                 }
-            }
+            },
+            "vehicles": {
+                "fuelTypes": {
+                    "Diesel": "Diesel",
+                    "Petrol": "Benzin",
+                    "Elektro": "Elektro",
+                    "Electric": "Elektro",
+                    "Hybrid": "Hybrid"
+                },
+                "transmission": {
+                    "Manual": "Schaltgetriebe",
+                    "Automatic": "Automatik"
+                },
+                "location": "Deutschland"
+            },
+            "heroSubtitle": "Premium Gebrauchtwagen von vertrauenswürdigen Partnern"
         },
         "about": {
             "title": "Über uns",

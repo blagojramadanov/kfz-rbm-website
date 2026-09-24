@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useFormatter } from "next-intl";
 import { Heart, MapPin, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -61,6 +61,7 @@ const LATEST_VEHICLES: Vehicle[] = [
 
 export function LatestVehicles() {
   const t = useTranslations("pages.home");
+  const format = useFormatter();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {LATEST_VEHICLES.map((vehicle) => (
@@ -90,7 +91,7 @@ export function LatestVehicles() {
 
             {/* Price */}
             <p className="text-2xl font-bold text-kfz-blue mt-2 mb-2">
-              €{vehicle.price.toLocaleString()}
+              €{format.number(vehicle.price, { notation: "standard" })}
             </p>
 
             {/* Specs */}
@@ -100,12 +101,12 @@ export function LatestVehicles() {
                 <span>•</span>
                 <div className="flex items-center gap-1">
                   <Gauge className="w-4 h-4" />
-                  {vehicle.mileage.toLocaleString()} km
+                  {format.number(vehicle.mileage)} km
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                {vehicle.fuelType}
+                {t(`vehicles.fuelTypes.${vehicle.fuelType}` as any) || vehicle.fuelType}
               </div>
             </div>
 
