@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Heart, MapPin, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -59,6 +60,7 @@ const LATEST_VEHICLES: Vehicle[] = [
 ];
 
 export function LatestVehicles() {
+  const t = useTranslations("pages.home");
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {LATEST_VEHICLES.map((vehicle) => (
@@ -109,7 +111,7 @@ export function LatestVehicles() {
 
             {/* CTA */}
             <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white text-sm">
-              Details ansehen
+              {t("latest.viewDetails")}
             </Button>
           </div>
         </div>

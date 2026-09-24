@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { FeaturedVehicles } from "@/components/featured-vehicles";
 import { SearchBar } from "@/components/search-bar";
@@ -7,7 +8,8 @@ import { ServicesGrid } from "@/components/services-grid";
 import { ArrowRight, CheckCircle, Users, Award, Shield, Zap } from "lucide-react";
 import { COMPANY } from "@/lib/company";
 
-export default function Home() {
+export default async function Home() {
+  const t = await getTranslations("pages.home");
   return (
     <div className="w-full">
       {/* Hero Section with Background Image */}
@@ -53,12 +55,12 @@ export default function Home() {
             {/* Main Headline */}
             <div className="mb-8">
               <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                Gebrauchtwagen kaufen.<br />
-                Verkaufen.<br />
-                Inzahlungnahme. Export.
+                {t("hero.headline1")}<br />
+                {t("hero.headline2")}<br />
+                {t("hero.headline3")}
               </h2>
               <p className="text-xl sm:text-2xl text-blue-100 max-w-3xl">
-                Deutschlands führender Autohändler für Premium-Gebrauchtwagen mit 20+ Jahren Erfahrung
+                {t("hero.subheadline")}
               </p>
             </div>
 
@@ -68,7 +70,7 @@ export default function Home() {
                 size="lg"
                 className="bg-kfz-accent hover:bg-kfz-accent-light text-white px-8 py-6 text-lg font-semibold rounded-lg shadow-lg transition-all hover:shadow-xl"
               >
-                Fahrzeuge entdecken
+                {t("hero.discoverVehicles")}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button
@@ -76,7 +78,7 @@ export default function Home() {
                 variant="outline"
                 className="border-white text-white hover:bg-white hover:text-kfz-blue px-8 py-6 text-lg font-semibold rounded-lg"
               >
-                Mein Auto anbieten
+                {t("hero.offerVehicle")}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </div>
@@ -104,17 +106,17 @@ export default function Home() {
           <div className="mb-12">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-4xl font-bold text-gray-900">
-                Neu hinzugefügte Fahrzeuge
+                {t("latest.title")}
               </h2>
               <Button
                 variant="ghost"
                 className="text-kfz-accent hover:text-kfz-blue"
               >
-                Alle anzeigen <ArrowRight className="ml-2 w-4 h-4" />
+                {t("latest.viewAll")} <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
             <p className="text-lg text-gray-600">
-              Die neuesten Premium-Gebrauchtwagen aus unserem Bestand
+              {t("latest.description")}
             </p>
           </div>
 
@@ -127,10 +129,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Ausgewählte Fahrzeuge
+              {t("featured.title")}
             </h2>
             <p className="text-lg text-gray-600">
-              Unsere handverlesenen Premium-Gebrauchtwagen
+              {t("featured.description")}
             </p>
           </div>
 
@@ -142,7 +144,7 @@ export default function Home() {
               size="lg"
               className="border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white px-8 py-6 text-lg font-semibold"
             >
-              Alle Fahrzeuge ansehen
+              {t("featured.viewAll")}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
@@ -154,10 +156,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Unsere Dienstleistungen
+              {t("services.title")}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Umfassende Lösungen für den Kauf und Verkauf von Gebrauchtwagen
+              {t("services.description")}
             </p>
           </div>
 
@@ -170,10 +172,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Us?
+              {t("trustSection.title")}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Mit über 20 Jahren Erfahrung haben wir uns einen Namen für Qualität, Transparenz und Kundenzufriedenheit gemacht.
+              {t("trustSection.description")}
             </p>
           </div>
 
@@ -184,23 +186,23 @@ export default function Home() {
                 <Award className="w-8 h-8" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Qualitätsgarantie
+                {t("qualityGuarantee.title")}
               </h3>
               <p className="text-gray-700 mb-4">
-                Jedes Fahrzeug wird gründlich inspiziert und zertifiziert. Vollständige Transparenz über die Fahrzeughistorie.
+                {t("qualityGuarantee.description")}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-gray-700">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
-                  Vollständige Inspektion
+                  {t("qualityGuarantee.item1")}
                 </li>
                 <li className="flex items-center text-gray-700">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
-                  Mehrpunkt-Überprüfung
+                  {t("qualityGuarantee.item2")}
                 </li>
                 <li className="flex items-center text-gray-700">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
-                  Gewährleistung inbegriffen
+                  {t("qualityGuarantee.item3")}
                 </li>
               </ul>
             </div>
@@ -211,23 +213,23 @@ export default function Home() {
                 <Users className="w-8 h-8" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Expertenteam
+                {t("expertTeam.title")}
               </h3>
               <p className="text-gray-700 mb-4">
-                Unser erfahrenes Team hilft Ihnen, das perfekte Fahrzeug für Ihre Bedürfnisse zu finden.
+                {t("expertTeam.description")}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-gray-700">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
-                  20+ Jahre Erfahrung
+                  {t("expertTeam.item1")}
                 </li>
                 <li className="flex items-center text-gray-700">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
-                  Fachberatungen
+                  {t("expertTeam.item2")}
                 </li>
                 <li className="flex items-center text-gray-700">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
-                  Persönlicher Service
+                  {t("expertTeam.item3")}
                 </li>
               </ul>
             </div>
@@ -238,23 +240,23 @@ export default function Home() {
                 <Shield className="w-8 h-8" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Transparente Preise
+                {t("transparentPricing.title")}
               </h3>
               <p className="text-gray-700 mb-4">
-                Keine versteckten Gebühren. Was Sie sehen, ist das, was Sie zahlen.
+                {t("transparentPricing.description")}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-gray-700">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
-                  Keine versteckten Kosten
+                  {t("transparentPricing.item1")}
                 </li>
                 <li className="flex items-center text-gray-700">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
-                  Flexible Finanzierung
+                  {t("transparentPricing.item2")}
                 </li>
                 <li className="flex items-center text-gray-700">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
-                  Inzahlungnahme möglich
+                  {t("transparentPricing.item3")}
                 </li>
               </ul>
             </div>
@@ -280,35 +282,35 @@ export default function Home() {
             {/* Right: Content */}
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                About Our Company
+                {t("aboutSection.title")}
               </h2>
               <p className="text-lg text-gray-600 mb-4">
-                Wir sind Ihr vertrauenswürdiger Partner für Premium-Gebrauchtwagen. Wir haben es uns zur Aufgabe gemacht, unseren Kunden die besten Fahrzeuge mit höchster Qualität und Transparenz anzubieten.
+                {t("aboutSection.paragraph1")}
               </p>
               <p className="text-lg text-gray-600 mb-6">
-                Unser erfahrenes Team wählt jedes Fahrzeug sorgfältig aus und inspiziert es gründlich, um sicherzustellen, dass Sie ein Auto erhalten, das Ihren Erwartungen entspricht.
+                {t("aboutSection.paragraph2")}
               </p>
 
               <div className="space-y-3 mb-8">
                 <div className="flex items-start gap-3">
                   <Zap className="w-6 h-6 text-kfz-accent flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">Schnelle Abwicklung</h3>
-                    <p className="text-gray-600">Unbürokratische und schnelle Abwicklung aller Formalitäten</p>
+                    <h3 className="font-semibold text-gray-900">{t("aboutSection.quickProcess")}</h3>
+                    <p className="text-gray-600">{t("aboutSection.quickProcessDesc")}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Zap className="w-6 h-6 text-kfz-accent flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">Faire Preise</h3>
-                    <p className="text-gray-600">Marktgerechte Preise für Kauf und Verkauf</p>
+                    <h3 className="font-semibold text-gray-900">{t("aboutSection.fairPrices")}</h3>
+                    <p className="text-gray-600">{t("aboutSection.fairPricesDesc")}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Zap className="w-6 h-6 text-kfz-accent flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">Gesamtlösung</h3>
-                    <p className="text-gray-600">Alles aus einer Hand - Kauf, Verkauf, Inzahlungnahme</p>
+                    <h3 className="font-semibold text-gray-900">{t("aboutSection.completeSolution")}</h3>
+                    <p className="text-gray-600">{t("aboutSection.completeSolutionDesc")}</p>
                   </div>
                 </div>
               </div>
@@ -317,7 +319,7 @@ export default function Home() {
                 size="lg"
                 className="bg-kfz-blue hover:bg-kfz-blue-dark text-white px-8 py-6 text-lg font-semibold"
               >
-                Mehr erfahren
+                {t("aboutSection.learnMore")}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </div>
@@ -329,17 +331,17 @@ export default function Home() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-4">
-            Bereit für Ihr Traumauto?
+            {t("contact.title")}
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Kontaktieren Sie uns noch heute für eine Probefahrt oder um über Ihre Anforderungen zu sprechen.
+            {t("contact.description")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
               className="bg-kfz-accent hover:bg-kfz-accent-light text-white px-8 py-6 text-lg font-semibold"
             >
-              Kontakt aufnehmen
+              {t("contact.contactCta")}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button
@@ -347,7 +349,7 @@ export default function Home() {
               variant="outline"
               className="border-white text-white hover:bg-white hover:text-kfz-blue px-8 py-6 text-lg font-semibold"
             >
-              Anrufen: +49 123 456789
+              {t("contact.callCta")}
             </Button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Heart, MapPin, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -86,6 +87,7 @@ const FEATURED_VEHICLES: Vehicle[] = [
 ];
 
 export function FeaturedVehicles() {
+  const t = useTranslations("pages.home");
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {FEATURED_VEHICLES.map((vehicle) => (
@@ -109,7 +111,7 @@ export function FeaturedVehicles() {
             </div>
             {vehicle.featured && (
               <div className="absolute top-4 left-4 bg-kfz-accent text-white px-3 py-1 rounded-full text-sm font-semibold">
-                Featured
+                {t("featured.featured")}
               </div>
             )}
           </div>
@@ -145,13 +147,13 @@ export function FeaturedVehicles() {
             {/* CTA */}
             <div className="space-y-3">
               <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white">
-                View Details
+                {t("featured.viewDetails")}
               </Button>
               <Button
                 variant="outline"
                 className="w-full border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white"
               >
-                Test Drive
+                {t("featured.testDrive")}
               </Button>
             </div>
           </div>
