@@ -127,6 +127,13 @@ This document tracks all files that contain hardcoded user-visible text requirin
 
 ---
 
+## 12. Legal pages (added after the homepage work)
+
+- [x] `app/[locale]/privacy/page.tsx`, `app/[locale]/terms/page.tsx`, `app/[locale]/impressum/page.tsx` - demo pages (fictional data from `lib/company.ts`, no owner/managing director), localized `generateMetadata`; strings in `legalPages.*`; shared layout in `components/legal-page.tsx`
+- [x] `app/[locale]/contact/page.tsx` - reads `?testDrive=<vehicle label>` and prefills the message (`contact.testDriveMessage`)
+
+---
+
 ## Hardcoded Text Categories to Translate
 
 For each file, look for and catalog:
@@ -167,6 +174,8 @@ For each file, look for and catalog:
 - **next-intl keys are always relative to the namespace** passed to `useTranslations`/`getTranslations`; a dotted key is *not* an absolute path.
 - **Never append a block to the JSON without checking the key does not already exist.** A duplicate top-level key does not error: `JSON.parse` (and webpack) keep the last one and silently drop the earlier section. `npm run check:i18n` now fails on duplicate keys.
 - **DB values are never translated or changed.** Map them with `getFuelTypeLabel()` / `getTransmissionLabel()` from `lib/vehicle-labels.ts` (uses `t.has()`, falls back to the raw value). Pass a translator from `useTranslations("common")`.
+- **Homepage vehicle lists** come from Supabase via `lib/public-vehicles.ts` (anon key, no cookies, so only rows the public RLS policy allows: `status = 'available'`). Latest = newest 4; featured = `vehicles.featured = true` (newest 6). The page is `force-dynamic`. The list components are server components that take the vehicles as a prop; empty states are `pages.home.latest.empty` / `pages.home.featured.empty`.
+- **Fuel type values in the DB** are inconsistent (`gasoline`, `diesel`, `electric`, `hybrid` from the admin form; `Benzin`, `Diesel`, `Elektro` from older data). `common.fuelTypes` maps all of them; unknown values still fall back to the raw value.
 - **Opening hours** live only in `COMPANY.hours` (`lib/company.ts`, 24h). Render them with `<BusinessHours />` (24h for de/mk, 12h AM/PM for en).
 - German: formal "Sie". Macedonian: formal "Вие" (never "ти"). "RBM" and "Premium Cars" stay untranslated.
 - Message files: UTF-8 **without BOM**, 4-space indent, trailing newline. Do not write them with PowerShell.
@@ -181,4 +190,8 @@ For each file, look for and catalog:
 - Vehicle pages (section 3) still need translating; reuse `common.fuelTypes` / `common.transmissions`.
 - `pages.about` and `pages.services` are still "coming soon" placeholders (translated in de/en/mk).
 - Some `mk` strings outside the pages touched here (e.g. `vehicles.filter*`) use singular imperatives ("Филтрирај"); switch to the formal plural ("Филтрирајте") when those pages are translated.
-- Homepage CTAs are wired with the locale-aware `Link` from `lib/navigation.ts` (pass hrefs without a locale prefix). Still unlinked: the demo vehicle cards' "view details" and "test drive" buttons (the demo cards are hardcoded, not DB vehicles, and there is no test-drive page).
+- Homepage CTAs are wired with the locale-aware `Link` from `lib/navigation.ts` (pass hrefs without a locale prefix). The latest/featured cards are real DB vehicles; "view details" goes to `/fahrzeuge/<slug>` and "test drive" to `/contact?testDrive=<vehicle label>`.
+- The vehicle detail route matches `brand-model` slugs (not unique) against only the newest 100 vehicles, client-side. Two vehicles with the same brand and model resolve to the same page. Fix this when the vehicle pages (section 3) are done (e.g. a unique slug or id in the URL).
+- The contact form's submit handler only `console.log`s; messages (including test-drive requests) are not stored or sent yet.
+- Latest/featured also include `listing_type = 'export'` vehicles (public RLS allows them); filter on `listing_type` in `lib/public-vehicles.ts` if that is not wanted.
+- `COMPANY.legal.*` and the address contain German "(Beispiel)"/"Beispiel…" placeholders that are shown as-is in every locale (same as the contact page).

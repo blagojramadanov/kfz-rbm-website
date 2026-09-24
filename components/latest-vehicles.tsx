@@ -1,85 +1,46 @@
-"use client";
-
 import Image from "next/image";
-import { useTranslations, useFormatter } from "next-intl";
-import { Heart, MapPin, Gauge } from "lucide-react";
+import { getFormatter, getTranslations } from "next-intl/server";
+import { Car, Heart, MapPin, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/lib/navigation";
+import type { PublicVehicle } from "@/lib/public-vehicles";
 import { getFuelTypeLabel } from "@/lib/vehicle-labels";
 
-interface Vehicle {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
-  price: number;
-  mileage: number;
-  fuelType: string;
-  image: string;
-}
+export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }) {
+  const t = await getTranslations("pages.home");
+  const tCommon = await getTranslations("common");
+  const format = await getFormatter();
 
-const LATEST_VEHICLES: Vehicle[] = [
-  {
-    id: "l1",
-    brand: "Tesla",
-    model: "Model 3",
-    year: 2023,
-    price: 55000,
-    mileage: 5000,
-    fuelType: "Elektro",
-    image: "https://picsum.photos/seed/kfzrbm-15/500/400",
-  },
-  {
-    id: "l2",
-    brand: "Porsche",
-    model: "Cayenne",
-    year: 2022,
-    price: 75000,
-    mileage: 22000,
-    fuelType: "Diesel",
-    image: "https://picsum.photos/seed/kfzrbm-16/500/400",
-  },
-  {
-    id: "l3",
-    brand: "BMW",
-    model: "X5",
-    year: 2023,
-    price: 65000,
-    mileage: 8000,
-    fuelType: "Diesel",
-    image: "https://picsum.photos/seed/kfzrbm-17/500/400",
-  },
-  {
-    id: "l4",
-    brand: "Mercedes-Benz",
-    model: "GLE",
-    year: 2023,
-    price: 72000,
-    mileage: 6000,
-    fuelType: "Diesel",
-    image: "https://picsum.photos/seed/kfzrbm-18/500/400",
-  },
-];
+  if (vehicles.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow p-10 text-center text-gray-600">
+        {t("latest.empty")}
+      </div>
+    );
+  }
 
-export function LatestVehicles() {
-  const t = useTranslations("pages.home");
-  const tCommon = useTranslations("common");
-  const format = useFormatter();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {LATEST_VEHICLES.map((vehicle) => (
+      {vehicles.map((vehicle) => (
         <div
           key={vehicle.id}
           className="bg-white rounded-lg shadow hover:shadow-xl transition-shadow overflow-hidden group"
         >
           {/* Image Container */}
           <div className="relative h-48 bg-gray-200 overflow-hidden">
-            <Image
-              src={vehicle.image}
-              alt={`${vehicle.brand} ${vehicle.model}`}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+            {vehicle.image ? (
+              <Image
+                src={vehicle.image}
+                alt={`${vehicle.brand} ${vehicle.model}`}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                <Car className="w-12 h-12" aria-hidden="true" />
+              </div>
+            )}
             <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow hover:bg-gray-100 transition-colors z-10">
               <Heart className="w-5 h-5 text-red-500" />
             </button>
@@ -106,15 +67,20 @@ export function LatestVehicles() {
                   {format.number(vehicle.mileage)} km
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                {getFuelTypeLabel(tCommon, vehicle.fuelType)}
-              </div>
+              {vehicle.fuelType && (
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  {getFuelTypeLabel(tCommon, vehicle.fuelType)}
+                </div>
+              )}
             </div>
 
             {/* CTA */}
-            <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white text-sm">
-              {t("latest.viewDetails")}
+            <Button
+              asChild
+              className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white text-sm"
+            >
+              <Link href={`/fahrzeuge/${vehicle.slug}`}>{t("latest.viewDetails")}</Link>
             </Button>
           </div>
         </div>

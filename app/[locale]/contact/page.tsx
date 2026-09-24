@@ -3,17 +3,38 @@
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { COMPANY, getFormattedAddress } from "@/lib/company";
 import { BusinessHours } from "@/components/business-hours";
 
+// Longest vehicle label accepted from the `testDrive` query param.
+const MAX_TEST_DRIVE_LENGTH = 100;
+
 export default function ContactPage() {
+  return (
+    <Suspense fallback={null}>
+      <ContactContent />
+    </Suspense>
+  );
+}
+
+function ContactContent() {
   const t = useTranslations();
+  const searchParams = useSearchParams();
+  // `?testDrive=<vehicle label>` (set by the homepage "Test drive" button)
+  // prefills the message once; the visitor can edit it freely afterwards.
+  const testDriveVehicle = searchParams
+    .get("testDrive")
+    ?.trim()
+    .slice(0, MAX_TEST_DRIVE_LENGTH);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    message: "",
+    message: testDriveVehicle
+      ? t("contact.testDriveMessage", { vehicle: testDriveVehicle })
+      : "",
   });
 
   const handleSubmit = (e: FormEvent) => {

@@ -195,7 +195,8 @@
         "sendMessage": "Send Message",
         "messageSent": "Message sent successfully",
         "messageError": "Error sending message",
-        "followUs": "Follow Us"
+        "followUs": "Follow Us",
+        "testDriveMessage": "I am interested in a test drive of the {vehicle}. Please let me know which appointments are available."
     },
     "footer": {
         "allRightsReserved": "All rights reserved",
@@ -264,7 +265,8 @@
                 "title": "Recently Added Vehicles",
                 "description": "The latest premium used cars from our inventory",
                 "viewAll": "View All",
-                "viewDetails": "View Details"
+                "viewDetails": "View Details",
+                "empty": "No vehicles are available at the moment. Please check back soon."
             },
             "featured": {
                 "title": "Featured Vehicles",
@@ -272,7 +274,8 @@
                 "viewAll": "View All Vehicles",
                 "featured": "Featured",
                 "viewDetails": "View Details",
-                "testDrive": "Test Drive"
+                "testDrive": "Test Drive",
+                "empty": "There are no featured vehicles at the moment. Please check back soon."
             },
             "trustSection": {
                 "title": "Why Choose Us?",
@@ -431,7 +434,12 @@
             "Petrol": "Petrol",
             "Elektro": "Electric",
             "Electric": "Electric",
-            "Hybrid": "Hybrid"
+            "Hybrid": "Hybrid",
+            "gasoline": "Petrol",
+            "diesel": "Diesel",
+            "electric": "Electric",
+            "hybrid": "Hybrid",
+            "Benzin": "Petrol"
         },
         "transmissions": {
             "Manual": "Manual",
@@ -446,5 +454,89 @@
     "meta": {
         "title": "{name} – Premium Used Cars",
         "description": "Find your perfect car at {name} – your used-car dealership for inspected premium vehicles."
+    },
+    "legalPages": {
+        "demoNotice": {
+            "title": "Demo content",
+            "text": "This page contains placeholder text and fictional example data only. It is neither a legally binding statement nor legal advice."
+        },
+        "privacy": {
+            "metaDescription": "Sample privacy policy of the {name} demo website.",
+            "title": "Privacy Policy",
+            "intro": "Protecting your personal data matters to us. This sample privacy policy shows how such a page would be laid out on this demo website.",
+            "sections": {
+                "controller": {
+                    "title": "Controller",
+                    "body": "The party responsible for data processing on this website is {company}, {address}. You can reach us by email at {email}."
+                },
+                "data": {
+                    "title": "Data we process",
+                    "body": "When you visit the website, technically necessary data is processed, for example your IP address and the date and time of access. If you create a customer account, write to us via the contact form or offer a vehicle, we process the information you enter, such as your name, email address, phone number and vehicle details."
+                },
+                "purposes": {
+                    "title": "Purposes of processing",
+                    "body": "We process your data to provide the website, answer your enquiries, manage your customer account and handle vehicle offers and trade-ins."
+                },
+                "cookies": {
+                    "title": "Cookies and sessions",
+                    "body": "This demo website only uses technically necessary cookies, for example for signing in and for remembering your language setting. Your browsing behaviour is not analysed."
+                },
+                "rights": {
+                    "title": "Your rights",
+                    "body": "You have the right of access, rectification, erasure, restriction of processing, data portability and objection. You may also lodge a complaint with a data protection supervisory authority. Please contact {email} for this purpose."
+                }
+            }
+        },
+        "terms": {
+            "metaDescription": "Sample terms and conditions of the {name} demo website.",
+            "title": "Terms & Conditions",
+            "intro": "These sample terms and conditions show how such a page would be laid out on this demo website.",
+            "sections": {
+                "scope": {
+                    "title": "Scope",
+                    "body": "These terms apply to all offers and services provided by {company} through this website."
+                },
+                "offers": {
+                    "title": "Offers and prices",
+                    "body": "The vehicles shown are non-binding and subject to prior sale. All prices are in euros. Errors and changes are reserved."
+                },
+                "contract": {
+                    "title": "Formation of contract",
+                    "body": "A purchase contract is only concluded once {company} has confirmed it in writing. Enquiries submitted through the website are not binding orders."
+                },
+                "warranty": {
+                    "title": "Warranty",
+                    "body": "Statutory warranty rights apply unless otherwise agreed in writing in an individual case."
+                },
+                "law": {
+                    "title": "Governing law",
+                    "body": "The law of the Federal Republic of Germany applies."
+                }
+            }
+        },
+        "impressum": {
+            "metaDescription": "Sample legal notice (Impressum) of the {name} demo website.",
+            "title": "Impressum",
+            "intro": "Sample details for this demo website.",
+            "sections": {
+                "provider": {
+                    "title": "Provider"
+                },
+                "contact": {
+                    "title": "Contact",
+                    "phone": "Phone: {phone}",
+                    "email": "Email: {email}"
+                },
+                "register": {
+                    "title": "Register and tax",
+                    "registerNumber": "Commercial register number: {number}",
+                    "vatId": "VAT ID: {vatId}"
+                },
+                "responsible": {
+                    "title": "Responsible for content",
+                    "body": "{company} is responsible for the content of this website (address above)."
+                }
+            }
+        }
     }
 }

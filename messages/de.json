@@ -195,7 +195,8 @@
         "sendMessage": "Nachricht senden",
         "messageSent": "Nachricht erfolgreich gesendet",
         "messageError": "Fehler beim Senden der Nachricht",
-        "followUs": "Folgen Sie uns"
+        "followUs": "Folgen Sie uns",
+        "testDriveMessage": "Ich interessiere mich für eine Probefahrt mit dem Fahrzeug {vehicle}. Bitte teilen Sie mir die verfügbaren Termine mit."
     },
     "footer": {
         "allRightsReserved": "Alle Rechte vorbehalten",
@@ -264,15 +265,17 @@
                 "title": "Neu hinzugefügte Fahrzeuge",
                 "description": "Die neuesten Premium-Gebrauchtwagen aus unserem Bestand",
                 "viewAll": "Alle anzeigen",
-                "viewDetails": "Details ansehen"
+                "viewDetails": "Details ansehen",
+                "empty": "Zurzeit sind keine Fahrzeuge verfügbar. Bitte schauen Sie bald wieder vorbei."
             },
             "featured": {
                 "title": "Ausgewählte Fahrzeuge",
                 "description": "Unsere handverlesenen Premium-Gebrauchtwagen",
                 "viewAll": "Alle Fahrzeuge ansehen",
-                "featured": "Featured",
+                "featured": "Empfohlen",
                 "viewDetails": "Fahrzeugdetails anzeigen",
-                "testDrive": "Probefahrt"
+                "testDrive": "Probefahrt",
+                "empty": "Zurzeit gibt es keine ausgewählten Fahrzeuge. Bitte schauen Sie bald wieder vorbei."
             },
             "trustSection": {
                 "title": "Warum uns wählen?",
@@ -431,7 +434,12 @@
             "Petrol": "Benzin",
             "Elektro": "Elektro",
             "Electric": "Elektro",
-            "Hybrid": "Hybrid"
+            "Hybrid": "Hybrid",
+            "gasoline": "Benzin",
+            "diesel": "Diesel",
+            "electric": "Elektro",
+            "hybrid": "Hybrid",
+            "Benzin": "Benzin"
         },
         "transmissions": {
             "Manual": "Schaltgetriebe",
@@ -446,5 +454,89 @@
     "meta": {
         "title": "{name} – Premium-Gebrauchtwagen",
         "description": "Finden Sie Ihr Traumauto bei {name} – Ihr Gebrauchtwagenhändler für geprüfte Premium-Fahrzeuge."
+    },
+    "legalPages": {
+        "demoNotice": {
+            "title": "Demo-Inhalt",
+            "text": "Diese Seite enthält Platzhaltertext und ausschließlich fiktive Beispieldaten. Sie stellt weder eine rechtsverbindliche Angabe noch eine Rechtsberatung dar."
+        },
+        "privacy": {
+            "metaDescription": "Beispiel-Datenschutzerklärung der Demo-Website von {name}.",
+            "title": "Datenschutzerklärung",
+            "intro": "Der Schutz Ihrer personenbezogenen Daten ist uns wichtig. Diese Beispiel-Datenschutzerklärung zeigt, wie eine solche Seite auf dieser Demo-Website aufgebaut wäre.",
+            "sections": {
+                "controller": {
+                    "title": "Verantwortlicher",
+                    "body": "Verantwortlich für die Datenverarbeitung auf dieser Website ist {company}, {address}. Sie erreichen uns per E-Mail unter {email}."
+                },
+                "data": {
+                    "title": "Welche Daten wir verarbeiten",
+                    "body": "Beim Besuch der Website werden technisch notwendige Daten verarbeitet, zum Beispiel die IP-Adresse sowie Datum und Uhrzeit des Zugriffs. Wenn Sie ein Kundenkonto anlegen, uns über das Kontaktformular schreiben oder ein Fahrzeug anbieten, verarbeiten wir die von Ihnen eingegebenen Angaben, etwa Name, E-Mail-Adresse, Telefonnummer und Fahrzeugdaten."
+                },
+                "purposes": {
+                    "title": "Zwecke der Verarbeitung",
+                    "body": "Wir verarbeiten Ihre Daten, um die Website bereitzustellen, Ihre Anfragen zu beantworten, Ihr Kundenkonto zu verwalten sowie Fahrzeugangebote und Inzahlungnahmen zu bearbeiten."
+                },
+                "cookies": {
+                    "title": "Cookies und Sitzungen",
+                    "body": "Diese Demo-Website verwendet nur technisch notwendige Cookies, zum Beispiel für die Anmeldung und die Speicherung Ihrer Spracheinstellung. Eine Auswertung Ihres Nutzungsverhaltens findet nicht statt."
+                },
+                "rights": {
+                    "title": "Ihre Rechte",
+                    "body": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Außerdem können Sie sich bei einer Datenschutz-Aufsichtsbehörde beschweren. Wenden Sie sich dazu bitte an {email}."
+                }
+            }
+        },
+        "terms": {
+            "metaDescription": "Beispiel-Geschäftsbedingungen der Demo-Website von {name}.",
+            "title": "Allgemeine Geschäftsbedingungen",
+            "intro": "Diese Beispiel-Geschäftsbedingungen zeigen, wie eine solche Seite auf dieser Demo-Website aufgebaut wäre.",
+            "sections": {
+                "scope": {
+                    "title": "Geltungsbereich",
+                    "body": "Diese Bedingungen gelten für alle Angebote und Leistungen von {company} über diese Website."
+                },
+                "offers": {
+                    "title": "Angebote und Preise",
+                    "body": "Die dargestellten Fahrzeuge sind freibleibend und unverbindlich; ein Zwischenverkauf bleibt vorbehalten. Alle Preise verstehen sich in Euro. Irrtümer und Änderungen bleiben vorbehalten."
+                },
+                "contract": {
+                    "title": "Vertragsschluss",
+                    "body": "Ein Kaufvertrag kommt erst durch die schriftliche Bestätigung von {company} zustande. Anfragen über die Website sind keine verbindlichen Bestellungen."
+                },
+                "warranty": {
+                    "title": "Gewährleistung",
+                    "body": "Es gelten die gesetzlichen Gewährleistungsrechte, soweit im Einzelfall nicht schriftlich etwas anderes vereinbart wird."
+                },
+                "law": {
+                    "title": "Anwendbares Recht",
+                    "body": "Es gilt das Recht der Bundesrepublik Deutschland."
+                }
+            }
+        },
+        "impressum": {
+            "metaDescription": "Beispiel-Impressum der Demo-Website von {name}.",
+            "title": "Impressum",
+            "intro": "Beispielangaben für diese Demo-Website.",
+            "sections": {
+                "provider": {
+                    "title": "Anbieter"
+                },
+                "contact": {
+                    "title": "Kontakt",
+                    "phone": "Telefon: {phone}",
+                    "email": "E-Mail: {email}"
+                },
+                "register": {
+                    "title": "Register und Steuer",
+                    "registerNumber": "Handelsregisternummer: {number}",
+                    "vatId": "USt-IdNr.: {vatId}"
+                },
+                "responsible": {
+                    "title": "Inhaltlich verantwortlich",
+                    "body": "Für die Inhalte dieser Website ist {company} verantwortlich (Anschrift siehe oben)."
+                }
+            }
+        }
     }
 }

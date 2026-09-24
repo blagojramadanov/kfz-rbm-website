@@ -8,9 +8,17 @@ import { ServicesGrid } from "@/components/services-grid";
 import { ArrowRight, CheckCircle, Users, Award, Shield, Zap } from "lucide-react";
 import { COMPANY } from "@/lib/company";
 import { Link } from "@/lib/navigation";
+import { getFeaturedVehicles, getLatestVehicles } from "@/lib/public-vehicles";
+
+// The latest/featured lists come from the database; never prerender them at build time.
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const t = await getTranslations("pages.home");
+  const [latestVehicles, featuredVehicles] = await Promise.all([
+    getLatestVehicles(4),
+    getFeaturedVehicles(6),
+  ]);
   return (
     <div className="w-full">
       {/* Hero Section with Background Image */}
@@ -130,7 +138,7 @@ export default async function Home() {
             </p>
           </div>
 
-          <LatestVehicles />
+          <LatestVehicles vehicles={latestVehicles} />
         </div>
       </section>
 
@@ -146,7 +154,7 @@ export default async function Home() {
             </p>
           </div>
 
-          <FeaturedVehicles />
+          <FeaturedVehicles vehicles={featuredVehicles} />
 
           <div className="text-center mt-12">
             <Button
