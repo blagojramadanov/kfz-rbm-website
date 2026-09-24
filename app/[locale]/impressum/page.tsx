@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LegalPage } from "@/components/legal-page";
-import { COMPANY } from "@/lib/company";
+import { COMPANY, getAddress, getLegalInfo } from "@/lib/company";
 
 export async function generateMetadata({
   params: { locale },
@@ -17,8 +17,16 @@ export async function generateMetadata({
 
 // Deliberately lists no natural person (no owner / managing director): the
 // demo data in lib/company.ts is fictional.
-export default async function ImpressumPage() {
+export default async function ImpressumPage({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  setRequestLocale(locale);
   const t = await getTranslations("legalPages.impressum");
+  const tCompany = await getTranslations("company");
+  const address = getAddress(tCompany);
+  const legal = getLegalInfo(tCompany);
 
   return (
     <LegalPage
@@ -30,9 +38,9 @@ export default async function ImpressumPage() {
           title: t("sections.provider.title"),
           body: [
             COMPANY.fullName,
-            COMPANY.address.street,
-            `${COMPANY.address.zip} ${COMPANY.address.city}`,
-            COMPANY.address.country,
+            address.street,
+            `${address.zip} ${address.city}`,
+            address.country,
           ],
         },
         {
@@ -47,8 +55,8 @@ export default async function ImpressumPage() {
           id: "register",
           title: t("sections.register.title"),
           body: [
-            t("sections.register.registerNumber", { number: COMPANY.legal.registerNumber }),
-            t("sections.register.vatId", { vatId: COMPANY.legal.ustIdNr }),
+            t("sections.register.registerNumber", { number: legal.registerNumber }),
+            t("sections.register.vatId", { vatId: legal.ustIdNr }),
           ],
         },
         {

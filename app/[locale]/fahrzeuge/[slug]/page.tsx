@@ -1,98 +1,103 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { VehicleGallery } from "@/components/vehicle-gallery";
+import type { Metadata } from "next";
+import Image from "next/image";
+import { notFound, permanentRedirect } from "next/navigation";
+import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
+import { ArrowLeft, Car } from "lucide-react";
+import { BusinessHours } from "@/components/business-hours";
 import { ListingTypeBadge } from "@/components/listing-type-badge";
+import { VehicleGallery } from "@/components/vehicle-gallery";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabase";
-import { MOCK_VEHICLES } from "@/lib/vehicle-data";
-import { ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { COMPANY } from "@/lib/company";
+import { formatMileage, formatPrice } from "@/lib/format-vehicle";
+import { Link } from "@/lib/navigation";
+import {
+  findSlugByLegacySlug,
+  getRelatedVehicles,
+  getVehicleBySlug,
+} from "@/lib/public-vehicles";
+import { decodeSlugParam } from "@/lib/vehicle-slug";
+import {
+  getBodyTypeLabel,
+  getColorLabel,
+  getFuelTypeLabel,
+  getTransmissionLabel,
+  getVehicleConditionLabel,
+} from "@/lib/vehicle-labels";
+
+// ISR: the vehicle is read with the cookie-less anon client (lib/public-vehicles.ts)
+// and rendered on first request, then refreshed at most once a minute.
+// Must be a literal for Next to read it; keep in sync with REVALIDATE_SECONDS in that file.
+export const revalidate = 60;
+
+// No vehicle is prerendered at build time, but returning an (empty) list opts this
+// dynamic route into on-demand ISR: each slug is rendered once, cached, then refreshed.
+export function generateStaticParams() {
+  return [];
+}
 
 interface VehicleDetailPageProps {
   params: {
+    locale: string;
     slug: string;
   };
 }
 
-export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
-  const [vehicle, setVehicle] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+export async function generateMetadata({
+  params: { locale, slug },
+}: VehicleDetailPageProps): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: "pages.fahrzeugDetail" });
+  const vehicle = await getVehicleBySlug(decodeSlugParam(slug));
+  if (!vehicle) return { title: t("notFound.title") };
 
-  useEffect(() => {
-    const fetchVehicle = async () => {
-      try {
-        // Try to find vehicle by ID or slug in database
-        const { data, error } = await supabase
-          .from("vehicles")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(100);
+  const format = await getFormatter({ locale });
+  const image = vehicle.images[0];
+  return {
+    title: t("metaTitle", {
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      name: COMPANY.name,
+    }),
+    description: t("metaDescription", {
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      mileage: formatMileage(format, vehicle.mileage),
+      price: formatPrice(format, vehicle.price),
+      name: COMPANY.name,
+    }),
+    openGraph: image ? { images: [image] } : undefined,
+  };
+}
 
-        if (error || !data) {
-          console.error("Error fetching vehicles:", error);
-          // Fallback to mock data
-          const mockVehicle = MOCK_VEHICLES.find((v) => v.slug === params.slug);
-          setVehicle(mockVehicle);
-          setLoading(false);
-          return;
-        }
+export default async function VehicleDetailPage({
+  params: { locale, slug: rawSlug },
+}: VehicleDetailPageProps) {
+  setRequestLocale(locale);
+  const slug = decodeSlugParam(rawSlug);
 
-        // Find vehicle by matching slug pattern (brand-model)
-        const foundVehicle = data.find((v) => {
-          const slug = `${v.brand}-${v.model}`.toLowerCase().replace(/\s+/g, '-');
-          return slug === params.slug;
-        });
-
-        if (!foundVehicle) {
-          // Fallback to mock data
-          const mockVehicle = MOCK_VEHICLES.find((v) => v.slug === params.slug);
-          setVehicle(mockVehicle);
-          setLoading(false);
-          return;
-        }
-
-        // Fetch images for the vehicle
-        const { data: images } = await supabase
-          .from("vehicle_images")
-          .select("image_url")
-          .eq("vehicle_id", foundVehicle.id)
-          .order("sort_order", { ascending: true });
-
-        const vehicleWithImages = {
-          ...foundVehicle,
-          images: images?.map((img) => img.image_url) || [],
-        };
-
-        setVehicle(vehicleWithImages);
-      } catch (err) {
-        console.error("Error loading vehicle:", err);
-        // Fallback to mock data
-        const mockVehicle = MOCK_VEHICLES.find((v) => v.slug === params.slug);
-        setVehicle(mockVehicle);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVehicle();
-  }, [params.slug]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Fahrzeugdetails werden geladen...</p>
-        </div>
-      </div>
-    );
-  }
-
+  const vehicle = await getVehicleBySlug(slug);
   if (!vehicle) {
+    // Old `brand-model` URL? Send it to the vehicle's unique slug.
+    const currentSlug = await findSlugByLegacySlug(slug);
+    if (currentSlug) permanentRedirect(`/${locale}/fahrzeuge/${currentSlug}`);
     notFound();
   }
+  // Same id, outdated or mistyped name part: use the canonical URL.
+  if (slug !== vehicle.slug) permanentRedirect(`/${locale}/fahrzeuge/${vehicle.slug}`);
+
+  const [t, tVehicles, tCommon, tContact, format, relatedVehicles] = await Promise.all([
+    getTranslations("pages.fahrzeugDetail"),
+    getTranslations("vehicles"),
+    getTranslations("common"),
+    getTranslations("contact"),
+    getFormatter(),
+    getRelatedVehicles(vehicle, 4),
+  ]);
+
+  const isExport = vehicle.listingType === "export";
+  const vehicleLabel = `${vehicle.brand} ${vehicle.model} (${vehicle.year})`;
+  const priceLabel = formatPrice(format, vehicle.price);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -103,8 +108,8 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
             href="/fahrzeuge"
             className="inline-flex items-center gap-2 text-kfz-blue hover:text-kfz-blue-dark transition"
           >
-            <ArrowLeft className="w-5 h-5" />
-            Zurück zur Übersicht
+            <ArrowLeft className="w-5 h-5" aria-hidden="true" />
+            {t("backToOverview")}
           </Link>
         </div>
       </div>
@@ -115,17 +120,14 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
           {/* Left Column - Gallery and Main Info */}
           <div className="lg:col-span-2">
             {/* Gallery */}
-            <VehicleGallery
-              images={vehicle.images}
-              title={`${vehicle.brand} ${vehicle.model}`}
-            />
+            <VehicleGallery images={vehicle.images} title={`${vehicle.brand} ${vehicle.model}`} />
 
             {/* Title and Key Stats */}
             <div className="mt-12">
               {/* Listing Type Badge */}
-              {vehicle.listing_type === "export" && (
+              {isExport && (
                 <div className="mb-4">
-                  <ListingTypeBadge type={vehicle.listing_type} />
+                  <ListingTypeBadge type="export" />
                 </div>
               )}
 
@@ -134,17 +136,12 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
                   <h1 className="text-4xl font-bold text-gray-900 mb-2">
                     {vehicle.brand} {vehicle.model}
                   </h1>
-                  <p className="text-gray-600 text-lg">
-                    {vehicle.year}
-                    {vehicle.firstRegistration ? ` • ${vehicle.firstRegistration}` : ""}
-                  </p>
+                  <p className="text-gray-600 text-lg">{vehicle.year}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-4xl font-bold text-kfz-blue mb-2">
-                    €{vehicle.price?.toLocaleString("de-DE") || "—"}
-                  </div>
+                  <div className="text-4xl font-bold text-kfz-blue mb-2">{priceLabel}</div>
                   <p className="text-gray-600">
-                    {vehicle.listing_type === "export" ? "Exportpreis (netto)" : "Netto-Verkaufspreis"}
+                    {isExport ? t("price.export") : t("price.sale")}
                   </p>
                 </div>
               </div>
@@ -152,57 +149,67 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
               {/* Quick Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12 pb-12 border-b">
                 <div>
-                  <p className="text-gray-600 text-sm mb-1">Kilometer</p>
+                  <p className="text-gray-600 text-sm mb-1">{tVehicles("mileage")}</p>
                   <p className="text-xl font-bold text-gray-900">
-                    {vehicle.mileage ? (vehicle.mileage / 1000).toFixed(0) + "k km" : "—"}
+                    {formatMileage(format, vehicle.mileage)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm mb-1">Leistung</p>
+                  <p className="text-gray-600 text-sm mb-1">{tVehicles("power")}</p>
                   <p className="text-xl font-bold text-gray-900">
-                    {vehicle.power_hp || vehicle.powerHp || "—"} PS
+                    {vehicle.powerHp != null
+                      ? tVehicles("powerValue", { value: format.number(vehicle.powerHp) })
+                      : "—"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm mb-1">Getriebe</p>
-                  <p className="text-xl font-bold text-gray-900">{vehicle.transmission || "—"}</p>
+                  <p className="text-gray-600 text-sm mb-1">{tVehicles("transmission")}</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {vehicle.transmission
+                      ? getTransmissionLabel(tCommon, vehicle.transmission)
+                      : "—"}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm mb-1">Kraftstoff</p>
-                  <p className="text-xl font-bold text-gray-900">{vehicle.fuel_type || vehicle.fuelType || "—"}</p>
+                  <p className="text-gray-600 text-sm mb-1">{tVehicles("fuelType")}</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {vehicle.fuelType ? getFuelTypeLabel(tCommon, vehicle.fuelType) : "—"}
+                  </p>
                 </div>
               </div>
 
               {/* Export-Specific Fields */}
-              {vehicle.listing_type === "export" && (
+              {isExport && (
                 <div className="mb-12 p-6 bg-blue-50 rounded-lg border border-blue-200">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">🌍 Exportinformationen</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                    <span aria-hidden="true">🌍</span> {t("exportInfo.title")}
+                  </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     {vehicle.zustand && (
                       <div>
-                        <p className="text-gray-600 text-sm mb-1">Zustand</p>
+                        <p className="text-gray-600 text-sm mb-1">{tVehicles("condition")}</p>
                         <p className="text-lg font-semibold text-gray-900">
-                          {vehicle.zustand === "fahrbereit" && "Fahrbereit"}
-                          {vehicle.zustand === "nicht_fahrbereit" && "Nicht fahrbereit"}
-                          {vehicle.zustand === "unfallwagen" && "Unfallwagen"}
+                          {getVehicleConditionLabel(tCommon, vehicle.zustand)}
                         </p>
                       </div>
                     )}
                     {vehicle.zielland && (
                       <div>
-                        <p className="text-gray-600 text-sm mb-1">Zielland</p>
+                        <p className="text-gray-600 text-sm mb-1">{t("exportInfo.destination")}</p>
                         <p className="text-lg font-semibold text-gray-900">{vehicle.zielland}</p>
                       </div>
                     )}
                     <div>
-                      <p className="text-gray-600 text-sm mb-1">Preistyp</p>
-                      <p className="text-lg font-semibold text-gray-900">Netto (§25a)</p>
+                      <p className="text-gray-600 text-sm mb-1">{t("exportInfo.priceType")}</p>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {t("exportInfo.priceTypeValue")}
+                      </p>
                     </div>
                   </div>
-                  {vehicle.export_notes && (
+                  {vehicle.exportNotes && (
                     <div className="mt-6 pt-6 border-t border-blue-200">
-                      <p className="text-gray-600 text-sm mb-2">Exportnoten</p>
-                      <p className="text-gray-700">{vehicle.export_notes}</p>
+                      <p className="text-gray-600 text-sm mb-2">{t("exportInfo.notes")}</p>
+                      <p className="text-gray-700">{vehicle.exportNotes}</p>
                     </div>
                   )}
                 </div>
@@ -210,94 +217,42 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
 
               {/* Description */}
               <div className="mb-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Beschreibung</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t("description.title")}</h2>
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  {vehicle.description || "Keine Beschreibung verfügbar"}
+                  {vehicle.description || t("description.empty")}
                 </p>
               </div>
 
               {/* Detailed Specs */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12 pb-12 border-b">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    Fahrzeugdetails
-                  </h3>
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-gray-600 text-sm">Fahrzeugart</dt>
-                      <dd className="text-gray-900 font-semibold">{vehicle.body_type || vehicle.bodyType || "—"}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-gray-600 text-sm">Farbe (Außen)</dt>
-                      <dd className="text-gray-900 font-semibold">{vehicle.color_exterior || vehicle.color || "—"}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-gray-600 text-sm">Erstzulassung</dt>
-                      <dd className="text-gray-900 font-semibold">{vehicle.firstRegistration || vehicle.year || "—"}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-gray-600 text-sm">Hubraum</dt>
-                      <dd className="text-gray-900 font-semibold">{vehicle.engine_cc || "Auf Anfrage"}</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    Inspektionen & Zertifikate
-                  </h3>
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-gray-600 text-sm">HU (TÜV)</dt>
-                      <dd className="text-gray-900 font-semibold">{vehicle.tu}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-gray-600 text-sm">AU</dt>
-                      <dd className="text-gray-900 font-semibold">{vehicle.au}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-gray-600 text-sm">Unfallhistorie</dt>
-                      <dd className="flex items-center gap-2 text-gray-900 font-semibold">
-                        {vehicle.damageHistory === "Unfallfrei" ? (
-                          <>
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                            Unfallfrei
-                          </>
-                        ) : (
-                          <>
-                            <AlertCircle className="w-5 h-5 text-yellow-500" />
-                            Mit Schaden
-                          </>
-                        )}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-gray-600 text-sm">MwSt. ausweisbar</dt>
-                      <dd className="text-gray-900 font-semibold">{vehicle.taxable}</dd>
-                    </div>
-                  </dl>
-                </div>
-              </div>
-
-              {/* Features */}
-              {vehicle.features && vehicle.features.length > 0 && (
-                <div className="mb-12">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                    Ausstattung & Features
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {vehicle.features.map((feature: string, index: number) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg"
-                      >
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                        <span className="text-gray-900">{feature}</span>
-                      </div>
-                    ))}
+              <div className="mb-12 pb-12 border-b">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">{tVehicles("details")}</h3>
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+                  <div>
+                    <dt className="text-gray-600 text-sm">{tVehicles("bodyType")}</dt>
+                    <dd className="text-gray-900 font-semibold">
+                      {vehicle.bodyType ? getBodyTypeLabel(tCommon, vehicle.bodyType) : "—"}
+                    </dd>
                   </div>
-                </div>
-              )}
+                  <div>
+                    <dt className="text-gray-600 text-sm">{tVehicles("colorExterior")}</dt>
+                    <dd className="text-gray-900 font-semibold">
+                      {vehicle.color ? getColorLabel(tCommon, vehicle.color) : "—"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-600 text-sm">{tVehicles("firstRegistration")}</dt>
+                    <dd className="text-gray-900 font-semibold">{vehicle.year}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-600 text-sm">{tVehicles("engineSize")}</dt>
+                    <dd className="text-gray-900 font-semibold">
+                      {vehicle.engineCc
+                        ? tVehicles("engineValue", { value: format.number(vehicle.engineCc) })
+                        : tVehicles("onRequest")}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
             </div>
           </div>
 
@@ -307,79 +262,66 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
             <div className="sticky top-24 bg-white rounded-lg shadow-lg p-8 space-y-6">
               {/* Price Summary */}
               <div className="border-b pb-6">
-                <p className="text-gray-600 text-sm mb-2">Verkaufspreis</p>
-                <p className="text-3xl font-bold text-kfz-blue mb-4">
-                  €{vehicle.price.toLocaleString("de-DE")}
-                </p>
-                {vehicle.taxable === "Ja" && (
-                  <p className="text-sm text-gray-600">
-                    zzgl. MwSt. ausweisbar
-                  </p>
-                )}
+                <p className="text-gray-600 text-sm mb-2">{t("price.summary")}</p>
+                <p className="text-3xl font-bold text-kfz-blue">{priceLabel}</p>
               </div>
 
               {/* Quick Contact */}
               <div className="space-y-3">
-                <h3 className="font-bold text-gray-900">Interessiert?</h3>
-                <p className="text-sm text-gray-600">
-                  Kontaktieren Sie uns für weitere Informationen und eine Probefahrt.
-                </p>
+                <h3 className="font-bold text-gray-900">{t("cta.title")}</h3>
+                <p className="text-sm text-gray-600">{t("cta.text")}</p>
 
-                <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white py-3 text-lg font-semibold">
-                  Anfrage senden
+                <Button
+                  asChild
+                  className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white py-3 text-lg font-semibold"
+                >
+                  <Link href="/contact">{t("cta.inquiry")}</Link>
                 </Button>
 
                 <Button
+                  asChild
                   variant="outline"
                   className="w-full border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white py-3 text-lg font-semibold"
                 >
-                  Probefahrt vereinbaren
+                  <Link href={{ pathname: "/contact", query: { testDrive: vehicleLabel } }}>
+                    {t("cta.testDrive")}
+                  </Link>
                 </Button>
               </div>
 
               {/* Contact Info */}
               <div className="border-t pt-6 space-y-4 text-sm">
                 <div>
-                  <p className="text-gray-600 mb-1">Telefon</p>
+                  <p className="text-gray-600 mb-1">{tContact("phone")}</p>
                   <a
-                    href="tel:+49123456789"
+                    href={`tel:${COMPANY.phone.replace(/\s/g, "")}`}
                     className="text-kfz-blue hover:text-kfz-blue-dark font-semibold"
                   >
-                    +49 123 456789
+                    {COMPANY.phone}
                   </a>
                 </div>
                 <div>
-                  <p className="text-gray-600 mb-1">E-Mail</p>
+                  <p className="text-gray-600 mb-1">{tContact("email")}</p>
                   <a
-                    href="mailto:info@kfz-rbm.de"
+                    href={`mailto:${COMPANY.email}`}
                     className="text-kfz-blue hover:text-kfz-blue-dark font-semibold break-all"
                   >
-                    info@kfz-rbm.de
+                    {COMPANY.email}
                   </a>
                 </div>
                 <div>
-                  <p className="text-gray-600 mb-1">Öffnungszeiten</p>
-                  <p className="text-gray-900">
-                    Mo-Fr: 9:00 - 18:00 Uhr
-                    <br />
-                    Sa: 10:00 - 16:00 Uhr
-                  </p>
+                  <p className="text-gray-600 mb-1">{tContact("hours")}</p>
+                  <BusinessHours className="text-gray-900" />
                 </div>
               </div>
 
               {/* Share & Favorite */}
               <div className="border-t pt-6 flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                >
-                  Teilen
+                <Button variant="outline" className="flex-1">
+                  {t("cta.share")}
                 </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                >
-                  Merken
+                <Button variant="outline" className="flex-1">
+                  {t("cta.save")}
                 </Button>
               </div>
             </div>
@@ -388,19 +330,12 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
       </div>
 
       {/* Related Vehicles */}
-      <div className="bg-white py-16 px-4 sm:px-6 lg:px-8 border-t">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">
-            Ähnliche Fahrzeuge
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {MOCK_VEHICLES.filter(
-              (v) =>
-                v.brand === vehicle.brand &&
-                v.id !== vehicle.id
-            )
-              .slice(0, 4)
-              .map((relatedVehicle) => (
+      {relatedVehicles.length > 0 && (
+        <div className="bg-white py-16 px-4 sm:px-6 lg:px-8 border-t">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">{t("related")}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedVehicles.map((relatedVehicle) => (
                 <Link
                   key={relatedVehicle.id}
                   href={`/fahrzeuge/${relatedVehicle.slug}`}
@@ -408,29 +343,38 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
                 >
                   <div className="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition">
                     <div className="relative h-40 bg-gray-200">
-                      <img
-                        src={relatedVehicle.images[0]}
-                        alt={`${relatedVehicle.brand} ${relatedVehicle.model}`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition"
-                      />
+                      {relatedVehicle.image ? (
+                        <Image
+                          src={relatedVehicle.image}
+                          alt={`${relatedVehicle.brand} ${relatedVehicle.model}`}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          className="object-cover group-hover:scale-105 transition"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                          <Car className="w-10 h-10" aria-hidden="true" />
+                        </div>
+                      )}
                     </div>
                     <div className="p-4">
                       <h4 className="font-bold text-gray-900 group-hover:text-kfz-blue">
                         {relatedVehicle.brand} {relatedVehicle.model}
                       </h4>
                       <p className="text-kfz-blue font-bold mt-2">
-                        €{relatedVehicle.price.toLocaleString("de-DE")}
+                        {formatPrice(format, relatedVehicle.price)}
                       </p>
                       <p className="text-sm text-gray-600 mt-1">
-                        {relatedVehicle.year} • {(relatedVehicle.mileage / 1000).toFixed(0)}k km
+                        {relatedVehicle.year} • {formatMileage(format, relatedVehicle.mileage)}
                       </p>
                     </div>
                   </div>
                 </Link>
               ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

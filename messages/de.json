@@ -122,7 +122,57 @@
         "noAccidents": "Keine Unfälle",
         "inquire": "Anfrage",
         "tradeIn": "Inzahlungnahme",
-        "makeOffer": "Angebot machen"
+        "makeOffer": "Angebot machen",
+        "brand": "Marke",
+        "mileage": "Kilometerstand",
+        "firstRegistration": "Erstzulassung",
+        "bodyType": "Fahrzeugart",
+        "colorExterior": "Farbe (außen)",
+        "powerValue": "{value} PS",
+        "engineValue": "{value} cm³",
+        "onRequest": "Auf Anfrage",
+        "card": {
+            "addFavorite": "Zu Favoriten hinzufügen",
+            "noImage": "Kein Bild verfügbar"
+        },
+        "filters": {
+            "title": "Filter",
+            "clearAll": "Alle löschen ({count})",
+            "priceEur": "Preis (€)",
+            "rangeFrom": "{label} von",
+            "rangeTo": "{label} bis"
+        },
+        "gallery": {
+            "previous": "Vorheriges Bild",
+            "next": "Nächstes Bild",
+            "imageAlt": "{title} – Bild {index} von {total}",
+            "thumbnailAlt": "{title} – Vorschaubild {index}",
+            "showImage": "Bild {index} anzeigen",
+            "counter": "{current} / {total}",
+            "noImages": "Keine Bilder verfügbar"
+        },
+        "source": {
+            "rbm": "RBM Fahrzeug",
+            "customer": "Kundenfahrzeug",
+            "unknown": "Unbekannt"
+        },
+        "listing": {
+            "searchLabel": "Fahrzeuge durchsuchen",
+            "searchPlaceholder": "Marke, Modell...",
+            "sortLabel": "Sortierung",
+            "sort": {
+                "newest": "Neueste zuerst",
+                "priceAsc": "Preis aufsteigend",
+                "priceDesc": "Preis absteigend",
+                "mileage": "Kilometerstand",
+                "year": "Erstzulassung"
+            },
+            "toggleFilters": "Filter ein- oder ausblenden",
+            "resultsCount": "{count, plural, one {# Fahrzeug gefunden} other {# Fahrzeuge gefunden}}",
+            "noResultsTitle": "Keine Fahrzeuge gefunden",
+            "noResultsHint": "Versuchen Sie, die Filter anzupassen oder die Suche zu verfeinern.",
+            "resetFilters": "Filter zurücksetzen"
+        }
     },
     "vehicleStatus": {
         "available": "Verfügbar",
@@ -251,11 +301,11 @@
     "pages": {
         "home": {
             "hero": {
-                "tagline": "Premium Gebrauchtwagen von vertrauenswürdigen Partnern",
+                "tagline": "Premium-Gebrauchtwagen von vertrauenswürdigen Partnern",
                 "headline1": "Gebrauchtwagen kaufen.",
                 "headline2": "Verkaufen.",
                 "headline3": "Inzahlungnahme. Export.",
-                "subheadline": "Deutschlands führender Autohändler für Premium-Gebrauchtwagen mit 20+ Jahren Erfahrung",
+                "subheadline": "Premium-Gebrauchtwagen mit transparenten Preisen und persönlicher Beratung",
                 "discoverVehicles": "Fahrzeuge entdecken",
                 "offerVehicle": "Mein Auto anbieten",
                 "backgroundAlt": "Luxuriöser Fahrzeughintergrund",
@@ -265,7 +315,6 @@
                 "title": "Neu hinzugefügte Fahrzeuge",
                 "description": "Die neuesten Premium-Gebrauchtwagen aus unserem Bestand",
                 "viewAll": "Alle anzeigen",
-                "viewDetails": "Details ansehen",
                 "empty": "Zurzeit sind keine Fahrzeuge verfügbar. Bitte schauen Sie bald wieder vorbei."
             },
             "featured": {
@@ -273,13 +322,12 @@
                 "description": "Unsere handverlesenen Premium-Gebrauchtwagen",
                 "viewAll": "Alle Fahrzeuge ansehen",
                 "featured": "Empfohlen",
-                "viewDetails": "Fahrzeugdetails anzeigen",
                 "testDrive": "Probefahrt",
                 "empty": "Zurzeit gibt es keine ausgewählten Fahrzeuge. Bitte schauen Sie bald wieder vorbei."
             },
             "trustSection": {
                 "title": "Warum uns wählen?",
-                "description": "Mit über 20 Jahren Erfahrung haben wir uns einen Namen für Qualität, Transparenz und Kundenzufriedenheit gemacht."
+                "description": "Qualität, Transparenz und Kundenzufriedenheit stehen bei uns im Mittelpunkt."
             },
             "qualityGuarantee": {
                 "title": "Qualitätsgarantie",
@@ -290,9 +338,9 @@
             },
             "expertTeam": {
                 "title": "Expertenteam",
-                "description": "Unser erfahrenes Team hilft Ihnen, das perfekte Fahrzeug für Ihre Bedürfnisse zu finden.",
-                "item1": "20+ Jahre Erfahrung",
-                "item2": "Fachberatungen",
+                "description": "Unser Team hilft Ihnen, das perfekte Fahrzeug für Ihre Bedürfnisse zu finden.",
+                "item1": "Kompetente Ansprechpartner",
+                "item2": "Fachberatung",
                 "item3": "Persönlicher Service"
             },
             "transparentPricing": {
@@ -305,7 +353,7 @@
             "aboutSection": {
                 "title": "Über unser Unternehmen",
                 "paragraph1": "Wir sind Ihr vertrauenswürdiger Partner für Premium-Gebrauchtwagen. Wir haben es uns zur Aufgabe gemacht, unseren Kunden die besten Fahrzeuge mit höchster Qualität und Transparenz anzubieten.",
-                "paragraph2": "Unser erfahrenes Team wählt jedes Fahrzeug sorgfältig aus und inspiziert es gründlich, um sicherzustellen, dass Sie ein Auto erhalten, das Ihren Erwartungen entspricht.",
+                "paragraph2": "Unser Team wählt jedes Fahrzeug sorgfältig aus und inspiziert es gründlich, um sicherzustellen, dass Sie ein Auto erhalten, das Ihren Erwartungen entspricht.",
                 "quickProcess": "Schnelle Abwicklung",
                 "quickProcessDesc": "Unbürokratische und schnelle Abwicklung aller Formalitäten",
                 "fairPrices": "Faire Preise",
@@ -384,15 +432,6 @@
             "messageError": "Fehler beim Senden der Nachricht",
             "contactInfo": "Kontaktinformationen"
         },
-        "fahrzeuge": {
-            "title": "Fahrzeuge",
-            "browseVehicles": "Fahrzeuge durchsuchen",
-            "noVehicles": "Keine Fahrzeuge gefunden",
-            "filters": "Filter",
-            "sort": "Sortieren",
-            "details": "Details",
-            "export": "Exportieren"
-        },
         "login": {
             "title": "Anmelden",
             "subtitle": "Melden Sie sich an, um fortzufahren"
@@ -411,6 +450,56 @@
             "title": "Unsere Dienstleistungen",
             "subtitle": "Umfassende Lösungen für den Kauf und Verkauf von Gebrauchtwagen",
             "comingSoon": "Die Seite kommt bald..."
+        },
+        "fahrzeuge": {
+            "metaTitle": "Fahrzeuginventar – {name}",
+            "metaDescription": "Durchsuchen Sie das aktuelle Fahrzeugangebot von {name} und filtern Sie nach Marke, Preis, Kilometerstand und mehr.",
+            "heroTitle": "Fahrzeuginventar",
+            "heroSubtitle": "Durchsuchen Sie unsere Auswahl an Premium-Fahrzeugen",
+            "emptyTitle": "Zurzeit sind keine Fahrzeuge verfügbar",
+            "emptyHint": "Bitte schauen Sie bald wieder vorbei."
+        },
+        "fahrzeugeExport": {
+            "metaTitle": "Exportfahrzeuge – {name}",
+            "metaDescription": "Fahrzeuge für den Export ins Ausland bei {name}: Angebote für internationale Märkte im Überblick.",
+            "heroTitle": "Exportfahrzeuge",
+            "heroSubtitle": "Fahrzeuge für den Export ins Ausland • Professionelle Qualität für internationale Märkte",
+            "emptyTitle": "Zurzeit sind keine Exportfahrzeuge verfügbar",
+            "emptyHint": "Bitte schauen Sie bald wieder vorbei."
+        },
+        "fahrzeugDetail": {
+            "metaTitle": "{brand} {model} ({year}) – {name}",
+            "metaDescription": "{brand} {model}, Erstzulassung {year}, {mileage}, {price}. Jetzt bei {name} ansehen und eine Probefahrt anfragen.",
+            "backToOverview": "Zurück zur Übersicht",
+            "notFound": {
+                "title": "Fahrzeug nicht gefunden",
+                "text": "Dieses Fahrzeug ist nicht mehr verfügbar oder der Link ist ungültig."
+            },
+            "price": {
+                "sale": "Netto-Verkaufspreis",
+                "export": "Exportpreis (netto)",
+                "summary": "Verkaufspreis"
+            },
+            "exportInfo": {
+                "title": "Exportinformationen",
+                "destination": "Zielland",
+                "priceType": "Preistyp",
+                "priceTypeValue": "Netto (§25a)",
+                "notes": "Exporthinweise"
+            },
+            "description": {
+                "title": "Beschreibung",
+                "empty": "Keine Beschreibung verfügbar"
+            },
+            "cta": {
+                "title": "Interessiert?",
+                "text": "Kontaktieren Sie uns für weitere Informationen und eine Probefahrt.",
+                "inquiry": "Anfrage senden",
+                "testDrive": "Probefahrt vereinbaren",
+                "share": "Teilen",
+                "save": "Merken"
+            },
+            "related": "Ähnliche Fahrzeuge"
         }
     },
     "common": {
@@ -443,7 +532,57 @@
         },
         "transmissions": {
             "Manual": "Schaltgetriebe",
-            "Automatic": "Automatik"
+            "Automatic": "Automatik",
+            "automatik": "Automatik",
+            "automatic": "Automatik",
+            "manuell": "Schaltgetriebe",
+            "manual": "Schaltgetriebe",
+            "cvt": "CVT"
+        },
+        "viewDetails": "Details ansehen",
+        "listingTypes": {
+            "verkauf": "Verkauf",
+            "export": "Export"
+        },
+        "bodyTypes": {
+            "sedan": "Limousine",
+            "limousine": "Limousine",
+            "suv": "SUV",
+            "kombi": "Kombi",
+            "coupe": "Coupé",
+            "coupé": "Coupé",
+            "cabriolet": "Cabrio",
+            "kleinwagen": "Kleinwagen",
+            "van": "Van"
+        },
+        "colors": {
+            "schwarz": "Schwarz",
+            "black": "Schwarz",
+            "weiß": "Weiß",
+            "weiss": "Weiß",
+            "white": "Weiß",
+            "grau": "Grau",
+            "grey": "Grau",
+            "gray": "Grau",
+            "silber": "Silber",
+            "silver": "Silber",
+            "blau": "Blau",
+            "blue": "Blau",
+            "rot": "Rot",
+            "red": "Rot",
+            "grün": "Grün",
+            "green": "Grün",
+            "gelb": "Gelb",
+            "yellow": "Gelb",
+            "braun": "Braun",
+            "brown": "Braun",
+            "beige": "Beige",
+            "orange": "Orange"
+        },
+        "vehicleConditions": {
+            "fahrbereit": "Fahrbereit",
+            "nicht_fahrbereit": "Nicht fahrbereit",
+            "unfallwagen": "Unfallwagen"
         }
     },
     "hours": {
@@ -537,6 +676,17 @@
                     "body": "Für die Inhalte dieser Website ist {company} verantwortlich (Anschrift siehe oben)."
                 }
             }
+        }
+    },
+    "company": {
+        "address": {
+            "street": "Beispielstraße 1",
+            "city": "Beispielstadt",
+            "country": "Deutschland"
+        },
+        "legal": {
+            "ustIdNr": "DE000000000 (Beispiel)",
+            "registerNumber": "HRB 000000 (Beispiel)"
         }
     }
 }

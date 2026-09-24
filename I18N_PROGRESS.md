@@ -19,7 +19,7 @@ This document tracks all files that contain hardcoded user-visible text requirin
 ## 2. Homepage
 
 - [x] `app/page.tsx` - Root redirect page
-- [x] `app/[locale]/page.tsx` - Main homepage with hero section ("Gebrauchtwagen kaufen. Verkaufen. Inzahlungnahme. Export.", "Deutschlands führender Autohändler...", "Fahrzeuge entdecken", "Mein Auto anbieten", "Neu hinzugefügte Fahrzeuge", "Ausgewählte Fahrzeuge", "Unsere Dienstleistungen", "Why Choose Us?", "Qualitätsgarantie", "Expertenteam", "Transparente Preise", "About Our Company", "Schnelle Abwicklung", "Faire Preise", "Gesamtlösung", "Bereit für Ihr Traumauto?", "Kontakt aufnehmen", "Anrufen: +49 123 456789")
+- [x] `app/[locale]/page.tsx` - Main homepage with hero section ("Gebrauchtwagen kaufen. Verkaufen. Inzahlungnahme. Export.", "<neutral subheadline: no market-leader / years-of-experience claims>", "Fahrzeuge entdecken", "Mein Auto anbieten", "Neu hinzugefügte Fahrzeuge", "Ausgewählte Fahrzeuge", "Unsere Dienstleistungen", "Why Choose Us?", "Qualitätsgarantie", "Expertenteam", "Transparente Preise", "About Our Company", "Schnelle Abwicklung", "Faire Preise", "Gesamtlösung", "Bereit für Ihr Traumauto?", "Kontakt aufnehmen", "Anrufen: +49 123 456789")
 - [x] `components/featured-vehicles.tsx` - Featured vehicle labels and descriptions
 - [x] `components/latest-vehicles.tsx` - Latest vehicle section labels
 - [x] `components/search-bar.tsx` - Search input placeholders and button labels
@@ -29,20 +29,20 @@ This document tracks all files that contain hardcoded user-visible text requirin
 
 ## 3. Vehicle Pages (/fahrzeuge, /fahrzeuge/export, /fahrzeuge/[slug])
 
-- [ ] `app/[locale]/fahrzeuge/page.tsx` - Vehicle listing page headers, filters, sorting options
-- [ ] `app/[locale]/fahrzeuge/export/page.tsx` - Export vehicle page headers and content
-- [ ] `app/[locale]/fahrzeuge/[slug]/page.tsx` - Individual vehicle detail page (title, specifications, features, CTA buttons)
-- [ ] `app/[locale]/vehicles/page.tsx` - Alternative vehicle listing page
-- [ ] `components/vehicle-gallery.tsx` - Gallery controls, image navigation labels
-- [ ] `components/vehicle-card.tsx` - Vehicle card display (price labels, status badges, view/favorite buttons)
-- [ ] `components/vehicle-filters.tsx` - Filter labels (brand, model, year, price, mileage) and options
-- [ ] `components/vehicle-source-badge.tsx` - Source type badges and labels
-- [ ] `components/listing-type-badge.tsx` - Listing type badges and labels
+- [x] `app/[locale]/fahrzeuge/page.tsx` - server page (ISR, localized `generateMetadata`); renders the shared `components/vehicle-listing.tsx`
+- [x] `app/[locale]/fahrzeuge/export/page.tsx` - same, with export vehicles
+- [x] `app/[locale]/fahrzeuge/[slug]/page.tsx` (+ `not-found.tsx`) - detail page (ISR on demand, localized `generateMetadata`, unique slug, legacy-URL redirect)
+- [x] `app/[locale]/vehicles/page.tsx` - removed; `/{locale}/vehicles` now redirects to `/{locale}/fahrzeuge` via `next.config.js`
+- [x] `components/vehicle-gallery.tsx`, `components/vehicle-card.tsx`, `components/vehicle-filters.tsx` (controlled, no raw DB values), `components/vehicle-listing.tsx` (new, shared by both listings)
+- [x] `components/vehicle-source-badge.tsx`, `components/listing-type-badge.tsx`
 
-> **Macedonian (mk) TODO for this area:** the `vehicles.filter*` strings (e.g. `vehicles.filter`, `filterBrand`, `filterModel`, `filterYear`, `filterPrice`, `filterMileage`) use singular imperatives ("Филтрирај"). They must be changed to the formal "Вие" plural forms ("Филтрирајте") when this area is translated. Review the rest of `vehicles.*` in `mk.json` for the same problem.
-> Also: map DB fuel type / transmission values with `getFuelTypeLabel()` / `getTransmissionLabel()` (`lib/vehicle-labels.ts`); `components/vehicle-filters.tsx` currently renders them raw.
+Done in this area: strings in `vehicles.*` (shared vocabulary, `vehicles.filters/gallery/listing/card/source`) and `pages.fahrzeuge`, `pages.fahrzeugeExport`, `pages.fahrzeugDetail`; label maps `common.bodyTypes/colors/transmissions/vehicleConditions/listingTypes` (+ `getBodyTypeLabel`, `getColorLabel`, `getVehicleConditionLabel` in `lib/vehicle-labels.ts`); prices/mileage via `formatPrice`/`formatMileage` (`lib/format-vehicle.ts`, next-intl formatter); the Macedonian `vehicles.filter*` strings use "Вие" forms.
 
----
+Also changed here (behaviour, not just text):
+- The pages now read real vehicles only (anon Supabase client, `lib/public-vehicles.ts`). `lib/vehicle-data.ts` (German mock cars used as a fallback and as "similar vehicles") was deleted.
+- The card/detail/filters used mock-only camelCase fields; real DB rows are snake_case, so real cars showed "undefined PS" and **"Mit Schaden"**. They now use one normalized `PublicVehicle` type.
+- Removed UI that has no DB column behind it: HU/AU, accident history, "MwSt. ausweisbar", features list, and the two matching filter sections.
+- Detail slug is now `<brand>-<model>-<first 8 hex of id>` (`lib/vehicle-slug.ts`), looked up by an id range query, not by scanning the newest 100. Old `brand-model` URLs (and wrong-name/right-id URLs) 308-redirect to the canonical slug.
 
 ## 4. About, Services, Contact
 
@@ -159,10 +159,9 @@ For each file, look for and catalog:
 
 ## Translation Status Summary
 
-- **Total Files**: 74
-- **Completed**: 0
-- **In Progress**: 0
-- **Not Started**: 74
+- **Checklist items**: 64
+- **Completed**: 24
+- **Not started**: 40
 
 ---
 
@@ -174,8 +173,12 @@ For each file, look for and catalog:
 - **next-intl keys are always relative to the namespace** passed to `useTranslations`/`getTranslations`; a dotted key is *not* an absolute path.
 - **Never append a block to the JSON without checking the key does not already exist.** A duplicate top-level key does not error: `JSON.parse` (and webpack) keep the last one and silently drop the earlier section. `npm run check:i18n` now fails on duplicate keys.
 - **DB values are never translated or changed.** Map them with `getFuelTypeLabel()` / `getTransmissionLabel()` from `lib/vehicle-labels.ts` (uses `t.has()`, falls back to the raw value). Pass a translator from `useTranslations("common")`.
-- **Homepage vehicle lists** come from Supabase via `lib/public-vehicles.ts` (anon key, no cookies, so only rows the public RLS policy allows: `status = 'available'`). Latest = newest 4; featured = `vehicles.featured = true` (newest 6). The page is `force-dynamic`. The list components are server components that take the vehicles as a prop; empty states are `pages.home.latest.empty` / `pages.home.featured.empty`.
-- **Fuel type values in the DB** are inconsistent (`gasoline`, `diesel`, `electric`, `hybrid` from the admin form; `Benzin`, `Diesel`, `Elektro` from older data). `common.fuelTypes` maps all of them; unknown values still fall back to the raw value.
+- **Homepage vehicle lists** come from Supabase via `lib/public-vehicles.ts` (anon key, no cookies, so only rows the public RLS policy allows: `status = 'available'`). Latest = newest 4; featured = `vehicles.featured = true` (newest 6). The homepage, the two listings and the detail page use ISR (`export const revalidate = 60`, keep in sync with `REVALIDATE_SECONDS`); the Supabase fetch must not use `cache: "no-store"`. The list components are server components that take the vehicles as a prop; empty states are `pages.home.latest.empty` / `pages.home.featured.empty`.
+- **Static rendering: every server page under `app/[locale]` that uses next-intl (`useTranslations`, `getTranslations`, `getFormatter`, ...) must call `setRequestLocale(locale)` (from `next-intl/server`) first.** The locale layout no longer sets `force-dynamic`, so a page that skips it fails `npm run build` ("Usage of next-intl APIs in Server Components currently opts into dynamic rendering"). Client pages are unaffected. A dynamic-segment page that should be ISR (like `fahrzeuge/[slug]`) also needs `generateStaticParams() { return []; }`.
+- **Vehicle slugs**: `getVehicleSlug()` in `lib/vehicle-slug.ts` (`brand-model-<8 hex of id>`). Always build detail links with it (or use `PublicVehicle.slug`).
+- **Formatting**: prices and mileage go through `formatPrice()` / `formatMileage()` (`lib/format-vehicle.ts`), other numbers through the next-intl formatter; never `toLocaleString("de-DE")`.
+- **Company placeholders** ("Beispielstraße", "(Beispiel)") live in `company.*` messages; use `getFormattedAddress(t)` / `getAddress(t)` / `getLegalInfo(t)` from `lib/company.ts` with a `company` translator.
+- **Fuel type values in the DB** are inconsistent (`gasoline`, `diesel`, `electric`, `hybrid` from the admin form; `Benzin`, `Diesel`, `Elektro` from older data). `common.fuelTypes` maps all of them; unknown values still fall back to the raw value. The other label maps (`transmissions`, `bodyTypes`, `colors`, `vehicleConditions`) use lowercase keys; the helpers try the exact value first, then the lowercased one.
 - **Opening hours** live only in `COMPANY.hours` (`lib/company.ts`, 24h). Render them with `<BusinessHours />` (24h for de/mk, 12h AM/PM for en).
 - German: formal "Sie". Macedonian: formal "Вие" (never "ти"). "RBM" and "Premium Cars" stay untranslated.
 - Message files: UTF-8 **without BOM**, 4-space indent, trailing newline. Do not write them with PowerShell.
@@ -187,11 +190,17 @@ For each file, look for and catalog:
 
 ## Known follow-ups
 
-- Vehicle pages (section 3) still need translating; reuse `common.fuelTypes` / `common.transmissions`.
 - `pages.about` and `pages.services` are still "coming soon" placeholders (translated in de/en/mk).
-- Some `mk` strings outside the pages touched here (e.g. `vehicles.filter*`) use singular imperatives ("Филтрирај"); switch to the formal plural ("Филтрирајте") when those pages are translated.
-- Homepage CTAs are wired with the locale-aware `Link` from `lib/navigation.ts` (pass hrefs without a locale prefix). The latest/featured cards are real DB vehicles; "view details" goes to `/fahrzeuge/<slug>` and "test drive" to `/contact?testDrive=<vehicle label>`.
-- The vehicle detail route matches `brand-model` slugs (not unique) against only the newest 100 vehicles, client-side. Two vehicles with the same brand and model resolve to the same page. Fix this when the vehicle pages (section 3) are done (e.g. a unique slug or id in the URL).
-- The contact form's submit handler only `console.log`s; messages (including test-drive requests) are not stored or sent yet.
-- Latest/featured also include `listing_type = 'export'` vehicles (public RLS allows them); filter on `listing_type` in `lib/public-vehicles.ts` if that is not wanted.
-- `COMPANY.legal.*` and the address contain German "(Beispiel)"/"Beispiel…" placeholders that are shown as-is in every locale (same as the contact page).
+- **mk formality sweep still open** outside the translated areas: many Macedonian strings still use singular imperatives (e.g. `buttons.*` "Зачувај/Откажи/Избриши/Уреди/Затвори…", `forms.confirmPassword`, `forms.selectFile`, `errors.goHome`, `auth.*` "Пријави се/Регистрирај се/Потврди лозинка…", `common.confirm`, `pages.login|register|resetPassword.title`, `pages.contact.send`, `adminDashboard.approve/reject/manage*`, `contact.sendMessage`). Convert to "Вие" plural forms ("Зачувајте", "Пријавете се", ...) when each area is translated. Already fixed: `navigation.login/logout/register`, the homepage hero/search/services strings, `vehicles.*`.
+- Homepage CTAs are wired with the locale-aware `Link` from `lib/navigation.ts` (pass hrefs without a locale prefix). Cards are real DB vehicles; "view details" goes to `/fahrzeuge/<slug>` and "test drive" to `/contact?testDrive=<vehicle label>`; export vehicles carry an "Export" badge.
+
+## TODO (not i18n)
+
+- [ ] **Contact form only `console.log`s.** Needs storage (Supabase table + RLS: public insert, admin-only select/update/delete, same pattern as `customer_inquiries`) and an admin notification. The inquiry/test-drive buttons on vehicle pages only link to `/contact` (the test-drive one prefills the message).
+- [ ] **DB fuel values are inconsistent** (`gasoline` / `Benzin` / `Diesel` ...). The admin vehicle form should save fixed enum values (ideally a DB `CHECK`/enum), plus a one-time data cleanup migration. Same for `transmission` (form saves `automatic`/`manual`/`cvt`, older rows have `Automatik`) and `body_type`/`color_exterior` (free text today). The `common.*` label maps tolerate the current mix.
+- [x] **Vehicle detail slugs were not unique** (`brand-model`, newest-100 scan) - fixed in area 3 (unique `brand-model-<id8>` slug, id-range lookup, old URLs redirect).
+- [ ] **Customers must not delete their submitted vehicles; only admins can.** Checked against the migrations in this repo (not against the live database): `submitted_vehicles` has only "Admins can delete submissions" for DELETE (`023_security_audit_fixes.sql`, which also drops every earlier policy first, incl. 002's "Users can delete their own draft vehicles"); `submitted_vehicle_images` and the customer storage bucket likewise allow DELETE for admins only; no customer UI calls a delete on these tables. Still to do: run `select tablename, policyname, cmd, roles from pg_policies where tablename in ('submitted_vehicles','submitted_vehicle_images')` in the Supabase SQL editor to confirm the live policies match, and remove the dead draft-image delete path in `updateVehicleImages` (`app/actions/vehicles.ts`; RLS would deny it anyway).
+- [ ] Vehicle data the DB does not have: HU/AU, accident history, VAT-deductible flag, features (`vehicle_features` exists but is unused), first-registration month. The UI for them was removed in area 3; re-add together with the schema + admin form fields.
+- [ ] Non-functional buttons: favorites (heart on cards), "Teilen" / "Merken" on the detail page.
+- [ ] The one live vehicle has no rows in `vehicle_images` (cards show the placeholder); the admin flow should require at least one photo.
+- [ ] ISR delay: new/changed vehicles appear up to 60 s after publishing; add `revalidatePath` to the admin publish/update actions if that is too slow.

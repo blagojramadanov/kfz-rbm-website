@@ -10,6 +10,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
   const locale = useLocale();
   const t = useTranslations();
+  const tCompany = useTranslations("company");
 
   return (
     <footer className="bg-kfz-blue-dark text-white">
@@ -59,7 +60,7 @@ export function Footer() {
             <ul className="space-y-2 text-blue-100 text-sm">
               <li>{t("contact.phone")}: {COMPANY.phone}</li>
               <li>{t("contact.email")}: {COMPANY.email}</li>
-              <li>{t("contact.address")}: {getFormattedAddress()}</li>
+              <li>{t("contact.address")}: {getFormattedAddress(tCompany)}</li>
               <li>
                 {t("contact.hours")}:
                 <BusinessHours className="mt-1 space-y-0.5" />

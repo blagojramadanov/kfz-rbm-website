@@ -2,6 +2,8 @@ import Image from "next/image";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Car, Heart, MapPin, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ListingTypeBadge } from "@/components/listing-type-badge";
+import { formatMileage, formatPrice } from "@/lib/format-vehicle";
 import { Link } from "@/lib/navigation";
 import type { PublicVehicle } from "@/lib/public-vehicles";
 import { getFuelTypeLabel } from "@/lib/vehicle-labels";
@@ -9,6 +11,7 @@ import { getFuelTypeLabel } from "@/lib/vehicle-labels";
 export async function FeaturedVehicles({ vehicles }: { vehicles: PublicVehicle[] }) {
   const t = await getTranslations("pages.home");
   const tCommon = await getTranslations("common");
+  const tVehicles = await getTranslations("vehicles");
   const format = await getFormatter();
 
   if (vehicles.length === 0) {
@@ -42,13 +45,21 @@ export async function FeaturedVehicles({ vehicles }: { vehicles: PublicVehicle[]
               </div>
             )}
             <div className="absolute top-4 right-4">
-              <button className="bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors">
+              <button
+                aria-label={tVehicles("card.addFavorite")}
+                className="bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors"
+              >
                 <Heart className="w-6 h-6 text-red-500" />
               </button>
             </div>
-            {vehicle.featured && (
-              <div className="absolute top-4 left-4 bg-kfz-accent text-white px-3 py-1 rounded-full text-sm font-semibold">
-                {t("featured.featured")}
+            {(vehicle.featured || vehicle.listingType === "export") && (
+              <div className="absolute top-4 left-4 flex flex-col items-start gap-2">
+                {vehicle.featured && (
+                  <div className="bg-kfz-accent text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    {t("featured.featured")}
+                  </div>
+                )}
+                {vehicle.listingType === "export" && <ListingTypeBadge type="export" />}
               </div>
             )}
           </div>
@@ -62,10 +73,10 @@ export async function FeaturedVehicles({ vehicles }: { vehicles: PublicVehicle[]
             {/* Price */}
             <div className="mb-4">
               <p className="text-3xl font-bold text-kfz-blue">
-                €{format.number(vehicle.price, { notation: "standard" })}
+                {formatPrice(format, vehicle.price)}
               </p>
               <p className="text-sm text-gray-600">
-                {vehicle.year} • {format.number(vehicle.mileage)} km
+                {vehicle.year} • {formatMileage(format, vehicle.mileage)}
               </p>
             </div>
 
@@ -86,7 +97,7 @@ export async function FeaturedVehicles({ vehicles }: { vehicles: PublicVehicle[]
             {/* CTA */}
             <div className="space-y-3">
               <Button asChild className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white">
-                <Link href={`/fahrzeuge/${vehicle.slug}`}>{t("featured.viewDetails")}</Link>
+                <Link href={`/fahrzeuge/${vehicle.slug}`}>{tCommon("viewDetails")}</Link>
               </Button>
               <Button
                 asChild

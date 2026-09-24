@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LegalPage } from "@/components/legal-page";
 import { COMPANY, getFormattedAddress } from "@/lib/company";
 
@@ -15,8 +15,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function PrivacyPage() {
+export default async function PrivacyPage({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  setRequestLocale(locale);
   const t = await getTranslations("legalPages.privacy");
+  const tCompany = await getTranslations("company");
 
   return (
     <LegalPage
@@ -29,7 +35,7 @@ export default async function PrivacyPage() {
           body: [
             t("sections.controller.body", {
               company: COMPANY.fullName,
-              address: getFormattedAddress(),
+              address: getFormattedAddress(tCompany),
               email: COMPANY.email,
             }),
           ],

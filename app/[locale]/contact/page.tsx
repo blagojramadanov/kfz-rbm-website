@@ -21,6 +21,7 @@ export default function ContactPage() {
 
 function ContactContent() {
   const t = useTranslations();
+  const tCompany = useTranslations("company");
   const searchParams = useSearchParams();
   // `?testDrive=<vehicle label>` (set by the homepage "Test drive" button)
   // prefills the message once; the visitor can edit it freely afterwards.
@@ -85,7 +86,7 @@ function ContactContent() {
                 <div>
                   <h3 className="font-semibold text-gray-900">{t("contact.address")}</h3>
                   <p className="text-gray-600">
-                    {getFormattedAddress()}
+                    {getFormattedAddress(tCompany)}
                   </p>
                 </div>
               </div>

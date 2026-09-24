@@ -1,6 +1,8 @@
 import { useTranslations } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 
-export default function ServicesPage() {
+export default function ServicesPage({ params: { locale } }: { params: { locale: string } }) {
+  setRequestLocale(locale);
   const t = useTranslations();
 
   return (

@@ -2,6 +2,8 @@ import Image from "next/image";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Car, Heart, MapPin, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ListingTypeBadge } from "@/components/listing-type-badge";
+import { formatMileage, formatPrice } from "@/lib/format-vehicle";
 import { Link } from "@/lib/navigation";
 import type { PublicVehicle } from "@/lib/public-vehicles";
 import { getFuelTypeLabel } from "@/lib/vehicle-labels";
@@ -9,6 +11,7 @@ import { getFuelTypeLabel } from "@/lib/vehicle-labels";
 export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }) {
   const t = await getTranslations("pages.home");
   const tCommon = await getTranslations("common");
+  const tVehicles = await getTranslations("vehicles");
   const format = await getFormatter();
 
   if (vehicles.length === 0) {
@@ -41,7 +44,15 @@ export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }
                 <Car className="w-12 h-12" aria-hidden="true" />
               </div>
             )}
-            <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow hover:bg-gray-100 transition-colors z-10">
+            {vehicle.listingType === "export" && (
+              <div className="absolute top-3 left-3 z-10">
+                <ListingTypeBadge type="export" />
+              </div>
+            )}
+            <button
+              aria-label={tVehicles("card.addFavorite")}
+              className="absolute top-3 right-3 bg-white rounded-full p-2 shadow hover:bg-gray-100 transition-colors z-10"
+            >
               <Heart className="w-5 h-5 text-red-500" />
             </button>
           </div>
@@ -54,7 +65,7 @@ export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }
 
             {/* Price */}
             <p className="text-2xl font-bold text-kfz-blue mt-2 mb-2">
-              €{format.number(vehicle.price, { notation: "standard" })}
+              {formatPrice(format, vehicle.price)}
             </p>
 
             {/* Specs */}
@@ -64,7 +75,7 @@ export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }
                 <span>•</span>
                 <div className="flex items-center gap-1">
                   <Gauge className="w-4 h-4" />
-                  {format.number(vehicle.mileage)} km
+                  {formatMileage(format, vehicle.mileage)}
                 </div>
               </div>
               {vehicle.fuelType && (
@@ -80,7 +91,7 @@ export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }
               asChild
               className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white text-sm"
             >
-              <Link href={`/fahrzeuge/${vehicle.slug}`}>{t("latest.viewDetails")}</Link>
+              <Link href={`/fahrzeuge/${vehicle.slug}`}>{tCommon("viewDetails")}</Link>
             </Button>
           </div>
         </div>

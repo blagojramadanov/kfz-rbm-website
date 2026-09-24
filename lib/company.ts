@@ -2,7 +2,14 @@
  * Central Company Configuration
  * All company name, contact info, and branding comes from this file
  * This is a DEMO/EXAMPLE website with fictional data only
+ *
+ * Placeholder wording that reads differently per language ("Beispielstraße",
+ * "(Beispiel)", ...) lives in messages/*.json under `company.*`; use
+ * getFormattedAddress() / getLegalInfo() with a `company` translator.
  */
+
+// `t` must come from `useTranslations("company")` / `getTranslations({ locale, namespace: "company" })`.
+type CompanyTranslator = (key: any) => string;
 
 export const COMPANY = {
   // Display name (used in UI)
@@ -13,12 +20,9 @@ export const COMPANY = {
   email: "info@example.com",
   phone: "+49 000 0000000",
 
-  // Address (all fictional example data)
+  // Address (fictional; street, city and country are localized, see `company.address.*`)
   address: {
-    street: "Beispielstraße 1",
-    city: "Beispielstadt",
     zip: "12345",
-    country: "Deutschland",
   },
 
   // Business hours (fictional). 24h strings; null means closed.
@@ -36,19 +40,30 @@ export const COMPANY = {
     linkedin: "#", // Placeholder - no real profile
     twitter: "#", // Placeholder - no real profile
   },
-
-  // Legal/Business Info (all fictional)
-  legal: {
-    ustIdNr: "DE000000000 (Beispiel)",
-    registerNumber: "HRB 000000 (Beispiel)",
-    owner: "Beispielinhaber", // Generic, not a real person
-  },
 } as const;
+
+/** Address parts in the active language (`t` = `company` namespace translator). */
+export function getAddress(t: CompanyTranslator) {
+  return {
+    street: t("address.street"),
+    zip: COMPANY.address.zip,
+    city: t("address.city"),
+    country: t("address.country"),
+  };
+}
+
+/** Legal/business identifiers in the active language (`t` = `company` namespace translator). */
+export function getLegalInfo(t: CompanyTranslator) {
+  return {
+    ustIdNr: t("legal.ustIdNr"),
+    registerNumber: t("legal.registerNumber"),
+  };
+}
 
 /**
  * Get formatted address
  */
-export function getFormattedAddress() {
-  return `${COMPANY.address.street}, ${COMPANY.address.zip} ${COMPANY.address.city}, ${COMPANY.address.country}`;
+export function getFormattedAddress(t: CompanyTranslator) {
+  const { street, zip, city, country } = getAddress(t);
+  return `${street}, ${zip} ${city}, ${country}`;
 }
-

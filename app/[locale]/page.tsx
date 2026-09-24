@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { FeaturedVehicles } from "@/components/featured-vehicles";
 import { SearchBar } from "@/components/search-bar";
@@ -10,10 +10,13 @@ import { COMPANY } from "@/lib/company";
 import { Link } from "@/lib/navigation";
 import { getFeaturedVehicles, getLatestVehicles } from "@/lib/public-vehicles";
 
-// The latest/featured lists come from the database; never prerender them at build time.
-export const dynamic = "force-dynamic";
+// ISR: the latest/featured lists are read with the cookie-less anon client
+// (lib/public-vehicles.ts) and the page is regenerated at most once a minute.
+// Must be a literal for Next to read it; keep in sync with REVALIDATE_SECONDS in that file.
+export const revalidate = 60;
 
-export default async function Home() {
+export default async function Home({ params: { locale } }: { params: { locale: string } }) {
+  setRequestLocale(locale);
   const t = await getTranslations("pages.home");
   const [latestVehicles, featuredVehicles] = await Promise.all([
     getLatestVehicles(4),

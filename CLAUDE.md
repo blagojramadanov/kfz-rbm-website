@@ -11,3 +11,7 @@ These apply to every session; follow them without being reminded.
 - Every new message key is added to `messages/de.json`, `messages/en.json` and `messages/mk.json` at once.
 - `npm run check:i18n` and `npm run build` must both pass before committing.
 - Update `I18N_PROGRESS.md` after finishing each area.
+
+## Workflow
+
+Every task ends with build + check:i18n passing, I18N_PROGRESS.md updated, commit with a clear message, push to main, confirm Vercel Ready, report the commit hash.

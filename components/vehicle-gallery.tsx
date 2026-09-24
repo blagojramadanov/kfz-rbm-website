@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Car, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface VehicleGalleryProps {
   images: string[];
@@ -10,7 +11,17 @@ interface VehicleGalleryProps {
 }
 
 export function VehicleGallery({ images, title }: VehicleGalleryProps) {
+  const t = useTranslations("vehicles.gallery");
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  if (images.length === 0) {
+    return (
+      <div className="relative h-96 sm:h-[500px] bg-gray-100 rounded-lg flex flex-col items-center justify-center gap-3 text-gray-400">
+        <Car className="w-16 h-16" aria-hidden="true" />
+        <p>{t("noImages")}</p>
+      </div>
+    );
+  }
 
   const handlePrevious = () => {
     setSelectedIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -29,8 +40,8 @@ export function VehicleGallery({ images, title }: VehicleGalleryProps) {
       {/* Main Image */}
       <div className="relative h-96 sm:h-[500px] bg-gray-100 rounded-lg overflow-hidden group">
         <Image
-          src={images[selectedIndex] || "https://picsum.photos/seed/kfzrbm-gallery/1000/750"}
-          alt={`${title} - Bild ${selectedIndex + 1}`}
+          src={images[selectedIndex]}
+          alt={t("imageAlt", { title, index: selectedIndex + 1, total: images.length })}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 70vw"
           className="object-cover"
@@ -43,21 +54,21 @@ export function VehicleGallery({ images, title }: VehicleGalleryProps) {
             <button
               onClick={handlePrevious}
               className="absolute left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-900 rounded-full p-2 transition-all z-10"
-              aria-label="Vorheriges Bild"
+              aria-label={t("previous")}
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button
               onClick={handleNext}
               className="absolute right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-900 rounded-full p-2 transition-all z-10"
-              aria-label="Nächstes Bild"
+              aria-label={t("next")}
             >
               <ChevronRight className="w-6 h-6" />
             </button>
 
             {/* Image Counter */}
             <div className="absolute bottom-4 right-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded text-sm font-semibold">
-              {selectedIndex + 1} / {images.length}
+              {t("counter", { current: selectedIndex + 1, total: images.length })}
             </div>
           </>
         )}
@@ -70,6 +81,8 @@ export function VehicleGallery({ images, title }: VehicleGalleryProps) {
             <button
               key={index}
               onClick={() => handleThumbnailClick(index)}
+              aria-label={t("showImage", { index: index + 1 })}
+              aria-current={index === selectedIndex}
               className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
                 index === selectedIndex
                   ? "border-kfz-blue"
@@ -77,8 +90,8 @@ export function VehicleGallery({ images, title }: VehicleGalleryProps) {
               }`}
             >
               <Image
-                src={image || "https://picsum.photos/seed/kfzrbm-thumb/80/80"}
-                alt={`${title} - Thumbnail ${index + 1}`}
+                src={image}
+                alt={t("thumbnailAlt", { title, index: index + 1 })}
                 fill
                 sizes="80px"
                 className="object-cover"
