@@ -186,7 +186,7 @@
         "aboutUs": "About Us",
         "services": "Services",
         "contact": "Contact",
-        "contactInfo": "Contact Information",
+        "contactInfo": "Contact Info",
         "followUs": "Follow Us",
         "privacyPolicy": "Privacy Policy",
         "termsConditions": "Terms & Conditions",
@@ -289,32 +289,12 @@
         "language": "Language",
         "german": "Deutsch",
         "english": "English",
-        "macedonian": "РњР°РєРµРґРѕРЅСЃРєРё",
+        "macedonian": "Македонски",
         "closed": "Closed",
         "orElse": "or",
         "and": "and",
         "yes": "Yes",
         "no": "No",
         "required": "Required"
-    },
-    "admin": {
-        "title": "Admin Overview",
-        "overview": "Overview of vehicles, inquiries and customers",
-        "loading_stats": "Loading statistics...",
-        "vehicles": "Vehicles",
-        "available": "Available",
-        "sidebar": {
-            "overview": "Overview",
-            "vehicles": "Vehicles",
-            "allVehicles": "All Vehicles",
-            "newVehicle": "New Vehicle",
-            "submittedVehicles": "Submitted Vehicles",
-            "inquiries": "Inquiries",
-            "tradeIns": "Trade-Ins",
-            "customers": "Customers",
-            "statistics": "Statistics",
-            "adminPanel": "Admin Panel",
-            "adminDashboard": "Admin Dashboard"
-        }
     }
 }
