@@ -15,3 +15,9 @@ These apply to every session; follow them without being reminded.
 ## Workflow
 
 Every task ends with build + check:i18n passing, I18N_PROGRESS.md updated, commit with a clear message, push to main, confirm Vercel Ready, report the commit hash.
+
+## Security rules
+
+- Every server action starts with `requireUser()` or `requireAdmin()` from `lib/auth-guards.ts` and uses the session user. Never trust a user id, role, status or price sent by the client; validate input with zod (unknown fields are stripped).
+- Use the RLS-bound session client. The service-role client (`lib/supabase-admin.ts`) only after those checks and only where RLS forbids the write.
+- `/{locale}/dashboard/**` and `/{locale}/admin/**` are guarded server-side in `middleware.ts` (and client-side in the pages); a new protected area must be added to the middleware. The middleware does not protect server actions.

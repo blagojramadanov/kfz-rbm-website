@@ -102,7 +102,7 @@ export default function SubmitVehicleWizardPage() {
       if (vehicleId) {
         try {
           const { getSubmittedVehicleById } = await import("@/app/actions/vehicles");
-          const result = await getSubmittedVehicleById(vehicleId, user.id);
+          const result = await getSubmittedVehicleById(vehicleId);
 
           setEditingVehicleId(vehicleId);
           setFormData({

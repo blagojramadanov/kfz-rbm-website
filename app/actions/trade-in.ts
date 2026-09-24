@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import { getSupabaseServerClient, getSupabaseUser } from "@/lib/supabase-server";
 import type { TradeInRequest } from "@/lib/supabase";
 
@@ -23,24 +24,31 @@ export async function getAvailableVehicles() {
   }
 }
 
-export async function createTradeInRequest(
-  tradeInData: {
-    current_vehicle_brand: string;
-    current_vehicle_model: string;
-    current_vehicle_year: number;
-    current_vehicle_mileage: number;
-    current_vehicle_value_estimate: number;
-    desired_vehicle_id: string;
-  }
-) {
+const tradeInSchema = z.object({
+  current_vehicle_brand: z.string().trim().min(1).max(100),
+  current_vehicle_model: z.string().trim().min(1).max(100),
+  current_vehicle_year: z.number().int().min(1900).max(new Date().getFullYear() + 1),
+  current_vehicle_mileage: z.number().int().min(0).max(5_000_000),
+  current_vehicle_value_estimate: z.number().min(0).max(100_000_000),
+  desired_vehicle_id: z.guid(),
+});
+
+export async function createTradeInRequest(tradeInData: unknown) {
   try {
     const { supabase, user } = await getSupabaseUser();
+    // Unknown fields are stripped: the client cannot set user_id, status, admin notes, ...
+    const data = tradeInSchema.parse(tradeInData);
 
     const { data: request, error } = await supabase
       .from("trade_in_requests")
       .insert({
         user_id: user.id,
-        ...tradeInData,
+        current_vehicle_brand: data.current_vehicle_brand,
+        current_vehicle_model: data.current_vehicle_model,
+        current_vehicle_year: data.current_vehicle_year,
+        current_vehicle_mileage: data.current_vehicle_mileage,
+        current_vehicle_value_estimate: data.current_vehicle_value_estimate,
+        desired_vehicle_id: data.desired_vehicle_id,
         status: "new",
       })
       .select()
@@ -51,6 +59,7 @@ export async function createTradeInRequest(
     return { success: true, requestId: request.id, message: "Inzahlungnahmeanfrage erfolgreich erstellt" };
   } catch (error) {
     console.error("Error creating trade-in request:", error);
+    if (error instanceof z.ZodError) throw new Error("INVALID_INPUT");
     throw new Error(
       error instanceof Error ? error.message : "Fehler beim Erstellen der Inzahlungnahmeanfrage"
     );

@@ -182,7 +182,7 @@ export default function AdminCreateVehiclePage() {
                 type="file"
                 id="image-input"
                 multiple
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 onChange={handleImageSelection}
                 className="hidden"
               />

@@ -71,7 +71,7 @@ export default function MyVehiclesPage() {
     try {
       setLoadingVehicles(true);
       const { getSubmittedVehicles } = await import("@/app/actions/vehicles");
-      const data = await getSubmittedVehicles(user.id);
+      const data = await getSubmittedVehicles();
       setVehicles(data || []);
 
       // Fetch signed URLs for all images
