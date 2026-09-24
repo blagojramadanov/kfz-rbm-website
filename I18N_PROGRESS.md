@@ -204,3 +204,54 @@ For each file, look for and catalog:
 - [ ] Non-functional buttons: favorites (heart on cards), "Teilen" / "Merken" on the detail page.
 - [ ] The one live vehicle has no rows in `vehicle_images` (cards show the placeholder); the admin flow should require at least one photo.
 - [ ] ISR delay: new/changed vehicles appear up to 60 s after publishing; add `revalidatePath` to the admin publish/update actions if that is too slow.
+
+## Translation audit (2026-09-24, on commit 806d2f3)
+
+Read-only audit: no app code or translations were changed. Areas 1-3 and 12 are not part of it.
+
+**Scope actually covered.** Code scan: all of areas 4-11. Live check: all public pages on /de, /en, /mk (48 visits, dev server) and every dashboard/admin route while logged out (66 visits, dev + production build). **Not run: the logged-in customer and admin passes** - `AUDIT_CUSTOMER_EMAIL/PASSWORD` and `AUDIT_ADMIN_EMAIL/PASSWORD` are not set in `.env.local` (checked by name only; no values were read or printed). So the "live issues" for areas 6-11 below are inferred from the code, not observed, and the customer-isolation and after-logout checks are only partly done (see "Caching check"). The Playwright script lives outside the repo (Playwright installed there, not in `package.json`); once the four variables exist it runs the authenticated passes unchanged.
+
+### Summary
+
+Hardcoded = AST scan of JSX text, placeholders/aria-label/alt/title, `alert/confirm/setError`, `new Error("...")` and copy-like string literals (status maps, ternaries); ~±10 %. Counts exclude the legacy duplicate routes `app/admin/**` and `app/dashboard/**` (277 more strings) because they are unreachable: the middleware 307-redirects `/admin/...` and `/dashboard/...` to `/{locale}/...` (verified on the production build) - delete them instead of translating them.
+
+| Area | Pages / files | Hardcoded strings | Live issues (observed = O, inferred from code = I) | mk formality issues | Effort |
+|---|---|---|---|---|---|
+| 4 About, Services, Contact | 3 | 0 | O: none on de/en/mk (about/services are "coming soon" stubs) | 2 imperatives (`contact.sendMessage`, `pages.contact.send`) | small |
+| 5 Auth | 4 | 29 (register 4, forgot 8, reset 17) | O: German text on /en and /mk in register, forgot-password, reset-password (e.g. "Haben Sie bereits ein Konto?", "Passwort zurücksetzen", "oder") | 12 imperatives (`auth.*`, `forms.confirmPassword/selectFile`, `pages.login/register/resetPassword.title`); `auth.createAccount` = "Создај сметачно" is a wrong word | small |
+| 6 Wizard | 2 (926-line wizard) | 135 + 1 de-DE format | I: whole wizard German on /en and /mk (0 `t()` calls) | none yet (no mk strings exist) | large |
+| 7 Customer | 9 pages | 230 + 26 de-DE formats | I: all German on /en and /mk; only `dashboard/page` has 3 `t()` calls | none yet | large |
+| 8 Server actions / auth-context | 6 files | 97 (mostly `throw new Error("...")`, some English: "Unauthorized", "Failed to update profile") | I: German or English error text reaches the UI on every locale | `errors.goHome` "Оди на почетна" | medium (needs an error-code design, not just strings) |
+| 9 Admin vehicles | 4 pages | 167 + 4 de-DE formats | I: all German on /en and /mk; DB status/fuel values shown via hardcoded German maps ("Verfügbar", "Entwurf") | `adminDashboard.approve/reject/manageVehicles/manageUsers` (4, shared with 11) | large |
+| 10 Admin submissions | 2 pages | 62 + 5 de-DE formats | I: same; workflow labels with emoji ("🤝 Direktverkauf an RBM") hardcoded | - | medium |
+| 11 Admin overview, inquiries, trade-ins, customers, stats | 6 pages | 143 + 8 de-DE formats | I: same; `admin/page` mixes 6 `t()` with 25 hardcoded strings | - | large |
+| Cross-cutting | all | 44 hardcoded `de-DE`/`toLocale*` formats (in 6, 7, 9, 10, 11) | O: global 404 ("This page could not be found.") is English on all three locales; no page in areas 4-11 has its own `<title>` (all show the site default; they are client components, so `generateMetadata` needs server wrappers) | shared: `buttons.*` (15) + `common.confirm` = 16 imperatives | medium |
+
+Total: about 863 hardcoded strings + 44 hardcoded date/number formats in the 7 open areas. mk informal "ти"/твој forms: 0 (in `mk.json` and in code). mojibake: 0 (all visits). Raw message keys: 0. Missing-message console errors: 0. Raw DB enum values shown: none observed on public pages (authenticated pages not observed; the hardcoded German maps in areas 9-11 will show German labels on every locale).
+
+### Concrete issues per page
+
+Observed live (public pages, production/dev build):
+- `/en|/mk/register`: "Haben Sie bereits ein Konto? Anmelden", placeholder "Max Mustermann"; on mk also the divider "oder".
+- `/en|/mk/forgot-password`: title "Passwort zurücksetzen", the description, "E-Mail-Adresse", "Passwort-Reset anfordern", "Zurück zur Anmeldung", "oder" (plus 3 more lines; the page has 3 `t()` calls and ~8 hardcoded strings).
+- `/en|/mk/reset-password`: "Ungültiger Link", "Der Password-Reset-Link ist ungültig oder abgelaufen.", "Neuen Reset anfordern", success texts ("Passwort aktualisiert!") - the page has no `t()` calls at all, it is German on every locale.
+- Any unknown URL, e.g. `/mk/does-not-exist`: English default 404 (`app/[locale]` has no `not-found.tsx`; only `fahrzeuge/[slug]` has one).
+- `/en|/mk/fahrzeuge/<slug>`: the description is German because it is DB content (correct per the "never translate DB values" rule, listed for information). `RBM Premium Used Cars` (English `COMPANY.fullName`) appears inside mk/de sentences on privacy, terms and impressum.
+- `/de/*`, `/mk` (home, about, services, contact, login, fahrzeuge, export, privacy, terms, impressum): no issues found.
+
+Inferred from the code (not observed live), highest counts first: `dashboard/fahrzeug-anbieten` (123, incl. validation/toast strings and the "Schritt" stepper), `dashboard/inzahlungnahme` (58 + 9 formats), `admin/fahrzeuge/neu` (63), `dashboard/inzahlungnahme-anfragen/[id]` (46 + 8), `admin/fahrzeuge/[id]/edit` (48), `admin/statistik` (33), `admin/fahrzeuge/eingereicht/[id]` (33), `admin/kunden/[id]` (28), `dashboard/page` (28), `dashboard/profil` (29), `dashboard/fahrzeuge` (27), `admin/fahrzeuge` (26), `admin/inzahlungnahmen` (25), `admin/page` (25), `dashboard/inzahlungnahme-anfragen` (22), `admin/anfragen` (18), `admin/kunden` (14), `components/submission-workflow-info` (12), `dashboard/anfragen` (7), `dashboard/favoriten` (7), `dashboard/fahrzeug-angeboten` (6). Every page also has a hardcoded "Wird geladen..." loading state, and the prerendered HTML shell of every dashboard/admin page says "Wird geladen..." in German on all locales until hydration.
+
+mk formality (all singular imperatives, no "ти"): `buttons.*` (save, cancel, delete, edit, create, update, submit, search, filter, close, viewMore, download, export, import, publish), `common.confirm`, `forms.confirmPassword`, `forms.selectFile`, `errors.goHome`, `auth.signIn/signUp/signOut/confirmPassword/createAccount/resetPassword/sendResetLink`, `pages.login|register|resetPassword.title`, `pages.contact.send`, `contact.sendMessage`, `adminDashboard.approve/reject/manageVehicles/manageUsers`. (`vehicles.doors` and `legalPages.terms.sections.offers.title` are nouns, `buttons.prev` is an adjective - not issues.) Areas 6-11 have no mk strings yet, so their formality can only be checked when they are written.
+
+### Caching check (production build: `npm run build` + `next start`)
+
+1. **Dashboard/admin pages are NOT rendered dynamically per request any more.** Since `force-dynamic` was removed from the locale layout (commit 806d2f3), the 9 dashboard pages and the admin list pages (`admin`, `anfragen`, `fahrzeuge`, `fahrzeuge/neu`, `fahrzeuge/eingereicht`, `inzahlungnahmen`, `kunden`, `statistik`) are prerendered static (`●`) and served with `Cache-Control: s-maxage=31536000` (`x-nextjs-cache: HIT`). Only the `[id]` routes (`dashboard/inzahlungnahme-anfragen/[id]`, `admin/fahrzeuge/[id]`, `.../edit`, `eingereicht/[id]`, `admin/kunden/[id]`) are still `ƒ` with `private, no-store`.
+2. **No user data is cached.** Every dashboard/admin page and the admin layout is a client component (no `cookies()`/`headers()`, no server-side Supabase call); the cached HTML is only the "Wird geladen..." shell plus footer. Data is loaded in the browser (RLS with the user's session) or through server actions (per request, cookie-based). So nothing customer- or admin-specific can be served from cache.
+3. **Guards are client-side only** (there is no auth check in `middleware.ts`): a logged-out visitor gets the 200 shell and is then redirected by JS. Verified on the production build: all 22 protected routes x 3 locales redirect to `/{locale}/login` (locale preserved, none stayed on the page). Recommended hardening (not done): a server-side guard in the middleware (check the Supabase session cookie) or `dynamic = "force-dynamic"` on the dashboard/admin layouts.
+4. **Customer sees only own data - not verified live** (no credentials). Evidence from code/DB: customer pages query `submitted_vehicles`/`trade_in_requests` under RLS (`auth.uid() = user_id`, migration 023). With the anonymous key (read-only probes on the live project): `submitted_vehicles`, `submitted_vehicle_images`, `trade_in_requests`, `customer_inquiries` -> `42501 permission denied`; `user_profiles` -> `[]`; non-available `vehicles` -> `[]`. (`favorite_vehicles` and `admin_settings` do not exist in the live DB, although `lib/supabase.ts` defines `FavoriteVehicle` and migration 019 creates `admin_settings`.)
+5. **After logout - not verified live.** Because the cached HTML never contains user data, logout cannot leak cached content from the server side; whether the back button / bfcache shows stale client state after logout still needs the authenticated pass.
+6. **Two authorization gaps found while reading the actions (out of i18n scope, not exploited or tested):** `uploadVehicleImagesBase64` in `app/actions/vehicles.ts` uses the service-role client with no session or admin check, and the full vehicle UUIDs are present in the public listing HTML, so an unauthenticated caller could attach images to any published vehicle; `finalizeSubmission(vehicleId, userId)` (same file, currently unused) uses the service-role client and trusts the client-supplied `userId` without checking the session. Both should call the same `verifyAdminRole()` / `getSupabaseUser()` guards as the other actions.
+
+### Suggested order
+
+1. Area 5 + global `not-found.tsx` + mk imperatives in `buttons.*`/`auth.*` (small, most visible); 2. area 8 error-code design (blocks 6-11); 3. area 7 + 6 (customer flow); 4. areas 9-11 (admin); 5. delete the legacy `app/admin`/`app/dashboard` duplicates first (halves the work), add server-side guards, run the authenticated audit passes.
