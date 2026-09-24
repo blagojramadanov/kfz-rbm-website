@@ -95,25 +95,53 @@ function checkValues(obj, lang) {
   return issues;
 }
 
-// Scan code for t("key") calls
+// Scan code for t("key") calls with namespace support
 function scanCodeForKeys() {
   const usedKeys = new Set();
 
   // Find all .tsx, .ts, .jsx, .js files in app/ and components/
   const files = globSync([
-    path.join(rootDir, 'app/**/*.{ts,tsx,js,jsx}'),
-    path.join(rootDir, 'components/**/*.{ts,tsx,js,jsx}'),
-  ], { nodir: true });
-
-  // Pattern to match t("key"), t('key'), t(`key`) - but not .t() or similar
-  const keyPattern = /[^a-zA-Z0-9_.]t\s*\(\s*["'`]([^"'`]+)["'`]\s*\)/g;
+    'app/**/*.{ts,tsx,js,jsx}',
+    'components/**/*.{ts,tsx,js,jsx}',
+  ], { cwd: rootDir, nodir: true });
 
   for (const file of files) {
     try {
       const content = fs.readFileSync(file, 'utf8');
+
+      // Extract namespace from useTranslations("namespace") or getTranslations("namespace") or getTranslations({namespace: "ns"})
+      let namespace = null;
+
+      // Match: useTranslations("namespace") or getTranslations("namespace")
+      const nsPattern1 = /(?:useTranslations|getTranslations)\s*\(\s*["'`]([^"'`]+)["'`]\s*\)/;
+      const match1 = content.match(nsPattern1);
+      if (match1) {
+        namespace = match1[1];
+      }
+
+      // Match: getTranslations({namespace: "ns"})
+      const nsPattern2 = /getTranslations\s*\(\s*{\s*namespace\s*:\s*["'`]([^"'`]+)["'`]\s*}\s*\)/;
+      const match2 = content.match(nsPattern2);
+      if (match2) {
+        namespace = match2[1];
+      }
+
+      // Pattern to match t("key"), t('key'), t(`key`)
+      const keyPattern = /\bt\s*\(\s*["'`]([^"'`]+)["'`]\s*\)/g;
       let match;
+
       while ((match = keyPattern.exec(content)) !== null) {
-        usedKeys.add(match[1]);
+        const key = match[1];
+        // Skip keys that contain template variable interpolations
+        if (key.includes('${')) {
+          continue;
+        }
+        // If we have a namespace and the key doesn't already contain a dot (not a full path), prepend namespace
+        if (namespace && !key.includes('.')) {
+          usedKeys.add(`${namespace}.${key}`);
+        } else {
+          usedKeys.add(key);
+        }
       }
     } catch (err) {
       // Skip files that can't be read

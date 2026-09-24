@@ -165,6 +165,26 @@
         "manageVehicles": "Manage Vehicles",
         "manageUsers": "Manage Users"
     },
+    "admin": {
+        "sidebar": {
+            "adminDashboard": "Admin Dashboard",
+            "adminPanel": "Admin Panel",
+            "overview": "Overview",
+            "vehicles": "Vehicles",
+            "allVehicles": "All Vehicles",
+            "newVehicle": "New Vehicle",
+            "submittedVehicles": "Submitted Vehicles",
+            "inquiries": "Inquiries",
+            "tradeIns": "Trade-Ins",
+            "customers": "Customers",
+            "statistics": "Statistics"
+        },
+        "title": "Admin Dashboard",
+        "overview": "Manage your dealership inventory and monitor key metrics",
+        "loading_stats": "Error loading statistics",
+        "vehicles": "Total Vehicles",
+        "available": "available"
+    },
     "contact": {
         "title": "Contact Us",
         "getInTouch": "Get In Touch",
@@ -193,7 +213,8 @@
         "impressum": "Impressum",
         "premiumCars": "Premium Cars",
         "description": "Premium used-car dealership offering quality vehicles, expert service, and transparent pricing.",
-        "businessHours": "Hours: Mon-Fri 9am-6pm"
+        "businessHours": "Hours: Mon-Fri 9am-6pm",
+        "demoDisclaimer": "Demo website – all information is fictional example data."
     },
     "legal": {
         "privacyPolicy": "Privacy Policy",
@@ -226,7 +247,8 @@
         "signUpFailed": "Sign up failed",
         "invalidCredentials": "Invalid email or password",
         "userExists": "User with this email already exists",
-        "passwordsNotMatch": "Passwords do not match"
+        "passwordsNotMatch": "Passwords do not match",
+        "registrationSuccess": "Registration successful"
     },
     "pages": {
         "home": {
@@ -413,5 +435,160 @@
         "yes": "Yes",
         "no": "No",
         "required": "Required"
+    },
+    "hero": {
+        "headline1": "Buy used cars.",
+        "headline2": "Sell.",
+        "headline3": "Trade-in. Export.",
+        "subheadline": "Germany's leading dealership for premium used cars with 20+ years of experience",
+        "discoverVehicles": "Discover Vehicles",
+        "offerVehicle": "Offer My Car"
+    },
+    "latest": {
+        "title": "Recently Added Vehicles",
+        "description": "The latest premium used cars from our inventory",
+        "viewAll": "View All",
+        "viewDetails": "View Details"
+    },
+    "featured": {
+        "title": "Featured Vehicles",
+        "description": "Our hand-picked premium used cars",
+        "viewAll": "View All Vehicles",
+        "featured": "Featured",
+        "viewDetails": "View Details",
+        "testDrive": "Test Drive"
+    },
+    "trustSection": {
+        "title": "Why Choose Us?",
+        "description": "With over 20 years of experience, we have built a reputation for quality, transparency, and customer satisfaction."
+    },
+    "qualityGuarantee": {
+        "title": "Quality Guarantee",
+        "description": "Every vehicle is thoroughly inspected and certified. Complete transparency about vehicle history.",
+        "item1": "Complete Inspection",
+        "item2": "Multi-Point Check",
+        "item3": "Warranty Included"
+    },
+    "expertTeam": {
+        "title": "Expert Team",
+        "description": "Our experienced team helps you find the perfect vehicle for your needs.",
+        "item1": "20+ Years Experience",
+        "item2": "Expert Consultations",
+        "item3": "Personal Service"
+    },
+    "transparentPricing": {
+        "title": "Transparent Pricing",
+        "description": "No hidden fees. What you see is what you pay.",
+        "item1": "No Hidden Costs",
+        "item2": "Flexible Financing",
+        "item3": "Trade-in Available"
+    },
+    "aboutSection": {
+        "title": "About Our Company",
+        "paragraph1": "We are your trusted partner for premium used cars. We are committed to offering our customers the best vehicles with the highest quality and transparency.",
+        "paragraph2": "Our experienced team carefully selects each vehicle and inspects it thoroughly to ensure you get a car that meets your expectations.",
+        "quickProcess": "Fast Processing",
+        "quickProcessDesc": "Uncomplicated and quick processing of all formalities",
+        "fairPrices": "Fair Prices",
+        "fairPricesDesc": "Market-appropriate prices for buying and selling",
+        "completeSolution": "Complete Solution",
+        "completeSolutionDesc": "Everything from one source - buying, selling, trade-in",
+        "learnMore": "Learn More"
+    },
+    "search": {
+        "brand": "Brand",
+        "brandPlaceholder": "e.g. BMW, Mercedes",
+        "minPrice": "Min Price (€)",
+        "minPricePlaceholder": "5000",
+        "maxPrice": "Max Price (€)",
+        "maxPricePlaceholder": "50000",
+        "year": "Year",
+        "yearPlaceholder": "2023",
+        "search": "Search"
+    },
+    "services": {
+        "title": "Our Services",
+        "description": "Comprehensive solutions for buying and selling used cars",
+        "buy": {
+            "title": "Buy Used Cars",
+            "description": "Wide selection of certified premium vehicles with warranty and full transparency. Easy and secure transaction.",
+            "cta": "Explore Vehicles"
+        },
+        "sell": {
+            "title": "Sell Your Car",
+            "description": "Sell your vehicle quickly and at fair prices. Free valuation and quick processing without hassle.",
+            "cta": "Get Valuation"
+        },
+        "consignment": {
+            "title": "Consignment Sale",
+            "description": "Sell your vehicle on a commission basis. We handle marketing, viewings, and sales process.",
+            "cta": "Request Quote"
+        },
+        "trade-in": {
+            "title": "Trade-In",
+            "description": "Trade your old vehicle when buying a new one. We handle the entire process.",
+            "cta": "Learn More"
+        },
+        "export": {
+            "title": "Export",
+            "description": "International vehicle exports with complete documentation and logistics support worldwide.",
+            "cta": "Request Export"
+        }
+    },
+    "vehicles": {
+        "fuelTypes": {
+            "Diesel": "Diesel",
+            "Petrol": "Petrol",
+            "Elektro": "Electric",
+            "Electric": "Electric",
+            "Hybrid": "Hybrid"
+        },
+        "transmission": {
+            "Manual": "Manual",
+            "Automatic": "Automatic"
+        },
+        "location": "Germany"
+    },
+    "contact": {
+        "title": "Contact Us",
+        "getInTouch": "Get In Touch",
+        "email": "Email",
+        "phone": "Phone",
+        "address": "Address",
+        "hours": "Hours",
+        "sendMessage": "Send Message",
+        "monToFri": "Monday - Friday",
+        "satSun": "Saturday - Sunday",
+        "callCta": "Call: +49 123 456789",
+        "contactCta": "Get In Touch",
+        "description": "Contact us today for a test drive or to discuss your requirements."
+    },
+    "pages": {
+        "services": {
+            "title": "Our Services",
+            "subtitle": "Comprehensive solutions for buying and selling used cars",
+            "comingSoon": "Page coming soon..."
+        },
+        "about": {
+            "title": "About Us",
+            "description": "Premium used-car dealership offering quality vehicles and expert service",
+            "comingSoon": "Page coming soon..."
+        },
+        "contact": {
+            "title": "Contact Us",
+            "getInTouch": "Get In Touch",
+            "fullName": "Full Name",
+            "email": "Email",
+            "phone": "Phone",
+            "subject": "Subject",
+            "message": "Message",
+            "send": "Send",
+            "messageSent": "Message sent successfully",
+            "messageError": "Error sending message",
+            "contactInfo": "Contact Information",
+            "monToFri": "Monday - Friday: 09:00 - 18:00",
+            "satSun": "Saturday - Sunday: Closed",
+            "address": "Sample Street 1, 12345 Sample City"
+        }
     }
 }
