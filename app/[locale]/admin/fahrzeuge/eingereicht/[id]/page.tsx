@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { ArrowLeft, AlertCircle, CheckCircle, Upload } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
 
 interface SubmittedVehicle {
@@ -47,7 +47,7 @@ export default function SubmittedVehicleDetailPage() {
 
   useEffect(() => {
     if (!loading && !isAdmin) {
-      router.push("/admin-access-denied");
+      router.push("/dashboard");
     }
   }, [loading, isAdmin, router]);
 

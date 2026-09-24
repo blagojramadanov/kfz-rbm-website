@@ -5,11 +5,10 @@ import { useParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { User, Lock, AlertCircle, CheckCircle } from "lucide-react";
-import Link from "next/link";
 
 export default function ProfilePage() {
   const params = useParams();

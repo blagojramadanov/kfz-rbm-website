@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import type { TradeInRequest } from "@/lib/supabase";
 
 const STATUS_LABELS: Record<string, string> = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/lib/navigation";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
             <p className="text-blue-100 mb-6">
               {t("auth.passwordResetSent")}
             </p>
-            <Link href={`/${locale}/login`}>
+            <Link href={`/login`}>
               <Button className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold">
                 Zur Anmeldung zurück
               </Button>

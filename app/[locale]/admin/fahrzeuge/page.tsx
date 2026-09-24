@@ -5,10 +5,9 @@ import { useParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Edit2, Trash2, Plus, Search, AlertCircle, Eye, Star } from "lucide-react";
-import Link from "next/link";
 import { VehicleSourceBadge } from "@/components/vehicle-source-badge";
 
 interface Vehicle {
@@ -24,6 +23,8 @@ interface Vehicle {
 }
 
 export default function AdminVehiclesPage() {
+  const tActions = useTranslations("adminVehicleActions");
+  const tErrors = useTranslations("actionErrors");
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
@@ -37,7 +38,7 @@ export default function AdminVehiclesPage() {
 
   useEffect(() => {
     if (!loading && !isAdmin) {
-      router.push("/admin-access-denied");
+      router.push("/dashboard");
     }
   }, [loading, isAdmin, router]);
 
@@ -64,16 +65,20 @@ export default function AdminVehiclesPage() {
   }, [search, statusFilter, isAdmin]);
 
   const handleDelete = async (vehicleId: string) => {
-    if (!confirm("Sind Sie sicher, dass Sie dieses Fahrzeug löschen möchten?")) return;
+    if (!confirm(tActions("confirmDelete"))) return;
 
     try {
       setDeleting(vehicleId);
       const { deleteVehicle } = await import("@/app/actions/admin");
-      await deleteVehicle(vehicleId);
+      const result = await deleteVehicle(vehicleId);
+      if (!result.ok) {
+        setError(`${tActions("deleteFailed")} ${tErrors(result.error)}`);
+        return;
+      }
       setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
     } catch (err) {
       console.error("Error deleting vehicle:", err);
-      setError("Fehler beim Löschen des Fahrzeugs");
+      setError(`${tActions("deleteFailed")} ${tErrors("UNKNOWN")}`);
     } finally {
       setDeleting(null);
     }

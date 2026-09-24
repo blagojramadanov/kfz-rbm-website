@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
-import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -23,9 +23,9 @@ export default function LoginPage() {
     if (isAuthenticated && profile) {
       // Redirect based on user role
       if (profile.role === "ADMIN") {
-        router.push(`/${locale}/admin`);
+        router.push(`/admin`);
       } else {
-        router.push(`/${locale}/dashboard`);
+        router.push(`/dashboard`);
       }
     }
   }, [isAuthenticated, profile, router, locale]);
@@ -109,7 +109,7 @@ export default function LoginPage() {
             {/* Forgot Password Link */}
             <div className="text-right">
               <Link
-                href={`/${locale}/forgot-password`}
+                href={`/forgot-password`}
                 className="text-sm text-blue-100 hover:text-white transition-colors"
               >
                 {t("auth.forgotPassword")}
@@ -137,7 +137,7 @@ export default function LoginPage() {
           {/* Sign Up Link */}
           <p className="text-center text-blue-100">
             {t("auth.dontHaveAccount")}{" "}
-            <Link href={`/${locale}/register`} className="text-white font-semibold hover:underline">
+            <Link href={`/register`} className="text-white font-semibold hover:underline">
               {t("auth.signUp")}
             </Link>
           </p>

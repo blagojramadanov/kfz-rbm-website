@@ -5,10 +5,9 @@ import { useParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, CheckCircle, Mail } from "lucide-react";
-import Link from "next/link";
 
 export default function AdminInquiriesPage() {
   const params = useParams();
@@ -23,7 +22,7 @@ export default function AdminInquiriesPage() {
 
   useEffect(() => {
     if (!loading && !isAdmin) {
-      router.push("/admin-access-denied");
+      router.push("/dashboard");
     }
   }, [loading, isAdmin, router]);
 

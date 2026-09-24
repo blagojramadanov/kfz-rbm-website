@@ -1,6 +1,6 @@
 'use client';
 
-import Link from "next/link";
+import { Link } from "@/lib/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import { COMPANY, getFormattedAddress } from "@/lib/company";
@@ -32,22 +32,22 @@ export function Footer() {
             <h4 className="text-lg font-semibold mb-4">{t("footer.quickLinks")}</h4>
             <ul className="space-y-2 text-blue-100">
               <li>
-                <Link href={`/${locale}/fahrzeuge`} className="hover:text-white transition-colors">
+                <Link href={`/fahrzeuge`} className="hover:text-white transition-colors">
                   {t("navigation.vehicles")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/about`} className="hover:text-white transition-colors">
+                <Link href={`/about`} className="hover:text-white transition-colors">
                   {t("navigation.about")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/services`} className="hover:text-white transition-colors">
+                <Link href={`/services`} className="hover:text-white transition-colors">
                   {t("navigation.services")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/contact`} className="hover:text-white transition-colors">
+                <Link href={`/contact`} className="hover:text-white transition-colors">
                   {t("navigation.contact")}
                 </Link>
               </li>
@@ -111,13 +111,13 @@ export function Footer() {
         {/* Divider */}
         <div className="border-t border-blue-700 pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-blue-100">
-            <Link href={`/${locale}/privacy`} className="hover:text-white transition-colors">
+            <Link href={`/privacy`} className="hover:text-white transition-colors">
               {t("footer.privacyPolicy")}
             </Link>
-            <Link href={`/${locale}/terms`} className="hover:text-white transition-colors">
+            <Link href={`/terms`} className="hover:text-white transition-colors">
               {t("footer.termsConditions")}
             </Link>
-            <Link href={`/${locale}/impressum`} className="hover:text-white transition-colors">
+            <Link href={`/impressum`} className="hover:text-white transition-colors">
               {t("footer.impressum")}
             </Link>
           </div>

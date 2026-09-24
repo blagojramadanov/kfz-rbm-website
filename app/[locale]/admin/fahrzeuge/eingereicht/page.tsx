@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Check, X, AlertCircle, Car, MapPin, Calendar, Gauge } from "lucide-react";
 import Image from "next/image";
@@ -31,7 +31,7 @@ export default function AdminSubmittedVehiclesPage() {
 
   useEffect(() => {
     if (!loading && !isAdmin) {
-      router.push("/admin-access-denied");
+      router.push("/dashboard");
     }
   }, [loading, isAdmin, router]);
 

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Car, Users, MessageSquare, Repeat2, TrendingUp, AlertCircle } from "lucide-react";
-import Link from "next/link";
 
 interface DashboardStats {
   total_vehicles: number;
@@ -37,7 +37,7 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     if (!loading && !isAdmin) {
-      router.push("/admin-access-denied");
+      router.push("/dashboard");
     }
   }, [loading, isAdmin, router]);
 
@@ -97,7 +97,7 @@ export default function AdminDashboardPage() {
           {/* Quick Stats */}
           <div className="grid md:grid-cols-5 gap-4">
             {/* Total Vehicles */}
-            <Link href={`/${locale}/admin/fahrzeuge`}>
+            <Link href={`/admin/fahrzeuge`}>
               <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
                 <div className="flex items-center justify-between mb-2">
                   <Car className="w-10 h-10 text-blue-600" />

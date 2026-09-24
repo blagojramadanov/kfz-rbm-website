@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
+import { Link, useRouter } from "@/lib/navigation";
 import Image from "next/image";
 import { useState } from "react";
 import { Menu, X, LogOut, Settings, User } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
-import { useRouter } from "next/navigation";
 import { COMPANY } from "@/lib/company";
 import { LanguageSwitcher } from "./language-switcher";
 
@@ -22,13 +21,13 @@ export function Navbar() {
   const handleLogout = async () => {
     await signOut();
     setIsProfileOpen(false);
-    router.push(`/${locale}`);
+    router.push("/");
   };
 
   // Determine dashboard link based on user role
   const getDashboardLink = () => {
-    if (!profile) return `/${locale}/dashboard`;
-    return profile.role === "ADMIN" ? `/${locale}/admin` : `/${locale}/dashboard`;
+    if (!profile) return `/dashboard`;
+    return profile.role === "ADMIN" ? `/admin` : `/dashboard`;
   };
 
   const dashboardLink = getDashboardLink();
@@ -38,7 +37,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href={`/${locale}`} className="flex items-center gap-3">
+          <Link href={"/"} className="flex items-center gap-3">
             <div className="relative w-12 h-12">
               <Image
                 src="/assets/logo.png"
@@ -58,32 +57,32 @@ export function Navbar() {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
             <Link
-              href={`/${locale}/fahrzeuge`}
+              href={`/fahrzeuge`}
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
             >
               {t("navigation.vehicles")}
             </Link>
             <Link
-              href={`/${locale}/fahrzeuge/export`}
+              href={`/fahrzeuge/export`}
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium flex items-center gap-1"
             >
               <span>🌍</span>
               <span>{t("navigation.export")}</span>
             </Link>
             <Link
-              href={`/${locale}/about`}
+              href={`/about`}
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
             >
               {t("navigation.about")}
             </Link>
             <Link
-              href={`/${locale}/services`}
+              href={`/services`}
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
             >
               {t("navigation.services")}
             </Link>
             <Link
-              href={`/${locale}/contact`}
+              href={`/contact`}
               className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
             >
               {t("navigation.contact")}
@@ -116,7 +115,7 @@ export function Navbar() {
                           <User className="w-4 h-4 text-kfz-blue" />
                           <span>{profile.role === "ADMIN" ? t("navigation.admin") : t("navigation.dashboard")}</span>
                         </Link>
-                        <Link href={`/${locale}/dashboard/profil`} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
+                        <Link href={`/dashboard/profil`} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
                           <Settings className="w-4 h-4 text-kfz-blue" />
                           <span>{t("navigation.settings")}</span>
                         </Link>
@@ -131,7 +130,7 @@ export function Navbar() {
                     )}
                   </div>
                 ) : (
-                  <Link href={`/${locale}/login`}>
+                  <Link href={`/login`}>
                     <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white">
                       {t("auth.signIn")}
                     </Button>
@@ -159,31 +158,31 @@ export function Navbar() {
         {isOpen && (
           <div className="md:hidden pb-4 border-t">
             <Link
-              href={`/${locale}/fahrzeuge`}
+              href={`/fahrzeuge`}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               {t("navigation.vehicles")}
             </Link>
             <Link
-              href={`/${locale}/fahrzeuge/export`}
+              href={`/fahrzeuge/export`}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               🌍 {t("navigation.export")}
             </Link>
             <Link
-              href={`/${locale}/about`}
+              href={`/about`}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               {t("navigation.about")}
             </Link>
             <Link
-              href={`/${locale}/services`}
+              href={`/services`}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               {t("navigation.services")}
             </Link>
             <Link
-              href={`/${locale}/contact`}
+              href={`/contact`}
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               {t("navigation.contact")}
@@ -207,7 +206,7 @@ export function Navbar() {
                       </Button>
                     </>
                   ) : (
-                    <Link href={`/${locale}/login`} className="block w-full">
+                    <Link href={`/login`} className="block w-full">
                       <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white">
                         {t("auth.signIn")}
                       </Button>

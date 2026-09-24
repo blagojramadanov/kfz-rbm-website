@@ -3,7 +3,8 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useTranslations } from "next-intl";
 import {
@@ -16,44 +17,43 @@ import {
   ChevronDown,
   Menu
 } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { COMPANY } from "@/lib/company";
 
 const getAdminNavigation = (t: ReturnType<typeof useTranslations>, locale: string) => [
   {
     label: t("admin.sidebar.overview"),
-    href: `/${locale}/admin`,
+    href: `/admin`,
     icon: BarChart3,
   },
   {
     label: t("admin.sidebar.vehicles"),
-    href: `/${locale}/admin/fahrzeuge`,
+    href: `/admin/fahrzeuge`,
     icon: Car,
     submenu: [
-      { label: t("admin.sidebar.allVehicles"), href: `/${locale}/admin/fahrzeuge` },
-      { label: t("admin.sidebar.newVehicle"), href: `/${locale}/admin/fahrzeuge/neu` },
-      { label: t("admin.sidebar.submittedVehicles"), href: `/${locale}/admin/fahrzeuge/eingereicht` },
+      { label: t("admin.sidebar.allVehicles"), href: `/admin/fahrzeuge` },
+      { label: t("admin.sidebar.newVehicle"), href: `/admin/fahrzeuge/neu` },
+      { label: t("admin.sidebar.submittedVehicles"), href: `/admin/fahrzeuge/eingereicht` },
     ],
   },
   {
     label: t("admin.sidebar.inquiries"),
-    href: `/${locale}/admin/anfragen`,
+    href: `/admin/anfragen`,
     icon: MessageSquare,
   },
   {
     label: t("admin.sidebar.tradeIns"),
-    href: `/${locale}/admin/inzahlungnahmen`,
+    href: `/admin/inzahlungnahmen`,
     icon: Repeat2,
   },
   {
     label: t("admin.sidebar.customers"),
-    href: `/${locale}/admin/kunden`,
+    href: `/admin/kunden`,
     icon: Users,
   },
   {
     label: t("admin.sidebar.statistics"),
-    href: `/${locale}/admin/statistik`,
+    href: `/admin/statistik`,
     icon: BarChart3,
   },
 ];
@@ -71,7 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (!loading && !isAdmin) {
       // Redirect non-admins to dashboard
-      router.push(`/${locale}/dashboard`);
+      router.push(`/dashboard`);
     }
   }, [loading, isAdmin, router, locale]);
 
@@ -88,7 +88,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const handleLogout = async () => {
     await signOut();
-    router.push(`/${locale}`);
+    router.push("/");
   };
 
   return (

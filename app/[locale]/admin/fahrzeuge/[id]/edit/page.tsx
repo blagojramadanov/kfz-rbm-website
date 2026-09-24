@@ -1,12 +1,15 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, Save, ArrowLeft } from "lucide-react";
-import Link from "next/link";
 
 export default function AdminEditVehiclePage() {
+  const tActions = useTranslations("adminVehicleActions");
+  const tErrors = useTranslations("actionErrors");
   const router = useRouter();
   const params = useParams();
   const vehicleId = params?.id as string;
@@ -19,7 +22,7 @@ export default function AdminEditVehiclePage() {
 
   useEffect(() => {
     if (!loading && !isAdmin) {
-      router.push("/admin-access-denied");
+      router.push("/dashboard");
     }
   }, [loading, isAdmin, router]);
 
@@ -82,14 +85,18 @@ export default function AdminEditVehiclePage() {
       setFormLoading(true);
       setError("");
       const { updateVehicle } = await import("@/app/actions/admin");
-      await updateVehicle(vehicleId, formData);
+      const result = await updateVehicle(vehicleId, formData);
+      if (!result.ok) {
+        setError(`${tActions("updateFailed")} ${tErrors(result.error)}`);
+        return;
+      }
       setSuccess(true);
       setTimeout(() => {
         router.push(`/admin/fahrzeuge/${vehicleId}`);
       }, 1000);
     } catch (err) {
       console.error("Error updating vehicle:", err);
-      setError("Fehler beim Aktualisieren des Fahrzeugs: " + (err instanceof Error ? err.message : "Unbekannter Fehler"));
+      setError(`${tActions("updateFailed")} ${tErrors("UNKNOWN")}`);
     } finally {
       setFormLoading(false);
     }

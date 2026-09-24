@@ -5,11 +5,10 @@ import { useParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Trash2, ArrowRight } from "lucide-react";
-import Link from "next/link";
 import type { TradeInRequest } from "@/lib/supabase";
 
 const STATUS_LABELS: Record<string, string> = {

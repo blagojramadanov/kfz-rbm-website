@@ -5,11 +5,10 @@ import { useParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, AlertCircle, Check } from "lucide-react";
-import Link from "next/link";
 import type { Vehicle } from "@/lib/supabase";
 
 type Step = "current_vehicle" | "vehicle_value" | "select_desired" | "review" | "success";

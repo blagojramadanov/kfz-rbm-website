@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { toErrorCode, type ActionResult } from "@/lib/action-result";
 import { requireAdmin, requireUser } from "@/lib/auth-guards";
 import {
   MAX_IMAGES_PER_REQUEST,
@@ -227,62 +228,74 @@ export async function uploadSubmissionImages(submissionId: string, filesData: un
 }
 
 /**
- * Attaches photos to a published vehicle (`vehicles` table, public bucket).
- * Admin only: the role is checked in the database from the session. Uses the
- * session client; the admin RLS policies on vehicle_images and the bucket allow it.
+ * Attaches ONE photo to a vehicle in the `vehicles` table (public `vehicle-images` bucket).
+ * Admin only: the role is checked in the database from the session. Uses the session
+ * client; needs migration 025 (admin write policies on the bucket + vehicle_images grant).
+ * One image per call keeps each request well below the server action / Vercel body limits.
+ * Never throws: returns an error code the form translates.
  */
-export async function uploadVehicleImagesBase64(vehicleId: string, filesData: unknown) {
-  const { supabase } = await requireAdmin();
-  const targetId = parseOrThrow(id, vehicleId);
-  const files = parseOrThrow(
-    z.array(z.object({ name: z.string().max(255).optional(), data: imageDataUrlSchema })).min(1).max(MAX_IMAGES_PER_REQUEST),
-    filesData
-  );
+export async function uploadVehicleImage(
+  vehicleId: string,
+  dataUrl: string
+): Promise<ActionResult<{ url: string }>> {
+  let supabase: Awaited<ReturnType<typeof requireAdmin>>["supabase"];
+  try {
+    ({ supabase } = await requireAdmin());
+  } catch (error) {
+    return { ok: false, error: toErrorCode(error, "UNAUTHORIZED") };
+  }
+
+  const targetId = id.safeParse(vehicleId);
+  const data = imageDataUrlSchema.safeParse(dataUrl);
+  if (!targetId.success || !data.success) return { ok: false, error: "INVALID_INPUT" };
+  const image = decodeImageDataUrl(data.data);
+  if (!image) return { ok: false, error: "INVALID_INPUT" };
 
   const { data: vehicle, error: fetchError } = await supabase
     .from("vehicles")
     .select("id")
-    .eq("id", targetId)
+    .eq("id", targetId.data)
     .maybeSingle();
-  if (fetchError || !vehicle) throw new Error("NOT_FOUND");
+  if (fetchError) {
+    console.error("[uploadVehicleImage] load vehicle:", fetchError.message);
+    return { ok: false, error: "UPLOAD_FAILED" };
+  }
+  if (!vehicle) return { ok: false, error: "NOT_FOUND" };
 
-  const { data: existing } = await supabase
+  const { data: existing, count } = await supabase
     .from("vehicle_images")
-    .select("sort_order")
-    .eq("vehicle_id", targetId)
+    .select("sort_order", { count: "exact" })
+    .eq("vehicle_id", targetId.data)
     .order("sort_order", { ascending: false })
     .limit(1);
-  const nextSortOrder = (existing?.[0]?.sort_order ?? -1) + 1;
+  if ((count ?? 0) >= MAX_IMAGES_PER_REQUEST) return { ok: false, error: "INVALID_INPUT" };
+  const sortOrder = (existing?.[0]?.sort_order ?? -1) + 1;
 
-  let failed = 0;
-  for (let i = 0; i < files.length; i++) {
-    const image = decodeImageDataUrl(files[i].data);
-    if (!image) {
-      failed++;
-      continue;
-    }
-
-    // File name is generated; the client-sent name is never used in the path.
-    const path = `${targetId}/${Date.now()}-${randomUUID()}.${image.extension}`;
-    const { error: uploadError } = await supabase.storage
-      .from("vehicle-images")
-      .upload(path, image.bytes, { contentType: image.contentType, cacheControl: "3600", upsert: false });
-    if (uploadError) {
-      failed++;
-      continue;
-    }
-
-    const { data: publicUrl } = supabase.storage.from("vehicle-images").getPublicUrl(path);
-    const { error: insertError } = await supabase.from("vehicle_images").insert({
-      vehicle_id: targetId,
-      image_url: publicUrl.publicUrl,
-      sort_order: nextSortOrder + i,
-    });
-    if (insertError) failed++;
+  // File name is generated; nothing client-controlled ends up in the path.
+  const path = `${targetId.data}/${Date.now()}-${randomUUID()}.${image.extension}`;
+  const { error: uploadError } = await supabase.storage
+    .from("vehicle-images")
+    .upload(path, image.bytes, { contentType: image.contentType, cacheControl: "3600", upsert: false });
+  if (uploadError) {
+    // Logged so the cause (e.g. a missing storage policy) is visible in the server logs.
+    console.error("[uploadVehicleImage] storage upload:", uploadError.message);
+    return { ok: false, error: "UPLOAD_FAILED" };
   }
 
-  if (failed > 0) throw new Error("UPLOAD_FAILED");
-  return { success: true, uploadedCount: files.length };
+  const { data: publicUrl } = supabase.storage.from("vehicle-images").getPublicUrl(path);
+  const { error: insertError } = await supabase.from("vehicle_images").insert({
+    vehicle_id: targetId.data,
+    image_url: publicUrl.publicUrl,
+    sort_order: sortOrder,
+  });
+  if (insertError) {
+    console.error("[uploadVehicleImage] vehicle_images insert:", insertError.message);
+    // Don't leave an orphaned file behind.
+    await supabase.storage.from("vehicle-images").remove([path]);
+    return { ok: false, error: "UPLOAD_FAILED" };
+  }
+
+  return { ok: true, url: publicUrl.publicUrl };
 }
 
 /**

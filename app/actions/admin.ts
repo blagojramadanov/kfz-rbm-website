@@ -1,5 +1,7 @@
 "use server";
 
+import { z } from "zod";
+import { toErrorCode, type ActionErrorCode, type ActionResult } from "@/lib/action-result";
 import { requireAdmin } from "@/lib/auth-guards";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -31,111 +33,213 @@ function logAdminError(operation: string, error: unknown, context?: Record<strin
 // VEHICLE MANAGEMENT
 // ============================================================================
 
-export async function createVehicle(
-  vehicleData: {
-    vin: string;
-    brand: string;
-    model: string;
-    year: number;
-    mileage: number;
-    price: number;
-    transmission: string;
-    fuel_type: string;
-    body_type: string;
-    color_exterior: string;
-    color_interior?: string;
-    engine_cc?: number;
-    power_hp?: number;
-    description: string;
-    listing_type?: "verkauf" | "export";
-    zustand?: string;
-    zielland?: string;
-    export_notes?: string;
-  }
-) {
+const optionalText = (max: number) => z.string().trim().max(max).optional().nullable();
+const optionalInt = (max: number) => z.number().int().min(0).max(max).optional().nullable();
+
+// Columns an admin may set from the vehicle forms. Anything else (id, source_type,
+// submitted_vehicle_id, created_at, ...) is stripped.
+const vehicleFieldsSchema = z.object({
+  vin: z.string().trim().min(1).max(17),
+  brand: z.string().trim().min(1).max(50),
+  model: z.string().trim().min(1).max(100),
+  year: z.number().int().min(1900).max(new Date().getFullYear() + 1),
+  mileage: z.number().int().min(0).max(5_000_000),
+  price: z.number().min(0).max(100_000_000),
+  transmission: optionalText(20),
+  fuel_type: optionalText(20),
+  body_type: optionalText(30),
+  color_exterior: optionalText(50),
+  color_interior: optionalText(50),
+  engine_cc: optionalInt(20_000),
+  power_hp: optionalInt(5_000),
+  description: optionalText(10_000),
+  listing_type: z.enum(["verkauf", "export"]).optional(),
+  zustand: optionalText(30),
+  zielland: optionalText(100),
+  export_notes: optionalText(5_000),
+});
+const vehicleUpdateSchema = vehicleFieldsSchema.partial().extend({
+  status: z.enum(["draft", "available", "sold", "reserved"]).optional(),
+  featured: z.boolean().optional(),
+});
+
+/** Session + admin check that returns an error code instead of throwing. */
+async function adminSession(): Promise<
+  { ok: true; supabase: Awaited<ReturnType<typeof requireAdmin>>["supabase"] } | { ok: false; error: ActionErrorCode }
+> {
   try {
-    await verifyAdminRole();
-    const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
-    const supabase = getSupabaseAdminClient();
-
-    // Verify VIN is unique
-    const { data: existingVehicle } = await supabase
-      .from("vehicles")
-      .select("id")
-      .eq("vin", vehicleData.vin)
-      .maybeSingle();
-
-    if (existingVehicle) {
-      throw new Error("Ein Fahrzeug mit dieser VIN existiert bereits");
-    }
-
-    const { data, error } = await supabase
-      .from("vehicles")
-      .insert({
-        vin: vehicleData.vin,
-        brand: vehicleData.brand,
-        model: vehicleData.model,
-        year: vehicleData.year,
-        mileage: vehicleData.mileage,
-        price: vehicleData.price,
-        transmission: vehicleData.transmission,
-        fuel_type: vehicleData.fuel_type,
-        body_type: vehicleData.body_type,
-        color_exterior: vehicleData.color_exterior,
-        color_interior: vehicleData.color_interior,
-        engine_cc: vehicleData.engine_cc,
-        power_hp: vehicleData.power_hp,
-        description: vehicleData.description,
-        status: "available",
-        source_type: "rbm",
-        submitted_vehicle_id: null,
-        listing_type: vehicleData.listing_type || "verkauf",
-        zustand: vehicleData.zustand,
-        zielland: vehicleData.zielland,
-        export_notes: vehicleData.export_notes,
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return { success: true, vehicleId: data.id };
+    const { supabase } = await requireAdmin();
+    return { ok: true, supabase };
   } catch (error) {
-    console.error("Error creating vehicle:", error);
-    throw new Error(error instanceof Error ? error.message : "Fehler beim Erstellen des Fahrzeugs");
+    return { ok: false, error: toErrorCode(error, "UNAUTHORIZED") };
   }
 }
 
-export async function updateVehicle(vehicleId: string, updates: Record<string, any>) {
-  try {
-    await verifyAdminRole();
-    const { supabase } = await getSupabaseServerClient();
-
-    const { error } = await supabase
-      .from("vehicles")
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq("id", vehicleId);
-
-    if (error) throw error;
-    return { success: true };
-  } catch (error) {
-    console.error("Error updating vehicle:", error);
-    throw new Error(error instanceof Error ? error.message : "Fehler beim Aktualisieren des Fahrzeugs");
+/** Removes every file of a vehicle from the public bucket. Best effort; returns false if something is left. */
+async function removeVehicleFiles(
+  supabase: Awaited<ReturnType<typeof requireAdmin>>["supabase"],
+  vehicleId: string
+): Promise<boolean> {
+  const { data: files, error } = await supabase.storage.from("vehicle-images").list(vehicleId, { limit: 1000 });
+  if (error) {
+    console.error("[removeVehicleFiles] list:", error.message);
+    return false;
   }
+  if (!files?.length) return true;
+  const { error: removeError } = await supabase.storage
+    .from("vehicle-images")
+    .remove(files.map((file) => `${vehicleId}/${file.name}`));
+  if (removeError) console.error("[removeVehicleFiles] remove:", removeError.message);
+  return !removeError;
 }
 
-export async function deleteVehicle(vehicleId: string) {
-  try {
-    await verifyAdminRole();
-    const { supabase } = await getSupabaseServerClient();
+/**
+ * Creates a vehicle as **draft** (never public). The form uploads the photos with
+ * uploadVehicleImage() and then calls publishVehicle(); if an upload fails it calls
+ * discardDraftVehicle(), so no half-created vehicle goes live.
+ */
+export async function createVehicle(vehicleData: unknown): Promise<ActionResult<{ vehicleId: string }>> {
+  const session = await adminSession();
+  if (!session.ok) return session;
+  const parsed = vehicleFieldsSchema.safeParse(vehicleData);
+  if (!parsed.success) return { ok: false, error: "INVALID_INPUT" };
+  const data = parsed.data;
 
-    const { error } = await supabase.from("vehicles").delete().eq("id", vehicleId);
+  // role `authenticated` has no INSERT grant on vehicles, so the insert itself uses the
+  // service-role client - only after the admin check above, with an explicit column list.
+  const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
+  const supabase = getSupabaseAdminClient();
 
-    if (error) throw error;
-    return { success: true };
-  } catch (error) {
-    const msg = logAdminError("deleteVehicle", error, { vehicleId });
-    throw new Error(`Fehler beim Löschen des Fahrzeugs: ${msg}`);
+  const { data: existingVehicle } = await supabase
+    .from("vehicles")
+    .select("id")
+    .eq("vin", data.vin)
+    .maybeSingle();
+  if (existingVehicle) return { ok: false, error: "DUPLICATE_VIN" };
+
+  const { data: created, error } = await supabase
+    .from("vehicles")
+    .insert({
+      vin: data.vin,
+      brand: data.brand,
+      model: data.model,
+      year: data.year,
+      mileage: data.mileage,
+      price: data.price,
+      transmission: data.transmission,
+      fuel_type: data.fuel_type,
+      body_type: data.body_type,
+      color_exterior: data.color_exterior,
+      color_interior: data.color_interior,
+      engine_cc: data.engine_cc,
+      power_hp: data.power_hp,
+      description: data.description,
+      status: "draft",
+      source_type: "rbm",
+      submitted_vehicle_id: null,
+      listing_type: data.listing_type || "verkauf",
+      zustand: data.zustand,
+      zielland: data.zielland,
+      export_notes: data.export_notes,
+    })
+    .select("id")
+    .single();
+
+  if (error || !created) {
+    logAdminError("createVehicle", error);
+    return { ok: false, error: "CREATE_FAILED" };
   }
+  return { ok: true, vehicleId: created.id as string };
+}
+
+/** draft -> available, once all photos are uploaded. */
+export async function publishVehicle(vehicleId: string): Promise<ActionResult> {
+  const session = await adminSession();
+  if (!session.ok) return session;
+  if (!z.guid().safeParse(vehicleId).success) return { ok: false, error: "INVALID_INPUT" };
+
+  const { data, error } = await session.supabase
+    .from("vehicles")
+    .update({ status: "available", updated_at: new Date().toISOString() })
+    .eq("id", vehicleId)
+    .eq("status", "draft")
+    .select("id");
+  if (error) {
+    logAdminError("publishVehicle", error, { vehicleId });
+    return { ok: false, error: "UPDATE_FAILED" };
+  }
+  return data?.length === 1 ? { ok: true } : { ok: false, error: "INVALID_STATE" };
+}
+
+/**
+ * Rollback for a failed create: deletes a vehicle that is still a draft, together
+ * with its photo rows and files. Refuses anything that is not a draft.
+ */
+export async function discardDraftVehicle(vehicleId: string): Promise<ActionResult> {
+  const session = await adminSession();
+  if (!session.ok) return session;
+  if (!z.guid().safeParse(vehicleId).success) return { ok: false, error: "INVALID_INPUT" };
+
+  const { data: vehicle } = await session.supabase
+    .from("vehicles")
+    .select("id, status")
+    .eq("id", vehicleId)
+    .maybeSingle();
+  if (!vehicle) return { ok: false, error: "NOT_FOUND" };
+  if (vehicle.status !== "draft") return { ok: false, error: "INVALID_STATE" };
+
+  const filesRemoved = await removeVehicleFiles(session.supabase, vehicleId);
+  const { data, error } = await session.supabase
+    .from("vehicles")
+    .delete()
+    .eq("id", vehicleId)
+    .eq("status", "draft")
+    .select("id");
+  if (error || data?.length !== 1) {
+    logAdminError("discardDraftVehicle", error, { vehicleId });
+    return { ok: false, error: "DELETE_FAILED" };
+  }
+  if (!filesRemoved) console.error("[discardDraftVehicle] vehicle deleted but files may remain under", vehicleId);
+  return { ok: true };
+}
+
+export async function updateVehicle(vehicleId: string, updates: unknown): Promise<ActionResult> {
+  const session = await adminSession();
+  if (!session.ok) return session;
+  const parsed = vehicleUpdateSchema.safeParse(updates);
+  if (!z.guid().safeParse(vehicleId).success || !parsed.success) return { ok: false, error: "INVALID_INPUT" };
+
+  const { data, error } = await session.supabase
+    .from("vehicles")
+    .update({ ...parsed.data, updated_at: new Date().toISOString() })
+    .eq("id", vehicleId)
+    .select("id");
+
+  if (error) {
+    logAdminError("updateVehicle", error, { vehicleId });
+    return { ok: false, error: error.code === "23505" ? "DUPLICATE_VIN" : "UPDATE_FAILED" };
+  }
+  return data?.length === 1 ? { ok: true } : { ok: false, error: "NOT_FOUND" };
+}
+
+/** Deletes a vehicle, its image rows (FK cascade) and its files in the public bucket. */
+export async function deleteVehicle(vehicleId: string): Promise<ActionResult> {
+  const session = await adminSession();
+  if (!session.ok) return session;
+  if (!z.guid().safeParse(vehicleId).success) return { ok: false, error: "INVALID_INPUT" };
+
+  const { data, error } = await session.supabase.from("vehicles").delete().eq("id", vehicleId).select("id");
+  if (error) {
+    logAdminError("deleteVehicle", error, { vehicleId });
+    return { ok: false, error: "DELETE_FAILED" };
+  }
+  if (data?.length !== 1) return { ok: false, error: "NOT_FOUND" };
+
+  // Row is gone; files are only cleanup (a leftover file is not visible anywhere).
+  if (!(await removeVehicleFiles(session.supabase, vehicleId))) {
+    console.error("[deleteVehicle] vehicle deleted but files may remain under", vehicleId);
+  }
+  return { ok: true };
 }
 
 export async function getVehicles(

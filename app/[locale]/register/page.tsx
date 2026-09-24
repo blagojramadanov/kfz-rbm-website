@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
-import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -26,9 +26,9 @@ export default function RegisterPage() {
     if (isAuthenticated && profile) {
       // Redirect based on user role
       if (profile.role === "ADMIN") {
-        router.push(`/${locale}/admin`);
+        router.push(`/admin`);
       } else {
-        router.push(`/${locale}/dashboard`);
+        router.push(`/dashboard`);
       }
     }
   }, [isAuthenticated, profile, router, locale]);
@@ -84,7 +84,7 @@ export default function RegisterPage() {
             <p className="text-blue-100 mb-6">
               {t("pages.contact.contactInfo")}
             </p>
-            <Link href={`/${locale}/login`}>
+            <Link href={`/login`}>
               <Button className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold">
                 {t("auth.signIn")}
               </Button>

@@ -5,11 +5,10 @@ import { useParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, ArrowRight } from "lucide-react";
-import Link from "next/link";
 
 export default function InquiriesPage() {
   const params = useParams();

@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Plus, Car, Clock, CheckCircle, AlertCircle } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
 import type { SubmittedVehicle } from "@/lib/supabase";
 

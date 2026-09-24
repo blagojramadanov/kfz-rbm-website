@@ -688,5 +688,47 @@
             "ustIdNr": "DE000000000 (example)",
             "registerNumber": "HRB 000000 (example)"
         }
+    },
+    "actionErrors": {
+        "UNAUTHORIZED": "Your session has expired. Please sign in again.",
+        "FORBIDDEN": "You do not have permission to do this.",
+        "NOT_FOUND": "The entry was not found.",
+        "INVALID_INPUT": "Invalid input. Please check your details and images (JPEG, PNG or WebP).",
+        "INVALID_STATE": "This action is not possible in the current status.",
+        "DUPLICATE_VIN": "A vehicle with this VIN already exists.",
+        "CREATE_FAILED": "Creating it failed.",
+        "UPDATE_FAILED": "Saving failed.",
+        "DELETE_FAILED": "Deleting failed.",
+        "UPLOAD_FAILED": "The upload failed.",
+        "LOAD_FAILED": "The data could not be loaded.",
+        "UNKNOWN": "An unexpected error occurred. Please try again."
+    },
+    "adminVehicleForm": {
+        "images": {
+            "title": "Images",
+            "hint": "JPEG, PNG or WebP, up to {max} images. Large photos are resized before uploading.",
+            "select": "Select images",
+            "selected": "{count, plural, one {# image selected} other {# images selected}}",
+            "previewAlt": "Preview {index}",
+            "remove": "Remove image {index}"
+        },
+        "progress": {
+            "creating": "Creating vehicle...",
+            "uploading": "Uploading image {current} of {total}...",
+            "publishing": "Publishing vehicle..."
+        },
+        "errors": {
+            "brandModelRequired": "Please enter brand and model.",
+            "imageRead": "The image \"{name}\" could not be read. The vehicle was not created.",
+            "createFailed": "The vehicle could not be created.",
+            "uploadRolledBack": "The images could not be uploaded, so the vehicle was not created. Your input is kept and you can try again.",
+            "uploadDraftKept": "The images could not be uploaded. The vehicle is saved as a draft and is not publicly visible; please review or delete it in the vehicle list.",
+            "publishFailed": "The vehicle and images were saved, but the vehicle could not be published. It remains a non-public draft."
+        }
+    },
+    "adminVehicleActions": {
+        "confirmDelete": "Are you sure you want to delete this vehicle?",
+        "deleteFailed": "The vehicle could not be deleted.",
+        "updateFailed": "The vehicle could not be saved."
     }
 }

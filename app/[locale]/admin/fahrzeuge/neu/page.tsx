@@ -1,14 +1,15 @@
 "use client";
 import { useTranslations } from "next-intl";
+import type { ActionErrorCode } from "@/lib/action-result";
+import { resizeImageToDataUrl } from "@/lib/resize-image";
 import { useParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { AlertCircle, Save, ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { AlertCircle, Save, ArrowLeft, X } from "lucide-react";
 
 export default function AdminCreateVehiclePage() {
   const params = useParams();
@@ -36,61 +37,38 @@ export default function AdminCreateVehiclePage() {
   });
   const [formLoading, setFormLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [successVehicleId, setSuccessVehicleId] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [uploadingImages, setUploadingImages] = useState(false);
-  const [uploadError, setUploadError] = useState("");
+  const [progress, setProgress] = useState("");
+  const tForm = useTranslations("adminVehicleForm");
+  const tErrors = useTranslations("actionErrors");
+
+  const MAX_IMAGES = 20;
+  const errorText = (code: ActionErrorCode) => tErrors(code);
 
   const handleImageSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setSelectedFiles(files);
-    setUploadError("");
+    setSelectedFiles((current) => [...current, ...files].slice(0, MAX_IMAGES));
+    e.target.value = "";
   };
 
-  const handleUploadImages = async () => {
-    if (!successVehicleId || selectedFiles.length === 0) return;
+  const removeSelectedFile = (index: number) => {
+    setSelectedFiles((current) => current.filter((_, i) => i !== index));
+  };
 
+  // Calls a server action and turns a network/transport failure into a code
+  // (the actions themselves never throw).
+  const call = async <T,>(fn: () => Promise<T>): Promise<T | { ok: false; error: ActionErrorCode }> => {
     try {
-      setUploadingImages(true);
-      setUploadError("");
-
-      // Convert files to base64 (plain objects, serializable for server actions)
-      const filePromises = selectedFiles.map(file => {
-        return new Promise<{ name: string; data: string }>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            resolve({
-              name: file.name,
-              data: reader.result as string,
-            });
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      });
-
-      const filesAsBase64 = await Promise.all(filePromises);
-
-      const { uploadVehicleImagesBase64 } = await import("@/app/actions/vehicles");
-      await uploadVehicleImagesBase64(successVehicleId, filesAsBase64);
-
-      setSelectedFiles([]);
-      // Redirect after successful upload
-      setTimeout(() => {
-        router.push(`/admin/fahrzeuge/${successVehicleId}`);
-      }, 1000);
+      return await fn();
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Fehler beim Hochladen";
-      setUploadError(errorMsg);
-    } finally {
-      setUploadingImages(false);
+      console.error("Server action failed:", err);
+      return { ok: false, error: "UNKNOWN" };
     }
   };
 
   useEffect(() => {
     if (!loading && !isAdmin) {
-      router.push("/admin-access-denied");
+      router.push("/dashboard");
     }
   }, [loading, isAdmin, router]);
 
@@ -110,7 +88,7 @@ export default function AdminCreateVehiclePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.brand || !formData.model) {
-      setError("Bitte füllen Sie Marke und Modell aus");
+      setError(tForm("errors.brandModelRequired"));
       return;
     }
 
@@ -123,19 +101,58 @@ export default function AdminCreateVehiclePage() {
       return vin;
     };
     const submitData = { ...formData, vin: generateTestVIN() };
+    const actions = await import("@/app/actions/admin");
+    const { uploadVehicleImage } = await import("@/app/actions/vehicles");
 
+    setFormLoading(true);
+    setError("");
     try {
-      setFormLoading(true);
-      setError("");
-      const { createVehicle } = await import("@/app/actions/admin");
-      const result = await createVehicle(submitData);
-      setSuccess(true);
-      setSuccessVehicleId(result.vehicleId);
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Unbekannter Fehler";
-      setError("Fehler beim Erstellen des Fahrzeugs: " + errorMsg);
+      // 1. Resize/read all photos first, so a broken file never leaves a vehicle behind.
+      const images: string[] = [];
+      for (const file of selectedFiles) {
+        try {
+          images.push(await resizeImageToDataUrl(file));
+        } catch {
+          setError(tForm("errors.imageRead", { name: file.name }));
+          return;
+        }
+      }
+
+      // 2. Create the vehicle as a (non-public) draft.
+      setProgress(tForm("progress.creating"));
+      const created = await call(() => actions.createVehicle(submitData));
+      if (!created.ok) {
+        setError(`${tForm("errors.createFailed")} ${errorText(created.error)}`);
+        return;
+      }
+      const vehicleId = created.vehicleId;
+
+      // 3. Upload the photos one by one.
+      for (let i = 0; i < images.length; i++) {
+        setProgress(tForm("progress.uploading", { current: i + 1, total: images.length }));
+        const uploaded = await call(() => uploadVehicleImage(vehicleId, images[i]));
+        if (!uploaded.ok) {
+          // Roll back: remove the draft and the photos uploaded so far.
+          const discarded = await call(() => actions.discardDraftVehicle(vehicleId));
+          setError(
+            `${tForm(discarded.ok ? "errors.uploadRolledBack" : "errors.uploadDraftKept")} ${errorText(uploaded.error)}`
+          );
+          return;
+        }
+      }
+
+      // 4. Only now make it public.
+      setProgress(tForm("progress.publishing"));
+      const published = await call(() => actions.publishVehicle(vehicleId));
+      if (!published.ok) {
+        setError(`${tForm("errors.publishFailed")} ${errorText(published.error)}`);
+        return;
+      }
+
+      router.push(`/admin/fahrzeuge/${vehicleId}`);
     } finally {
       setFormLoading(false);
+      setProgress("");
     }
   };
 
@@ -145,91 +162,6 @@ export default function AdminCreateVehiclePage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
           <p className="text-gray-600">Wird geladen...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Success screen with image upload
-  if (success && successVehicleId) {
-    return (
-      <div className="space-y-6">
-        <Link href="/admin/fahrzeuge">
-          <button className="flex items-center gap-2 text-kfz-blue hover:text-kfz-blue-dark font-medium">
-            <ArrowLeft className="w-4 h-4" />
-            Zurück zur Fahrzeugliste
-          </button>
-        </Link>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-green-800 font-medium">✓ Fahrzeug erfolgreich erstellt!</p>
-          </div>
-
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Bilder hochladen</h2>
-            <p className="text-gray-600 mb-6">Laden Sie Fotos des Fahrzeugs hoch. (optional)</p>
-
-            {uploadError && (
-              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-800">{uploadError}</p>
-              </div>
-            )}
-
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-6 hover:border-kfz-blue transition-colors">
-              <input
-                type="file"
-                id="image-input"
-                multiple
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleImageSelection}
-                className="hidden"
-              />
-              <label
-                htmlFor="image-input"
-                className="cursor-pointer"
-              >
-                <div className="text-4xl mb-2">📷</div>
-                <p className="font-medium text-gray-900">Bilder auswählen</p>
-                <p className="text-sm text-gray-600">Oder hierher ziehen</p>
-                <p className="text-xs text-gray-500 mt-2">{selectedFiles.length} Datei(en) ausgewählt</p>
-              </label>
-            </div>
-
-            {selectedFiles.length > 0 && (
-              <div className="mb-6">
-                <p className="text-sm font-medium text-gray-900 mb-3">Vorschau:</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {selectedFiles.map((file, idx) => (
-                    <div key={idx} className="relative group">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Preview ${idx}`}
-                        className="w-full h-24 object-cover rounded-lg border border-gray-200"
-                      />
-                      <p className="text-xs text-gray-600 mt-1 truncate">{file.name}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleUploadImages}
-                disabled={uploadingImages || selectedFiles.length === 0}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-kfz-blue text-white rounded-lg hover:bg-kfz-blue-dark font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {uploadingImages ? "Wird hochgeladen..." : `Bilder hochladen (${selectedFiles.length})`}
-              </button>
-              <Link href={`/admin/fahrzeuge/${successVehicleId}`} className="flex-1">
-                <button className="w-full px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium transition-colors">
-                  Überspringen
-                </button>
-              </Link>
-            </div>
-          </div>
         </div>
       </div>
     );
@@ -255,11 +187,6 @@ export default function AdminCreateVehiclePage() {
           </div>
         )}
 
-        {success && (
-          <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-sm text-green-800 font-medium">Fahrzeug erfolgreich erstellt! Wird weitergeleitet...</p>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
@@ -529,6 +456,52 @@ export default function AdminCreateVehiclePage() {
               </div>
             )}
           </div>
+
+          <div className="pt-6 border-t border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">{tForm("images.title")}</h2>
+            <p className="text-sm text-gray-600 mb-4">{tForm("images.hint", { max: MAX_IMAGES })}</p>
+            <label className="block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-kfz-blue transition-colors">
+              <input
+                type="file"
+                multiple
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleImageSelection}
+                disabled={formLoading || selectedFiles.length >= MAX_IMAGES}
+                className="sr-only"
+              />
+              <span className="font-medium text-gray-900">{tForm("images.select")}</span>
+              <span className="block text-xs text-gray-500 mt-1">
+                {tForm("images.selected", { count: selectedFiles.length })}
+              </span>
+            </label>
+            {selectedFiles.length > 0 && (
+              <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                {selectedFiles.map((file, idx) => (
+                  <li key={`${file.name}-${idx}`} className="relative">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={tForm("images.previewAlt", { index: idx + 1 })}
+                      className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeSelectedFile(idx)}
+                      disabled={formLoading}
+                      aria-label={tForm("images.remove", { index: idx + 1 })}
+                      className="absolute top-1 right-1 bg-white/90 rounded-full p-1 shadow hover:bg-white"
+                    >
+                      <X className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                    <p className="text-xs text-gray-600 mt-1 truncate">{file.name}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {progress && (
+            <p role="status" className="text-sm text-gray-700">{progress}</p>
+          )}
 
           <div className="flex gap-3 pt-6 border-t border-gray-200">
             <button

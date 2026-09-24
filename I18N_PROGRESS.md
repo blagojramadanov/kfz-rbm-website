@@ -297,3 +297,31 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 3. Add `AUDIT_CUSTOMER_*` / `AUDIT_ADMIN_*` to `.env.local` and run the logged-in checks (customer redirect from admin, customer DELETE/UPDATE attempt, admin upload, logout).
 4. Server actions now throw the error codes listed above; the UI still shows `err.message`, so a failed wizard submit shows a raw code until area 8 maps codes to translated text.
 5. Other actions (admin CRUD in `admin.ts`) still take free-form objects; they are admin-only, but should get zod schemas too.
+
+## Production fix: admin image upload + locale paths (2026-09-24)
+
+### What broke (after commit 3aa1d04)
+1. **`POST /de/admin/fahrzeuge/neu` -> 500 `UPLOAD_FAILED`.** 3aa1d04 moved the image upload to the admin's session client. Role `authenticated` only has `SELECT` on `public.vehicle_images` (migration 010), so the image-row insert was always rejected ("permission denied for table vehicle_images", confirmed live with a throwaway non-admin user). The thrown error became a 500 page, and because the vehicle had already been created as `available`, a public vehicle without photos was left behind (AUDI A4 `c1d3a890`, now set to `draft` by hand).
+2. **`POST /admin/fahrzeuge/<id>/edit` -> 307 -> "failed to forward action response".** Admin/dashboard pages used `next/link` and `next/navigation`'s `useRouter` with bare `/admin/...` and `/dashboard/...` paths. The middleware redirected those (307), and for a server action POST the redirect loses the request. The same bare paths caused the many 307s on normal navigation.
+
+### Changes
+- **Migration 025** (`supabase/migrations/025_vehicle_image_storage_admin_policies.sql`, **must be applied by hand**): RLS enabled on `vehicle_images`, admin-only INSERT/UPDATE/DELETE policies, then `GRANT INSERT, UPDATE, DELETE` to `authenticated`. `vehicle-images` bucket: SELECT/INSERT/UPDATE/DELETE policies for admins only (public read stays via the public bucket URL). `customer-submitted-photos`: INSERT only into `{own uid}/{a submission the uploader owns, status draft/eingereicht}/` (before: any second folder). Idempotent.
+- **Actions return result objects** (`lib/action-result.ts`: `{ ok: true, ... } | { ok: false, error: CODE }`) instead of throwing: `createVehicle`, new `publishVehicle`, new `discardDraftVehicle`, `updateVehicle`, `deleteVehicle` (admin.ts) and `uploadVehicleImage` (vehicles.ts, one image per call, replaces `uploadVehicleImagesBase64`). Failure causes are logged server-side (`[uploadVehicleImage] storage upload: ...`).
+- **No half-created vehicles:** the create form creates the vehicle as `draft` (not public), resizes each photo in the browser (`lib/resize-image.ts`, max 1920 px JPEG), uploads them one by one, and only then publishes. On any failure it calls `discardDraftVehicle` (removes rows + files); if even that fails, the vehicle stays a non-public draft and the form says so. The old two-step "create, then upload on a success screen" flow is gone. `deleteVehicle` now also removes the vehicle's files; `updateVehicle` validates with zod (allow-list).
+- **Translated errors:** `actionErrors.<CODE>`, `adminVehicleForm.*`, `adminVehicleActions.*` (de/en/mk). Area 8 can reuse `actionErrors` for the other actions.
+- `experimental.serverActions.bodySizeLimit = "4mb"` (default 1 MB; Vercel's hard limit is 4.5 MB per request).
+- **Locale-aware navigation everywhere in `app/[locale]/**` + navbar/footer:** `Link`/`useRouter` from `lib/navigation.ts`, hand-built `/${locale}/...` prefixes removed, `router.push("/admin-access-denied")` (route never existed) -> `/dashboard`. The language switcher keeps `next/navigation` on purpose. Server-side `permanentRedirect` in the vehicle detail page keeps its explicit `/${locale}` prefix.
+- **Removed the legacy `app/admin/**` and `app/dashboard/**` routes** (10 files): unreachable (the middleware redirects every non-locale URL) and full of bare paths.
+
+### Tests
+- In-process against the real actions (fake Supabase, RLS off): create with 2 images -> draft -> 2 rows + 2 files -> `available`; storage denial and row-insert denial -> `UPLOAD_FAILED` returned (no throw), draft and already-uploaded files rolled back; invalid 2nd image rolls back the 1st; discard refuses published vehicles; edit saves allowed fields and ignores `id`/`source_type`; delete removes row + files; anonymous/customer get `UNAUTHORIZED`/`FORBIDDEN` with zero writes (12/12). Earlier security suite updated to the new action: 26/26.
+- Live storage probe (throwaway users, deleted afterwards): non-admins and anon are denied on `vehicle-images`; customers can upload into their own folder, not into another user's; **before 025 a customer could upload into `{own uid}/{any id}/`**.
+- Live navigation on the production build (throwaway customer, deleted afterwards): all 7 dashboard links x de/en/mk clicked, links on each target page collected: **0 requests to non-locale paths, 0 redirects**; a customer opening `/{locale}/admin` gets a server-side 307 to `/{locale}/dashboard`. Admin pages could not be crawled (no admin session), but use the same code path after the codemod.
+- **Not run: the admin create/edit/delete test with 2 images on `npm run dev`.** `AUDIT_ADMIN_*` is not in `.env.local`, and the rotated secret key has no UPDATE grant on `user_profiles`, so no temporary admin could be created. It also cannot pass before migration 025 is applied.
+
+### Open items
+1. Apply migration 025 in the Supabase SQL editor, then run its verification queries.
+2. Add `AUDIT_ADMIN_*` / `AUDIT_CUSTOMER_*` to `.env.local` so the admin flow can be tested live.
+3. Vehicle `f9af008f` ("sssssssss SSSS...", created 2026-09-24 22:41, 0 images) is live; probably another failed test - delete or set to draft in the admin.
+4. The customer wizard still sends all photos in one `createSubmittedVehicle` request; with several photos this can exceed the 4 MB limit. Switch it to `uploadSubmissionImages` per photo.
+5. `lib/auth-context.tsx` builds the password-reset link without a locale (`/reset-password`); it is a GET, so the middleware redirect works, but it always lands on `/de`.

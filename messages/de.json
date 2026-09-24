@@ -688,5 +688,47 @@
             "ustIdNr": "DE000000000 (Beispiel)",
             "registerNumber": "HRB 000000 (Beispiel)"
         }
+    },
+    "actionErrors": {
+        "UNAUTHORIZED": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+        "FORBIDDEN": "Dafür fehlt Ihnen die Berechtigung.",
+        "NOT_FOUND": "Der Eintrag wurde nicht gefunden.",
+        "INVALID_INPUT": "Ungültige Eingabe. Bitte prüfen Sie Ihre Angaben und Bilder (JPEG, PNG oder WebP).",
+        "INVALID_STATE": "Diese Aktion ist im aktuellen Status nicht möglich.",
+        "DUPLICATE_VIN": "Ein Fahrzeug mit dieser Fahrgestellnummer existiert bereits.",
+        "CREATE_FAILED": "Das Anlegen ist fehlgeschlagen.",
+        "UPDATE_FAILED": "Das Speichern ist fehlgeschlagen.",
+        "DELETE_FAILED": "Das Löschen ist fehlgeschlagen.",
+        "UPLOAD_FAILED": "Das Hochladen ist fehlgeschlagen.",
+        "LOAD_FAILED": "Die Daten konnten nicht geladen werden.",
+        "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+    },
+    "adminVehicleForm": {
+        "images": {
+            "title": "Bilder",
+            "hint": "JPEG, PNG oder WebP, bis zu {max} Bilder. Große Fotos werden vor dem Hochladen verkleinert.",
+            "select": "Bilder auswählen",
+            "selected": "{count, plural, one {# Bild ausgewählt} other {# Bilder ausgewählt}}",
+            "previewAlt": "Vorschau {index}",
+            "remove": "Bild {index} entfernen"
+        },
+        "progress": {
+            "creating": "Fahrzeug wird angelegt...",
+            "uploading": "Bild {current} von {total} wird hochgeladen...",
+            "publishing": "Fahrzeug wird veröffentlicht..."
+        },
+        "errors": {
+            "brandModelRequired": "Bitte füllen Sie Marke und Modell aus.",
+            "imageRead": "Das Bild „{name}“ konnte nicht gelesen werden. Das Fahrzeug wurde nicht angelegt.",
+            "createFailed": "Das Fahrzeug konnte nicht angelegt werden.",
+            "uploadRolledBack": "Die Bilder konnten nicht hochgeladen werden, daher wurde das Fahrzeug nicht angelegt. Ihre Eingaben sind erhalten, Sie können es erneut versuchen.",
+            "uploadDraftKept": "Die Bilder konnten nicht hochgeladen werden. Das Fahrzeug ist als Entwurf gespeichert und nicht öffentlich sichtbar; bitte prüfen oder löschen Sie es in der Fahrzeugliste.",
+            "publishFailed": "Das Fahrzeug und die Bilder wurden gespeichert, das Fahrzeug konnte aber nicht veröffentlicht werden. Es bleibt ein nicht öffentlicher Entwurf."
+        }
+    },
+    "adminVehicleActions": {
+        "confirmDelete": "Sind Sie sicher, dass Sie dieses Fahrzeug löschen möchten?",
+        "deleteFailed": "Das Fahrzeug konnte nicht gelöscht werden.",
+        "updateFailed": "Das Fahrzeug konnte nicht gespeichert werden."
     }
 }
