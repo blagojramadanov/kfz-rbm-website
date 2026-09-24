@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useTranslations, useFormatter } from "next-intl";
 import { Heart, MapPin, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getFuelTypeLabel } from "@/lib/vehicle-labels";
 
 interface Vehicle {
   id: string;
@@ -61,6 +62,7 @@ const LATEST_VEHICLES: Vehicle[] = [
 
 export function LatestVehicles() {
   const t = useTranslations("pages.home");
+  const tCommon = useTranslations("common");
   const format = useFormatter();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -106,7 +108,7 @@ export function LatestVehicles() {
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                {t(`vehicles.fuelTypes.${vehicle.fuelType}` as any) || vehicle.fuelType}
+                {getFuelTypeLabel(tCommon, vehicle.fuelType)}
               </div>
             </div>
 

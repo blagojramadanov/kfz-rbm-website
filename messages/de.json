@@ -195,9 +195,7 @@
         "sendMessage": "Nachricht senden",
         "messageSent": "Nachricht erfolgreich gesendet",
         "messageError": "Fehler beim Senden der Nachricht",
-        "followUs": "Folgen Sie uns",
-        "monToFri": "Montag - Freitag",
-        "satSun": "Samstag - Sonntag"
+        "followUs": "Folgen Sie uns"
     },
     "footer": {
         "allRightsReserved": "Alle Rechte vorbehalten",
@@ -211,9 +209,8 @@
         "privacyPolicy": "Datenschutzrichtlinie",
         "termsConditions": "Geschäftsbedingungen",
         "impressum": "Impressum",
-        "premiumCars": "Premium-Autos",
-        "description": "Hochwertiger Gebrauchtwagenhändler, der hochwertige Fahrzeuge, fachkundige Dienstleistungen und transparente Preise bietet.",
-        "businessHours": "Öffnungszeiten: Mo-Fr 9:00-18:00",
+        "premiumCars": "Premium Cars",
+        "description": "Ihr Gebrauchtwagenhändler für geprüfte Premium-Fahrzeuge – mit fachkundiger Beratung und transparenten Preisen.",
         "demoDisclaimer": "Demo-Website – alle Informationen sind fiktive Beispieldaten."
     },
     "legal": {
@@ -253,12 +250,15 @@
     "pages": {
         "home": {
             "hero": {
+                "tagline": "Premium Gebrauchtwagen von vertrauenswürdigen Partnern",
                 "headline1": "Gebrauchtwagen kaufen.",
                 "headline2": "Verkaufen.",
                 "headline3": "Inzahlungnahme. Export.",
                 "subheadline": "Deutschlands führender Autohändler für Premium-Gebrauchtwagen mit 20+ Jahren Erfahrung",
                 "discoverVehicles": "Fahrzeuge entdecken",
-                "offerVehicle": "Mein Auto anbieten"
+                "offerVehicle": "Mein Auto anbieten",
+                "backgroundAlt": "Luxuriöser Fahrzeughintergrund",
+                "logoAlt": "{name}-Logo"
             },
             "latest": {
                 "title": "Neu hinzugefügte Fahrzeuge",
@@ -275,7 +275,7 @@
                 "testDrive": "Probefahrt"
             },
             "trustSection": {
-                "title": "Why Choose Us?",
+                "title": "Warum uns wählen?",
                 "description": "Mit über 20 Jahren Erfahrung haben wir uns einen Namen für Qualität, Transparenz und Kundenzufriedenheit gemacht."
             },
             "qualityGuarantee": {
@@ -300,7 +300,7 @@
                 "item3": "Inzahlungnahme möglich"
             },
             "aboutSection": {
-                "title": "About Our Company",
+                "title": "Über unser Unternehmen",
                 "paragraph1": "Wir sind Ihr vertrauenswürdiger Partner für Premium-Gebrauchtwagen. Wir haben es uns zur Aufgabe gemacht, unseren Kunden die besten Fahrzeuge mit höchster Qualität und Transparenz anzubieten.",
                 "paragraph2": "Unser erfahrenes Team wählt jedes Fahrzeug sorgfältig aus und inspiziert es gründlich, um sicherzustellen, dass Sie ein Auto erhalten, das Ihren Erwartungen entspricht.",
                 "quickProcess": "Schnelle Abwicklung",
@@ -309,13 +309,14 @@
                 "fairPricesDesc": "Marktgerechte Preise für Kauf und Verkauf",
                 "completeSolution": "Gesamtlösung",
                 "completeSolutionDesc": "Alles aus einer Hand - Kauf, Verkauf, Inzahlungnahme",
-                "learnMore": "Mehr erfahren"
+                "learnMore": "Mehr erfahren",
+                "imageAlt": "Premium-Ausstellungsraum"
             },
             "contact": {
                 "title": "Bereit für Ihr Traumauto?",
                 "description": "Kontaktieren Sie uns noch heute für eine Probefahrt oder um über Ihre Anforderungen zu sprechen.",
                 "contactCta": "Kontakt aufnehmen",
-                "callCta": "Anrufen: +49 123 456789"
+                "callCta": "Anrufen: {phone}"
             },
             "search": {
                 "brand": "Marke",
@@ -358,26 +359,14 @@
                 }
             },
             "vehicles": {
-                "fuelTypes": {
-                    "Diesel": "Diesel",
-                    "Petrol": "Benzin",
-                    "Elektro": "Elektro",
-                    "Electric": "Elektro",
-                    "Hybrid": "Hybrid"
-                },
-                "transmission": {
-                    "Manual": "Schaltgetriebe",
-                    "Automatic": "Automatik"
-                },
                 "location": "Deutschland"
-            },
-            "heroSubtitle": "Premium Gebrauchtwagen von vertrauenswürdigen Partnern"
+            }
         },
         "about": {
             "title": "Über uns",
             "subtitle": "Premium-Gebrauchtwagen-Händler",
             "comingSoon": "Die Seite kommt bald...",
-            "description": "Premium used-car dealership offering quality vehicles and expert service"
+            "description": "Ihr Gebrauchtwagenhändler für hochwertige Fahrzeuge und fachkundigen Service."
         },
         "contact": {
             "title": "Kontaktieren Sie uns",
@@ -390,10 +379,7 @@
             "send": "Senden",
             "messageSent": "Nachricht erfolgreich gesendet",
             "messageError": "Fehler beim Senden der Nachricht",
-            "contactInfo": "Kontaktinformationen",
-            "monToFri": "Montag - Freitag: 09:00 - 18:00",
-            "satSun": "Samstag - Sonntag: Geschlossen",
-            "address": "Musterstraße 1, 12345 Musterstadt"
+            "contactInfo": "Kontaktinformationen"
         },
         "fahrzeuge": {
             "title": "Fahrzeuge",
@@ -417,6 +403,11 @@
         },
         "forgotPassword": {
             "title": "Passwort vergessen"
+        },
+        "services": {
+            "title": "Unsere Dienstleistungen",
+            "subtitle": "Umfassende Lösungen für den Kauf und Verkauf von Gebrauchtwagen",
+            "comingSoon": "Die Seite kommt bald..."
         }
     },
     "common": {
@@ -434,108 +425,7 @@
         "and": "und",
         "yes": "Ja",
         "no": "Nein",
-        "required": "Erforderlich"
-    },
-    "hero": {
-        "headline1": "Gebrauchtwagen kaufen.",
-        "headline2": "Verkaufen.",
-        "headline3": "Inzahlungnahme. Export.",
-        "subheadline": "Deutschlands führender Autohändler für Premium-Gebrauchtwagen mit 20+ Jahren Erfahrung",
-        "discoverVehicles": "Fahrzeuge entdecken",
-        "offerVehicle": "Mein Auto anbieten"
-    },
-    "latest": {
-        "title": "Neu hinzugefügte Fahrzeuge",
-        "description": "Die neuesten Premium-Gebrauchtwagen aus unserem Bestand",
-        "viewAll": "Alle anzeigen",
-        "viewDetails": "Details ansehen"
-    },
-    "featured": {
-        "title": "Ausgewählte Fahrzeuge",
-        "description": "Unsere handverlesenen Premium-Gebrauchtwagen",
-        "viewAll": "Alle Fahrzeuge ansehen",
-        "featured": "Featured",
-        "viewDetails": "Fahrzeugdetails anzeigen",
-        "testDrive": "Probefahrt"
-    },
-    "trustSection": {
-        "title": "Warum uns wählen?",
-        "description": "Mit über 20 Jahren Erfahrung haben wir uns einen Namen für Qualität, Transparenz und Kundenzufriedenheit gemacht."
-    },
-    "qualityGuarantee": {
-        "title": "Qualitätsgarantie",
-        "description": "Jedes Fahrzeug wird gründlich inspiziert und zertifiziert. Vollständige Transparenz über die Fahrzeughistorie.",
-        "item1": "Vollständige Inspektion",
-        "item2": "Mehrpunkt-Überprüfung",
-        "item3": "Gewährleistung inbegriffen"
-    },
-    "expertTeam": {
-        "title": "Expertenteam",
-        "description": "Unser erfahrenes Team hilft Ihnen, das perfekte Fahrzeug für Ihre Bedürfnisse zu finden.",
-        "item1": "20+ Jahre Erfahrung",
-        "item2": "Fachberatungen",
-        "item3": "Persönlicher Service"
-    },
-    "transparentPricing": {
-        "title": "Transparente Preise",
-        "description": "Keine versteckten Gebühren. Was Sie sehen, ist das, was Sie zahlen.",
-        "item1": "Keine versteckten Kosten",
-        "item2": "Flexible Finanzierung",
-        "item3": "Inzahlungnahme möglich"
-    },
-    "aboutSection": {
-        "title": "Über unser Unternehmen",
-        "paragraph1": "Wir sind Ihr vertrauenswürdiger Partner für Premium-Gebrauchtwagen. Wir haben es uns zur Aufgabe gemacht, unseren Kunden die besten Fahrzeuge mit höchster Qualität und Transparenz anzubieten.",
-        "paragraph2": "Unser erfahrenes Team wählt jedes Fahrzeug sorgfältig aus und inspiziert es gründlich, um sicherzustellen, dass Sie ein Auto erhalten, das Ihren Erwartungen entspricht.",
-        "quickProcess": "Schnelle Abwicklung",
-        "quickProcessDesc": "Unbürokratische und schnelle Abwicklung aller Formalitäten",
-        "fairPrices": "Faire Preise",
-        "fairPricesDesc": "Marktgerechte Preise für Kauf und Verkauf",
-        "completeSolution": "Gesamtlösung",
-        "completeSolutionDesc": "Alles aus einer Hand - Kauf, Verkauf, Inzahlungnahme",
-        "learnMore": "Mehr erfahren"
-    },
-    "search": {
-        "brand": "Marke",
-        "brandPlaceholder": "z.B. BMW, Mercedes",
-        "minPrice": "Mindestpreis (€)",
-        "minPricePlaceholder": "5000",
-        "maxPrice": "Höchstpreis (€)",
-        "maxPricePlaceholder": "50000",
-        "year": "Jahr",
-        "yearPlaceholder": "2023",
-        "search": "Suchen"
-    },
-    "services": {
-        "title": "Unsere Dienstleistungen",
-        "description": "Umfassende Lösungen für den Kauf und Verkauf von Gebrauchtwagen",
-        "buy": {
-            "title": "Gebrauchtwagen kaufen",
-            "description": "Breite Auswahl an geprüften Premium-Fahrzeugen mit Garantie und voller Transparenz. Einfache und sichere Abwicklung.",
-            "cta": "Fahrzeuge erkunden"
-        },
-        "sell": {
-            "title": "Auto verkaufen",
-            "description": "Verkaufen Sie Ihr Fahrzeug schnell und zu fairen Preisen. Kostenlose Bewertung und schnelle Abwicklung ohne Umstände.",
-            "cta": "Auto bewerten"
-        },
-        "consignment": {
-            "title": "Verkauf im Kundenauftrag",
-            "description": "Verkaufen Sie Ihr Fahrzeug in unserem Namen auf Provisionsbasis. Wir kümmern uns um Marketing, Besichtigungen und Verkaufsabwicklung.",
-            "cta": "Angebot anfragen"
-        },
-        "trade-in": {
-            "title": "Inzahlungnahme",
-            "description": "Tauschen Sie Ihr altes Fahrzeug beim Kauf eines neuen ein. Wir kümmern uns um den gesamten Prozess.",
-            "cta": "Mehr erfahren"
-        },
-        "export": {
-            "title": "Export",
-            "description": "Internationale Fahrzeugexporte mit vollständiger Dokumentation und Logistikunterstützung weltweit.",
-            "cta": "Export anfragen"
-        }
-    },
-    "vehicles": {
+        "required": "Erforderlich",
         "fuelTypes": {
             "Diesel": "Diesel",
             "Petrol": "Benzin",
@@ -543,52 +433,18 @@
             "Electric": "Elektro",
             "Hybrid": "Hybrid"
         },
-        "transmission": {
+        "transmissions": {
             "Manual": "Schaltgetriebe",
             "Automatic": "Automatik"
-        },
-        "location": "Deutschland"
-    },
-    "contact": {
-        "title": "Kontaktieren Sie uns",
-        "getInTouch": "Treten Sie mit uns in Kontakt",
-        "email": "E-Mail",
-        "phone": "Telefon",
-        "address": "Adresse",
-        "hours": "Öffnungszeiten",
-        "sendMessage": "Nachricht senden",
-        "monToFri": "Montag - Freitag",
-        "satSun": "Samstag - Sonntag",
-        "callCta": "Anrufen: +49 123 456789",
-        "contactCta": "Kontakt aufnehmen",
-        "description": "Kontaktieren Sie uns noch heute für eine Probefahrt oder um über Ihre Anforderungen zu sprechen."
-    },
-    "pages": {
-        "services": {
-            "title": "Unsere Dienstleistungen",
-            "subtitle": "Umfassende Lösungen für den Kauf und Verkauf von Gebrauchtwagen",
-            "comingSoon": "Die Seite kommt bald..."
-        },
-        "about": {
-            "title": "Über uns",
-            "description": "Premium used-car dealership offering quality vehicles and expert service",
-            "comingSoon": "Die Seite kommt bald..."
-        },
-        "contact": {
-            "title": "Kontaktieren Sie uns",
-            "getInTouch": "Treten Sie mit uns in Kontakt",
-            "fullName": "Vollständiger Name",
-            "email": "E-Mail",
-            "phone": "Telefon",
-            "subject": "Betreff",
-            "message": "Nachricht",
-            "send": "Senden",
-            "messageSent": "Nachricht erfolgreich gesendet",
-            "messageError": "Fehler beim Senden der Nachricht",
-            "contactInfo": "Kontaktinformationen",
-            "monToFri": "Montag - Freitag: 09:00 - 18:00",
-            "satSun": "Samstag - Sonntag: Geschlossen",
-            "address": "Musterstraße 1, 12345 Musterstadt"
         }
+    },
+    "hours": {
+        "monFri": "Montag – Freitag",
+        "saturday": "Samstag",
+        "sunday": "Sonntag"
+    },
+    "meta": {
+        "title": "{name} – Premium-Gebrauchtwagen",
+        "description": "Finden Sie Ihr Traumauto bei {name} – Ihr Gebrauchtwagenhändler für geprüfte Premium-Fahrzeuge."
     }
 }

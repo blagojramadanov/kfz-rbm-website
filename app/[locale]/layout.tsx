@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import "../globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -14,10 +14,17 @@ export const dynamic = "force-dynamic";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: `${COMPANY.name} - Premium Used Cars`,
-  description: `Find your perfect car at ${COMPANY.name} - Premium used-car dealership`,
-};
+export async function generateMetadata({
+  params: { locale },
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: "meta" });
+  return {
+    title: t("title", { name: COMPANY.name }),
+    description: t("description", { name: COMPANY.name }),
+  };
+}
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

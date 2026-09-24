@@ -21,11 +21,12 @@ export const COMPANY = {
     country: "Deutschland",
   },
 
-  // Business hours (fictional)
+  // Business hours (fictional). 24h strings; null means closed.
+  // Single source of truth for the contact page and the footer (see components/business-hours.tsx).
   hours: {
-    weekday: "09:00 - 18:00",
-    saturday: "10:00 - 16:00",
-    closed: "Sonntag",
+    weekdays: { open: "09:00", close: "18:00" },
+    saturday: { open: "10:00", close: "16:00" },
+    sunday: null,
   },
 
   // Social Media
@@ -36,22 +37,12 @@ export const COMPANY = {
     twitter: "#", // Placeholder - no real profile
   },
 
-  // Demo/Example Notice
-  demoNotice: {
-    de: "Demo-Website – alle Angaben sind fiktive Beispieldaten.",
-    en: "Demo website – all information is fictional example data.",
-    mk: "Демо веб-сајт – сви подаци су фиктивни примери.",
-  },
-
   // Legal/Business Info (all fictional)
   legal: {
     ustIdNr: "DE000000000 (Beispiel)",
     registerNumber: "HRB 000000 (Beispiel)",
     owner: "Beispielinhaber", // Generic, not a real person
   },
-
-  // Tagline
-  tagline: "Premium Gebrauchtwagen von vertrauenswürdigen Partnern",
 } as const;
 
 /**
@@ -61,9 +52,3 @@ export function getFormattedAddress() {
   return `${COMPANY.address.street}, ${COMPANY.address.zip} ${COMPANY.address.city}, ${COMPANY.address.country}`;
 }
 
-/**
- * Get formatted hours
- */
-export function getFormattedHours() {
-  return `Mo-Fr: ${COMPANY.hours.weekday}, Sa: ${COMPANY.hours.saturday}, ${COMPANY.hours.closed}: Geschlossen`;
-}

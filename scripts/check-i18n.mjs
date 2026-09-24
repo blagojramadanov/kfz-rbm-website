@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 /**
  * Check that all i18n keys exist in all language files (de.json, en.json, mk.json)
- * Also detects mojibake and scans code for unused translation keys
+ * Also detects:
+ *  - duplicate keys inside a message file (JSON.parse silently keeps the last one)
+ *  - mojibake
+ *  - keys used in code (resolved against their useTranslations/getTranslations
+ *    namespace) that are missing from any locale
+ *  - {placeholder} mismatches between locales
  */
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { globSync } from 'glob';
+import { findDuplicateKeys } from './lib/json-dups.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, '..');
@@ -19,7 +24,18 @@ const messages = {};
 for (const lang of languages) {
   const filePath = path.join(messagesDir, `${lang}.json`);
   try {
-    messages[lang] = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const text = fs.readFileSync(filePath, 'utf8');
+    if (text.charCodeAt(0) === 0xfeff) {
+      console.error(`\n❌ ${lang}.json starts with a BOM; write it as UTF-8 without BOM.`);
+      process.exit(1);
+    }
+    const dups = findDuplicateKeys(text);
+    if (dups.length > 0) {
+      console.error(`\n❌ DUPLICATE KEYS in ${lang}.json (the last one silently wins and shadows the rest):`);
+      dups.forEach(d => console.error(`  - ${d.path} (line ${d.line}, first defined at line ${d.firstLine})`));
+      process.exit(1);
+    }
+    messages[lang] = JSON.parse(text);
   } catch (err) {
     console.error(`Error loading ${lang}.json:`, err.message);
     process.exit(1);
@@ -95,60 +111,71 @@ function checkValues(obj, lang) {
   return issues;
 }
 
-// Scan code for t("key") calls with namespace support
-function scanCodeForKeys() {
-  const usedKeys = new Set();
+// Recursively list source files (no external glob dependency)
+function listSourceFiles(dir) {
+  const out = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === 'node_modules' || entry.name === '.next') continue;
+      out.push(...listSourceFiles(full));
+    } else if (/\.(ts|tsx|js|jsx)$/.test(entry.name)) {
+      out.push(full);
+    }
+  }
+  return out;
+}
 
-  // Find all .tsx, .ts, .jsx, .js files in app/ and components/
-  const files = globSync([
-    'app/**/*.{ts,tsx,js,jsx}',
-    'components/**/*.{ts,tsx,js,jsx}',
-  ], { cwd: rootDir, nodir: true });
+// Scan code for translator calls. next-intl keys are ALWAYS relative to the
+// namespace passed to useTranslations()/getTranslations(); a dotted key is not
+// an absolute path. Each call is resolved against the nearest preceding
+// declaration of the same variable in the same file.
+function scanCodeForKeys() {
+  const usedKeys = new Map(); // full key -> first file using it
+  const dynamicPrefixes = new Map(); // parent path of `${...}` keys -> first file
+  const files = ['app', 'components', 'lib'].flatMap((d) =>
+    fs.existsSync(path.join(rootDir, d)) ? listSourceFiles(path.join(rootDir, d)) : []
+  );
+
+  const declRe = /(?:const|let)\s+(\w+)\s*=\s*(?:await\s+)?(?:useTranslations|getTranslations)\s*\(([^)]*)\)/g;
 
   for (const file of files) {
-    try {
-      const content = fs.readFileSync(file, 'utf8');
+    const content = fs.readFileSync(file, 'utf8');
+    const rel = path.relative(rootDir, file).split(path.sep).join('/');
 
-      // Extract namespace from useTranslations("namespace") or getTranslations("namespace") or getTranslations({namespace: "ns"})
-      let namespace = null;
+    const decls = [];
+    let dm;
+    while ((dm = declRe.exec(content)) !== null) {
+      const arg = dm[2];
+      const nsMatch = arg.match(/^\s*["'`]([^"'`]+)["'`]\s*$/) || arg.match(/namespace\s*:\s*["'`]([^"'`]+)["'`]/);
+      decls.push({ name: dm[1], index: dm.index, ns: nsMatch ? nsMatch[1] : '' });
+    }
+    if (decls.length === 0) continue;
 
-      // Match: useTranslations("namespace") or getTranslations("namespace")
-      const nsPattern1 = /(?:useTranslations|getTranslations)\s*\(\s*["'`]([^"'`]+)["'`]\s*\)/;
-      const match1 = content.match(nsPattern1);
-      if (match1) {
-        namespace = match1[1];
+    const names = [...new Set(decls.map((d) => d.name))];
+    // name(...), name.has(...), name.rich(...) with a string/template literal first argument
+    const callRe = new RegExp(
+      String.raw`\b(${names.join('|')})(\.has|\.rich|\.raw|\.markup)?\s*\(\s*(["'` + '`' + String.raw`])((?:(?!\3)[^\\])*)\3`,
+      'g'
+    );
+    let cm;
+    while ((cm = callRe.exec(content)) !== null) {
+      const [, name, method, , key] = cm;
+      if (method === '.has') continue; // guarded lookup: missing keys are handled at runtime
+      const decl = decls.filter((d) => d.name === name && d.index < cm.index).pop();
+      if (!decl) continue;
+      const full = decl.ns ? `${decl.ns}.${key}` : key;
+      if (key.includes('${')) {
+        const prefix = full.slice(0, full.indexOf('${'));
+        const parent = prefix.endsWith('.') ? prefix.slice(0, -1) : prefix.split('.').slice(0, -1).join('.');
+        if (!dynamicPrefixes.has(parent)) dynamicPrefixes.set(parent, rel);
+      } else if (!usedKeys.has(full)) {
+        usedKeys.set(full, rel);
       }
-
-      // Match: getTranslations({namespace: "ns"})
-      const nsPattern2 = /getTranslations\s*\(\s*{\s*namespace\s*:\s*["'`]([^"'`]+)["'`]\s*}\s*\)/;
-      const match2 = content.match(nsPattern2);
-      if (match2) {
-        namespace = match2[1];
-      }
-
-      // Pattern to match t("key"), t('key'), t(`key`)
-      const keyPattern = /\bt\s*\(\s*["'`]([^"'`]+)["'`]\s*\)/g;
-      let match;
-
-      while ((match = keyPattern.exec(content)) !== null) {
-        const key = match[1];
-        // Skip keys that contain template variable interpolations
-        if (key.includes('${')) {
-          continue;
-        }
-        // If we have a namespace and the key doesn't already contain a dot (not a full path), prepend namespace
-        if (namespace && !key.includes('.')) {
-          usedKeys.add(`${namespace}.${key}`);
-        } else {
-          usedKeys.add(key);
-        }
-      }
-    } catch (err) {
-      // Skip files that can't be read
     }
   }
 
-  return usedKeys;
+  return { usedKeys, dynamicPrefixes };
 }
 
 // Check for mojibake
@@ -214,21 +241,47 @@ if (hasMissing) {
   process.exit(1);
 }
 
+const isObject = (v) => typeof v === 'object' && v !== null;
+const resolvePath = (obj, keyPath) =>
+  keyPath.split('.').reduce((o, k) => (isObject(o) ? o[k] : undefined), obj);
+
+// Check that {placeholders} match across locales
+const placeholders = (str) =>
+  typeof str === 'string' ? [...str.matchAll(/\{(\w+)\}/g)].map(m => m[1]).sort().join(',') : '';
+const placeholderIssues = [];
+for (const key of allKeys) {
+  const sets = languages.map(l => placeholders(resolvePath(messages[l], key)));
+  if (new Set(sets).size > 1) {
+    placeholderIssues.push(`${key}: ${languages.map((l, i) => `${l}={${sets[i]}}`).join(' ')}`);
+  }
+}
+if (placeholderIssues.length > 0) {
+  console.error('\n❌ PLACEHOLDER MISMATCH BETWEEN LOCALES:\n');
+  placeholderIssues.forEach(i => console.error(`  - ${i}`));
+  process.exit(1);
+}
+
 // Check for keys used in code but missing from message files
 console.log('\n📝 Scanning code for translation keys...');
-const usedKeys = scanCodeForKeys();
-console.log(`   Found ${usedKeys.size} unique keys used in code`);
+const { usedKeys, dynamicPrefixes } = scanCodeForKeys();
+console.log(`   Found ${usedKeys.size} unique keys used in code (+ ${dynamicPrefixes.size} dynamic key prefixes)`);
 
 let codeHasIssues = false;
 const missingInMessages = {};
 
 for (const lang of languages) {
   missingInMessages[lang] = [];
-  const messageKeys = new Set(getAllKeys(messages[lang]));
 
-  for (const usedKey of usedKeys) {
-    if (!messageKeys.has(usedKey)) {
-      missingInMessages[lang].push(usedKey);
+  for (const [usedKey, file] of usedKeys) {
+    // The key must resolve to a string; an object or nothing renders the raw key
+    if (typeof resolvePath(messages[lang], usedKey) !== 'string') {
+      missingInMessages[lang].push(`${usedKey}  (${file})`);
+      codeHasIssues = true;
+    }
+  }
+  for (const [parent, file] of dynamicPrefixes) {
+    if (!isObject(resolvePath(messages[lang], parent))) {
+      missingInMessages[lang].push(`${parent}.<dynamic>  (${file})`);
       codeHasIssues = true;
     }
   }
@@ -249,6 +302,7 @@ if (codeHasIssues) {
 console.log('✅ All translation keys are present in all language files!');
 console.log('✅ No encoding issues (mojibake) detected!');
 console.log('✅ All keys used in code are defined in message files!');
+console.log('✅ No duplicate keys; placeholders match across locales!');
 console.log(`\n📊 Summary:`);
 console.log(`   Total keys in message files: ${allKeys.size}`);
 console.log(`   Keys used in code: ${usedKeys.size}`);

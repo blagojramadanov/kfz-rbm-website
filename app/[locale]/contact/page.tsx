@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { COMPANY, getFormattedAddress } from "@/lib/company";
+import { BusinessHours } from "@/components/business-hours";
 
 export default function ContactPage() {
   const t = useTranslations();
@@ -74,11 +75,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">{t("contact.hours")}</h3>
-                  <p className="text-gray-600">
-                    {t("contact.monToFri")}: 9:00 AM - 6:00 PM<br />
-                    {t("contact.satSun")}: 10:00 AM - 4:00 PM<br />
-                    {t("common.closed") || "Closed"}
-                  </p>
+                  <BusinessHours className="text-gray-600" />
                 </div>
               </div>
             </div>

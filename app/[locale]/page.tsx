@@ -24,7 +24,7 @@ export default async function Home() {
         <div className="absolute inset-0 opacity-20">
           <Image
             src="https://picsum.photos/seed/kfzrbm-hero/1920/1080"
-            alt="Luxury automotive background"
+            alt={t("hero.backgroundAlt")}
             fill
             sizes="100vw"
             className="object-cover"
@@ -39,7 +39,7 @@ export default async function Home() {
               <div className="relative w-16 h-16 bg-white rounded-lg p-2">
                 <Image
                   src="/assets/logo.png"
-                  alt={`${COMPANY.name} Logo`}
+                  alt={t("hero.logoAlt", { name: COMPANY.name })}
                   width={64}
                   height={64}
                   className="object-contain"
@@ -48,7 +48,7 @@ export default async function Home() {
               </div>
               <div>
                 <h1 className="text-4xl font-bold">{COMPANY.name}</h1>
-                <p className="text-blue-100">{COMPANY.tagline}</p>
+                <p className="text-blue-100">{t("hero.tagline")}</p>
               </div>
             </div>
 
@@ -272,7 +272,7 @@ export default async function Home() {
             <div className="relative h-96 rounded-lg overflow-hidden shadow-lg">
               <Image
                 src="https://picsum.photos/seed/kfzrbm-about/600/400"
-                alt="Premium Showroom"
+                alt={t("aboutSection.imageAlt")}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
@@ -349,7 +349,7 @@ export default async function Home() {
               variant="outline"
               className="border-white text-white hover:bg-white hover:text-kfz-blue px-8 py-6 text-lg font-semibold"
             >
-              {t("contact.callCta")}
+              {t("contact.callCta", { phone: COMPANY.phone })}
             </Button>
           </div>
         </div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import { COMPANY, getFormattedAddress } from "@/lib/company";
+import { BusinessHours } from "@/components/business-hours";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -21,7 +22,7 @@ export function Footer() {
               {t("footer.description")}
             </p>
             <p className="text-blue-200 text-xs mt-3 italic">
-              {COMPANY.demoNotice.en}
+              {t("footer.demoDisclaimer")}
             </p>
           </div>
 
@@ -59,7 +60,10 @@ export function Footer() {
               <li>{t("contact.phone")}: {COMPANY.phone}</li>
               <li>{t("contact.email")}: {COMPANY.email}</li>
               <li>{t("contact.address")}: {getFormattedAddress()}</li>
-              <li>{t("footer.businessHours")}</li>
+              <li>
+                {t("contact.hours")}:
+                <BusinessHours className="mt-1 space-y-0.5" />
+              </li>
             </ul>
           </div>
 
