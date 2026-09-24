@@ -7,6 +7,7 @@ import { LatestVehicles } from "@/components/latest-vehicles";
 import { ServicesGrid } from "@/components/services-grid";
 import { ArrowRight, CheckCircle, Users, Award, Shield, Zap } from "lucide-react";
 import { COMPANY } from "@/lib/company";
+import { Link } from "@/lib/navigation";
 
 export default async function Home() {
   const t = await getTranslations("pages.home");
@@ -67,19 +68,25 @@ export default async function Home() {
             {/* Primary CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Button
+                asChild
                 size="lg"
                 className="bg-kfz-accent hover:bg-kfz-accent-light text-white px-8 py-6 text-lg font-semibold rounded-lg shadow-lg transition-all hover:shadow-xl"
               >
-                {t("hero.discoverVehicles")}
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <Link href="/fahrzeuge">
+                  {t("hero.discoverVehicles")}
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
               </Button>
               <Button
+                asChild
                 size="lg"
                 variant="outline"
                 className="border-white text-white hover:bg-white hover:text-kfz-blue px-8 py-6 text-lg font-semibold rounded-lg"
               >
-                {t("hero.offerVehicle")}
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <Link href="/dashboard/fahrzeug-anbieten">
+                  {t("hero.offerVehicle")}
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
               </Button>
             </div>
           </div>
@@ -109,10 +116,13 @@ export default async function Home() {
                 {t("latest.title")}
               </h2>
               <Button
+                asChild
                 variant="ghost"
                 className="text-kfz-accent hover:text-kfz-blue"
               >
-                {t("latest.viewAll")} <ArrowRight className="ml-2 w-4 h-4" />
+                <Link href="/fahrzeuge">
+                  {t("latest.viewAll")} <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
               </Button>
             </div>
             <p className="text-lg text-gray-600">
@@ -140,12 +150,15 @@ export default async function Home() {
 
           <div className="text-center mt-12">
             <Button
+              asChild
               variant="outline"
               size="lg"
               className="border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white px-8 py-6 text-lg font-semibold"
             >
-              {t("featured.viewAll")}
-              <ArrowRight className="ml-2 w-5 h-5" />
+              <Link href="/fahrzeuge">
+                {t("featured.viewAll")}
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -316,11 +329,14 @@ export default async function Home() {
               </div>
 
               <Button
+                asChild
                 size="lg"
                 className="bg-kfz-blue hover:bg-kfz-blue-dark text-white px-8 py-6 text-lg font-semibold"
               >
-                {t("aboutSection.learnMore")}
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <Link href="/about">
+                  {t("aboutSection.learnMore")}
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
               </Button>
             </div>
           </div>
@@ -338,18 +354,24 @@ export default async function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
+              asChild
               size="lg"
               className="bg-kfz-accent hover:bg-kfz-accent-light text-white px-8 py-6 text-lg font-semibold"
             >
-              {t("contact.contactCta")}
-              <ArrowRight className="ml-2 w-5 h-5" />
+              <Link href="/contact">
+                {t("contact.contactCta")}
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
             </Button>
             <Button
+              asChild
               size="lg"
               variant="outline"
               className="border-white text-white hover:bg-white hover:text-kfz-blue px-8 py-6 text-lg font-semibold"
             >
-              {t("contact.callCta", { phone: COMPANY.phone })}
+              <a href={`tel:${COMPANY.phone.replace(/\s/g, "")}`}>
+                {t("contact.callCta", { phone: COMPANY.phone })}
+              </a>
             </Button>
           </div>
         </div>

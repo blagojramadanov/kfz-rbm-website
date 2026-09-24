@@ -150,6 +150,12 @@ function scanCodeForKeys() {
       const nsMatch = arg.match(/^\s*["'`]([^"'`]+)["'`]\s*$/) || arg.match(/namespace\s*:\s*["'`]([^"'`]+)["'`]/);
       decls.push({ name: dm[1], index: dm.index, ns: nsMatch ? nsMatch[1] : '' });
     }
+    // Translators passed as parameters, e.g. (t: ReturnType<typeof useTranslations>) => ...
+    // The caller's namespace is unknown, so they are checked as root-level keys.
+    const paramRe = /\b(\w+)\s*:\s*ReturnType<typeof\s+(?:useTranslations|getTranslations)>/g;
+    while ((dm = paramRe.exec(content)) !== null) {
+      decls.push({ name: dm[1], index: dm.index, ns: '' });
+    }
     if (decls.length === 0) continue;
 
     const names = [...new Set(decls.map((d) => d.name))];

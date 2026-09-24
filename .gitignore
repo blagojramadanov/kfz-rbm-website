@@ -41,3 +41,4 @@ next-env.d.ts
 # documentation (except README)
 *.md
 !README.md
+!I18N_PROGRESS.md

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/lib/navigation";
 import { ArrowRight, Car, TrendingUp, Truck, Globe, Handshake } from "lucide-react";
 
 interface Service {
@@ -10,35 +11,41 @@ interface Service {
   icon: React.ReactNode;
   image: string;
   color: string;
+  href: string;
 }
 
 const SERVICES: Service[] = [
   {
     id: "buy",
+    href: "/fahrzeuge",
     icon: <Car className="w-8 h-8" />,
     image: "https://picsum.photos/seed/kfzrbm-10/500/400",
     color: "from-blue-50 to-blue-100",
   },
   {
     id: "sell",
+    href: "/dashboard/fahrzeug-anbieten",
     icon: <TrendingUp className="w-8 h-8" />,
     image: "https://picsum.photos/seed/kfzrbm-11/500/400",
     color: "from-green-50 to-green-100",
   },
   {
     id: "consignment",
+    href: "/dashboard/fahrzeug-anbieten",
     icon: <Handshake className="w-8 h-8" />,
     image: "https://picsum.photos/seed/kfzrbm-12/500/400",
     color: "from-orange-50 to-orange-100",
   },
   {
     id: "trade-in",
+    href: "/dashboard/inzahlungnahme",
     icon: <Truck className="w-8 h-8" />,
     image: "https://picsum.photos/seed/kfzrbm-13/500/400",
     color: "from-purple-50 to-purple-100",
   },
   {
     id: "export",
+    href: "/fahrzeuge/export",
     icon: <Globe className="w-8 h-8" />,
     image: "https://picsum.photos/seed/kfzrbm-14/500/400",
     color: "from-yellow-50 to-yellow-100",
@@ -82,9 +89,11 @@ export function ServicesGrid() {
               </div>
 
               {/* CTA */}
-              <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
-                {t(`services.${service.id}.cta`)}
-                <ArrowRight className="ml-2 w-4 h-4" />
+              <Button asChild className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
+                <Link href={service.href}>
+                  {t(`services.${service.id}.cta`)}
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
               </Button>
             </div>
           </div>
