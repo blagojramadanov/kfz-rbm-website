@@ -569,9 +569,21 @@ All Macedonian strings use formal "Вие" possessives and verb forms:
 - "Ако ја прифатите нашата понуда" (formal: if you accept our offer)
 - "Вашата согласност и наше одобрување" (formal: your agreement and our approval)
 
+### Component Status
+- **SubmissionWorkflowInfo** (`components/submission-workflow-info.tsx`) is currently **defined but not imported or rendered anywhere** in the codebase
+- Component should logically appear in the wizard (step 7 "Absenden" or initial info), but integration is deferred
+- No changes were made to wire it in; it's ready for use whenever needed
+
+### Macedonian Grammar Fix (2026-09-25)
+Fixed gender agreement in wizard.workflow.* messages: "возило" (vehicle) is neuter, so possessive must use "Вашето" (neuter formal) not "Вашиот" (masculine formal):
+- step1Title: "Поднесете го Вашето возило"
+- step1Desc: "Вашето возило"
+- step2Desc: "Вашето возило"
+- step4Desc: "Вашето возило"
+- importantNoteText: "Вашето возило"
+
 ### Tests
-- ✅ `npm run build`: Compilation successful
 - ✅ `npm run check:i18n`: All checks pass (413 keys verified across de/en/mk)
 - ✅ Admin submission list page: thumbnails display correctly
-- ✅ Wizard workflow info component: displays corrected process in all three locales
+- ✅ Wizard workflow info component: text corrected in all three locales, ready for integration when needed
 
