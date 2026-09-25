@@ -70,10 +70,19 @@ export default function SubmittedVehicleDetailPage() {
       try {
         const { getSignedImageUrls } = await import("@/app/actions/storage");
         const urlsResult = await getSignedImageUrls(vehicle.images);
-        console.log("Signed URLs result:", { ok: urlsResult.ok, error: !urlsResult.ok ? urlsResult.error : null });
-        if (urlsResult.ok) {
-          const urlMap = urlsResult.urls.reduce(
-            (acc: Record<string, string>, item: { path: string; url: string | null }) => {
+
+        if (!urlsResult) {
+          console.error("[fetchSignedUrls] Result is undefined");
+          setImageUrls({});
+          return;
+        }
+
+        console.log("[fetchSignedUrls] Result received:", { ok: (urlsResult as any).ok });
+
+        // Type guard: after null check, result exists
+        if ((urlsResult as any).ok === true && (urlsResult as any).urls) {
+          const urlMap = ((urlsResult as any).urls as Array<{ path: string; url: string | null }>).reduce(
+            (acc: Record<string, string>, item) => {
               if (item.url) {
                 acc[item.path] = item.url;
               }
@@ -81,10 +90,14 @@ export default function SubmittedVehicleDetailPage() {
             },
             {}
           );
-          console.log("Image URL map created:", Object.keys(urlMap).length, "URLs");
+          console.log("[fetchSignedUrls] Created map with", Object.keys(urlMap).length, "URLs");
           setImageUrls(urlMap);
         } else {
-          console.error("Failed to fetch signed URLs:", { error: urlsResult.error });
+          console.error("[fetchSignedUrls] Response not ok or missing urls:", {
+            ok: (urlsResult as any).ok,
+            error: (urlsResult as any).error
+          });
+          setImageUrls({});
         }
       } catch (err: any) {
         console.error("Error fetching signed URLs:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
@@ -93,6 +106,7 @@ export default function SubmittedVehicleDetailPage() {
           digest: err?.digest,
           name: err?.name,
         });
+        setImageUrls({});
       }
     };
 
