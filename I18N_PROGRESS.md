@@ -333,15 +333,15 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 ## Area 7: Customer Dashboard (2026-09-25)
 
 ### Completed
-- **Dashboard Pages** (9 customer-facing pages) ✅
-  - Main dashboard overview with all action cards and quick stats
-  - My vehicles page with status labels, offer accept/reject buttons
-  - Inquiries page (empty state)
-  - Favorites page (empty state)
-  - Profile page with password change and profile information sections
-  - Trade-in form with all steps (current vehicle, vehicle value, desired vehicle, review, success)
-  - Trade-in requests list with status filters
-  - Trade-in request detail page with pricing breakdown
+- **Dashboard Pages** (All 9 customer-facing pages) ✅
+  - Main dashboard overview with all action cards and quick stats (`dashboard/page.tsx`)
+  - My vehicles page with status labels, offer accept/reject buttons (`dashboard/fahrzeuge/page.tsx`)
+  - Inquiries page (empty state) (`dashboard/anfragen/page.tsx`)
+  - Favorites page (empty state) (`dashboard/favoriten/page.tsx`)
+  - Profile page with password change and profile information sections (`dashboard/profil/page.tsx`) ✅ **FINAL**
+  - Trade-in form with all steps: current vehicle, value, desired vehicle, review, success (`dashboard/inzahlungnahme/page.tsx`) ✅ **FINAL**
+  - Trade-in requests list with status filters (`dashboard/inzahlungnahme-anfragen/page.tsx`) ✅ **FINAL**
+  - Trade-in request detail page with pricing breakdown (`dashboard/inzahlungnahme-anfragen/[id]/page.tsx`) ✅ **FINAL**
 
 ### Message Keys Added (dashboard.* namespace)
 - `dashboard.overview.*` (23 keys) - main dashboard cards and CTAs
@@ -361,20 +361,22 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 - ✅ Placeholder values for form inputs (brand, model, year examples)
 - ✅ Validation messages with placeholders for min/max values
 - ✅ Empty state messages with CTAs
+- ✅ Dynamic STEPS array in wizard pages using t() for labels
+- ✅ Dynamic STATUS_LABELS maps using t() calls (no hardcoded maps)
+
+### Code Changes
+- ✅ **profil/page.tsx**: All hardcoded strings replaced with `t("dashboard.profile.*")` calls, validation messages use error codes
+- ✅ **inzahlungnahme/page.tsx**: Dynamic STEPS array, all form labels, validation messages, success page use `t("dashboard.tradeIn.*")`
+- ✅ **inzahlungnahme-anfragen/page.tsx**: Dynamic STATUS_LABELS map, header, button labels use `t("dashboard.tradeInRequests.*")`
+- ✅ **inzahlungnahme-anfragen/[id]/page.tsx**: Helper functions `getStatusLabel()` and `getStatusDescription()`, all field labels use `t("dashboard.tradeInRequestDetail.*")`
 
 ### Tests
-- ✅ `npm run check:i18n` - 462 keys verified across de/en/mk
-- ✅ `npm run build` - All pages compile successfully
-- ✅ Updated `dashboard/page.tsx` to use dashboard.overview.* translations
-- ✅ Updated `dashboard/fahrzeuge/page.tsx` with dashboard.vehicles.* and status labels
-- ✅ Updated `dashboard/anfragen/page.tsx` with dashboard.inquiries.* keys
-- ✅ Updated `dashboard/favoriten/page.tsx` with dashboard.favorites.* keys
-- ⏳ Profile, Trade-In pages pending (structure ready in messages, code updates can be done incrementally)
+- ✅ `npm run check:i18n` - 572 keys verified across de/en/mk (all translations complete)
+- ✅ `npm run build` - All pages compile successfully, no TypeScript errors
+- ✅ All four final pages localized and tested
 
 ### Known Limitations
-- Not all dashboard pages updated to use translations yet (profil, inzahlungnahme, inzahlungnahme-anfragen, inzahlungnahme-anfragen/[id])
-- Structure is in place in message files; code updates can follow the pattern established for the completed pages
-- All hardcoded strings identified in Area 7 audit are now available as translatable keys
+- None - Area 7 Customer Dashboard is 100% localized
 
 ## Area 8: error codes (2026-09-25)
 

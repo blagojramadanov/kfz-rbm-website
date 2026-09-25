@@ -69,7 +69,7 @@ export default function TradeInRequestDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -85,10 +85,10 @@ export default function TradeInRequestDetailPage() {
             className="text-blue-100 hover:text-white mb-2 inline-flex items-center gap-1 text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
-            Zurück zu Anfragen
+            {t("backToList")}
           </Link>
-          <h1 className="text-3xl font-bold mb-2">Inzahlungnahme-Details</h1>
-          <p className="text-blue-100">Anfrage-ID: {requestId}</p>
+          <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
+          <p className="text-blue-100">{t("requestId")} {requestId}</p>
         </div>
       </div>
 
@@ -118,38 +118,38 @@ export default function TradeInRequestDetailPage() {
             {/* Status Card */}
             <div className={`border-l-4 rounded-lg p-6 ${STATUS_COLORS[request.status]}`}>
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-bold">Status: {STATUS_LABELS[request.status]}</h2>
+                <h2 className="text-xl font-bold">Status: {getStatusLabel(request.status)}</h2>
                 <span className="text-sm font-medium">
                   {new Date(request.created_at).toLocaleDateString("de-DE")}
                 </span>
               </div>
-              <p className="text-sm">{STATUS_DESCRIPTIONS[request.status]}</p>
+              <p className="text-sm">{getStatusDescription(request.status)}</p>
             </div>
 
             {/* Request Details */}
             <div className="grid md:grid-cols-2 gap-6">
               {/* Current Vehicle */}
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Ihr Fahrzeug</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">{t("currentVehicle")}</h3>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-gray-600">Marke & Modell</p>
+                    <p className="text-sm text-gray-600">{t("brandModel")}</p>
                     <p className="font-semibold text-gray-900">
                       {request.current_vehicle_brand} {request.current_vehicle_model}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Erstzulassung</p>
+                    <p className="text-sm text-gray-600">{t("firstRegistration")}</p>
                     <p className="font-semibold text-gray-900">{request.current_vehicle_year}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Kilometerstand</p>
+                    <p className="text-sm text-gray-600">{t("mileage")}</p>
                     <p className="font-semibold text-gray-900">
                       {request.current_vehicle_mileage?.toLocaleString("de-DE")} km
                     </p>
                   </div>
                   <div className="pt-3 border-t">
-                    <p className="text-sm text-gray-600">Geschätzter Wert</p>
+                    <p className="text-sm text-gray-600">{t("estimatedValue")}</p>
                     <p className="text-2xl font-bold text-kfz-blue">
                       € {request.current_vehicle_value_estimate?.toLocaleString("de-DE")}
                     </p>
@@ -160,26 +160,26 @@ export default function TradeInRequestDetailPage() {
               {/* Desired Vehicle */}
               {request.desired_vehicle && (
                 <div className="bg-white rounded-lg shadow-md p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Gewünschtes Fahrzeug</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">{t("desiredVehicle")}</h3>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-gray-600">Marke & Modell</p>
+                      <p className="text-sm text-gray-600">{t("brandModel")}</p>
                       <p className="font-semibold text-gray-900">
                         {request.desired_vehicle.brand} {request.desired_vehicle.model}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Jahr</p>
+                      <p className="text-sm text-gray-600">{t("year")}</p>
                       <p className="font-semibold text-gray-900">{request.desired_vehicle.year}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Kilometerstand</p>
+                      <p className="text-sm text-gray-600">{t("mileage")}</p>
                       <p className="font-semibold text-gray-900">
                         {request.desired_vehicle.mileage?.toLocaleString("de-DE")} km
                       </p>
                     </div>
                     <div className="pt-3 border-t">
-                      <p className="text-sm text-gray-600">Preis</p>
+                      <p className="text-sm text-gray-600">{t("price")}</p>
                       <p className="text-2xl font-bold text-kfz-blue">
                         € {request.desired_vehicle.price?.toLocaleString("de-DE")}
                       </p>
@@ -192,25 +192,25 @@ export default function TradeInRequestDetailPage() {
             {/* Pricing Breakdown */}
             {request.desired_vehicle && (
               <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-6">Unverbindliche Preisschätzung</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-6">{t("pricingBreakdown")}</h3>
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center py-2 border-b">
-                    <span className="text-gray-700">Geschätzter Wert Ihres Fahrzeugs:</span>
+                    <span className="text-gray-700">{t("yourVehicleEstimate")}</span>
                     <span className="font-semibold">
                       € {request.current_vehicle_value_estimate?.toLocaleString("de-DE")}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center py-2 border-b">
-                    <span className="text-gray-700">Preis des gewünschten Fahrzeugs:</span>
+                    <span className="text-gray-700">{t("desiredVehiclePrice")}</span>
                     <span className="font-semibold">
                       € {request.desired_vehicle.price?.toLocaleString("de-DE")}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center py-4 bg-white rounded p-3">
-                    <span className="font-bold text-gray-900">Geschätzte Zuzahlung/Gutschrift:</span>
+                    <span className="font-bold text-gray-900">{t("difference")}</span>
                     <span
                       className={`text-2xl font-bold ${
                         (request.current_vehicle_value_estimate ?? 0) >
@@ -235,8 +235,7 @@ export default function TradeInRequestDetailPage() {
 
                 <div className="mt-6 p-4 bg-white border border-blue-300 rounded">
                   <p className="text-sm text-gray-700">
-                    <strong>ⓘ Wichtig:</strong> Die endgültige Fahrzeugbewertung und Zuzahlung wird individuell durch
-                    unser Team festgelegt. Der oben angezeigte Betrag ist unverbindlich und dient nur zur Schätzung.
+                    <strong>{t("importantNote")}</strong> {t("importantNoteText")}
                   </p>
                 </div>
               </div>
