@@ -5,6 +5,7 @@ import { Link } from "@/lib/navigation";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
+import { useErrorMessage } from "@/lib/use-error-message";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, AlertCircle, CheckCircle } from "lucide-react";
 
@@ -12,6 +13,7 @@ export default function ForgotPasswordPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const t = useTranslations();
+  const errorMessage = useErrorMessage();
   const { resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -27,11 +29,7 @@ export default function ForgotPasswordPage() {
       await resetPassword(email);
       setSubmitted(true);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : t("auth.passwordResetSent")
-      );
+      setError(errorMessage(err));
     } finally {
       setLoading(false);
     }

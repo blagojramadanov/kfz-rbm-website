@@ -9,6 +9,7 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Edit2, Trash2, Plus, Search, AlertCircle, Eye, Star } from "lucide-react";
 import { VehicleSourceBadge } from "@/components/vehicle-source-badge";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 interface Vehicle {
   id: string;
@@ -24,7 +25,7 @@ interface Vehicle {
 
 export default function AdminVehiclesPage() {
   const tActions = useTranslations("adminVehicleActions");
-  const tErrors = useTranslations("actionErrors");
+  const errorMessage = useErrorMessage();
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
@@ -46,14 +47,18 @@ export default function AdminVehiclesPage() {
     const loadVehicles = async () => {
       try {
         const { getVehicles } = await import("@/app/actions/admin");
-        const data = await getVehicles({
+        const result = await getVehicles({
           search: search || undefined,
           status: statusFilter || undefined,
         });
-        setVehicles(data);
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setVehicles(result.vehicles);
       } catch (err) {
         console.error("Error loading vehicles:", err);
-        setError("Fehler beim Laden der Fahrzeuge");
+        setError(errorMessage(err));
       } finally {
         setVehiclesLoading(false);
       }
@@ -72,13 +77,13 @@ export default function AdminVehiclesPage() {
       const { deleteVehicle } = await import("@/app/actions/admin");
       const result = await deleteVehicle(vehicleId);
       if (!result.ok) {
-        setError(`${tActions("deleteFailed")} ${tErrors(result.error)}`);
+        setError(`${tActions("deleteFailed")} ${errorMessage(result)}`);
         return;
       }
       setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
     } catch (err) {
       console.error("Error deleting vehicle:", err);
-      setError(`${tActions("deleteFailed")} ${tErrors("UNKNOWN")}`);
+      setError(`${tActions("deleteFailed")} ${errorMessage(err)}`);
     } finally {
       setDeleting(null);
     }

@@ -9,6 +9,7 @@ import { useRouter } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Check, X, AlertCircle, Car, MapPin, Calendar, Gauge } from "lucide-react";
 import Image from "next/image";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 export default function AdminSubmittedVehiclesPage() {
   const params = useParams();
@@ -17,6 +18,7 @@ export default function AdminSubmittedVehiclesPage() {
   const { loading, isAdmin } = useAuth();
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState("eingereicht");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
@@ -40,14 +42,18 @@ export default function AdminSubmittedVehiclesPage() {
       try {
         setVehiclesLoading(true);
         const { getSubmittedVehicles } = await import("@/app/actions/admin");
-        const data = await getSubmittedVehicles({
+        const result = await getSubmittedVehicles({
           status: statusFilter || undefined,
         });
-        setVehicles(data);
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setVehicles(result.vehicles);
         setError("");
       } catch (err) {
         console.error("Error loading vehicles:", err);
-        setError("Fehler beim Laden der Fahrzeuge");
+        setError(errorMessage(err));
       } finally {
         setVehiclesLoading(false);
       }
@@ -60,11 +66,15 @@ export default function AdminSubmittedVehiclesPage() {
     try {
       setActionInProgress(vehicleId);
       const { approveSubmittedVehicle } = await import("@/app/actions/admin");
-      await approveSubmittedVehicle(vehicleId);
+      const result = await approveSubmittedVehicle(vehicleId);
+      if (!result.ok) {
+        setError(errorMessage(result));
+        return;
+      }
       setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
       setError("");
     } catch (err) {
-      setError("Fehler beim Genehmigen: " + (err instanceof Error ? err.message : "Unbekannter Fehler"));
+      setError(errorMessage(err));
     } finally {
       setActionInProgress(null);
     }
@@ -78,13 +88,17 @@ export default function AdminSubmittedVehiclesPage() {
     try {
       setActionInProgress(vehicleId);
       const { rejectSubmittedVehicle } = await import("@/app/actions/admin");
-      await rejectSubmittedVehicle(vehicleId, rejectReason);
+      const result = await rejectSubmittedVehicle(vehicleId, rejectReason);
+      if (!result.ok) {
+        setError(errorMessage(result));
+        return;
+      }
       setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
       setRejectingId(null);
       setRejectReason("");
       setError("");
     } catch (err) {
-      setError("Fehler beim Ablehnen: " + (err instanceof Error ? err.message : "Unbekannter Fehler"));
+      setError(errorMessage(err));
     } finally {
       setActionInProgress(null);
     }

@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Trash2, ArrowRight } from "lucide-react";
 import type { TradeInRequest } from "@/lib/supabase";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 const STATUS_LABELS: Record<string, string> = {
   new: "Neue Anfrage",
@@ -34,6 +35,7 @@ export default function TradeInRequestsPage() {
   const { loading, isAuthenticated, user } = useAuth();
   const [requests, setRequests] = useState<TradeInRequest[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(true);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -48,11 +50,15 @@ export default function TradeInRequestsPage() {
 
       try {
         const { getTradeInRequests } = await import("@/app/actions/trade-in");
-        const data = await getTradeInRequests();
-        setRequests(data);
+        const result = await getTradeInRequests();
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setRequests(result.requests);
       } catch (err) {
         console.error("Error loading requests:", err);
-        setError("Fehler beim Laden der Anfragen");
+        setError(errorMessage(err));
       } finally {
         setRequestsLoading(false);
       }

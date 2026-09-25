@@ -6,6 +6,7 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import type { TradeInRequest } from "@/lib/supabase";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 const STATUS_LABELS: Record<string, string> = {
   new: "Neue Anfrage",
@@ -37,6 +38,7 @@ export default function TradeInRequestDetailPage() {
   const { loading, isAuthenticated, user } = useAuth();
   const [request, setRequest] = useState<TradeInRequest | null>(null);
   const [requestLoading, setRequestLoading] = useState(true);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
 
   const requestId = params?.id as string;
@@ -53,11 +55,15 @@ export default function TradeInRequestDetailPage() {
 
       try {
         const { getTradeInRequestById } = await import("@/app/actions/trade-in");
-        const data = await getTradeInRequestById(requestId);
-        setRequest(data);
+        const result = await getTradeInRequestById(requestId);
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setRequest(result.request);
       } catch (err) {
         console.error("Error loading request:", err);
-        setError(err instanceof Error ? err.message : "Fehler beim Laden der Anfrage");
+        setError(errorMessage(err));
       } finally {
         setRequestLoading(false);
       }

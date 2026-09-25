@@ -6,6 +6,7 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { ArrowLeft, AlertCircle, CheckCircle, Upload } from "lucide-react";
 import Image from "next/image";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 interface SubmittedVehicle {
   id: string;
@@ -33,6 +34,7 @@ export default function SubmittedVehicleDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { loading, isAdmin } = useAuth();
+  const errorMessage = useErrorMessage();
   const [vehicle, setVehicle] = useState<SubmittedVehicle | null>(null);
   const [vehicleLoading, setVehicleLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,14 +60,18 @@ export default function SubmittedVehicleDetailPage() {
       try {
         setVehicleLoading(true);
         const { getSubmittedVehicleById } = await import("@/app/actions/admin");
-        const data = await getSubmittedVehicleById(vehicleId);
-        setVehicle(data);
-        setPublishPrice(data.price);
-        setPublishDescription(data.description || "");
+        const result = await getSubmittedVehicleById(vehicleId);
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setVehicle(result.vehicle);
+        setPublishPrice(result.vehicle.price);
+        setPublishDescription(result.vehicle.description || "");
         setError("");
       } catch (err) {
         console.error("Error loading vehicle:", err);
-        setError(err instanceof Error ? err.message : "Fehler beim Laden des Fahrzeugs");
+        setError(errorMessage(err));
       } finally {
         setVehicleLoading(false);
       }
@@ -93,9 +99,15 @@ export default function SubmittedVehicleDetailPage() {
         featured: publishFeatured,
       });
 
+      if (!result.ok) {
+        setError(errorMessage(result));
+        setPublishing(false);
+        return;
+      }
+
       router.push(`/admin/fahrzeuge/${result.vehicleId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Fehler beim Veröffentlichen");
+      setError(errorMessage(err));
       setPublishing(false);
     }
   };

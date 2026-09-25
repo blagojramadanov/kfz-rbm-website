@@ -85,10 +85,14 @@ Also changed here (behaviour, not just text):
 
 ## 8. Server Actions (Error/Success Messages → Error Codes)
 
-- [ ] `app/actions/admin.ts` or similar - Admin action error messages ("Fahrzeug gelöscht", "Fehler beim Löschen", confirmation dialogs "Sind Sie sicher...")
-- [ ] `app/actions/auth.ts` or similar - Auth action messages (login errors, registration messages, validation)
-- [ ] `app/actions/dashboard.ts` or similar - Dashboard action messages (submission success/error, profile update, trade-in status)
-- [ ] `lib/auth-context.tsx` - Auth context error messages, loading states
+- [x] `app/actions/admin.ts` or similar - Admin action error messages ("Fahrzeug gelöscht", "Fehler beim Löschen", confirmation dialogs "Sind Sie sicher...")
+- [x] `app/actions/auth.ts` or similar - Auth action messages (login errors, registration messages, validation)
+- [x] `app/actions/dashboard.ts` or similar - Dashboard action messages (submission success/error, profile update, trade-in status)
+- [x] `lib/auth-context.tsx` - Auth context error messages, loading states
+
+---
+
+**Done (2026-09-25):** see "Area 8: error codes" at the end of this file.
 
 ---
 
@@ -325,3 +329,27 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 3. Vehicle `f9af008f` ("sssssssss SSSS...", created 2026-09-24 22:41, 0 images) is live; probably another failed test - delete or set to draft in the admin.
 4. The customer wizard still sends all photos in one `createSubmittedVehicle` request; with several photos this can exceed the 4 MB limit. Switch it to `uploadSubmissionImages` per photo.
 5. `lib/auth-context.tsx` builds the password-reset link without a locale (`/reset-password`); it is a GET, so the middleware redirect works, but it always lands on `/de`.
+
+## Area 8: error codes (2026-09-25)
+
+### Design
+- Server actions and the client auth helpers never return or throw human-readable text. Actions return `{ ok: true, ... } | { ok: false, error: CODE }` via `runAction()` (`lib/action-result.ts`); unexpected errors are logged with the action name and mapped to the action's fallback code (a raw DB/Supabase message never reaches the client). Throwing is not an option: in production Next.js replaces the message of an error thrown in a server action.
+- Codes: generic (`UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `INVALID_INPUT`, `INVALID_STATE`, `DUPLICATE_VIN`, `CREATE/UPDATE/DELETE/UPLOAD/LOAD_FAILED`, `UNKNOWN`) plus auth (`INVALID_CREDENTIALS`, `EMAIL_NOT_CONFIRMED`, `EMAIL_TAKEN`, `WEAK_PASSWORD`, `SAME_PASSWORD`, `INVALID_CURRENT_PASSWORD`, `RATE_LIMITED`, `NETWORK`).
+- `lib/auth-errors.ts` maps Supabase Auth errors (`code`/`status`/English text) to codes; `lib/auth-context.tsx` throws `ActionError(code)`.
+- UI: `useErrorMessage()` (`lib/use-error-message.ts`) turns a code, a failed result or anything caught into `errors.codes.<CODE>` (de/en/mk); anything that is not a known code becomes `errors.codes.UNKNOWN`. `actionErrors.*` was renamed to `errors.codes.*` (8 new keys x 3 locales).
+- All callers updated: login, register, forgot/reset password, profile, customer wizard, my vehicles (accept/reject offer), trade-in (new/list/detail), all admin pages.
+
+### Bugs found and fixed on the way
+- `changePassword` in `auth-context` never verified the current password (`signInWithPassword` returns the error, it does not throw), so any current password was accepted. Now `INVALID_CURRENT_PASSWORD`.
+- The wizard ignored the result of `createSubmittedVehicle` and redirected to the success page even when the submission failed.
+- Admin vehicle detail page stored `{ vehicle, images }` as the vehicle (all fields empty); now `result.vehicle`.
+- The profile page swallowed every error into one generic German text.
+
+### Tests
+- `tsc --noEmit`, `npm run check:i18n`, `npm run build`: pass.
+- In-process: `authErrorCode` (5 cases) and `runAction` (success, `ActionError`, unknown error -> fallback code without leaking the message, guard code passthrough): all pass.
+- Not run live in a browser (no `AUDIT_*` sessions), so wrong-password / wrong-current-password messages on the deployed site are not yet seen in all three languages.
+
+### Still open
+- Hardcoded German texts next to the error handling (validation messages, `confirm()`/`alert()` prompts, labels) belong to areas 5-7 and 9-11; `alert()` in "my vehicles" should become an inline message there.
+- Admin CRUD actions still take free-form objects (only admin-only).

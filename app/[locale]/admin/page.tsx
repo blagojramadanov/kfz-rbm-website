@@ -6,6 +6,7 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Car, Users, MessageSquare, Repeat2, TrendingUp, AlertCircle } from "lucide-react";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 interface DashboardStats {
   total_vehicles: number;
@@ -33,6 +34,7 @@ export default function AdminDashboardPage() {
   const { loading, isAdmin } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -45,11 +47,15 @@ export default function AdminDashboardPage() {
     const loadStats = async () => {
       try {
         const { getDashboardStats } = await import("@/app/actions/admin");
-        const data = await getDashboardStats();
-        setStats(data);
+        const result = await getDashboardStats();
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setStats(result.stats);
       } catch (err) {
         console.error("Error loading stats:", err);
-        setError(t("admin.loading_stats"));
+        setError(errorMessage(err));
       } finally {
         setStatsLoading(false);
       }

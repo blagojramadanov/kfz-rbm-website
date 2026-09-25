@@ -6,10 +6,11 @@ import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, Save, ArrowLeft } from "lucide-react";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 export default function AdminEditVehiclePage() {
   const tActions = useTranslations("adminVehicleActions");
-  const tErrors = useTranslations("actionErrors");
+  const errorMessage = useErrorMessage();
   const router = useRouter();
   const params = useParams();
   const vehicleId = params?.id as string;
@@ -32,7 +33,12 @@ export default function AdminEditVehiclePage() {
       try {
         setInitialLoading(true);
         const { getVehicleById } = await import("@/app/actions/admin");
-        const { vehicle } = await getVehicleById(vehicleId);
+        const result = await getVehicleById(vehicleId);
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        const { vehicle } = result;
         setFormData({
           vin: vehicle.vin,
           brand: vehicle.brand,
@@ -52,7 +58,7 @@ export default function AdminEditVehiclePage() {
           featured: vehicle.featured,
         });
       } catch (err) {
-        setError("Fehler beim Laden des Fahrzeugs");
+        setError(errorMessage(err));
       } finally {
         setInitialLoading(false);
       }
@@ -87,7 +93,7 @@ export default function AdminEditVehiclePage() {
       const { updateVehicle } = await import("@/app/actions/admin");
       const result = await updateVehicle(vehicleId, formData);
       if (!result.ok) {
-        setError(`${tActions("updateFailed")} ${tErrors(result.error)}`);
+        setError(`${tActions("updateFailed")} ${errorMessage(result)}`);
         return;
       }
       setSuccess(true);
@@ -96,7 +102,7 @@ export default function AdminEditVehiclePage() {
       }, 1000);
     } catch (err) {
       console.error("Error updating vehicle:", err);
-      setError(`${tActions("updateFailed")} ${tErrors("UNKNOWN")}`);
+      setError(`${tActions("updateFailed")} ${errorMessage(err)}`);
     } finally {
       setFormLoading(false);
     }

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Car, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import type { SubmittedVehicle } from "@/lib/supabase";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 type DashboardVehicleStatus = "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "akzeptiert" | "abgelehnt";
 
@@ -49,6 +50,7 @@ export const dynamic = "force-dynamic";
 export default function MyVehiclesPage() {
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
+  const errorMessage = useErrorMessage();
   const [vehicles, setVehicles] = useState<SubmittedVehicle[]>([]);
   const [loadingVehicles, setLoadingVehicles] = useState(true);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
@@ -70,7 +72,12 @@ export default function MyVehiclesPage() {
     try {
       setLoadingVehicles(true);
       const { getSubmittedVehicles } = await import("@/app/actions/vehicles");
-      const data = await getSubmittedVehicles();
+      const result = await getSubmittedVehicles();
+      if (!result.ok) {
+        alert(errorMessage(result));
+        return;
+      }
+      const data = result.vehicles;
       setVehicles(data || []);
 
       // Fetch signed URLs for all images
@@ -78,15 +85,16 @@ export default function MyVehiclesPage() {
         const allPaths = data.flatMap(v => v.images || []);
         if (allPaths.length > 0) {
           const { getSignedImageUrls } = await import("@/app/actions/storage");
-          const urls = await getSignedImageUrls(allPaths);
-          const urlMap = Object.fromEntries(urls.filter(u => u.url).map(u => [u.path, u.url!]));
-          setImageUrls(urlMap);
+          const signed = await getSignedImageUrls(allPaths);
+          if (signed.ok) {
+            const urlMap = Object.fromEntries(signed.urls.filter(u => u.url).map(u => [u.path, u.url!]));
+            setImageUrls(urlMap);
+          }
         }
       }
     } catch (error) {
       console.error("Error fetching vehicles:", error);
-      const errorMsg = error instanceof Error ? error.message : "Fehler beim Laden der Fahrzeuge";
-      alert(errorMsg);
+      alert(errorMessage(error));
     } finally {
       setLoadingVehicles(false);
     }
@@ -99,11 +107,15 @@ export default function MyVehiclesPage() {
 
     try {
       const { acceptOffer } = await import("@/app/actions/vehicles");
-      await acceptOffer(vehicleId);
+      const result = await acceptOffer(vehicleId);
+      if (!result.ok) {
+        alert(errorMessage(result));
+        return;
+      }
       await fetchVehicles();
     } catch (error) {
       console.error("Error accepting offer:", error);
-      alert(error instanceof Error ? error.message : "Fehler beim Annehmen des Angebots");
+      alert(errorMessage(error));
     }
   };
 
@@ -114,11 +126,15 @@ export default function MyVehiclesPage() {
 
     try {
       const { rejectOffer } = await import("@/app/actions/vehicles");
-      await rejectOffer(vehicleId);
+      const result = await rejectOffer(vehicleId);
+      if (!result.ok) {
+        alert(errorMessage(result));
+        return;
+      }
       await fetchVehicles();
     } catch (error) {
       console.error("Error rejecting offer:", error);
-      alert(error instanceof Error ? error.message : "Fehler beim Ablehnen des Angebots");
+      alert(errorMessage(error));
     }
   };
 

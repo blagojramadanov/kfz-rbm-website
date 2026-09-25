@@ -80,7 +80,29 @@
         "networkError": "Netzwerkfehler",
         "tryAgain": "Versuchen Sie es später erneut",
         "goHome": "Zur Startseite",
-        "contactSupport": "Kontaktieren Sie den Support"
+        "contactSupport": "Kontaktieren Sie den Support",
+        "codes": {
+            "UNAUTHORIZED": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+            "FORBIDDEN": "Dafür fehlt Ihnen die Berechtigung.",
+            "NOT_FOUND": "Der Eintrag wurde nicht gefunden.",
+            "INVALID_INPUT": "Ungültige Eingabe. Bitte prüfen Sie Ihre Angaben und Bilder (JPEG, PNG oder WebP).",
+            "INVALID_STATE": "Diese Aktion ist im aktuellen Status nicht möglich.",
+            "DUPLICATE_VIN": "Ein Fahrzeug mit dieser Fahrgestellnummer existiert bereits.",
+            "CREATE_FAILED": "Das Anlegen ist fehlgeschlagen.",
+            "UPDATE_FAILED": "Das Speichern ist fehlgeschlagen.",
+            "DELETE_FAILED": "Das Löschen ist fehlgeschlagen.",
+            "UPLOAD_FAILED": "Das Hochladen ist fehlgeschlagen.",
+            "LOAD_FAILED": "Die Daten konnten nicht geladen werden.",
+            "INVALID_CREDENTIALS": "E-Mail-Adresse oder Passwort ist falsch.",
+            "EMAIL_NOT_CONFIRMED": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse.",
+            "EMAIL_TAKEN": "Diese E-Mail-Adresse ist bereits registriert.",
+            "WEAK_PASSWORD": "Das Passwort ist zu schwach. Bitte wählen Sie mindestens 8 Zeichen.",
+            "SAME_PASSWORD": "Das neue Passwort muss sich vom bisherigen unterscheiden.",
+            "INVALID_CURRENT_PASSWORD": "Das aktuelle Passwort ist falsch.",
+            "RATE_LIMITED": "Zu viele Versuche. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+            "NETWORK": "Netzwerkfehler. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+            "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+        }
     },
     "success": {
         "saved": "Erfolgreich gespeichert",
@@ -688,20 +710,6 @@
             "ustIdNr": "DE000000000 (Beispiel)",
             "registerNumber": "HRB 000000 (Beispiel)"
         }
-    },
-    "actionErrors": {
-        "UNAUTHORIZED": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
-        "FORBIDDEN": "Dafür fehlt Ihnen die Berechtigung.",
-        "NOT_FOUND": "Der Eintrag wurde nicht gefunden.",
-        "INVALID_INPUT": "Ungültige Eingabe. Bitte prüfen Sie Ihre Angaben und Bilder (JPEG, PNG oder WebP).",
-        "INVALID_STATE": "Diese Aktion ist im aktuellen Status nicht möglich.",
-        "DUPLICATE_VIN": "Ein Fahrzeug mit dieser Fahrgestellnummer existiert bereits.",
-        "CREATE_FAILED": "Das Anlegen ist fehlgeschlagen.",
-        "UPDATE_FAILED": "Das Speichern ist fehlgeschlagen.",
-        "DELETE_FAILED": "Das Löschen ist fehlgeschlagen.",
-        "UPLOAD_FAILED": "Das Hochladen ist fehlgeschlagen.",
-        "LOAD_FAILED": "Die Daten konnten nicht geladen werden.",
-        "UNKNOWN": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
     },
     "adminVehicleForm": {
         "images": {

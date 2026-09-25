@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, AlertCircle, Check } from "lucide-react";
 import type { Vehicle } from "@/lib/supabase";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 type Step = "current_vehicle" | "vehicle_value" | "select_desired" | "review" | "success";
 
@@ -49,6 +50,7 @@ export default function InzahlungnahmePage() {
   const [desiredVehicle, setDesiredVehicle] = useState<Vehicle | null>(null);
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
   const [successId, setSuccessId] = useState<string>("");
 
@@ -62,11 +64,15 @@ export default function InzahlungnahmePage() {
     const loadVehicles = async () => {
       try {
         const { getAvailableVehicles } = await import("@/app/actions/trade-in");
-        const vehicles = await getAvailableVehicles();
-        setAvailableVehicles(vehicles);
+        const result = await getAvailableVehicles();
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setAvailableVehicles(result.vehicles);
       } catch (err) {
         console.error("Error loading vehicles:", err);
-        setError("Fehler beim Laden der verfügbaren Fahrzeuge");
+        setError(errorMessage(err));
       } finally {
         setVehiclesLoading(false);
       }
@@ -161,10 +167,15 @@ export default function InzahlungnahmePage() {
         desired_vehicle_id: formData.desired_vehicle_id,
       });
 
+      if (!result.ok) {
+        setError(errorMessage(result));
+        return;
+      }
+
       setSuccessId(result.requestId);
       setCurrentStep("success");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Fehler beim Absenden der Anfrage");
+      setError(errorMessage(err));
     } finally {
       setSaving(false);
     }

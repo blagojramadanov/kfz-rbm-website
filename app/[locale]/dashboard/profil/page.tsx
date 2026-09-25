@@ -9,12 +9,14 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { User, Lock, AlertCircle, CheckCircle } from "lucide-react";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 export default function ProfilePage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
   const { profile, loading, isAuthenticated, updateProfile, changePassword } = useAuth();
+  const errorMessage = useErrorMessage();
 
   const [activeTab, setActiveTab] = useState<"profile" | "password">("profile");
   const [saving, setSaving] = useState(false);
@@ -88,7 +90,7 @@ export default function ProfilePage() {
       });
       setMessage({ type: "success", text: "Profil erfolgreich aktualisiert" });
     } catch (error) {
-      setMessage({ type: "error", text: "Fehler beim Aktualisieren des Profils" });
+      setMessage({ type: "error", text: errorMessage(error) });
     } finally {
       setSaving(false);
     }
@@ -121,7 +123,7 @@ export default function ProfilePage() {
         confirm_password: "",
       });
     } catch (error) {
-      setMessage({ type: "error", text: "Fehler beim Ändern des Passworts" });
+      setMessage({ type: "error", text: errorMessage(error) });
     } finally {
       setSaving(false);
     }

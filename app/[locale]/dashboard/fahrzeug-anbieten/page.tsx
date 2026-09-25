@@ -9,6 +9,7 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Upload, X, GripVertical, Check } from "lucide-react";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 type Step = "fahrzeugdaten" | "preis" | "bilder" | "beschreibung" | "verkaufsart" | "kontrolle" | "absenden";
 
@@ -81,6 +82,7 @@ export default function SubmitVehicleWizardPage() {
   });
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [saving, setSaving] = useState(false);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
   const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
   const [editingVehicleId, setEditingVehicleId] = useState<string | null>(null);
@@ -102,6 +104,10 @@ export default function SubmitVehicleWizardPage() {
         try {
           const { getSubmittedVehicleById } = await import("@/app/actions/vehicles");
           const result = await getSubmittedVehicleById(vehicleId);
+          if (!result.ok) {
+            setError(errorMessage(result));
+            return;
+          }
 
           setEditingVehicleId(vehicleId);
           setFormData({
@@ -136,7 +142,7 @@ export default function SubmitVehicleWizardPage() {
             );
           }
         } catch (err) {
-          setError("Fehler beim Laden des Fahrzeugs");
+          setError(errorMessage(err));
           console.error(err);
         }
       }
@@ -369,7 +375,8 @@ export default function SubmitVehicleWizardPage() {
 
       if (editingVehicleId) {
         // Direct submission only - no editing after submit
-        throw new Error("Submitted vehicles cannot be edited. Please create a new submission.");
+        setError(errorMessage("INVALID_STATE"));
+        return;
       } else {
         // Create new vehicle as draft first (so images can be uploaded due to RLS policy)
         const imagesToPass = images.map((img) => img.data);
@@ -397,13 +404,16 @@ export default function SubmitVehicleWizardPage() {
           },
           imagesToPass
         );
-
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
       }
 
       // Redirect to success page
       router.push("/dashboard/fahrzeug-angeboten");
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Fehler beim Absenden des Fahrzeugs");
+      setError(errorMessage(error));
     } finally {
       setSaving(false);
     }

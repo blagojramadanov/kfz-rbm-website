@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
+import { useErrorMessage } from "@/lib/use-error-message";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Lock, AlertCircle, CheckCircle } from "lucide-react";
 
@@ -15,6 +16,7 @@ export default function ResetPasswordPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const t = useTranslations();
+  const errorMessage = useErrorMessage();
   const { updatePassword } = useAuth();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -73,11 +75,7 @@ export default function ResetPasswordPage() {
       setSubmitted(true);
       setTimeout(() => router.push("/dashboard"), 2000);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Fehler beim Zurücksetzen des Passworts"
-      );
+      setError(errorMessage(err));
     } finally {
       setLoading(false);
     }

@@ -3,6 +3,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { AuthUser, UserProfile } from "@/lib/supabase";
+import { ActionError } from "@/lib/action-result";
+import { authErrorCode, throwAuthError } from "@/lib/auth-errors";
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -121,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
     });
 
-    if (error) throw error;
+    if (error) throwAuthError(error);
   };
 
   const signIn = async (email: string, password: string) => {
@@ -130,12 +132,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
     });
 
-    if (error) throw error;
+    if (error) throwAuthError(error);
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    if (error) throwAuthError(error);
     setUser(null);
     setProfile(null);
   };
@@ -145,7 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
-    if (error) throw error;
+    if (error) throwAuthError(error);
   };
 
   const updatePassword = async (newPassword: string) => {
@@ -153,20 +155,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password: newPassword,
     });
 
-    if (error) throw error;
+    if (error) throwAuthError(error);
   };
 
   const changePassword = async (currentPassword: string, newPassword: string) => {
-    if (!user?.email) throw new Error("No user email found");
+    if (!user?.email) throw new ActionError("UNAUTHORIZED");
 
-    // Verify current password by attempting to sign in
-    try {
-      await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword,
-      });
-    } catch {
-      throw new Error("Aktuelles Passwort ist ungültig");
+    // Verify the current password by signing in again (signIn returns the error, it does not throw)
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+    if (verifyError) {
+      const code = authErrorCode(verifyError);
+      throw new ActionError(code === "INVALID_CREDENTIALS" ? "INVALID_CURRENT_PASSWORD" : code);
     }
 
     // If verification succeeds, update password
@@ -174,17 +176,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password: newPassword,
     });
 
-    if (error) throw error;
+    if (error) throwAuthError(error);
   };
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
-    if (!user) throw new Error("No user logged in");
+    if (!user) throw new ActionError("UNAUTHORIZED");
 
     // Import server action dynamically to avoid circular dependency
     const { updateUserProfile } = await import("@/app/actions/auth");
 
     // Call server action which enforces RLS and prevents role updates
-    await updateUserProfile(updates as any);
+    const result = await updateUserProfile(updates);
+    if (!result.ok) throw new ActionError(result.error);
 
     // Update local state only with safe fields (filter out undefined)
     const safeUpdates: Record<string, any> = {};

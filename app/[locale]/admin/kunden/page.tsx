@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, Search, Eye } from "lucide-react";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 export default function AdminCustomersPage() {
   const params = useParams();
@@ -16,6 +17,7 @@ export default function AdminCustomersPage() {
   const { loading, isAdmin } = useAuth();
   const [customers, setCustomers] = useState<any[]>([]);
   const [customersLoading, setCustomersLoading] = useState(true);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
@@ -30,12 +32,16 @@ export default function AdminCustomersPage() {
       try {
         setCustomersLoading(true);
         const { getCustomers } = await import("@/app/actions/admin");
-        const data = await getCustomers();
-        setCustomers(data);
+        const result = await getCustomers();
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setCustomers(result.customers);
         setError("");
       } catch (err) {
         console.error("Error loading customers:", err);
-        setError("Fehler beim Laden der Kunden");
+        setError(errorMessage(err));
       } finally {
         setCustomersLoading(false);
       }

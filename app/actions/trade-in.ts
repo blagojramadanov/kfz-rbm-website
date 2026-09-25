@@ -1,27 +1,49 @@
 "use server";
 
 import { z } from "zod";
-import { getSupabaseServerClient, getSupabaseUser } from "@/lib/supabase-server";
+import { ActionError, runAction } from "@/lib/action-result";
+import { requireUser } from "@/lib/auth-guards";
 import type { TradeInRequest } from "@/lib/supabase";
 
-export async function getAvailableVehicles() {
-  try {
-    const { supabase } = await getSupabaseServerClient();
+/**
+ * Customer trade-in actions. Every export returns an ActionResult
+ * ({ ok: false, error: CODE } on failure); no human-readable text.
+ */
 
-    const { data: vehicles, error } = await supabase
+const DESIRED_VEHICLE_COLUMNS = `
+  *,
+  vehicles:desired_vehicle_id (
+    id,
+    brand,
+    model,
+    year,
+    mileage,
+    price,
+    transmission,
+    fuel_type,
+    body_type,
+    color_exterior,
+    description
+  )
+`;
+
+/** PostgREST may return the joined vehicle as an array or an object. */
+function withDesiredVehicle(request: any): TradeInRequest {
+  const desiredVehicle = Array.isArray(request.vehicles) ? request.vehicles[0] : request.vehicles;
+  return { ...request, desired_vehicle: desiredVehicle ?? null } as TradeInRequest;
+}
+
+export async function getAvailableVehicles() {
+  return runAction("getAvailableVehicles", "LOAD_FAILED", async () => {
+    const { supabase } = await requireUser();
+    const { data, error } = await supabase
       .from("vehicles")
       .select("*")
       .eq("status", "available")
       .order("created_at", { ascending: false });
-
     if (error) throw error;
-    return vehicles || [];
-  } catch (error) {
-    console.error("Error fetching vehicles:", error);
-    throw new Error(
-      error instanceof Error ? error.message : "Fehler beim Abrufen der Fahrzeuge"
-    );
-  }
+    return { vehicles: data || [] };
+  });
 }
 
 const tradeInSchema = z.object({
@@ -34,10 +56,12 @@ const tradeInSchema = z.object({
 });
 
 export async function createTradeInRequest(tradeInData: unknown) {
-  try {
-    const { supabase, user } = await getSupabaseUser();
+  return runAction("createTradeInRequest", "CREATE_FAILED", async () => {
+    const { supabase, user } = await requireUser();
     // Unknown fields are stripped: the client cannot set user_id, status, admin notes, ...
-    const data = tradeInSchema.parse(tradeInData);
+    const parsed = tradeInSchema.safeParse(tradeInData);
+    if (!parsed.success) throw new ActionError("INVALID_INPUT");
+    const data = parsed.data;
 
     const { data: request, error } = await supabase
       .from("trade_in_requests")
@@ -51,134 +75,41 @@ export async function createTradeInRequest(tradeInData: unknown) {
         desired_vehicle_id: data.desired_vehicle_id,
         status: "new",
       })
-      .select()
+      .select("id")
       .single();
+    if (error || !request) throw error ?? new ActionError("CREATE_FAILED");
 
-    if (error) throw error;
-
-    return { success: true, requestId: request.id, message: "Inzahlungnahmeanfrage erfolgreich erstellt" };
-  } catch (error) {
-    console.error("Error creating trade-in request:", error);
-    if (error instanceof z.ZodError) throw new Error("INVALID_INPUT");
-    throw new Error(
-      error instanceof Error ? error.message : "Fehler beim Erstellen der Inzahlungnahmeanfrage"
-    );
-  }
+    return { requestId: request.id as string };
+  });
 }
 
-export async function getTradeInRequests(): Promise<TradeInRequest[]> {
-  try {
-    const { supabase, user } = await getSupabaseUser();
-
-    const { data: requests, error } = await supabase
+export async function getTradeInRequests() {
+  return runAction("getTradeInRequests", "LOAD_FAILED", async () => {
+    const { supabase, user } = await requireUser();
+    const { data, error } = await supabase
       .from("trade_in_requests")
-      .select(
-        `
-        *,
-        vehicles:desired_vehicle_id (
-          id,
-          brand,
-          model,
-          year,
-          mileage,
-          price,
-          transmission,
-          fuel_type,
-          body_type,
-          color_exterior,
-          description
-        )
-      `
-      )
+      .select(DESIRED_VEHICLE_COLUMNS)
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
-
     if (error) throw error;
-
-    // Map the data to include desired_vehicle
-    // PostgREST returns foreign key relationships as arrays, get first element
-    const mappedRequests = (requests || []).map((req: any) => {
-      const desiredVehicle = Array.isArray(req.vehicles)
-        ? req.vehicles[0]
-        : req.vehicles;
-
-      return {
-        ...req,
-        desired_vehicle: desiredVehicle,
-      };
-    });
-
-    console.log("[trade-in] getTradeInRequests - sample result:", {
-      count: mappedRequests.length,
-      first_item_vehicles_type: requests?.[0]?.vehicles ? (Array.isArray(requests[0].vehicles) ? "array" : typeof requests[0].vehicles) : "N/A",
-    });
-
-    return mappedRequests as TradeInRequest[];
-  } catch (error) {
-    console.error("Error fetching trade-in requests:", error);
-    throw new Error(
-      error instanceof Error ? error.message : "Fehler beim Abrufen der Anfragen"
-    );
-  }
+    return { requests: (data || []).map(withDesiredVehicle) };
+  });
 }
 
 export async function getTradeInRequestById(requestId: string) {
-  try {
-    const { supabase, user } = await getSupabaseUser();
+  return runAction("getTradeInRequestById", "LOAD_FAILED", async () => {
+    const { supabase, user } = await requireUser();
+    if (!z.guid().safeParse(requestId).success) throw new ActionError("NOT_FOUND");
 
-    const { data: request, error } = await supabase
+    const { data, error } = await supabase
       .from("trade_in_requests")
-      .select(
-        `
-        *,
-        vehicles:desired_vehicle_id (
-          id,
-          brand,
-          model,
-          year,
-          mileage,
-          price,
-          transmission,
-          fuel_type,
-          body_type,
-          color_exterior,
-          description
-        )
-      `
-      )
+      .select(DESIRED_VEHICLE_COLUMNS)
       .eq("id", requestId)
       .eq("user_id", user.id)
-      .single();
-
+      .maybeSingle();
     if (error) throw error;
-    if (!request) throw new Error("Anfrage nicht gefunden");
+    if (!data) throw new ActionError("NOT_FOUND");
 
-    // Handle relationship response - might be array or object
-    let desiredVehicle = null;
-    if (request.vehicles) {
-      // PostgREST returns foreign key relationships as arrays
-      desiredVehicle = Array.isArray(request.vehicles)
-        ? request.vehicles[0]
-        : request.vehicles;
-    }
-
-    console.log("[trade-in] getTradeInRequestById result:", {
-      requestId,
-      desired_vehicle_id: request.desired_vehicle_id,
-      vehicles_type: Array.isArray(request.vehicles) ? "array" : typeof request.vehicles,
-      vehicles_length: Array.isArray(request.vehicles) ? request.vehicles.length : "N/A",
-      vehicles_value: request.vehicles,
-      desiredVehicle,
-    });
-
-    return {
-      ...request,
-      desired_vehicle: desiredVehicle,
-    } as TradeInRequest;
-  } catch (error) {
-    console.error("Error fetching trade-in request:", error);
-    throw new Error(
-      error instanceof Error ? error.message : "Fehler beim Abrufen der Anfrage"
-    );
-  }
+    return { request: withDesiredVehicle(data) };
+  });
 }

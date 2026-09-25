@@ -1,100 +1,61 @@
 "use server";
 
-import { getSupabaseUser } from "@/lib/supabase-server";
+import { z } from "zod";
+import { ActionError, runAction } from "@/lib/action-result";
+import { requireAdmin, requireUser } from "@/lib/auth-guards";
+import { authErrorCode } from "@/lib/auth-errors";
 
-interface UpdateProfileInput {
-  full_name?: string;
-  phone?: string;
-  company_name?: string;
-}
+/** Account actions. Every export returns an ActionResult; no human-readable text. */
 
-export async function updateUserProfile(updates: UpdateProfileInput) {
-  try {
-    const { supabase, user } = await getSupabaseUser();
+const profileSchema = z.object({
+  full_name: z.string().trim().max(100).optional(),
+  phone: z.string().trim().max(40).optional(),
+  company_name: z.string().trim().max(100).optional(),
+});
 
-    // Filter out any attempt to update protected fields
-    const safeUpdates = {
-      full_name: updates.full_name,
-      phone: updates.phone,
-      company_name: updates.company_name,
-      updated_at: new Date().toISOString(),
-    };
-
-    // Never allow role to be updated via this function
-    const updateData = Object.fromEntries(
-      Object.entries(safeUpdates).filter(([_key, value]) => value !== undefined)
-    );
+export async function updateUserProfile(updates: unknown) {
+  return runAction("updateUserProfile", "UPDATE_FAILED", async () => {
+    const { supabase, user } = await requireUser();
+    // Allow-list: role, email and ids can never be changed here.
+    const parsed = profileSchema.safeParse(updates);
+    if (!parsed.success) throw new ActionError("INVALID_INPUT");
+    const fields = Object.fromEntries(Object.entries(parsed.data).filter(([, value]) => value !== undefined));
 
     const { error } = await supabase
       .from("user_profiles")
-      .update(updateData)
+      .update({ ...fields, updated_at: new Date().toISOString() })
       .eq("id", user.id);
-
-    if (error) {
-      if (error.code === "PGRST100") {
-        throw new Error("RLS policy violation: Insufficient permissions");
-      }
-      throw new Error(error.message || "Failed to update profile");
-    }
-
-    return { success: true };
-  } catch (error) {
-    throw error instanceof Error ? error : new Error("Failed to update profile");
-  }
+    if (error) throw error;
+    return {};
+  });
 }
 
 export async function changePassword(newPassword: string) {
-  try {
-    const { supabase } = await getSupabaseUser();
-
-    if (newPassword.length < 8) {
-      throw new Error("Password must be at least 8 characters");
+  return runAction("changePassword", "UPDATE_FAILED", async () => {
+    const { supabase } = await requireUser();
+    if (typeof newPassword !== "string" || newPassword.length < 8 || newPassword.length > 72) {
+      throw new ActionError("WEAK_PASSWORD");
     }
-
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
-
-    if (error) {
-      throw new Error(error.message || "Failed to update password");
-    }
-
-    return { success: true };
-  } catch (error) {
-    throw error instanceof Error ? error : new Error("Failed to change password");
-  }
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw new ActionError(authErrorCode(error));
+    return {};
+  });
 }
 
-export async function assignUserRole(
-  targetUserId: string,
-  newRole: "CUSTOMER" | "ADMIN"
-) {
-  try {
-    const { supabase, user } = await getSupabaseUser();
+export async function assignUserRole(targetUserId: string, newRole: "CUSTOMER" | "ADMIN") {
+  return runAction("assignUserRole", "UPDATE_FAILED", async () => {
+    const { supabase } = await requireAdmin();
+    const input = z
+      .object({ id: z.guid(), role: z.enum(["CUSTOMER", "ADMIN"]) })
+      .safeParse({ id: targetUserId, role: newRole });
+    if (!input.success) throw new ActionError("INVALID_INPUT");
 
-    // Verify requester is admin
-    const { data: requesterProfile } = await supabase
-      .from("user_profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (requesterProfile?.role !== "ADMIN") {
-      throw new Error("Only admins can assign roles");
-    }
-
-    // Update role (RLS will also enforce this, defense in depth)
+    // RLS ("Only admins can update role") enforces this as well.
     const { error } = await supabase
       .from("user_profiles")
-      .update({ role: newRole, updated_at: new Date().toISOString() })
-      .eq("id", targetUserId);
-
-    if (error) {
-      throw new Error(error.message || "Failed to update user role");
-    }
-
-    return { success: true };
-  } catch (error) {
-    throw error instanceof Error ? error : new Error("Failed to assign user role");
-  }
+      .update({ role: input.data.role, updated_at: new Date().toISOString() })
+      .eq("id", input.data.id);
+    if (error) throw error;
+    return {};
+  });
 }

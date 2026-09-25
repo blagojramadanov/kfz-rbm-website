@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
+import { useErrorMessage } from "@/lib/use-error-message";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react";
 
@@ -13,6 +14,7 @@ export default function RegisterPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const t = useTranslations();
+  const errorMessage = useErrorMessage();
   const { signUp, isAuthenticated, profile } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -62,9 +64,7 @@ export default function RegisterPage() {
       await signUp(email, password, fullName);
       setSubmitted(true);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("auth.signUpFailed")
-      );
+      setError(errorMessage(err));
     } finally {
       setLoading(false);
     }

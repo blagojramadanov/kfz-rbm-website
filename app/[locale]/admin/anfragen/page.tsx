@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, CheckCircle, Mail } from "lucide-react";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 export default function AdminInquiriesPage() {
   const params = useParams();
@@ -16,6 +17,7 @@ export default function AdminInquiriesPage() {
   const { loading, isAdmin } = useAuth();
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [inquiriesLoading, setInquiriesLoading] = useState(true);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState("new");
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
@@ -31,14 +33,18 @@ export default function AdminInquiriesPage() {
       try {
         setInquiriesLoading(true);
         const { getInquiries } = await import("@/app/actions/admin");
-        const data = await getInquiries({
+        const result = await getInquiries({
           status: statusFilter || undefined,
         });
-        setInquiries(data);
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setInquiries(result.inquiries);
         setError("");
       } catch (err) {
         console.error("Error loading inquiries:", err);
-        setError("Fehler beim Laden der Anfragen");
+        setError(errorMessage(err));
       } finally {
         setInquiriesLoading(false);
       }
@@ -51,13 +57,17 @@ export default function AdminInquiriesPage() {
     try {
       setActionInProgress(inquiryId);
       const { updateInquiryStatus } = await import("@/app/actions/admin");
-      await updateInquiryStatus(inquiryId, newStatus);
+      const result = await updateInquiryStatus(inquiryId, newStatus);
+      if (!result.ok) {
+        setError(errorMessage(result));
+        return;
+      }
       setInquiries((prev) =>
         prev.map((i) => (i.id === inquiryId ? { ...i, status: newStatus } : i))
       );
       setError("");
     } catch (err) {
-      setError("Fehler beim Aktualisieren: " + (err instanceof Error ? err.message : "Unbekannter Fehler"));
+      setError(errorMessage(err));
     } finally {
       setActionInProgress(null);
     }

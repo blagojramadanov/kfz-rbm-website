@@ -1,6 +1,7 @@
 "use client";
 import { useTranslations } from "next-intl";
 import type { ActionErrorCode } from "@/lib/action-result";
+import { useErrorMessage } from "@/lib/use-error-message";
 import { resizeImageToDataUrl } from "@/lib/resize-image";
 import { useParams } from "next/navigation";
 
@@ -40,10 +41,10 @@ export default function AdminCreateVehiclePage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState("");
   const tForm = useTranslations("adminVehicleForm");
-  const tErrors = useTranslations("actionErrors");
+  const errorMessage = useErrorMessage();
 
   const MAX_IMAGES = 20;
-  const errorText = (code: ActionErrorCode) => tErrors(code);
+  const errorText = (code: ActionErrorCode) => errorMessage(code);
 
   const handleImageSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);

@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
+import { useErrorMessage } from "@/lib/use-error-message";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Lock, AlertCircle } from "lucide-react";
 
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const t = useTranslations();
+  const errorMessage = useErrorMessage();
   const { signIn, isAuthenticated, profile } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,9 +41,7 @@ export default function LoginPage() {
       await signIn(email, password);
       // Redirect will happen via useEffect above
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("auth.loginFailed")
-      );
+      setError(errorMessage(err));
     } finally {
       setLoading(false);
     }

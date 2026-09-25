@@ -80,7 +80,29 @@
         "networkError": "Network error",
         "tryAgain": "Please try again later",
         "goHome": "Go to Home",
-        "contactSupport": "Contact Support"
+        "contactSupport": "Contact Support",
+        "codes": {
+            "UNAUTHORIZED": "Your session has expired. Please sign in again.",
+            "FORBIDDEN": "You do not have permission to do this.",
+            "NOT_FOUND": "The entry was not found.",
+            "INVALID_INPUT": "Invalid input. Please check your details and images (JPEG, PNG or WebP).",
+            "INVALID_STATE": "This action is not possible in the current status.",
+            "DUPLICATE_VIN": "A vehicle with this VIN already exists.",
+            "CREATE_FAILED": "Creating it failed.",
+            "UPDATE_FAILED": "Saving failed.",
+            "DELETE_FAILED": "Deleting failed.",
+            "UPLOAD_FAILED": "The upload failed.",
+            "LOAD_FAILED": "The data could not be loaded.",
+            "INVALID_CREDENTIALS": "Incorrect email address or password.",
+            "EMAIL_NOT_CONFIRMED": "Please confirm your email address first.",
+            "EMAIL_TAKEN": "This email address is already registered.",
+            "WEAK_PASSWORD": "The password is too weak. Please choose at least 8 characters.",
+            "SAME_PASSWORD": "The new password must be different from the current one.",
+            "INVALID_CURRENT_PASSWORD": "The current password is incorrect.",
+            "RATE_LIMITED": "Too many attempts. Please wait a moment and try again.",
+            "NETWORK": "Network error. Please check your connection and try again.",
+            "UNKNOWN": "An unexpected error occurred. Please try again."
+        }
     },
     "success": {
         "saved": "Successfully saved",
@@ -688,20 +710,6 @@
             "ustIdNr": "DE000000000 (example)",
             "registerNumber": "HRB 000000 (example)"
         }
-    },
-    "actionErrors": {
-        "UNAUTHORIZED": "Your session has expired. Please sign in again.",
-        "FORBIDDEN": "You do not have permission to do this.",
-        "NOT_FOUND": "The entry was not found.",
-        "INVALID_INPUT": "Invalid input. Please check your details and images (JPEG, PNG or WebP).",
-        "INVALID_STATE": "This action is not possible in the current status.",
-        "DUPLICATE_VIN": "A vehicle with this VIN already exists.",
-        "CREATE_FAILED": "Creating it failed.",
-        "UPDATE_FAILED": "Saving failed.",
-        "DELETE_FAILED": "Deleting failed.",
-        "UPLOAD_FAILED": "The upload failed.",
-        "LOAD_FAILED": "The data could not be loaded.",
-        "UNKNOWN": "An unexpected error occurred. Please try again."
     },
     "adminVehicleForm": {
         "images": {

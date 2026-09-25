@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, Edit2, X } from "lucide-react";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 export default function AdminTradeInRequestsPage() {
   const params = useParams();
@@ -16,6 +17,7 @@ export default function AdminTradeInRequestsPage() {
   const { loading, isAdmin } = useAuth();
   const [requests, setRequests] = useState<any[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(true);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState("new");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -33,14 +35,18 @@ export default function AdminTradeInRequestsPage() {
       try {
         setRequestsLoading(true);
         const { getTradeInRequests } = await import("@/app/actions/admin");
-        const data = await getTradeInRequests({
+        const result = await getTradeInRequests({
           status: statusFilter || undefined,
         });
-        setRequests(data);
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setRequests(result.requests);
         setError("");
       } catch (err) {
         console.error("Error loading requests:", err);
-        setError("Fehler beim Laden der Anfragen");
+        setError(errorMessage(err));
       } finally {
         setRequestsLoading(false);
       }
@@ -53,10 +59,14 @@ export default function AdminTradeInRequestsPage() {
     try {
       setActionInProgress(requestId);
       const { updateTradeInRequest } = await import("@/app/actions/admin");
-      await updateTradeInRequest(requestId, {
+      const result = await updateTradeInRequest(requestId, {
         status: newStatus as any,
         admin_notes: editingNotes,
       });
+      if (!result.ok) {
+        setError(errorMessage(result));
+        return;
+      }
       setRequests((prev) =>
         prev.map((r) =>
           r.id === requestId ? { ...r, status: newStatus, admin_notes: editingNotes } : r
@@ -66,7 +76,7 @@ export default function AdminTradeInRequestsPage() {
       setEditingNotes("");
       setError("");
     } catch (err) {
-      setError("Fehler beim Aktualisieren: " + (err instanceof Error ? err.message : "Unbekannter Fehler"));
+      setError(errorMessage(err));
     } finally {
       setActionInProgress(null);
     }

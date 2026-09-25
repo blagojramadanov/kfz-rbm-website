@@ -6,12 +6,13 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, ArrowLeft, Edit2, Trash2, Star } from "lucide-react";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 export const dynamic = "force-dynamic";
 
 export default function AdminVehicleDetailPage() {
   const tActions = useTranslations("adminVehicleActions");
-  const tErrors = useTranslations("actionErrors");
+  const errorMessage = useErrorMessage();
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
@@ -34,12 +35,16 @@ export default function AdminVehicleDetailPage() {
       try {
         setVehicleLoading(true);
         const { getVehicleById } = await import("@/app/actions/admin");
-        const data = await getVehicleById(vehicleId);
-        setVehicle(data);
+        const result = await getVehicleById(vehicleId);
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setVehicle(result.vehicle);
         setError("");
       } catch (err) {
         console.error("Error loading vehicle:", err);
-        setError("Fehler beim Laden des Fahrzeugs");
+        setError(errorMessage(err));
       } finally {
         setVehicleLoading(false);
       }
@@ -55,13 +60,13 @@ export default function AdminVehicleDetailPage() {
       const { deleteVehicle } = await import("@/app/actions/admin");
       const result = await deleteVehicle(vehicleId);
       if (!result.ok) {
-        setError(`${tActions("deleteFailed")} ${tErrors(result.error)}`);
+        setError(`${tActions("deleteFailed")} ${errorMessage(result)}`);
         setDeleting(false);
         return;
       }
       router.push("/admin/fahrzeuge");
     } catch (err) {
-      setError(`${tActions("deleteFailed")} ${tErrors("UNKNOWN")}`);
+      setError(`${tActions("deleteFailed")} ${errorMessage(err)}`);
       setDeleting(false);
     }
   };

@@ -2,7 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { toErrorCode, type ActionResult } from "@/lib/action-result";
+import { ActionError, runAction, toErrorCode, type ActionResult } from "@/lib/action-result";
 import { requireAdmin, requireUser } from "@/lib/auth-guards";
 import {
   MAX_IMAGES_PER_REQUEST,
@@ -22,7 +22,8 @@ import type { SubmittedVehicle } from "@/lib/supabase";
  *  - RLS-bound session clients are used wherever the policies allow it. The
  *    service-role client is used only where RLS forbids the write for customers
  *    (status changes), and only after the session + ownership + state checks.
- * Errors are stable codes: UNAUTHORIZED, FORBIDDEN, NOT_FOUND, INVALID_INPUT, ...
+ * Every exported action returns ActionResult ({ ok: false, error: CODE } on failure,
+ * see lib/action-result.ts); nothing here returns or throws human-readable text.
  */
 
 const id = z.guid();
@@ -49,11 +50,11 @@ const PHOTO_UPLOAD_STATUSES = ["draft", "eingereicht"];
 
 function parseOrThrow<T extends z.ZodType>(schema: T, value: unknown): z.infer<T> {
   const result = schema.safeParse(value);
-  if (!result.success) throw new Error("INVALID_INPUT");
+  if (!result.success) throw new ActionError("INVALID_INPUT");
   return result.data;
 }
 
-export async function getSubmittedVehicleById(vehicleId: string) {
+async function getSubmittedVehicleByIdImpl(vehicleId: string) {
   const { supabase, user } = await requireUser();
   const submissionId = parseOrThrow(id, vehicleId);
 
@@ -64,7 +65,7 @@ export async function getSubmittedVehicleById(vehicleId: string) {
     .eq("user_id", user.id)
     .single();
 
-  if (vehicleError || !vehicle) throw new Error("NOT_FOUND");
+  if (vehicleError || !vehicle) throw new ActionError("NOT_FOUND");
 
   const { data: images } = await supabase
     .from("submitted_vehicle_images")
@@ -75,7 +76,7 @@ export async function getSubmittedVehicleById(vehicleId: string) {
   return { vehicle, images: images || [] };
 }
 
-export async function getSubmittedVehicles(): Promise<SubmittedVehicle[]> {
+async function getSubmittedVehiclesImpl(): Promise<SubmittedVehicle[]> {
   const { supabase, user } = await requireUser();
 
   const { data: vehicles, error: vehiclesError } = await supabase
@@ -84,7 +85,7 @@ export async function getSubmittedVehicles(): Promise<SubmittedVehicle[]> {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  if (vehiclesError) throw new Error("LOAD_FAILED");
+  if (vehiclesError) throw new ActionError("LOAD_FAILED");
   if (!vehicles) return [];
 
   const vehiclesWithImages = await Promise.all(
@@ -137,7 +138,7 @@ async function storeSubmissionImages(
   return uploaded;
 }
 
-export async function createSubmittedVehicle(vehicleData: unknown, images: unknown) {
+async function createSubmittedVehicleImpl(vehicleData: unknown, images: unknown) {
   const { supabase, user } = await requireUser();
   const data = parseOrThrow(submittedVehicleSchema, vehicleData);
   const imageList = parseOrThrow(imageListSchema, images ?? []);
@@ -166,15 +167,13 @@ export async function createSubmittedVehicle(vehicleData: unknown, images: unkno
     .select()
     .single();
 
-  if (vehicleError || !vehicle) throw new Error("CREATE_FAILED");
+  if (vehicleError || !vehicle) throw new ActionError("CREATE_FAILED");
 
   const uploadedCount = await storeSubmissionImages(supabase, user.id, vehicle.id, imageList, 0, true);
 
   return {
-    success: true,
     vehicleId: vehicle.id as string,
     uploadedCount,
-    message: "Fahrzeug eingereicht",
   };
 }
 
@@ -182,7 +181,7 @@ export async function createSubmittedVehicle(vehicleData: unknown, images: unkno
  * Adds photos to the caller's own submission (private bucket, RLS-bound client).
  * Ownership is checked against the session user, not a client-sent id.
  */
-export async function uploadSubmissionImages(submissionId: string, filesData: unknown) {
+async function uploadSubmissionImagesImpl(submissionId: string, filesData: unknown) {
   const { supabase, user } = await requireUser();
   const targetId = parseOrThrow(id, submissionId);
   const files = parseOrThrow(
@@ -197,9 +196,9 @@ export async function uploadSubmissionImages(submissionId: string, filesData: un
     .maybeSingle();
 
   // RLS already hides other users' rows; the explicit check keeps this safe if a policy changes.
-  if (error || !submission) throw new Error("NOT_FOUND");
-  if (submission.user_id !== user.id) throw new Error("FORBIDDEN");
-  if (!PHOTO_UPLOAD_STATUSES.includes(submission.status)) throw new Error("FORBIDDEN");
+  if (error || !submission) throw new ActionError("NOT_FOUND");
+  if (submission.user_id !== user.id) throw new ActionError("FORBIDDEN");
+  if (!PHOTO_UPLOAD_STATUSES.includes(submission.status)) throw new ActionError("FORBIDDEN");
 
   const { data: existing } = await supabase
     .from("submitted_vehicle_images")
@@ -211,7 +210,7 @@ export async function uploadSubmissionImages(submissionId: string, filesData: un
     .from("submitted_vehicle_images")
     .select("id", { count: "exact", head: true })
     .eq("submitted_vehicle_id", targetId);
-  if ((count ?? 0) + files.length > MAX_IMAGES_PER_REQUEST) throw new Error("INVALID_INPUT");
+  if ((count ?? 0) + files.length > MAX_IMAGES_PER_REQUEST) throw new ActionError("INVALID_INPUT");
 
   const nextSortOrder = (existing?.[0]?.sort_order ?? -1) + 1;
   const uploaded = await storeSubmissionImages(
@@ -222,9 +221,9 @@ export async function uploadSubmissionImages(submissionId: string, filesData: un
     nextSortOrder,
     (count ?? 0) === 0
   );
-  if (uploaded !== files.length) throw new Error("UPLOAD_FAILED");
+  if (uploaded !== files.length) throw new ActionError("UPLOAD_FAILED");
 
-  return { success: true, uploadedCount: uploaded };
+  return { uploadedCount: uploaded };
 }
 
 /**
@@ -304,7 +303,7 @@ export async function uploadVehicleImage(
  * (Customers cannot UPDATE under RLS, so the status write itself uses the
  * service-role client, but only after the checks above it.)
  */
-export async function finalizeSubmission(vehicleId: string) {
+async function finalizeSubmissionImpl(vehicleId: string) {
   const { supabase, user } = await requireUser();
   const submissionId = parseOrThrow(id, vehicleId);
 
@@ -314,9 +313,9 @@ export async function finalizeSubmission(vehicleId: string) {
     .eq("id", submissionId)
     .maybeSingle();
 
-  if (fetchError || !vehicle) throw new Error("NOT_FOUND");
-  if (vehicle.user_id !== user.id) throw new Error("FORBIDDEN");
-  if (vehicle.status !== "draft") throw new Error("INVALID_STATE");
+  if (fetchError || !vehicle) throw new ActionError("NOT_FOUND");
+  if (vehicle.user_id !== user.id) throw new ActionError("FORBIDDEN");
+  if (vehicle.status !== "draft") throw new ActionError("INVALID_STATE");
 
   const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
   const { data: updated, error } = await getSupabaseAdminClient()
@@ -327,8 +326,8 @@ export async function finalizeSubmission(vehicleId: string) {
     .eq("status", "draft")
     .select("id");
 
-  if (error || !updated || updated.length !== 1) throw new Error("UPDATE_FAILED");
-  return { success: true, message: "Fahrzeug erfolgreich eingereicht" };
+  if (error || !updated || updated.length !== 1) throw new ActionError("UPDATE_FAILED");
+  return {};
 }
 
 async function respondToOffer(vehicleId: string, decision: "akzeptiert" | "eingereicht") {
@@ -342,9 +341,9 @@ async function respondToOffer(vehicleId: string, decision: "akzeptiert" | "einge
     .eq("id", submissionId)
     .maybeSingle();
 
-  if (fetchError || !vehicle) throw new Error("NOT_FOUND");
-  if (vehicle.user_id !== user.id) throw new Error("FORBIDDEN");
-  if (vehicle.status !== "angebot_gesendet") throw new Error("INVALID_STATE");
+  if (fetchError || !vehicle) throw new ActionError("NOT_FOUND");
+  if (vehicle.user_id !== user.id) throw new ActionError("FORBIDDEN");
+  if (vehicle.status !== "angebot_gesendet") throw new ActionError("INVALID_STATE");
 
   // Only status and timestamps change; the write is pinned to owner + current state.
   const now = new Date().toISOString();
@@ -361,22 +360,48 @@ async function respondToOffer(vehicleId: string, decision: "akzeptiert" | "einge
     .eq("status", "angebot_gesendet")
     .select("id");
 
-  if (error || !updated || updated.length !== 1) throw new Error("UPDATE_FAILED");
+  if (error || !updated || updated.length !== 1) throw new ActionError("UPDATE_FAILED");
   return decision;
 }
 
-export async function acceptOffer(vehicleId: string) {
+async function acceptOfferImpl(vehicleId: string) {
   await respondToOffer(vehicleId, "akzeptiert");
-  return {
-    success: true,
-    message: "Angebot akzeptiert. Kontaktieren Sie uns für die nächsten Schritte.",
-  };
+  return {};
+}
+
+async function rejectOfferImpl(vehicleId: string) {
+  await respondToOffer(vehicleId, "eingereicht");
+  return {};
+}
+
+// ----------------------------------------------------------------------------
+// Exported actions: never throw, never return human-readable text.
+// ----------------------------------------------------------------------------
+
+export async function getSubmittedVehicleById(vehicleId: string) {
+  return runAction("getSubmittedVehicleById", "LOAD_FAILED", () => getSubmittedVehicleByIdImpl(vehicleId));
+}
+
+export async function getSubmittedVehicles() {
+  return runAction("getSubmittedVehicles", "LOAD_FAILED", async () => ({ vehicles: await getSubmittedVehiclesImpl() }));
+}
+
+export async function createSubmittedVehicle(vehicleData: unknown, images: unknown) {
+  return runAction("createSubmittedVehicle", "CREATE_FAILED", () => createSubmittedVehicleImpl(vehicleData, images));
+}
+
+export async function uploadSubmissionImages(submissionId: string, filesData: unknown) {
+  return runAction("uploadSubmissionImages", "UPLOAD_FAILED", () => uploadSubmissionImagesImpl(submissionId, filesData));
+}
+
+export async function finalizeSubmission(vehicleId: string) {
+  return runAction("finalizeSubmission", "UPDATE_FAILED", () => finalizeSubmissionImpl(vehicleId));
+}
+
+export async function acceptOffer(vehicleId: string) {
+  return runAction("acceptOffer", "UPDATE_FAILED", () => acceptOfferImpl(vehicleId));
 }
 
 export async function rejectOffer(vehicleId: string) {
-  await respondToOffer(vehicleId, "eingereicht");
-  return {
-    success: true,
-    message: "Angebot abgelehnt. Sie können andere Angebote erhalten.",
-  };
+  return runAction("rejectOffer", "UPDATE_FAILED", () => rejectOfferImpl(vehicleId));
 }

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle } from "lucide-react";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 export default function AdminStatisticsPage() {
   const params = useParams();
@@ -16,6 +17,7 @@ export default function AdminStatisticsPage() {
   const { loading, isAdmin } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -29,12 +31,16 @@ export default function AdminStatisticsPage() {
       try {
         setStatsLoading(true);
         const { getDashboardStats } = await import("@/app/actions/admin");
-        const data = await getDashboardStats();
-        setStats(data);
+        const result = await getDashboardStats();
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setStats(result.stats);
         setError("");
       } catch (err) {
         console.error("Error loading stats:", err);
-        setError("Fehler beim Laden der Statistiken");
+        setError(errorMessage(err));
       } finally {
         setStatsLoading(false);
       }

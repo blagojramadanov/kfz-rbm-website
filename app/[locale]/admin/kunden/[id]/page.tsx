@@ -6,6 +6,7 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, ArrowLeft } from "lucide-react";
+import { useErrorMessage } from "@/lib/use-error-message";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,7 @@ export default function AdminCustomerDetailPage() {
   const { loading, isAdmin } = useAuth();
   const [customer, setCustomer] = useState<any>(null);
   const [customerLoading, setCustomerLoading] = useState(true);
+  const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -31,12 +33,16 @@ export default function AdminCustomerDetailPage() {
       try {
         setCustomerLoading(true);
         const { getCustomerDetails } = await import("@/app/actions/admin");
-        const data = await getCustomerDetails(customerId);
-        setCustomer(data);
+        const result = await getCustomerDetails(customerId);
+        if (!result.ok) {
+          setError(errorMessage(result));
+          return;
+        }
+        setCustomer(result);
         setError("");
       } catch (err) {
         console.error("Error loading customer:", err);
-        setError("Fehler beim Laden des Kunden");
+        setError(errorMessage(err));
       } finally {
         setCustomerLoading(false);
       }
