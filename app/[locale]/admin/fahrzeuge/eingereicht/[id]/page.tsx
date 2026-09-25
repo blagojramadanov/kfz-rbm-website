@@ -70,7 +70,8 @@ export default function SubmittedVehicleDetailPage() {
       try {
         const { getSignedImageUrls } = await import("@/app/actions/storage");
         const urlsResult = await getSignedImageUrls(vehicle.images);
-        if (urlsResult && urlsResult.ok && urlsResult.urls) {
+        console.log("Signed URLs result:", { ok: urlsResult.ok, error: !urlsResult.ok ? urlsResult.error : null });
+        if (urlsResult.ok) {
           const urlMap = urlsResult.urls.reduce(
             (acc: Record<string, string>, item: { path: string; url: string | null }) => {
               if (item.url) {
@@ -80,12 +81,19 @@ export default function SubmittedVehicleDetailPage() {
             },
             {}
           );
+          console.log("Image URL map created:", Object.keys(urlMap).length, "URLs");
           setImageUrls(urlMap);
         } else {
-          console.error("Failed to fetch signed URLs:", urlsResult);
+          console.error("Failed to fetch signed URLs:", { error: urlsResult.error });
         }
-      } catch (err) {
-        console.error("Error fetching signed URLs:", err);
+      } catch (err: any) {
+        console.error("Error fetching signed URLs:", {
+          message: err?.message,
+          digest: err?.digest,
+          name: err?.name,
+          toString: err?.toString(),
+          fullError: err
+        });
       }
     };
 
