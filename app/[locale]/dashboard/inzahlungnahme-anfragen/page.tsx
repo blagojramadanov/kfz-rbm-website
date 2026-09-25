@@ -12,14 +12,6 @@ import { AlertCircle, Trash2, ArrowRight } from "lucide-react";
 import type { TradeInRequest } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
 
-const STATUS_LABELS: Record<string, string> = {
-  new: "Neue Anfrage",
-  reviewing: "Wird geprüft",
-  contact_made: "Kontakt aufgenommen",
-  completed: "Abgeschlossen",
-  cancelled: "Storniert",
-};
-
 const STATUS_COLORS: Record<string, string> = {
   new: "bg-blue-100 text-blue-800",
   reviewing: "bg-yellow-100 text-yellow-800",
@@ -32,11 +24,22 @@ export default function TradeInRequestsPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
+  const t = useTranslations("dashboard.tradeInRequests");
+  const tCommon = useTranslations("common");
   const { loading, isAuthenticated, user } = useAuth();
   const [requests, setRequests] = useState<TradeInRequest[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(true);
   const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
+
+  // Create STATUS_LABELS dynamically
+  const STATUS_LABELS: Record<string, string> = {
+    new: t("status.new"),
+    reviewing: t("status.reviewing"),
+    contact_made: t("status.contact_made"),
+    completed: t("status.completed"),
+    cancelled: t("status.cancelled"),
+  };
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -75,7 +78,7 @@ export default function TradeInRequestsPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -89,8 +92,8 @@ export default function TradeInRequestsPage() {
           <Link href="/dashboard" className="text-blue-100 hover:text-white mb-2 inline-block text-sm">
             ← Dashboard
           </Link>
-          <h1 className="text-3xl font-bold mb-2">Meine Inzahlungnahmeanfragen</h1>
-          <p className="text-blue-100">Verwalten Sie Ihre Inzahlungnahmeanfragen und den Status</p>
+          <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
+          <p className="text-blue-100">{t("description")}</p>
         </div>
       </div>
 
@@ -104,10 +107,10 @@ export default function TradeInRequestsPage() {
         )}
 
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Anfragen ({requests.length})</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t("count", { count: requests.length })}</h2>
           <Link href="/dashboard/inzahlungnahme">
             <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white">
-              Neue Anfrage erstellen
+              {t("newRequest")}
             </Button>
           </Link>
         </div>
@@ -115,14 +118,14 @@ export default function TradeInRequestsPage() {
         {requestsLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto"></div>
-            <p className="text-gray-600 mt-4">Anfragen werden geladen...</p>
+            <p className="text-gray-600 mt-4">{t("loading")}</p>
           </div>
         ) : requests.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <p className="text-gray-600 mb-6">Sie haben noch keine Inzahlungnahmeanfragen erstellt.</p>
+            <p className="text-gray-600 mb-6">{t("empty")}</p>
             <Link href="/dashboard/inzahlungnahme">
               <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white">
-                Erste Anfrage erstellen
+                {t("firstRequest")}
               </Button>
             </Link>
           </div>
@@ -146,7 +149,7 @@ export default function TradeInRequestsPage() {
                       {/* Current Vehicle */}
                       <div>
                         <p className="text-sm text-gray-600 mb-2">
-                          <strong>Ihr Fahrzeug</strong>
+                          <strong>{t("yourVehicle")}</strong>
                         </p>
                         <div className="space-y-1 text-sm">
                           <p className="text-gray-900">
@@ -162,7 +165,7 @@ export default function TradeInRequestsPage() {
                       {request.desired_vehicle && (
                         <div>
                           <p className="text-sm text-gray-600 mb-2">
-                            <strong>Gewünschtes Fahrzeug</strong>
+                            <strong>{t("desiredVehicle")}</strong>
                           </p>
                           <div className="space-y-1 text-sm">
                             <p className="text-gray-900">
@@ -181,10 +184,10 @@ export default function TradeInRequestsPage() {
                     {request.desired_vehicle && (
                       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
                         <p className="text-xs text-gray-600 mb-2">
-                          <strong>Unverbindliche Schätzung</strong>
+                          <strong>{t("estimate")}</strong>
                         </p>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-700">Geschätzte Zuzahlung/Gutschrift:</span>
+                          <span className="text-sm text-gray-700">{t("difference")}</span>
                           <span
                             className={`font-bold text-lg ${
                               (request.current_vehicle_value_estimate ?? 0) >

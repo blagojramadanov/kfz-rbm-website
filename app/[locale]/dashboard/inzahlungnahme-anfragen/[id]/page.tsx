@@ -4,25 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { useTranslations } from "next-intl";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import type { TradeInRequest } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
-
-const STATUS_LABELS: Record<string, string> = {
-  new: "Neue Anfrage",
-  reviewing: "Wird geprüft",
-  contact_made: "Kontakt aufgenommen",
-  completed: "Abgeschlossen",
-  cancelled: "Storniert",
-};
-
-const STATUS_DESCRIPTIONS: Record<string, string> = {
-  new: "Ihre Anfrage wurde eingereicht und wird in Kürze von unserem Team überprüft.",
-  reviewing: "Unsere Experten überprüfen derzeit Ihre Anfrage und Ihre Fahrzeugwertschätzung.",
-  contact_made: "Wir haben Ihre Anfrage geprüft und werden uns in Kürze mit Ihnen in Verbindung setzen.",
-  completed: "Diese Anfrage wurde abgeschlossen.",
-  cancelled: "Diese Anfrage wurde storniert.",
-};
 
 const STATUS_COLORS: Record<string, string> = {
   new: "bg-blue-100 text-blue-800 border-blue-300",
@@ -33,6 +18,8 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function TradeInRequestDetailPage() {
+  const t = useTranslations("dashboard.tradeInRequestDetail");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const params = useParams();
   const { loading, isAuthenticated, user } = useAuth();
@@ -42,6 +29,9 @@ export default function TradeInRequestDetailPage() {
   const [error, setError] = useState("");
 
   const requestId = params?.id as string;
+
+  const getStatusLabel = (status: string) => t(`status.${status}`) || status;
+  const getStatusDescription = (status: string) => t(`statusDescriptions.${status}`) || "";
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -114,13 +104,13 @@ export default function TradeInRequestDetailPage() {
         {requestLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto"></div>
-            <p className="text-gray-600 mt-4">Anfrage wird geladen...</p>
+            <p className="text-gray-600 mt-4">{t("loading")}</p>
           </div>
         ) : !request ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <p className="text-gray-600 mb-6">Anfrage nicht gefunden.</p>
+            <p className="text-gray-600 mb-6">{t("notFound")}</p>
             <Link href="/dashboard/inzahlungnahme-anfragen" className="text-kfz-blue hover:underline">
-              Zurück zur Übersicht
+              {t("backToOverview")}
             </Link>
           </div>
         ) : (

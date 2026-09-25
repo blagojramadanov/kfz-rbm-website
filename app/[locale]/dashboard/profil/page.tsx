@@ -15,6 +15,8 @@ export default function ProfilePage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
+  const t = useTranslations("dashboard.profile");
+  const tCommon = useTranslations("common");
   const { profile, loading, isAuthenticated, updateProfile, changePassword } = useAuth();
   const errorMessage = useErrorMessage();
 
@@ -55,7 +57,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -88,7 +90,7 @@ export default function ProfilePage() {
         phone: profileForm.phone,
         company_name: profileForm.company_name,
       });
-      setMessage({ type: "success", text: "Profil erfolgreich aktualisiert" });
+      setMessage({ type: "success", text: t("messages.profileUpdated") });
     } catch (error) {
       setMessage({ type: "error", text: errorMessage(error) });
     } finally {
@@ -103,20 +105,20 @@ export default function ProfilePage() {
 
     // Validate passwords
     if (passwordForm.new_password !== passwordForm.confirm_password) {
-      setMessage({ type: "error", text: "Passwörter stimmen nicht überein" });
+      setMessage({ type: "error", text: t("messages.passwordsNotMatch") });
       setSaving(false);
       return;
     }
 
     if (passwordForm.new_password.length < 8) {
-      setMessage({ type: "error", text: "Passwort muss mindestens 8 Zeichen lang sein" });
+      setMessage({ type: "error", text: t("messages.passwordTooShort") });
       setSaving(false);
       return;
     }
 
     try {
       await changePassword(passwordForm.current_password, passwordForm.new_password);
-      setMessage({ type: "success", text: "Passwort erfolgreich geändert" });
+      setMessage({ type: "success", text: t("messages.passwordChanged") });
       setPasswordForm({
         current_password: "",
         new_password: "",
@@ -138,10 +140,10 @@ export default function ProfilePage() {
             Dashboard
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">
-            Profil
+            {t("title")}
           </h1>
           <p className="text-gray-600 mt-1">
-            Verwalten Sie Ihre Kontoinformationen und Sicherheitseinstellungen
+            {t("description")}
           </p>
         </div>
       </div>
@@ -160,7 +162,7 @@ export default function ProfilePage() {
                 }`}
               >
                 <User className="w-4 h-4 inline mr-2" />
-                Profilinformationen
+                {t("tabs.profile")}
               </button>
               <button
                 onClick={() => setActiveTab("password")}
@@ -171,7 +173,7 @@ export default function ProfilePage() {
                 }`}
               >
                 <Lock className="w-4 h-4 inline mr-2" />
-                Sicherheit
+                {t("tabs.security")}
               </button>
             </div>
           </div>
@@ -201,7 +203,7 @@ export default function ProfilePage() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email
+                      {t("form.email")}
                     </label>
                     <input
                       type="email"
@@ -209,47 +211,47 @@ export default function ProfilePage() {
                       disabled
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Die Email-Adresse kann nicht geändert werden</p>
+                    <p className="text-xs text-gray-500 mt-1">{t("form.emailDisabled")}</p>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Vollständiger Name
+                      {t("form.fullName")}
                     </label>
                     <input
                       type="text"
                       name="full_name"
                       value={profileForm.full_name}
                       onChange={handleProfileChange}
-                      placeholder="z.B. Max Mustermann"
+                      placeholder={t("form.placeholder.fullName")}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Telefon
+                      {t("form.phone")}
                     </label>
                     <input
                       type="tel"
                       name="phone"
                       value={profileForm.phone}
                       onChange={handleProfileChange}
-                      placeholder="z.B. +49 123 456789"
+                      placeholder={t("form.placeholder.phone")}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Unternehmen
+                      {t("form.company")}
                     </label>
                     <input
                       type="text"
                       name="company_name"
                       value={profileForm.company_name}
                       onChange={handleProfileChange}
-                      placeholder="z.B. Auto GmbH"
+                      placeholder={t("form.placeholder.company")}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                     />
                   </div>
@@ -258,7 +260,7 @@ export default function ProfilePage() {
                 <div className="flex gap-4 justify-end pt-4">
                   <Link href="/dashboard">
                     <Button variant="outline" className="border-gray-300">
-                      Abbrechen
+                      {t("buttons.cancel")}
                     </Button>
                   </Link>
                   <Button
@@ -266,7 +268,7 @@ export default function ProfilePage() {
                     disabled={saving}
                     className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold"
                   >
-                    {saving ? "Wird gespeichert..." : "Änderungen speichern"}
+                    {saving ? t("buttons.saving") : t("buttons.save")}
                   </Button>
                 </div>
               </form>
@@ -279,7 +281,7 @@ export default function ProfilePage() {
               <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-md">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Aktuelles Passwort
+                    {t("password.current")}
                   </label>
                   <input
                     type="password"
@@ -293,7 +295,7 @@ export default function ProfilePage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Neues Passwort
+                    {t("password.new")}
                   </label>
                   <input
                     type="password"
@@ -301,14 +303,14 @@ export default function ProfilePage() {
                     value={passwordForm.new_password}
                     onChange={handlePasswordChange}
                     required
-                    placeholder="Mindestens 8 Zeichen"
+                    placeholder={t("password.newPlaceholder")}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Passwort wiederholen
+                    {t("password.confirm")}
                   </label>
                   <input
                     type="password"
@@ -323,7 +325,7 @@ export default function ProfilePage() {
                 <div className="flex gap-4 justify-end pt-4">
                   <Link href="/dashboard">
                     <Button variant="outline" className="border-gray-300">
-                      Abbrechen
+                      {t("buttons.cancel")}
                     </Button>
                   </Link>
                   <Button
@@ -331,7 +333,7 @@ export default function ProfilePage() {
                     disabled={saving}
                     className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold"
                   >
-                    {saving ? "Wird gespeichert..." : "Passwort ändern"}
+                    {saving ? t("buttons.changingPassword") : t("buttons.changePassword")}
                   </Button>
                 </div>
               </form>

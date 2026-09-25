@@ -14,13 +14,7 @@ import { useErrorMessage } from "@/lib/use-error-message";
 
 type Step = "current_vehicle" | "vehicle_value" | "select_desired" | "review" | "success";
 
-const STEPS: { id: Step; label: string }[] = [
-  { id: "current_vehicle", label: "Aktuelles Fahrzeug" },
-  { id: "vehicle_value", label: "Fahrzeugwert" },
-  { id: "select_desired", label: "Gewünschtes Fahrzeug" },
-  { id: "review", label: "Überprüfung" },
-  { id: "success", label: "Erfolg" },
-];
+// STEPS labels will be dynamically generated with useTranslations
 
 interface TradeInForm {
   current_vehicle_brand: string;
@@ -35,8 +29,20 @@ export default function InzahlungnahmePage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
+  const t = useTranslations("dashboard.tradeIn");
+  const tCommon = useTranslations("common");
   const { loading, isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState<Step>("current_vehicle");
+
+  // Create STEPS array dynamically with translations
+  const STEPS: { id: Step; label: string }[] = [
+    { id: "current_vehicle", label: t("steps.current_vehicle") },
+    { id: "vehicle_value", label: t("steps.vehicle_value") },
+    { id: "select_desired", label: t("steps.select_desired") },
+    { id: "review", label: t("steps.review") },
+    { id: "success", label: t("steps.success") },
+  ];
+
   const [formData, setFormData] = useState<TradeInForm>({
     current_vehicle_brand: "",
     current_vehicle_model: "",
@@ -86,7 +92,7 @@ export default function InzahlungnahmePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -114,19 +120,19 @@ export default function InzahlungnahmePage() {
     switch (currentStep) {
       case "current_vehicle":
         if (!formData.current_vehicle_brand || !formData.current_vehicle_model || !formData.current_vehicle_year) {
-          setError("Bitte füllen Sie Marke, Modell und Jahr aus");
+          setError(t("validation.brandRequired"));
           return false;
         }
         break;
       case "vehicle_value":
         if (!formData.current_vehicle_value_estimate) {
-          setError("Bitte geben Sie einen geschätzten Fahrzeugwert ein");
+          setError(t("validation.valueRequired"));
           return false;
         }
         break;
       case "select_desired":
         if (!formData.desired_vehicle_id) {
-          setError("Bitte wählen Sie ein gewünschtes Fahrzeug aus");
+          setError(t("validation.vehicleRequired"));
           return false;
         }
         break;
@@ -196,8 +202,8 @@ export default function InzahlungnahmePage() {
           <Link href="/dashboard" className="text-blue-100 hover:text-white mb-2 inline-block text-sm">
             ← Dashboard
           </Link>
-          <h1 className="text-3xl font-bold mb-2">Inzahlungnahme</h1>
-          <p className="text-blue-100">Schritt {currentIndex + 1} von {STEPS.length}</p>
+          <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
+          <p className="text-blue-100">{t("stepProgress", { current: currentIndex + 1, total: STEPS.length })}</p>
         </div>
       </div>
 
@@ -251,32 +257,32 @@ export default function InzahlungnahmePage() {
         {/* Current Vehicle */}
         {currentStep === "current_vehicle" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Ihr aktuelles Fahrzeug</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("currentVehicle.title")}</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Marke *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("currentVehicle.brand")} *</label>
                 <input
                   type="text"
                   name="current_vehicle_brand"
                   value={formData.current_vehicle_brand}
                   onChange={handleInputChange}
-                  placeholder="z.B. BMW, Mercedes"
+                  placeholder={t("currentVehicle.brandPlaceholder")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Modell *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("currentVehicle.model")} *</label>
                 <input
                   type="text"
                   name="current_vehicle_model"
                   value={formData.current_vehicle_model}
                   onChange={handleInputChange}
-                  placeholder="z.B. 330i, C-Class"
+                  placeholder={t("currentVehicle.modelPlaceholder")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Erstzulassung *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("currentVehicle.year")} *</label>
                 <input
                   type="number"
                   name="current_vehicle_year"
@@ -288,13 +294,13 @@ export default function InzahlungnahmePage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Kilometerstand</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("currentVehicle.mileage")}</label>
                 <input
                   type="number"
                   name="current_vehicle_mileage"
                   value={formData.current_vehicle_mileage}
                   onChange={handleInputChange}
-                  placeholder="50000"
+                  placeholder={t("currentVehicle.mileagePlaceholder")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
@@ -305,18 +311,18 @@ export default function InzahlungnahmePage() {
         {/* Vehicle Value */}
         {currentStep === "vehicle_value" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Fahrzeugwert</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("vehicleValue.title")}</h2>
             <p className="text-gray-600 mb-8">
-              Schätzen Sie den aktuellen Wert Ihres Fahrzeugs. Dies ist eine unverbindliche Schätzung.
+              {t("vehicleValue.description")}
             </p>
             <div className="max-w-md">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Geschätzter Wert (€) *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t("vehicleValue.label")} *</label>
               <input
                 type="number"
                 name="current_vehicle_value_estimate"
                 value={formData.current_vehicle_value_estimate}
                 onChange={handleInputChange}
-                placeholder="50000"
+                placeholder={t("vehicleValue.placeholder")}
                 step="100"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent text-lg"
               />
@@ -327,16 +333,16 @@ export default function InzahlungnahmePage() {
         {/* Select Desired Vehicle */}
         {currentStep === "select_desired" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Gewünschtes Fahrzeug</h2>
-            <p className="text-gray-600 mb-6">Wählen Sie das Fahrzeug aus, das Sie kaufen möchten:</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("selectDesired.title")}</h2>
+            <p className="text-gray-600 mb-6">{t("selectDesired.description")}</p>
 
             {vehiclesLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto"></div>
-                <p className="text-gray-600 mt-4">Fahrzeuge werden geladen...</p>
+                <p className="text-gray-600 mt-4">{t("selectDesired.loading")}</p>
               </div>
             ) : availableVehicles.length === 0 ? (
-              <p className="text-gray-600">Keine verfügbaren Fahrzeuge vorhanden.</p>
+              <p className="text-gray-600">{t("selectDesired.empty")}</p>
             ) : (
               <div className="grid md:grid-cols-2 gap-4">
                 {availableVehicles.map((vehicle) => (
@@ -377,35 +383,35 @@ export default function InzahlungnahmePage() {
         {/* Review */}
         {currentStep === "review" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Überprüfung</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("review.title")}</h2>
 
             <div className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Ihr Fahrzeug</h3>
+                  <h3 className="font-semibold text-gray-900 mb-3">{t("review.yourVehicle")}</h3>
                   <div className="space-y-1 text-sm">
                     <p>
-                      <span className="text-gray-600">Marke:</span>{" "}
+                      <span className="text-gray-600">{t("review.brand")}</span>{" "}
                       <span className="font-medium">{formData.current_vehicle_brand}</span>
                     </p>
                     <p>
-                      <span className="text-gray-600">Modell:</span>{" "}
+                      <span className="text-gray-600">{t("review.model")}</span>{" "}
                       <span className="font-medium">{formData.current_vehicle_model}</span>
                     </p>
                     <p>
-                      <span className="text-gray-600">Jahr:</span>{" "}
+                      <span className="text-gray-600">{t("review.year")}</span>{" "}
                       <span className="font-medium">{formData.current_vehicle_year}</span>
                     </p>
                     {formData.current_vehicle_mileage && (
                       <p>
-                        <span className="text-gray-600">Kilometer:</span>{" "}
+                        <span className="text-gray-600">{t("review.mileage")}</span>{" "}
                         <span className="font-medium">
                           {parseInt(formData.current_vehicle_mileage).toLocaleString("de-DE")} km
                         </span>
                       </p>
                     )}
                     <p className="mt-2">
-                      <span className="text-gray-600">Geschätzter Wert:</span>{" "}
+                      <span className="text-gray-600">{t("review.estimatedValue")}</span>{" "}
                       <span className="font-bold text-lg">
                         € {parseFloat(formData.current_vehicle_value_estimate).toLocaleString("de-DE")}
                       </span>
@@ -414,7 +420,7 @@ export default function InzahlungnahmePage() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Gewünschtes Fahrzeug</h3>
+                  <h3 className="font-semibold text-gray-900 mb-3">{t("review.desiredVehicle")}</h3>
                   {desiredVehicle && (
                     <div className="space-y-1 text-sm">
                       <p>
@@ -442,22 +448,22 @@ export default function InzahlungnahmePage() {
 
               {/* Estimated Price Difference */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Unverbindliche Preisschätzung</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">{t("review.priceEstimate")}</h3>
                 <div className="mb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600">Geschätzter Wert Ihres Fahrzeugs:</span>
+                    <span className="text-gray-600">{t("review.yourEstimate")}</span>
                     <span className="font-bold">
                       € {parseFloat(formData.current_vehicle_value_estimate).toLocaleString("de-DE")}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-gray-600">Preis des gewünschten Fahrzeugs:</span>
+                    <span className="text-gray-600">{t("review.desiredPrice")}</span>
                     <span className="font-bold">
                       € {desiredVehicle?.price?.toLocaleString("de-DE")}
                     </span>
                   </div>
                   <div className="border-t border-blue-300 pt-4 flex justify-between items-center">
-                    <span className="font-semibold text-gray-900">Geschätzte Zuzahlung/Gutschrift:</span>
+                    <span className="font-semibold text-gray-900">{t("review.difference")}</span>
                     <span
                       className={`text-2xl font-bold ${
                         estimatedDifference !== null && estimatedDifference > 0
@@ -474,8 +480,7 @@ export default function InzahlungnahmePage() {
 
                 <div className="bg-white rounded p-4 border border-blue-200">
                   <p className="text-xs text-gray-600 italic">
-                    ⓘ <strong>Wichtig:</strong> Die endgültige Fahrzeugbewertung und Zuzahlung wird individuell durch
-                    unser Team festgelegt.
+                    {t("review.importantNote")} <strong>{t("review.importantNoteText")}</strong>
                   </p>
                 </div>
               </div>
@@ -487,25 +492,24 @@ export default function InzahlungnahmePage() {
         {currentStep === "success" && (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Anfrage erfolgreich eingereicht!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t("success.title")}</h2>
             <p className="text-gray-600 mb-4">
-              Ihre Inzahlungnahmeanfrage wurde erfolgreich eingereicht. Unsere Experten werden Ihre Anfrage prüfen und
-              sich in Kürze mit Ihnen in Verbindung setzen.
+              {t("success.description")}
             </p>
-            <p className="text-sm text-gray-500 mb-8">Anfrage-ID: {successId}</p>
+            <p className="text-sm text-gray-500 mb-8">{t("success.requestId")} {successId}</p>
             <div className="flex gap-4 justify-center">
               <Button
                 onClick={() => router.push("/dashboard")}
                 className="bg-kfz-blue hover:bg-kfz-blue-dark text-white"
               >
-                Zum Dashboard
+                {t("success.toDashboard")}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => router.push("/dashboard/inzahlungnahme-anfragen")}
                 className="border-gray-300"
               >
-                Anfragen ansehen
+                {t("success.viewRequests")}
               </Button>
             </div>
           </div>
@@ -521,7 +525,7 @@ export default function InzahlungnahmePage() {
               className="border-gray-300"
             >
               <ChevronLeft className="mr-2 w-4 h-4" />
-              Zurück
+              {t("buttons.back")}
             </Button>
 
             {currentStep !== "review" ? (
@@ -529,7 +533,7 @@ export default function InzahlungnahmePage() {
                 onClick={handleNext}
                 className="bg-kfz-blue hover:bg-kfz-blue-dark text-white"
               >
-                Weiter
+                {t("buttons.next")}
                 <ChevronRight className="ml-2 w-4 h-4" />
               </Button>
             ) : (
@@ -538,7 +542,7 @@ export default function InzahlungnahmePage() {
                 disabled={saving}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
-                {saving ? "Wird eingereicht..." : "Anfrage einreichen"}
+                {saving ? t("buttons.submitting") : t("buttons.submit")}
                 <Check className="ml-2 w-4 h-4" />
               </Button>
             )}
