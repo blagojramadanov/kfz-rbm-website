@@ -655,3 +655,45 @@ Fixed gender agreement in wizard.workflow.* messages: "возило" (vehicle) i
 - ✅ Admin submission list page: thumbnails display correctly
 - ✅ Wizard workflow info component: text corrected in all three locales, ready for integration when needed
 
+## Area 7 Live Testing Fixes (2026-09-25) - Final Commit
+
+### Issues Fixed from Live Browser Testing (16 total)
+
+**A. Formatting & Locale-Aware Display** ✅
+1. **fahrzeuge card prices/mileage** - Now use `useLocaleFormatter()` for proper locale formatting (was hardcoded en-US format)
+2. **fahrzeuge card labels** - "Fuel:" and "Trans:" now translated with `dashboard.vehicles.fuel/transmission` keys
+3. **fahrzeuge DB values** - Now display through `getFuelTypeLabel()` and `getTransmissionLabel()` helpers
+4. **inzahlungnahme wizard** - Prices use locale-aware `formatCurrency()` helper function
+5. **inzahlungnahme-anfragen** - All prices/mileage use `formatter.number()` instead of hardcoded `.toLocaleString("de-DE")`
+6. **Dashboard breadcrumbs** - All "Dashboard" links now use translated `navigation.dashboard` key via `tNav()`
+
+**B. Hardcoded Strings Translated** ✅
+7. **Trade-in review labels** - "Fahrzeug:", "Kilometer:", "Preis:" now use translation keys
+8. **Breadcrumb navigation** - All subpages use `tNav("dashboard")` instead of hardcoded "Dashboard"
+9. **Mileage placeholder** - Formatted via locale formatter instead of raw "50000"
+
+**C. Macedonian Grammar Corrections** ✅
+10. **"Испитување" → "Прашања"** - Fixed throughout dashboard + admin ("inquiries" not "examination")
+11. **"Непрофитна процена" → "Необврзувачка проценка"** - Correct non-binding estimate terminology
+12. **"Добредојде" → "Добредојдовте"** - Formal greeting in dashboard welcome
+13. **Singular imperatives → Formal Вие forms** - "Управувај" → "Управувајте", validation messages, all buttons
+14. **Macedonian descriptions** - Fixed "испитување" → "прашања" in dashboard.overview.inquiriesDescription
+15. **Label descriptions** - "Видете ги испитувањата" → "Видете ги прашањата"
+
+**D. UI Fixes** ✅
+16. **Double checkmark** - Removed duplicate "✓ ✓" from accepted-offer message (now single check)
+
+### Code Changes
+- **fahrzeuge/page.tsx**: Added `useLocaleFormatter()`, used `tNav()` for breadcrumb, DB values via label helpers
+- **inzahlungnahme/page.tsx**: Created `formatCurrency()` helper, fixed all price displays, added `tNav()` for breadcrumb
+- **inzahlungnahme-anfragen/page.tsx**: Added `useLocaleFormatter()`, replaced `.toLocaleString()` calls, imported formatter
+- **inzahlungnahme-anfragen/[id]/page.tsx**: Fixed "Notes" label to use translation key
+- **anfragen/page.tsx, favoriten/page.tsx, profil/page.tsx**: Added `tNav()` for Dashboard breadcrumb
+- **messages/mk.json**: Updated all Macedonian terminology and grammar for formal language
+
+### Verification
+- ✅ `npm run check:i18n`: 577/577 keys verified
+- ✅ `npm run build`: All pages compile successfully
+- ✅ Commit hash: `409320f`
+- ✅ Pushed to main successfully
+
