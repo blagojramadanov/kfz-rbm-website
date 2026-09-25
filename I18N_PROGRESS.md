@@ -375,42 +375,55 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 ## Area 6: Customer "Mein Auto anbieten" Wizard (2026-09-25)
 
 ### Completed
-- **Wizard page** (`app/[locale]/dashboard/fahrzeug-anbieten/page.tsx`): 135 hardcoded German strings moved to `wizard.*` namespace ✅
+- **Wizard page** (`app/[locale]/dashboard/fahrzeug-anbieten/page.tsx`): 135+ hardcoded German strings moved to `wizard.*` namespace ✅
   - All step labels, field labels, placeholders, validation messages, error messages replaced with `t()` calls
   - Fixed hardcoded German number format on review page (`.toLocaleString()` instead of `.toLocaleString("de-DE")`)
   - Updated form field values to use normalized keys (gasoline/diesel, manual/automatic, sedan/suv, direct/tradeIn/consignment, yes/no)
   - Added helper function to translate sales type labels on review page
   - Used error codes from area 8 for validation error messages
 
-- **Code-level improvements** (final fixes) ✅
+- **Code-level improvements** (final fixes + live testing fixes) ✅
   - Extracted constants: `MAX_IMAGES = 20`, `DESCRIPTION_MIN_CHARS = 20`, `MAX_MILEAGE = 99999999`, `MAX_POWER = 99999`, `MAX_PRICE = 99999999.99`
+  - Fixed missing placeholder values: `images.uploadCount` now passes `{current, max}`, `description.minCharsNote` now passes `{min}`
   - Updated validation messages to pass placeholder values: `mileageRange` and `powerRange` with `{ max: format.number(...) }`, `priceMax` with EUR currency formatting, `descriptionMinLength` with `{ min }` placeholder
   - Review page now uses `useFormatter().number()` for mileage, power, and price displays with proper localization
   - Imported label helpers (`getFuelTypeLabel`, `getTransmissionLabel`, `getBodyTypeLabel`) and use them on review page to display translated DB values (fuel, transmission, body type)
   - Updated unit message strings: `wizard.units.kilometers` → `wizard.units.mileage` (format "{value} km"), `wizard.units.horsePower` → `wizard.units.power` (format "{value} PS" in de/mk, "{value} hp" in en)
+  - Removed unit suffix from field labels (powerHp: "Leistung (PS)" → "Leistung") to avoid duplication when displaying with formatted value
+  - Fixed description truncation: changed from `substring(0, 100) + "..."` to CSS `line-clamp-3` for proper ellipsis handling
   - All messages now use ICU placeholders and formatters for consistent number/currency display across locales
+
+- **Success page** (`app/[locale]/dashboard/fahrzeug-angeboten/page.tsx`): Fully localized ✅
+  - Added `wizard.success.*` keys in de/en/mk: title, message, description, viewVehicles button, backToDashboard button
+  - Macedonian uses formal "Вашето возило" (formal possessive)
+  - Updated loading text to use translations instead of hardcoded German
 
 - **Workflow info component** (`components/submission-workflow-info.tsx`): All hardcoded strings replaced with `wizard.workflow.*` keys ✅
   - 4 workflow steps + important note all use translations
 
-- **Message files**: Added 120+ new keys in `wizard.*` namespace across all three locales ✅
-  - German (de.json): Full translations for labels, options, validation messages, workflow info; updated validation messages with {min}/{max}/{maxCount} placeholders; new unit format strings
+- **Message files**: Added 125+ new keys in `wizard.*` namespace across all three locales ✅
+  - German (de.json): Full translations for labels, options, validation messages, workflow info, success page; updated validation messages with {min}/{max}/{maxCount} placeholders; new unit format strings
   - English (en.json): Full English translations with proper plurals and formal address; validation placeholders and new unit format strings
-  - Macedonian (mk.json): Full Macedonian translations with formal "Вие" forms, no imperatives; validation placeholders with correct Macedonian formatting; new unit format strings with proper abbreviations
+  - Macedonian (mk.json): Full Macedonian translations with formal "Вие" forms, no imperatives; validation placeholders with correct Macedonian formatting; new unit format strings with proper abbreviations; success page with formal language
 
-- **Macedonian language corrections** (from previous pass) ✅
-  - Title: "Понудете го Вашиот автомобил" (formal verb + formal possessive)
-  - Field labels: transmission="Менувач", bodyType="Тип на каросерија", huAu="Технички преглед (HU/AU)"
+- **Macedonian language corrections** (comprehensive fixes) ✅
+  - Wizard title: "Понудете го Вашиот автомобил" (formal verb + formal possessive)
+  - Field labels: transmission="Менувач", bodyType="Тип на каросерија", huAu="Технички преглед (HU/AU)", powerHp="Моќност" (unit removed from label)
   - Placeholders: "нпр. BMW, Mercedes" (brand names), "нпр. црна, бела" (lowercase colors)
   - Options: fuel.electric="Електрично", bodyType.wagon="Караван", bodyType.van="Комбе", bodyType.smallCar="Мал автомобил"
+  - Common labels (shared with vehicle display): transmissions.manual="Рачен" (not "Ручна" Serbian), transmissions.automatic="Автоматски" (not "Автоматска" Serbian), bodyTypes.van="Комбе" (not "Ван" English)
+  - Footer: followUs="Следете нè" (formal, corrected from "Следувајте нас")
   - Terminology: "возило" (not "кола"), "знаци" (not "карактери")
   - ICU plural forms for imagesCount and validation messages
 
 ### Tests
-- ✅ `npm run check:i18n`: All 408 keys found, no duplicates, all placeholders match, no encoding issues
+- ✅ `npm run check:i18n`: All 413 keys found, no duplicates, all placeholders match, no encoding issues
 - ✅ `npm run build`: Compilation successful, no type errors, all pages rendered
-- ✅ Area 6 removed all hardcoded strings from wizard workflow (audit count: 135 → 0)
+- ✅ Area 6 removed all hardcoded strings from wizard workflow (audit count: 135+ → 0)
 - ✅ Code passes TypeScript checks; all formatter and label helper calls use correct namespace/parameters
 - ✅ Validation messages pass {min}/{max}/{maxCount}/{current} placeholders with formatted values
 - ✅ Review page displays mileage/power with proper ICU format strings, translated fuel/transmission/body type values
+- ✅ Success page fully localized with proper translations in de/en/mk
+- ✅ Missing placeholder values fixed; no raw keys visible on /de, /en, /mk
+- ✅ Unit duplication fixed on review step
 

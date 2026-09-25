@@ -713,7 +713,7 @@ export default function SubmitVehicleWizardPage() {
         {/* Bilder */}
         {currentStep === "bilder" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("images.uploadCount", { current: images.length })}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("images.uploadCount", { current: images.length, max: MAX_IMAGES })}</h2>
 
             {/* Upload Area */}
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-8 hover:border-kfz-blue transition-colors">
@@ -797,7 +797,7 @@ export default function SubmitVehicleWizardPage() {
               rows={10}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
             />
-            <p className="text-sm text-gray-600 mt-2">{t("description.minCharsNote")}</p>
+            <p className="text-sm text-gray-600 mt-2">{t("description.minCharsNote", { min: DESCRIPTION_MIN_CHARS })}</p>
           </div>
         )}
 
@@ -905,7 +905,7 @@ export default function SubmitVehicleWizardPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">{t("review.descriptionSection")}</h3>
-                <p className="text-gray-600">{formData.beschreibung.substring(0, 100)}...</p>
+                <p className="text-gray-600 line-clamp-3">{formData.beschreibung}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">{t("review.salesTypeSection")}</h3>

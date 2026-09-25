@@ -13,6 +13,7 @@ import { CheckCircle, ArrowRight } from "lucide-react";
 export default function SuccessPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
+  const t = useTranslations("wizard");
   const router = useRouter();
   const { loading, isAuthenticated } = useAuth();
 
@@ -27,7 +28,7 @@ export default function SuccessPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{t("loading")}</p>
         </div>
       </div>
     );
@@ -43,28 +44,28 @@ export default function SuccessPage() {
         </div>
 
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Vielen Dank!
+          {t("success.title")}
         </h1>
 
         <p className="text-lg text-gray-600 mb-2">
-          Ihr Fahrzeug wurde erfolgreich gesendet.
+          {t("success.message")}
         </p>
 
         <p className="text-gray-600 mb-8">
-          Wir melden uns in Kürze bei Ihnen mit weiteren Informationen.
+          {t("success.description")}
         </p>
 
         <div className="space-y-3">
           <Link href="/dashboard/fahrzeuge" className="block w-full">
             <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
-              Meine Fahrzeuge anschauen
+              {t("success.viewVehicles")}
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </Link>
 
           <Link href="/dashboard" className="block w-full">
             <Button variant="outline" className="w-full border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white">
-              Zum Dashboard
+              {t("success.backToDashboard")}
             </Button>
           </Link>
         </div>

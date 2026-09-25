@@ -784,7 +784,7 @@
             "firstRegistration": "First registration",
             "firstRegistrationRequired": "First registration *",
             "mileage": "Mileage",
-            "powerHp": "Power (HP)",
+            "powerHp": "Power",
             "fuel": "Fuel type",
             "transmission": "Transmission",
             "bodyType": "Body type",
@@ -918,6 +918,13 @@
             "step4Desc": "Interested parties can see your vehicle, ask questions, and book test drives.",
             "importantNoteLabel": "Important:",
             "importantNoteText": "Only approved vehicles are displayed publicly. You can resubmit rejected vehicles."
+        },
+        "success": {
+            "title": "Thank you!",
+            "message": "Your vehicle has been successfully submitted.",
+            "description": "We will contact you shortly with further information.",
+            "viewVehicles": "View my vehicles",
+            "backToDashboard": "Back to dashboard"
         }
     }
 }

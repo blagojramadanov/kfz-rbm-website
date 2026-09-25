@@ -784,7 +784,7 @@
             "firstRegistration": "Erstzulassung",
             "firstRegistrationRequired": "Erstzulassung *",
             "mileage": "Kilometerstand",
-            "powerHp": "Leistung (PS)",
+            "powerHp": "Leistung",
             "fuel": "Kraftstoff",
             "transmission": "Getriebe",
             "bodyType": "Karosserie",
@@ -918,6 +918,13 @@
             "step4Desc": "Interessierte können Ihr Fahrzeug sehen, Anfragen stellen und Probefahrten buchen.",
             "importantNoteLabel": "Wichtig:",
             "importantNoteText": "Nur genehmigt Fahrzeuge werden öffentlich angezeigt. Sie können abgelehnte Fahrzeuge erneut einreichen."
+        },
+        "success": {
+            "title": "Vielen Dank!",
+            "message": "Ihr Fahrzeug wurde erfolgreich gesendet.",
+            "description": "Wir melden uns in Kürze bei Ihnen mit weiteren Informationen.",
+            "viewVehicles": "Meine Fahrzeuge anschauen",
+            "backToDashboard": "Zum Dashboard"
         }
     }
 }
