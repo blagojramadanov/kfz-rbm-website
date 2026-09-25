@@ -7,12 +7,14 @@ import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Car, MessageSquare, Heart, Plus, FileText, LogOut, ArrowRight, Repeat2 } from "lucide-react";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 
 export const dynamic = "force-dynamic";
 
 export default function DashboardPage() {
   const t = useTranslations("dashboard");
   const tCommon = useTranslations("common");
+  const formatter = useLocaleFormatter();
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string || 'de';
@@ -109,7 +111,7 @@ export default function DashboardPage() {
               <div>
                 <p className="text-sm text-gray-500">{t("memberSince")}</p>
                 <p className="text-sm font-semibold text-gray-900">
-                  {new Date(profile.created_at).toLocaleDateString("de-DE")}
+                  {formatter.dateTime(new Date(profile.created_at), { year: "numeric", month: "long", day: "numeric" })}
                 </p>
               </div>
               <FileText className="w-10 h-10 text-orange-600" />

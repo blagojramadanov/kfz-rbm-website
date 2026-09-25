@@ -9,6 +9,10 @@ import { Plus, Car, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import type { SubmittedVehicle } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { getFuelTypeLabel, getTransmissionLabel } from "@/lib/vehicle-labels";
+import { useLocale } from "next-intl";
+import { getNumberLocale } from "@/lib/i18n/number-locale";
 
 type DashboardVehicleStatus = "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "akzeptiert" | "abgelehnt";
 
@@ -17,12 +21,25 @@ export const dynamic = "force-dynamic";
 export default function MyVehiclesPage() {
   const t = useTranslations("dashboard.vehicles");
   const tCommon = useTranslations("common");
+  const tNav = useTranslations("navigation");
+  const locale = useLocale();
+  const formatter = useLocaleFormatter();
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
   const errorMessage = useErrorMessage();
   const [vehicles, setVehicles] = useState<SubmittedVehicle[]>([]);
   const [loadingVehicles, setLoadingVehicles] = useState(true);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
+
+  const formatCurrency = (value: number) => {
+    const numberLocale = getNumberLocale(locale);
+    return new Intl.NumberFormat(numberLocale, {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   const getStatusConfig = (status: DashboardVehicleStatus): { label: string; color: string; icon: React.ReactNode; bgColor: string } => {
     const statusLabel = t(`status.${status}`);
@@ -157,8 +174,8 @@ export default function MyVehiclesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <Link href="/dashboard" className="text-kfz-blue hover:underline mb-2 inline-block">
-                Dashboard
+              <Link href="/dashboard" className="text-kfz-blue hover:underline mb-2 inline-block text-sm">
+                ← {tNav("dashboard")}
               </Link>
               <h1 className="text-3xl font-bold text-gray-900">
                 {t("title")}
@@ -245,21 +262,21 @@ export default function MyVehiclesPage() {
                       {vehicle.brand} {vehicle.model}
                     </h3>
                     <p className="text-sm text-gray-600 mb-3">
-                      {vehicle.year} • {vehicle.mileage?.toLocaleString()} km
+                      {vehicle.year} • {formatter.number(vehicle.mileage || 0)} km
                     </p>
 
                     {/* Price */}
                     <p className="text-2xl font-bold text-kfz-blue mb-4">
-                      €{vehicle.price?.toLocaleString()}
+                      {formatCurrency(vehicle.price || 0)}
                     </p>
 
                     {/* Quick Specs */}
                     <div className="grid grid-cols-2 gap-2 mb-4 text-sm text-gray-600">
                       <div>
-                        <span className="font-semibold">Fuel:</span> {vehicle.fuel_type}
+                        <span className="font-semibold">{t("fuel")}:</span> {getFuelTypeLabel(tCommon, vehicle.fuel_type)}
                       </div>
                       <div>
-                        <span className="font-semibold">Trans:</span> {vehicle.transmission}
+                        <span className="font-semibold">{t("transmission")}:</span> {getTransmissionLabel(tCommon, vehicle.transmission)}
                       </div>
                     </div>
 
@@ -268,7 +285,7 @@ export default function MyVehiclesPage() {
                       <div className="border-t pt-3 mt-3">
                         <div className="bg-green-50 p-3 rounded mb-3">
                           <p className="text-sm text-gray-600 mb-1">{t("offeredPrice")}</p>
-                          <p className="text-2xl font-bold text-green-600">€{vehicle.offered_price.toLocaleString("de-DE")}</p>
+                          <p className="text-2xl font-bold text-green-600">{formatCurrency(vehicle.offered_price)}</p>
                           {vehicle.offer_terms && (
                             <p className="text-xs text-gray-600 mt-2">{vehicle.offer_terms}</p>
                           )}
@@ -293,7 +310,7 @@ export default function MyVehiclesPage() {
                     {/* Accepted/Rejected Status */}
                     {status === "akzeptiert" && (
                       <div className="border-t pt-3 mt-3 bg-green-50 p-3 rounded">
-                        <p className="text-sm text-green-700">✓ <span className="font-semibold">{t("offerAccepted")}</span></p>
+                        <p className="text-sm text-green-700"><span className="font-semibold">{t("offerAccepted")}</span></p>
                         <p className="text-xs text-gray-600 mt-1">{t("contactUs")}</p>
                       </div>
                     )}

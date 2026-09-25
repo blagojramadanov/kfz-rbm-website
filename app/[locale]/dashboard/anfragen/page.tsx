@@ -13,6 +13,7 @@ import { MessageSquare, ArrowRight } from "lucide-react";
 export default function InquiriesPage() {
   const t = useTranslations("dashboard.inquiries");
   const tCommon = useTranslations("common");
+  const tNav = useTranslations("navigation");
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function InquiriesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div>
             <Link href="/dashboard" className="text-kfz-blue hover:underline mb-2 inline-block">
-              Dashboard
+              {tNav("dashboard")}
             </Link>
             <h1 className="text-3xl font-bold text-gray-900">
               {t("title")}

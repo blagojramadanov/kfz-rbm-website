@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, Trash2, ArrowRight } from "lucide-react";
 import type { TradeInRequest } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 
 const STATUS_COLORS: Record<string, string> = {
   new: "bg-blue-100 text-blue-800",
@@ -26,6 +27,8 @@ export default function TradeInRequestsPage() {
   const router = useRouter();
   const t = useTranslations("dashboard.tradeInRequests");
   const tCommon = useTranslations("common");
+  const tNav = useTranslations("navigation");
+  const formatter = useLocaleFormatter();
   const { loading, isAuthenticated, user } = useAuth();
   const [requests, setRequests] = useState<TradeInRequest[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(true);
@@ -90,7 +93,7 @@ export default function TradeInRequestsPage() {
       <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link href="/dashboard" className="text-blue-100 hover:text-white mb-2 inline-block text-sm">
-            ← Dashboard
+            ← {tNav("dashboard")}
           </Link>
           <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
           <p className="text-blue-100">{t("description")}</p>
@@ -153,10 +156,10 @@ export default function TradeInRequestsPage() {
                         </p>
                         <div className="space-y-1 text-sm">
                           <p className="text-gray-900">
-                            {request.current_vehicle_mileage?.toLocaleString("de-DE")} km
+                            {formatter.number(request.current_vehicle_mileage || 0)} km
                           </p>
                           <p className="font-semibold text-lg text-kfz-blue">
-                            € {request.current_vehicle_value_estimate?.toLocaleString("de-DE")}
+                            €{formatter.number(request.current_vehicle_value_estimate || 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                           </p>
                         </div>
                       </div>
@@ -173,7 +176,7 @@ export default function TradeInRequestsPage() {
                               {request.desired_vehicle.model}
                             </p>
                             <p className="font-semibold text-lg text-kfz-blue">
-                              € {request.desired_vehicle.price?.toLocaleString("de-DE")}
+                              €{formatter.number(request.desired_vehicle.price || 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                             </p>
                           </div>
                         </div>
@@ -202,10 +205,13 @@ export default function TradeInRequestsPage() {
                               ? "+"
                               : ""}
                             €{" "}
-                            {Math.abs(
-                              (request.current_vehicle_value_estimate ?? 0) -
-                                (request.desired_vehicle.price ?? 0)
-                            ).toLocaleString("de-DE")}
+                            {formatter.number(
+                              Math.abs(
+                                (request.current_vehicle_value_estimate ?? 0) -
+                                  (request.desired_vehicle.price ?? 0)
+                              ),
+                              { minimumFractionDigits: 0, maximumFractionDigits: 0 }
+                            )}
                           </span>
                         </div>
                         <p className="text-xs text-gray-500 mt-2 italic">

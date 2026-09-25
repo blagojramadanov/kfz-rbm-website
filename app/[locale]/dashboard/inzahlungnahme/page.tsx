@@ -11,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, AlertCircle, Check } from "lucide-react";
 import type { Vehicle } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { useLocale } from "next-intl";
+import { getNumberLocale } from "@/lib/i18n/number-locale";
 
 type Step = "current_vehicle" | "vehicle_value" | "select_desired" | "review" | "success";
 
@@ -27,12 +30,24 @@ interface TradeInForm {
 
 export default function InzahlungnahmePage() {
   const params = useParams();
-  const locale = params.locale as string || 'de';
   const router = useRouter();
   const t = useTranslations("dashboard.tradeIn");
   const tCommon = useTranslations("common");
+  const tNav = useTranslations("navigation");
+  const locale = useLocale();
+  const formatter = useLocaleFormatter();
   const { loading, isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState<Step>("current_vehicle");
+
+  const formatCurrency = (value: number) => {
+    const numberLocale = getNumberLocale(locale);
+    return new Intl.NumberFormat(numberLocale, {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   // Create STEPS array dynamically with translations
   const STEPS: { id: Step; label: string }[] = [
@@ -200,7 +215,7 @@ export default function InzahlungnahmePage() {
       <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link href="/dashboard" className="text-blue-100 hover:text-white mb-2 inline-block text-sm">
-            ← Dashboard
+            ← {tNav("dashboard")}
           </Link>
           <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
           <p className="text-blue-100">{t("stepProgress", { current: currentIndex + 1, total: STEPS.length })}</p>
@@ -367,10 +382,10 @@ export default function InzahlungnahmePage() {
                         {vehicle.year} {vehicle.brand} {vehicle.model}
                       </p>
                       <p className="text-sm text-gray-600 mt-1">
-                        {vehicle.mileage?.toLocaleString("de-DE")} km
+                        {formatter.number(vehicle.mileage || 0)} km
                       </p>
                       <p className="text-lg font-bold text-kfz-blue mt-2">
-                        € {vehicle.price?.toLocaleString("de-DE")}
+                        {formatCurrency(vehicle.price || 0)}
                       </p>
                     </div>
                   </label>
@@ -406,14 +421,14 @@ export default function InzahlungnahmePage() {
                       <p>
                         <span className="text-gray-600">{t("review.mileage")}</span>{" "}
                         <span className="font-medium">
-                          {parseInt(formData.current_vehicle_mileage).toLocaleString("de-DE")} km
+                          {formatter.number(parseInt(formData.current_vehicle_mileage))} km
                         </span>
                       </p>
                     )}
                     <p className="mt-2">
                       <span className="text-gray-600">{t("review.estimatedValue")}</span>{" "}
                       <span className="font-bold text-lg">
-                        € {parseFloat(formData.current_vehicle_value_estimate).toLocaleString("de-DE")}
+                        {formatCurrency(parseFloat(formData.current_vehicle_value_estimate))}
                       </span>
                     </p>
                   </div>
@@ -424,21 +439,21 @@ export default function InzahlungnahmePage() {
                   {desiredVehicle && (
                     <div className="space-y-1 text-sm">
                       <p>
-                        <span className="text-gray-600">Fahrzeug:</span>{" "}
+                        <span className="text-gray-600">{t("review.vehicle")}</span>{" "}
                         <span className="font-medium">
                           {desiredVehicle.year} {desiredVehicle.brand} {desiredVehicle.model}
                         </span>
                       </p>
                       <p>
-                        <span className="text-gray-600">Kilometer:</span>{" "}
+                        <span className="text-gray-600">{t("review.mileage")}</span>{" "}
                         <span className="font-medium">
-                          {desiredVehicle.mileage?.toLocaleString("de-DE")} km
+                          {formatter.number(desiredVehicle.mileage || 0)} km
                         </span>
                       </p>
                       <p className="mt-2">
-                        <span className="text-gray-600">Preis:</span>{" "}
+                        <span className="text-gray-600">{t("review.price")}</span>{" "}
                         <span className="font-bold text-lg text-kfz-blue">
-                          € {desiredVehicle.price?.toLocaleString("de-DE")}
+                          {formatCurrency(desiredVehicle.price || 0)}
                         </span>
                       </p>
                     </div>
@@ -453,13 +468,13 @@ export default function InzahlungnahmePage() {
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-gray-600">{t("review.yourEstimate")}</span>
                     <span className="font-bold">
-                      € {parseFloat(formData.current_vehicle_value_estimate).toLocaleString("de-DE")}
+                      {formatCurrency(parseFloat(formData.current_vehicle_value_estimate))}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-gray-600">{t("review.desiredPrice")}</span>
                     <span className="font-bold">
-                      € {desiredVehicle?.price?.toLocaleString("de-DE")}
+                      {formatCurrency(desiredVehicle?.price || 0)}
                     </span>
                   </div>
                   <div className="border-t border-blue-300 pt-4 flex justify-between items-center">
@@ -472,8 +487,8 @@ export default function InzahlungnahmePage() {
                       }`}
                     >
                       {estimatedDifference !== null
-                        ? `${estimatedDifference > 0 ? "+" : ""}€ ${Math.abs(estimatedDifference).toLocaleString("de-DE")}`
-                        : "€ 0"}
+                        ? `${estimatedDifference > 0 ? "+" : ""}€${formatter.number(Math.abs(estimatedDifference), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+                        : `€${formatter.number(0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
                     </span>
                   </div>
                 </div>

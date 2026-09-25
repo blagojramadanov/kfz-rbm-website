@@ -254,6 +254,8 @@
             "emptyDescription": "You haven't listed any vehicles for sale yet. Click below to add your first vehicle.",
             "firstVehicle": "List First Vehicle",
             "loading": "Loading vehicles...",
+            "fuel": "Fuel Type",
+            "transmission": "Transmission",
             "status": {
                 "eingereicht": "Submitted",
                 "in_bearbeitung": "In Review",
@@ -418,6 +420,7 @@
             "requestId": "Request ID:",
             "loading": "Loading request...",
             "notFound": "Request not found.",
+            "adminNotes": "Notes",
             "backToOverview": "Back to Overview",
             "status": {
                 "new": "New Request",

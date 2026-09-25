@@ -18,6 +18,7 @@ export default function ProfilePage() {
   const t = useTranslations("dashboard.profile");
   const tCommon = useTranslations("common");
   const { profile, loading, isAuthenticated, updateProfile, changePassword } = useAuth();
+  const tNav = useTranslations("navigation");
   const errorMessage = useErrorMessage();
 
   const [activeTab, setActiveTab] = useState<"profile" | "password">("profile");
@@ -137,7 +138,7 @@ export default function ProfilePage() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link href="/dashboard" className="text-kfz-blue hover:underline mb-2 inline-block">
-            Dashboard
+            {tNav("dashboard")}
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">
             {t("title")}

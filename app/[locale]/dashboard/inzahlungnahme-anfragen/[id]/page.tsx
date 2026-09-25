@@ -8,6 +8,9 @@ import { useTranslations } from "next-intl";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import type { TradeInRequest } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { useLocale } from "next-intl";
+import { getNumberLocale } from "@/lib/i18n/number-locale";
 
 const STATUS_COLORS: Record<string, string> = {
   new: "bg-blue-100 text-blue-800 border-blue-300",
@@ -20,6 +23,8 @@ const STATUS_COLORS: Record<string, string> = {
 export default function TradeInRequestDetailPage() {
   const t = useTranslations("dashboard.tradeInRequestDetail");
   const tCommon = useTranslations("common");
+  const locale = useLocale();
+  const formatter = useLocaleFormatter();
   const router = useRouter();
   const params = useParams();
   const { loading, isAuthenticated, user } = useAuth();
@@ -27,6 +32,16 @@ export default function TradeInRequestDetailPage() {
   const [requestLoading, setRequestLoading] = useState(true);
   const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
+
+  const formatCurrency = (value: number) => {
+    const numberLocale = getNumberLocale(locale);
+    return new Intl.NumberFormat(numberLocale, {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   const requestId = params?.id as string;
 
@@ -118,9 +133,9 @@ export default function TradeInRequestDetailPage() {
             {/* Status Card */}
             <div className={`border-l-4 rounded-lg p-6 ${STATUS_COLORS[request.status]}`}>
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-bold">Status: {getStatusLabel(request.status)}</h2>
+                <h2 className="text-xl font-bold">{getStatusLabel(request.status)}</h2>
                 <span className="text-sm font-medium">
-                  {new Date(request.created_at).toLocaleDateString("de-DE")}
+                  {formatter.dateTime(new Date(request.created_at), { year: "numeric", month: "2-digit", day: "2-digit" })}
                 </span>
               </div>
               <p className="text-sm">{getStatusDescription(request.status)}</p>
@@ -145,13 +160,13 @@ export default function TradeInRequestDetailPage() {
                   <div>
                     <p className="text-sm text-gray-600">{t("mileage")}</p>
                     <p className="font-semibold text-gray-900">
-                      {request.current_vehicle_mileage?.toLocaleString("de-DE")} km
+                      {formatter.number(request.current_vehicle_mileage || 0)} km
                     </p>
                   </div>
                   <div className="pt-3 border-t">
                     <p className="text-sm text-gray-600">{t("estimatedValue")}</p>
                     <p className="text-2xl font-bold text-kfz-blue">
-                      € {request.current_vehicle_value_estimate?.toLocaleString("de-DE")}
+                      {formatCurrency(request.current_vehicle_value_estimate || 0)}
                     </p>
                   </div>
                 </div>
@@ -175,13 +190,13 @@ export default function TradeInRequestDetailPage() {
                     <div>
                       <p className="text-sm text-gray-600">{t("mileage")}</p>
                       <p className="font-semibold text-gray-900">
-                        {request.desired_vehicle.mileage?.toLocaleString("de-DE")} km
+                        {formatter.number(request.desired_vehicle.mileage || 0)} km
                       </p>
                     </div>
                     <div className="pt-3 border-t">
                       <p className="text-sm text-gray-600">{t("price")}</p>
                       <p className="text-2xl font-bold text-kfz-blue">
-                        € {request.desired_vehicle.price?.toLocaleString("de-DE")}
+                        {formatCurrency(request.desired_vehicle.price || 0)}
                       </p>
                     </div>
                   </div>
@@ -198,14 +213,14 @@ export default function TradeInRequestDetailPage() {
                   <div className="flex justify-between items-center py-2 border-b">
                     <span className="text-gray-700">{t("yourVehicleEstimate")}</span>
                     <span className="font-semibold">
-                      € {request.current_vehicle_value_estimate?.toLocaleString("de-DE")}
+                      {formatCurrency(request.current_vehicle_value_estimate || 0)}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center py-2 border-b">
                     <span className="text-gray-700">{t("desiredVehiclePrice")}</span>
                     <span className="font-semibold">
-                      € {request.desired_vehicle.price?.toLocaleString("de-DE")}
+                      {formatCurrency(request.desired_vehicle.price || 0)}
                     </span>
                   </div>
 
@@ -219,16 +234,17 @@ export default function TradeInRequestDetailPage() {
                           : "text-red-600"
                       }`}
                     >
-                      {(request.current_vehicle_value_estimate ?? 0) -
+                      {((request.current_vehicle_value_estimate ?? 0) -
                         (request.desired_vehicle.price ?? 0) >
                       0
                         ? "+"
-                        : ""}
-                      €{" "}
-                      {Math.abs(
-                        (request.current_vehicle_value_estimate ?? 0) -
-                          (request.desired_vehicle.price ?? 0)
-                      ).toLocaleString("de-DE")}
+                        : "")}
+                      {formatCurrency(
+                        Math.abs(
+                          (request.current_vehicle_value_estimate ?? 0) -
+                            (request.desired_vehicle.price ?? 0)
+                        )
+                      )}
                     </span>
                   </div>
                 </div>
@@ -244,33 +260,22 @@ export default function TradeInRequestDetailPage() {
             {/* Admin Notes */}
             {request.admin_notes && (
               <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Admin Notes</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{t("adminNotes")}</h3>
                 <p className="text-gray-700">{request.admin_notes}</p>
               </div>
             )}
 
             {/* Important Notice */}
             <div className="bg-amber-50 border-l-4 border-amber-400 rounded-lg p-6">
-              <h3 className="font-bold text-amber-900 mb-2">Wichtige Hinweise</h3>
-              <ul className="list-disc list-inside space-y-2 text-sm text-amber-900">
-                <li>
-                  Diese Schätzung ist <strong>unverbindlich</strong> und basiert auf Ihren Angaben.
-                </li>
-                <li>
-                  Die tatsächliche Fahrzeugbewertung wird nach einer Inspektion durch unser Team festgelegt.
-                </li>
-                <li>Der endgültige Kaufpreis kann von der Schätzung abweichen.</li>
-                <li>
-                  Wir werden sich mit Ihnen in Verbindung setzen, um die genauen Bedingungen zu besprechen.
-                </li>
-              </ul>
+              <h3 className="font-bold text-amber-900 mb-2">{t("importantNote")}</h3>
+              <p className="text-sm text-amber-900 mb-3">{t("importantNoteText")}</p>
             </div>
 
             {/* Action Buttons */}
             <div className="flex justify-between gap-4">
               <Link href="/dashboard/inzahlungnahme-anfragen">
                 <button className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                  ← Zurück
+                  ← {t("backToList")}
                 </button>
               </Link>
             </div>

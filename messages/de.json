@@ -254,6 +254,8 @@
             "emptyDescription": "Sie haben noch keine Fahrzeuge zum Verkauf angeboten. Klicken Sie unten, um Ihr erstes Fahrzeug hinzuzufügen.",
             "firstVehicle": "Erstes Fahrzeug anbieten",
             "loading": "Fahrzeuge werden geladen...",
+            "fuel": "Kraftstofftyp",
+            "transmission": "Getriebe",
             "status": {
                 "eingereicht": "Eingereicht",
                 "in_bearbeitung": "In Bearbeitung",
@@ -418,6 +420,7 @@
             "requestId": "Anfrage-ID:",
             "loading": "Anfrage wird geladen...",
             "notFound": "Anfrage nicht gefunden.",
+            "adminNotes": "Notizen",
             "backToOverview": "Zurück zur Übersicht",
             "status": {
                 "new": "Neue Anfrage",
