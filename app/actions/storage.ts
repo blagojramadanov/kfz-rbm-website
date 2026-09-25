@@ -6,11 +6,15 @@ import { requireAdmin } from "@/lib/auth-guards";
 
 /** Signed URLs (1 h) for photos in the private customer bucket. Admin only. */
 export async function getSignedImageUrls(paths: unknown) {
+  console.log("[getSignedImageUrls] Server action called with paths count:", Array.isArray(paths) ? (paths as any).length : "unknown");
   return runAction("getSignedImageUrls", "LOAD_FAILED", async () => {
+    console.log("[getSignedImageUrls] Inside runAction handler");
     // Admin-only: uses service-role client to bypass storage RLS for reading all customers' images
     try {
       await requireAdmin();
+      console.log("[getSignedImageUrls] Admin check passed");
     } catch (error) {
+      console.error("[getSignedImageUrls] Admin check failed:", error);
       throw new ActionError(toErrorCode(error, "UNAUTHORIZED") === "FORBIDDEN" ? "UNAUTHORIZED" : toErrorCode(error, "UNAUTHORIZED"));
     }
 

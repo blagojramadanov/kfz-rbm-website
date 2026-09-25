@@ -68,8 +68,13 @@ export default function SubmittedVehicleDetailPage() {
       }
 
       try {
-        const { getSignedImageUrls } = await import("@/app/actions/storage");
+        console.log("[fetchSignedUrls] Starting - about to import action");
+        const storageModule = await import("@/app/actions/storage");
+        console.log("[fetchSignedUrls] Import successful, module:", Object.keys(storageModule));
+        const { getSignedImageUrls } = storageModule;
+        console.log("[fetchSignedUrls] Got function, type:", typeof getSignedImageUrls, "paths to send:", vehicle.images.length);
         const urlsResult = await getSignedImageUrls(vehicle.images);
+        console.log("[fetchSignedUrls] Action returned:", urlsResult, "type:", typeof urlsResult);
 
         if (!urlsResult) {
           console.error("[fetchSignedUrls] Result is undefined");
