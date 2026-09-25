@@ -859,7 +859,11 @@
             "descriptionMinLength": "Bitte geben Sie eine Beschreibung mit mindestens 20 Zeichen ein",
             "descriptionMinChars": "Minimum 20 Zeichen erforderlich",
             "imageErrorCompressing": "Fehler beim Verarbeiten des Bildes",
-            "imageLimitExceeded": "Maximum 20 Bilder erlaubt"
+            "imageLimitExceeded": "Maximum {maxCount} Bilder erlaubt"
+        },
+        "units": {
+            "kilometers": "km",
+            "horsePower": "PS"
         },
         "images": {
             "uploadCount": "Fotos hochladen ({current}/20)",

@@ -1,5 +1,5 @@
 "use client";
-import { useTranslations } from "next-intl";
+import { useTranslations, useFormatter } from "next-intl";
 import { useParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +10,6 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Upload, X, GripVertical, Check } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
-import { getFormatter } from "next-intl/server";
 
 type Step = "fahrzeugdaten" | "preis" | "bilder" | "beschreibung" | "verkaufsart" | "kontrolle" | "absenden";
 
@@ -52,6 +51,7 @@ export default function SubmitVehicleWizardPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const t = useTranslations("wizard");
+  const format = useFormatter();
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState<Step>("fahrzeugdaten");
@@ -203,12 +203,14 @@ export default function SubmitVehicleWizardPage() {
     });
   };
 
+  const MAX_IMAGES = 20;
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    if (images.length + files.length > 20) {
-      setError(t("validation.imageLimitExceeded"));
+    if (images.length + files.length > MAX_IMAGES) {
+      setError(t("validation.imageLimitExceeded", { maxCount: MAX_IMAGES }));
       return;
     }
 
@@ -715,13 +717,13 @@ export default function SubmitVehicleWizardPage() {
                 onChange={handleImageUpload}
                 className="hidden"
                 id="image-upload"
-                disabled={images.length >= 20}
+                disabled={images.length >= MAX_IMAGES}
               />
               <label htmlFor="image-upload" className="cursor-pointer block">
                 <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
                 <p className="text-lg font-semibold text-gray-900">{t("images.uploadTitle")}</p>
                 <p className="text-sm text-gray-600">{t("images.uploadSubtitle")}</p>
-                {images.length >= 20 && <p className="text-sm text-red-600 mt-2">{t("images.uploadMaxReached")}</p>}
+                {images.length >= MAX_IMAGES && <p className="text-sm text-red-600 mt-2">{t("images.uploadMaxReached")}</p>}
               </label>
             </div>
 
@@ -879,14 +881,14 @@ export default function SubmitVehicleWizardPage() {
                   <p><span className="font-medium">{t("fields.brand")}:</span> {formData.marke}</p>
                   <p><span className="font-medium">{t("fields.model")}:</span> {formData.modell}</p>
                   <p><span className="font-medium">{t("fields.firstRegistration")}:</span> {formData.erstzulassung}</p>
-                  <p><span className="font-medium">{t("fields.mileage")}:</span> {formData.kilometerstand} km</p>
-                  <p><span className="font-medium">{t("fields.powerHp")}:</span> {formData.leistung} PS</p>
+                  <p><span className="font-medium">{t("fields.mileage")}:</span> {formData.kilometerstand} {t("units.kilometers")}</p>
+                  <p><span className="font-medium">{t("fields.powerHp")}:</span> {formData.leistung} {t("units.horsePower")}</p>
                   <p><span className="font-medium">{t("fields.fuel")}:</span> {formData.kraftstoff}</p>
                 </div>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">{t("review.priceSection")}</h3>
-                <p className="text-2xl font-bold text-kfz-blue">€ {parseFloat(formData.preisvorstellung).toLocaleString()}</p>
+                <p className="text-2xl font-bold text-kfz-blue">{format.number(parseFloat(formData.preisvorstellung) || 0, { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">{t("review.imagesSection")}</h3>

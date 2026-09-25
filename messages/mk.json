@@ -859,7 +859,11 @@
             "descriptionMinLength": "Ве молиме, внесете опис со барем 20 карактери",
             "descriptionMinChars": "Минимум 20 карактери потребни",
             "imageErrorCompressing": "Грешка при обработката на сликата",
-            "imageLimitExceeded": "Максимум 20 слики дозволени"
+            "imageLimitExceeded": "Максимум {maxCount} слики дозволени"
+        },
+        "units": {
+            "kilometers": "км",
+            "horsePower": "КС"
         },
         "images": {
             "uploadCount": "Прикачете фотографии ({current}/20)",
