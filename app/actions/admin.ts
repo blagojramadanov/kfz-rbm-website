@@ -646,7 +646,10 @@ export async function publishSubmittedVehicle(
       .maybeSingle();
     if (!submittedVehicle) throw new ActionError("NOT_FOUND");
 
-    const generatedVin = `VIN-${submittedVehicle.brand.toUpperCase()}-${submittedVehicle.model.toUpperCase()}-${Date.now()}`;
+    // Generate a 17-character VIN (standard VIN length) from the submitted vehicle ID.
+    // Format: SUBM + first 13 alphanumeric characters of the UUID (VINs are always 17 chars)
+    const vinId = input.data.id.replace(/-/g, "").substring(0, 13).toUpperCase();
+    const generatedVin = `SUBM${vinId}`;
 
     const { data: newVehicle, error: createError } = await supabase
       .from("vehicles")

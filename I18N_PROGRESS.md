@@ -576,6 +576,24 @@ All Macedonian strings use formal "Вие" possessives and verb forms:
 - Visual role: Secondary info box (blue) showing what happens after submission, not the primary focus
 - Tested on /de, /en, /mk: all render correctly with no raw keys or truncation
 
+### Bug Fix: publishSubmittedVehicle VIN Truncation (2026-09-25)
+
+**Error:** Publishing a submitted vehicle failed with Postgres error `value too long for type character varying(17)`
+
+**Root cause:** The VIN generation function was creating strings longer than 17 characters:
+```
+VIN-VOLKSWAGEN-GOLF-1695123456789  // way longer than 17 chars
+```
+The `vehicles.vin` column has `VARCHAR(17)` constraint (standard VIN length).
+
+**Fix:** Changed VIN generation in `publishSubmittedVehicle` to use the submitted vehicle UUID:
+```
+// Before: VIN-VOLKSWAGEN-GOLF-1695123456789 (too long)
+// After: SUBM<13 UUID chars> (exactly 17 chars)
+```
+
+The VIN now uses the format `SUBM` + first 13 alphanumeric characters of the submitted vehicle UUID, ensuring it's always exactly 17 characters and unique across all submissions.
+
 ### Macedonian Grammar Fix (2026-09-25)
 Fixed gender agreement in wizard.workflow.* messages: "возило" (vehicle) is neuter, so possessive must use "Вашето" (neuter formal) not "Вашиот" (masculine formal):
 - step1Title: "Поднесете го Вашето возило"
