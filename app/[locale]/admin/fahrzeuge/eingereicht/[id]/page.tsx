@@ -87,12 +87,11 @@ export default function SubmittedVehicleDetailPage() {
           console.error("Failed to fetch signed URLs:", { error: urlsResult.error });
         }
       } catch (err: any) {
-        console.error("Error fetching signed URLs:", {
+        console.error("Error fetching signed URLs:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
+        console.error("Error details:", {
           message: err?.message,
           digest: err?.digest,
           name: err?.name,
-          toString: err?.toString(),
-          fullError: err
         });
       }
     };
