@@ -390,6 +390,7 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 
 ### Bug fixes applied to admin detail page
 - Fixed undefined `.ok` access error by adding null/safety checks around server action results
+- Fixed infinite loading state: removed `errorMessage` from useEffect dependency array (was causing effect to run incorrectly)
 - Fixed broken image src fallback: now shows loading state instead of falling back to empty string (which caused browser to use page URL as src)
 - Fixed missing power value display: now uses `format.number(vehicle.power)` via useLocaleFormatter()
 - Fixed raw DB values displayed without translation:

@@ -126,7 +126,7 @@ export default function SubmittedVehicleDetailPage() {
     if (isAdmin && vehicleId) {
       loadVehicle();
     }
-  }, [isAdmin, vehicleId, errorMessage]);
+  }, [isAdmin, vehicleId]);
 
   const handlePublish = async () => {
     if (!vehicle) return;
