@@ -6,7 +6,15 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { ArrowLeft, AlertCircle, CheckCircle, Upload } from "lucide-react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import {
+  getFuelTypeLabel,
+  getTransmissionLabel,
+  getBodyTypeLabel,
+  getColorLabel,
+} from "@/lib/vehicle-labels";
 
 interface SubmittedVehicle {
   id: string;
@@ -34,6 +42,9 @@ export default function SubmittedVehicleDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { loading, isAdmin } = useAuth();
+  const t = useTranslations();
+  const tCommon = useTranslations("common");
+  const format = useLocaleFormatter();
   const errorMessage = useErrorMessage();
   const [vehicle, setVehicle] = useState<SubmittedVehicle | null>(null);
   const [vehicleLoading, setVehicleLoading] = useState(true);
@@ -60,38 +71,53 @@ export default function SubmittedVehicleDetailPage() {
 
       try {
         setVehicleLoading(true);
+        setError("");
         const { getSubmittedVehicleById } = await import("@/app/actions/admin");
         const result = await getSubmittedVehicleById(vehicleId);
-        if (!result.ok) {
-          setError(errorMessage(result));
+
+        // Check if result exists and has ok property
+        if (!result || !result.ok) {
+          setError(errorMessage(result || { error: "UNKNOWN" }));
+          setVehicle(null);
           return;
         }
+
+        if (!result.vehicle) {
+          setError("Fahrzeug nicht gefunden");
+          setVehicle(null);
+          return;
+        }
+
         setVehicle(result.vehicle);
         setPublishPrice(result.vehicle.price);
         setPublishDescription(result.vehicle.description || "");
 
         // Fetch signed URLs for images
         if (result.vehicle.images && result.vehicle.images.length > 0) {
-          const { getSignedImageUrls } = await import("@/app/actions/storage");
-          const urlsResult = await getSignedImageUrls(result.vehicle.images);
-          if (urlsResult.ok) {
-            const urlMap = urlsResult.urls.reduce(
-              (acc: Record<string, string>, item: { path: string; url: string | null }) => {
-                if (item.url) {
-                  acc[item.path] = item.url;
-                }
-                return acc;
-              },
-              {}
-            );
-            setImageUrls(urlMap);
+          try {
+            const { getSignedImageUrls } = await import("@/app/actions/storage");
+            const urlsResult = await getSignedImageUrls(result.vehicle.images);
+            if (urlsResult && urlsResult.ok && urlsResult.urls) {
+              const urlMap = urlsResult.urls.reduce(
+                (acc: Record<string, string>, item: { path: string; url: string | null }) => {
+                  if (item.url) {
+                    acc[item.path] = item.url;
+                  }
+                  return acc;
+                },
+                {}
+              );
+              setImageUrls(urlMap);
+            }
+          } catch (urlErr) {
+            console.error("Error fetching signed URLs:", urlErr);
+            // Don't fail the entire page if signed URLs fail
           }
         }
-
-        setError("");
       } catch (err) {
         console.error("Error loading vehicle:", err);
         setError(errorMessage(err));
+        setVehicle(null);
       } finally {
         setVehicleLoading(false);
       }
@@ -100,7 +126,7 @@ export default function SubmittedVehicleDetailPage() {
     if (isAdmin && vehicleId) {
       loadVehicle();
     }
-  }, [isAdmin, vehicleId]);
+  }, [isAdmin, vehicleId, errorMessage]);
 
   const handlePublish = async () => {
     if (!vehicle) return;
@@ -203,14 +229,27 @@ export default function SubmittedVehicleDetailPage() {
           {/* Images */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="relative w-full aspect-video bg-gray-200">
-              {vehicle.images && vehicle.images.length > 0 ? (
-                <Image
-                  src={imageUrls[vehicle.images[currentImageIndex]] || ""}
-                  alt={`${vehicle.brand} ${vehicle.model}`}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
+              {vehicle && vehicle.images && vehicle.images.length > 0 ? (
+                (() => {
+                  const currentPath = vehicle.images[currentImageIndex];
+                  const signedUrl = imageUrls[currentPath];
+                  return signedUrl ? (
+                    <Image
+                      src={signedUrl}
+                      alt={`${vehicle.brand} ${vehicle.model}`}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="text-center">
+                        <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">Bild wird geladen...</p>
+                      </div>
+                    </div>
+                  );
+                })()
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <Upload className="w-12 h-12 text-gray-400" />
@@ -252,40 +291,43 @@ export default function SubmittedVehicleDetailPage() {
           </div>
 
           {/* Vehicle Info */}
-          <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {vehicle.brand} {vehicle.model}
-              </h1>
-              <p className="text-gray-600 mt-1">{vehicle.year} • {vehicle.mileage?.toLocaleString("de-DE")} km</p>
-            </div>
+          {vehicle ? (
+            <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {vehicle.brand} {vehicle.model}
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  {vehicle.year} • {format.number(vehicle.mileage)} km
+                </p>
+              </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-              <div>
-                <p className="text-sm text-gray-600">Kraftstoff</p>
-                <p className="font-semibold text-gray-900">{vehicle.fuel_type}</p>
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                <div>
+                  <p className="text-sm text-gray-600">Kraftstoff</p>
+                  <p className="font-semibold text-gray-900">{getFuelTypeLabel(tCommon, vehicle.fuel_type)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Getriebe</p>
+                  <p className="font-semibold text-gray-900">{getTransmissionLabel(tCommon, vehicle.transmission)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Farbe</p>
+                  <p className="font-semibold text-gray-900">{getColorLabel(tCommon, vehicle.color)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Leistung</p>
+                  <p className="font-semibold text-gray-900">{format.number(vehicle.power)} PS</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Karosserie</p>
+                  <p className="font-semibold text-gray-900">{getBodyTypeLabel(tCommon, vehicle.body_type)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Status</p>
+                  <p className="font-semibold text-gray-900 capitalize">{vehicle.status}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Getriebe</p>
-                <p className="font-semibold text-gray-900">{vehicle.transmission}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Farbe</p>
-                <p className="font-semibold text-gray-900">{vehicle.color}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Leistung</p>
-                <p className="font-semibold text-gray-900">{vehicle.power} PS</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Karosserie</p>
-                <p className="font-semibold text-gray-900">{vehicle.body_type}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Status</p>
-                <p className="font-semibold text-gray-900 capitalize">{vehicle.status}</p>
-              </div>
-            </div>
 
             {vehicle.sales_type && (
               <div className="pt-4 border-t">
@@ -320,25 +362,33 @@ export default function SubmittedVehicleDetailPage() {
                 </div>
               </div>
             )}
-          </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <p className="text-gray-600">Fahrzeug wird geladen...</p>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
         <div className="space-y-4">
           {/* Price Card */}
-          <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Eingereicht von Kunde</p>
-              <p className="text-2xl font-bold text-kfz-blue">
-                € {vehicle.price.toLocaleString("de-DE")}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {new Date(vehicle.created_at).toLocaleDateString("de-DE")}
-              </p>
+          {vehicle && (
+            <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Eingereicht von Kunde</p>
+                <p className="text-2xl font-bold text-kfz-blue">
+                  {format.number(vehicle.price, { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {new Date(vehicle.created_at).toLocaleDateString("de-DE")}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Publish Form */}
+          {vehicle && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-4">
             <h3 className="font-bold text-gray-900">In Fahrzeuge veröffentlichen</h3>
 
@@ -403,6 +453,7 @@ export default function SubmittedVehicleDetailPage() {
               </div>
             )}
           </div>
+          )}
         </div>
       </div>
     </div>

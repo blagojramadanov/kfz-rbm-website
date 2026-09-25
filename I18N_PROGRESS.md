@@ -372,7 +372,7 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 - ✅ Created `app/[locale]/not-found.tsx` (no module exports, so no type errors)
 - ⏳ Ultrareview running (2 of 3 free uses) for areas 4, 5 changes
 
-## Cross-cutting: Signed URLs for Private Submission Images (2026-09-25)
+## Cross-cutting: Signed URLs for Private Submission Images + Admin Page Fixes (2026-09-25)
 
 ### Completed
 - **Admin submission detail page** (`app/[locale]/admin/fahrzeuge/eingereicht/[id]/page.tsx`) ✅
@@ -380,11 +380,25 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
   - Respects RLS: admin sees all submissions, customer only their own
   - Display signed URLs via next/image with `unoptimized` flag (Supabase URLs already allowed in next.config)
   - Signed URLs valid for 1 hour, fetched server-side before rendering
+  - **Bug fixes:** Proper null checks on result object before accessing `.ok`; loading state for images; no broken fallback URLs
+  - **Localization fixes:** Use label helpers for fuel_type, transmission, body_type, color; use useLocaleFormatter() for mileage, power, price display
 
 - **Customer wizard edit flow** (`app/[locale]/dashboard/fahrzeug-anbieten/page.tsx`) ✅
   - Fetch signed URLs when loading previously submitted vehicle for editing
   - Use signed URLs for image preview display in edit mode
-  - Fallback to raw path if signing fails (graceful degradation)
+  - Graceful error handling if signing fails (signed URL mapping fails silently, doesn't break page)
+
+### Bug fixes applied to admin detail page
+- Fixed undefined `.ok` access error by adding null/safety checks around server action results
+- Fixed broken image src fallback: now shows loading state instead of falling back to empty string (which caused browser to use page URL as src)
+- Fixed missing power value display: now uses `format.number(vehicle.power)` via useLocaleFormatter()
+- Fixed raw DB values displayed without translation:
+  - fuel_type: now uses `getFuelTypeLabel(tCommon, vehicle.fuel_type)`
+  - transmission: now uses `getTransmissionLabel(tCommon, vehicle.transmission)`
+  - body_type: now uses `getBodyTypeLabel(tCommon, vehicle.body_type)`
+  - color: now uses `getColorLabel(tCommon, vehicle.color)`
+- Fixed price formatting: now uses `format.number(..., { style: "currency", currency: "EUR" })` via useLocaleFormatter()
+- Added proper vehicle null checks: render loading state when vehicle is null, not undefined errors
 
 ### Why this fix was needed
 - Submission images stored in private bucket with paths like "<userId>/<submissionId>/<file>.jpg"
