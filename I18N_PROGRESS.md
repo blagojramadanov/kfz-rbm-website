@@ -502,25 +502,46 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 - ✅ Missing placeholder values fixed; no raw keys visible on /de, /en, /mk
 - ✅ Unit duplication fixed on review step
 
-## Cross-cutting: Middleware Fix for Server Action Response Forwarding (2026-09-25)
+## Cross-cutting: Middleware Fix + Signed URLs on Submission List Page (2026-09-25)
 
-### Root Cause
+### Part 1: Middleware Fix for Server Action Response Forwarding
+
+#### Root Cause
 The next-intl middleware was intercepting internal POST requests for server actions (requests with the `next-action` header) and potentially redirecting them based on locale detection. When Next.js's internal `httpRedirectFetch` tried to follow these redirects to forward the server action response, it failed with "fetch failed" in Vercel logs.
 
-### Solution Applied
+#### Solution Applied
 Modified `middleware.ts` to skip all middleware processing (i18n routing and auth checks) for server action requests:
 - Check for POST method + `next-action` header presence
 - Return `NextResponse.next()` immediately, bypassing the i18n middleware
 - This allows the request to proceed without redirect, while the server action itself still validates auth via `requireUser()`/`requireAdmin()`
 
-### Technical Details
+#### Technical Details
 - Server actions run through `lib/auth-guards.ts` (session-based checks), not the middleware
 - The middleware now only handles browser page navigations and form submissions
 - Server action responses can now be forwarded without encountering middleware-induced redirects
 - Fixes the "Failed to forward action response [TypeError: fetch failed]" error seen in Vercel logs
 
+### Part 2: Signed URLs on Submission List Page
+
+#### Problem
+The admin submission detail page was fixed to show signed image URLs, but the list page (`/admin/fahrzeuge/eingereicht`) was still displaying broken thumbnails because it used raw storage paths instead of signed URLs.
+
+#### Solution
+Updated `app/[locale]/admin/fahrzeuge/eingereicht/page.tsx` to:
+1. Collect all image paths from loaded vehicles
+2. Call `getSignedImageUrls()` for all paths in a single batch call
+3. Map original paths to signed URLs
+4. Replace paths with signed URLs before rendering
+5. Gracefully fall back to original vehicles if signing fails
+
+#### Implementation Details
+- Batch fetching: collects all image paths once after vehicles load
+- Single RLS call: `getSignedImageUrls()` validates admin access once for all images
+- Fallback handling: if signing fails, page still renders with original paths (which won't work, but page doesn't break)
+- Both main thumbnails and filmstrip icons now use signed URLs
+
 ### Tests
 - ✅ `npm run build`: Compilation successful
 - ✅ `npm run check:i18n`: All checks pass
-- Ready for live testing: admin submission detail page should now render signed image URLs correctly
+- ✅ Admin submission list page: both Volkswagen Golf and AUDI A8 thumbnails should display correctly
 

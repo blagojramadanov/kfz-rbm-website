@@ -49,7 +49,48 @@ export default function AdminSubmittedVehiclesPage() {
           setError(errorMessage(result));
           return;
         }
-        setVehicles(result.vehicles);
+
+        // Collect all image paths from all vehicles
+        const allImagePaths: string[] = [];
+        const imagePathToVehicleMap: Record<string, { vehicleId: string; index: number }> = {};
+
+        result.vehicles.forEach((vehicle: any) => {
+          if (vehicle.images && Array.isArray(vehicle.images)) {
+            vehicle.images.forEach((imagePath: string, index: number) => {
+              allImagePaths.push(imagePath);
+              imagePathToVehicleMap[imagePath] = { vehicleId: vehicle.id, index };
+            });
+          }
+        });
+
+        // Fetch signed URLs for all images
+        if (allImagePaths.length > 0) {
+          const { getSignedImageUrls } = await import("@/app/actions/storage");
+          const urlResult = await getSignedImageUrls(allImagePaths);
+
+          if (urlResult.ok && urlResult.urls) {
+            // Create a mapping of original paths to signed URLs
+            const pathToSignedUrl: Record<string, string> = {};
+            urlResult.urls.forEach((item: { path: string; url: string | null }) => {
+              if (item.url) {
+                pathToSignedUrl[item.path] = item.url;
+              }
+            });
+
+            // Replace paths with signed URLs in vehicles
+            const vehiclesWithSignedUrls = result.vehicles.map((vehicle: any) => ({
+              ...vehicle,
+              images: vehicle.images?.map((path: string) => pathToSignedUrl[path] || path) || [],
+            }));
+            setVehicles(vehiclesWithSignedUrls);
+          } else {
+            // Fall back to original vehicles if signing fails
+            setVehicles(result.vehicles);
+          }
+        } else {
+          setVehicles(result.vehicles);
+        }
+
         setError("");
       } catch (err) {
         console.error("Error loading vehicles:", err);
