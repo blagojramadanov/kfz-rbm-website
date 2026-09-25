@@ -44,6 +44,7 @@ export default function SubmittedVehicleDetailPage() {
   const [publishFeatured, setPublishFeatured] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>({}); // Map of path -> signed URL
 
   const vehicleId = params?.id as string;
 
@@ -68,6 +69,25 @@ export default function SubmittedVehicleDetailPage() {
         setVehicle(result.vehicle);
         setPublishPrice(result.vehicle.price);
         setPublishDescription(result.vehicle.description || "");
+
+        // Fetch signed URLs for images
+        if (result.vehicle.images && result.vehicle.images.length > 0) {
+          const { getSignedImageUrls } = await import("@/app/actions/storage");
+          const urlsResult = await getSignedImageUrls(result.vehicle.images);
+          if (urlsResult.ok) {
+            const urlMap = urlsResult.urls.reduce(
+              (acc: Record<string, string>, item: { path: string; url: string | null }) => {
+                if (item.url) {
+                  acc[item.path] = item.url;
+                }
+                return acc;
+              },
+              {}
+            );
+            setImageUrls(urlMap);
+          }
+        }
+
         setError("");
       } catch (err) {
         console.error("Error loading vehicle:", err);
@@ -185,10 +205,11 @@ export default function SubmittedVehicleDetailPage() {
             <div className="relative w-full aspect-video bg-gray-200">
               {vehicle.images && vehicle.images.length > 0 ? (
                 <Image
-                  src={vehicle.images[currentImageIndex]}
+                  src={imageUrls[vehicle.images[currentImageIndex]] || ""}
                   alt={`${vehicle.brand} ${vehicle.model}`}
                   fill
                   className="object-cover"
+                  unoptimized
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">

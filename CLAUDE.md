@@ -16,6 +16,11 @@ These apply to every session; follow them without being reminded.
 
 Every task ends with build + check:i18n passing, I18N_PROGRESS.md updated, commit with a clear message, push to main, confirm Vercel Ready, report the commit hash.
 
+## Localization rules
+
+- **Client-side number formatting**: Use `useLocaleFormatter()` from `lib/use-locale-formatter.ts` instead of `useFormatter().number()`, `Intl.NumberFormat` directly, or `toLocaleString()`. The wrapper maps unsupported locales (mk) to supported ones (de-DE) to avoid browser Intl fallback to en-US. Server-side formatters (`getFormatter()`) work correctly for all locales.
+- **Date formatting**: Server-side dates use `getFormatter()` (full Intl support). Client-side dates **also work correctly** because the browser Intl API has date/time data for "mk"; only number formatting falls back to en-US when the browser lacks numeric data. Do not use the wrapper for dates.
+
 ## Security rules
 
 - Every server action starts with `requireUser()` or `requireAdmin()` from `lib/auth-guards.ts` and uses the session user. Never trust a user id, role, status or price sent by the client; validate input with zod (unknown fields are stripped).

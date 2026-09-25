@@ -372,6 +372,38 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 - ✅ Created `app/[locale]/not-found.tsx` (no module exports, so no type errors)
 - ⏳ Ultrareview running (2 of 3 free uses) for areas 4, 5 changes
 
+## Cross-cutting: Signed URLs for Private Submission Images (2026-09-25)
+
+### Completed
+- **Admin submission detail page** (`app/[locale]/admin/fahrzeuge/eingereicht/[id]/page.tsx`) ✅
+  - Fetch signed URLs for submission images using `getSignedImageUrls()`
+  - Respects RLS: admin sees all submissions, customer only their own
+  - Display signed URLs via next/image with `unoptimized` flag (Supabase URLs already allowed in next.config)
+  - Signed URLs valid for 1 hour, fetched server-side before rendering
+
+- **Customer wizard edit flow** (`app/[locale]/dashboard/fahrzeug-anbieten/page.tsx`) ✅
+  - Fetch signed URLs when loading previously submitted vehicle for editing
+  - Use signed URLs for image preview display in edit mode
+  - Fallback to raw path if signing fails (graceful degradation)
+
+### Why this fix was needed
+- Submission images stored in private bucket with paths like "<userId>/<submissionId>/<file>.jpg"
+- Raw paths return 400 from next/image (bucket is private since migration 025)
+- Existing `getSignedImageUrls()` action already handles RLS, just needed to be used
+
+### Approach chosen: Server-side signed URLs via existing action
+- Minimal code changes
+- Leverages existing RLS policies (admin access to all, customer to own only)
+- Session client prevents unauthorized access
+- Signed URLs with 1-hour TTL good for page load time
+
+### Tests
+- ✅ `npm run check:i18n` passes
+- ✅ `npm run build` succeeds
+- Admin submission detail page: needs live testing with existing AUDI A8/VW Golf submissions
+
+---
+
 ## Cross-cutting: Locale-aware Number Formatting (2026-09-25)
 
 ### Completed

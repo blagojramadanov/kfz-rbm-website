@@ -135,10 +135,24 @@ export default function SubmitVehicleWizardPage() {
           });
 
           if (result.images && result.images.length > 0) {
+            // Fetch signed URLs for stored images
+            const { getSignedImageUrls } = await import("@/app/actions/storage");
+            const imagePaths = result.images.map((img: any) => img.image_url);
+            const urlsResult = await getSignedImageUrls(imagePaths);
+
+            const urlMap: Record<string, string> = {};
+            if (urlsResult.ok) {
+              urlsResult.urls.forEach((item: { path: string; url: string | null }) => {
+                if (item.url) {
+                  urlMap[item.path] = item.url;
+                }
+              });
+            }
+
             setImages(
               result.images.map((img: any) => ({
                 id: img.id,
-                data: img.image_url,
+                data: urlMap[img.image_url] || img.image_url, // Use signed URL if available, fallback to path
                 isMain: img.is_main || false,
                 uploaded: true,
                 dbId: img.id,
