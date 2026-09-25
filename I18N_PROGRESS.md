@@ -502,3 +502,25 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 - ✅ Missing placeholder values fixed; no raw keys visible on /de, /en, /mk
 - ✅ Unit duplication fixed on review step
 
+## Cross-cutting: Middleware Fix for Server Action Response Forwarding (2026-09-25)
+
+### Root Cause
+The next-intl middleware was intercepting internal POST requests for server actions (requests with the `next-action` header) and potentially redirecting them based on locale detection. When Next.js's internal `httpRedirectFetch` tried to follow these redirects to forward the server action response, it failed with "fetch failed" in Vercel logs.
+
+### Solution Applied
+Modified `middleware.ts` to skip all middleware processing (i18n routing and auth checks) for server action requests:
+- Check for POST method + `next-action` header presence
+- Return `NextResponse.next()` immediately, bypassing the i18n middleware
+- This allows the request to proceed without redirect, while the server action itself still validates auth via `requireUser()`/`requireAdmin()`
+
+### Technical Details
+- Server actions run through `lib/auth-guards.ts` (session-based checks), not the middleware
+- The middleware now only handles browser page navigations and form submissions
+- Server action responses can now be forwarded without encountering middleware-induced redirects
+- Fixes the "Failed to forward action response [TypeError: fetch failed]" error seen in Vercel logs
+
+### Tests
+- ✅ `npm run build`: Compilation successful
+- ✅ `npm run check:i18n`: All checks pass
+- Ready for live testing: admin submission detail page should now render signed image URLs correctly
+

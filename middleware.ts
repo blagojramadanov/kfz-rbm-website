@@ -39,6 +39,12 @@ function normalizePath(pathname: string): string | null {
 }
 
 export async function middleware(request: NextRequest) {
+  // Skip middleware for server action requests (POST with next-action header).
+  // These use the session from the page and should not be redirected by i18n routing.
+  if (request.method === 'POST' && request.headers.has('next-action')) {
+    return NextResponse.next();
+  }
+
   const path = normalizePath(request.nextUrl.pathname);
   if (path === null) return new NextResponse("Bad request", { status: 400 });
 
