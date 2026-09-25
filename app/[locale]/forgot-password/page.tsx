@@ -115,7 +115,7 @@ export default function ForgotPasswordPage() {
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="flex-1 h-px bg-white/20"></div>
-            <span className="text-sm text-blue-100">oder</span>
+            <span className="text-sm text-blue-100">{t("forms.divider")}</span>
             <div className="flex-1 h-px bg-white/20"></div>
           </div>
 

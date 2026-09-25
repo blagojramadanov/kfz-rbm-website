@@ -38,7 +38,7 @@ export default function ResetPasswordPage() {
             <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">Ungültiger Link</h2>
             <p className="text-blue-100 mb-6">
-              Der Password-Reset-Link ist ungültig oder abgelaufen.
+              {t("auth.invalidResetLinkDesc")}
             </p>
             <Link href="/forgot-password">
               <Button className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold">

@@ -14,31 +14,31 @@
         "settings": "Поставки"
     },
     "buttons": {
-        "save": "Зачувај",
+        "save": "Зачувајте",
         "cancel": "Откажи",
-        "delete": "Избриши",
-        "edit": "Уреди",
-        "create": "Создај",
-        "update": "Ажурирај",
-        "submit": "Поднеси",
-        "search": "Барај",
-        "filter": "Филтрирај",
-        "close": "Затвори",
+        "delete": "Избришите",
+        "edit": "Уредите",
+        "create": "Создајте",
+        "update": "Ажурирајте",
+        "submit": "Поднесете",
+        "search": "Пребарајте",
+        "filter": "Филтрирајте",
+        "close": "Затворите",
         "back": "Назад",
         "next": "Напред",
         "prev": "Претходни",
-        "viewMore": "Погледај повеќе",
-        "download": "Преземи",
-        "export": "Извези",
-        "import": "Увези",
-        "publish": "Објави",
+        "viewMore": "Погледнете повеќе",
+        "download": "Преузмете",
+        "export": "Извезете",
+        "import": "Увезете",
+        "publish": "Објавите",
         "draft": "Нацрт"
     },
     "forms": {
         "fullName": "Полно име",
         "email": "Е-пошта",
         "password": "Лозинка",
-        "confirmPassword": "Потврди лозинка",
+        "confirmPassword": "Потврдете лозинка",
         "phone": "Телефон",
         "address": "Адреса",
         "city": "Град",
@@ -55,7 +55,9 @@
         "price": "Цена",
         "description": "Опис",
         "images": "Слики",
-        "selectFile": "Одбери датотека"
+        "selectFile": "Изберете датотека",
+        "fullNamePlaceholder": "Јован Јовановски",
+        "divider": "или"
     },
     "validation": {
         "required": "Ова поле е задолжително",
@@ -79,7 +81,7 @@
         "serverError": "Грешка на серверот",
         "networkError": "Грешка во мрежата",
         "tryAgain": "Ве молиме обидете се подоцна",
-        "goHome": "Оди на почетна",
+        "goHome": "Одите на почетна",
         "contactSupport": "Контактирајте поддршка",
         "codes": {
             "UNAUTHORIZED": "Вашата сесија истече. Ве молиме, најавете се повторно.",
@@ -294,22 +296,22 @@
         "dataProtection": "Заштита на податоци"
     },
     "auth": {
-        "signIn": "Пријави се",
-        "signUp": "Регистрирај се",
-        "signOut": "Одјави се",
+        "signIn": "Најавете се",
+        "signUp": "Регистрирајте се",
+        "signOut": "Одјавете се",
         "email": "Е-пошта",
         "password": "Лозинка",
-        "confirmPassword": "Потврди лозинка",
+        "confirmPassword": "Потврдете лозинка",
         "welcomeBack": "Добредојде назад",
         "signInMessage": "Пријавете се за да продолжите",
-        "createAccount": "Создај сметачно",
+        "createAccount": "Создајте сметка",
         "createAccountMessage": "Регистрирајте се за ново сметачно",
         "alreadyHaveAccount": "Веќе имате сметачно?",
         "dontHaveAccount": "Немате сметачно?",
         "forgotPassword": "Заборавивте лозинка?",
-        "resetPassword": "Рестартирај лозинка",
+        "resetPassword": "Ресетирајте лозинка",
         "enterEmail": "Внесете ја вашата е-пошта",
-        "sendResetLink": "Испрати врска за рестартирање",
+        "sendResetLink": "Испратете линк за ресетирање",
         "enterNewPassword": "Внесете нова лозинка",
         "passwordResetSent": "Врска за рестартирање на лозинка е испратена на вашата е-пошта",
         "passwordResetSuccess": "Вашата лозинка е успешно рестартирана",
@@ -318,7 +320,13 @@
         "invalidCredentials": "Неважечка е-пошта или лозинка",
         "userExists": "Корисник со оваа е-пошта веќе постои",
         "passwordsNotMatch": "Лозинките не се совпаѓаат",
-        "registrationSuccess": "Регистрација успешна"
+        "registrationSuccess": "Регистрација успешна",
+        "haveAccount": "Веќе имате сметка?",
+        "signInLink": "Најавете се",
+        "passwordResetTitle": "Ресетирајте лозинка",
+        "invalidResetLink": "Невалиден или истекол линк",
+        "invalidResetLinkDesc": "Линкот за ресетирање на лозинка е невалиден или истекол.",
+        "requestNewReset": "Побарајте ново ресетирање"
     },
     "pages": {
         "home": {
@@ -522,6 +530,11 @@
                 "save": "Зачувајте"
             },
             "related": "Слични возила"
+        },
+        "notFound": {
+            "title": "Страницата не е пронајдена",
+            "description": "Бараната страница не може да се најде.",
+            "backHome": "Назад на почетна"
         }
     },
     "common": {
@@ -529,7 +542,7 @@
         "loading": "Се вчитува...",
         "error": "Грешка",
         "success": "Успех",
-        "confirm": "Потврди",
+        "confirm": "Потврдете",
         "language": "Јазик",
         "german": "Deutsch",
         "english": "English",

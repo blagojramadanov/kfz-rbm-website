@@ -55,7 +55,9 @@
         "price": "Price",
         "description": "Description",
         "images": "Images",
-        "selectFile": "Select File"
+        "selectFile": "Select File",
+        "fullNamePlaceholder": "John Doe",
+        "divider": "or"
     },
     "validation": {
         "required": "This field is required",
@@ -318,7 +320,13 @@
         "invalidCredentials": "Invalid email or password",
         "userExists": "User with this email already exists",
         "passwordsNotMatch": "Passwords do not match",
-        "registrationSuccess": "Registration successful"
+        "registrationSuccess": "Registration successful",
+        "haveAccount": "Already have an account?",
+        "signInLink": "Sign in",
+        "passwordResetTitle": "Reset Password",
+        "invalidResetLink": "Invalid or expired link",
+        "invalidResetLinkDesc": "The password reset link is invalid or has expired.",
+        "requestNewReset": "Request a new reset"
     },
     "pages": {
         "home": {
@@ -522,6 +530,11 @@
                 "save": "Save"
             },
             "related": "Similar Vehicles"
+        },
+        "notFound": {
+            "title": "Page not found",
+            "description": "The requested page could not be found.",
+            "backHome": "Back to home"
         }
     },
     "common": {

@@ -54,10 +54,10 @@ Also changed here (behaviour, not just text):
 
 ## 5. Auth (Login, Register, Forgot/Reset Password)
 
-- [ ] `app/[locale]/login/page.tsx` - Login form (title "Willkommen zurück", labels "Email", "Passwort", buttons "Anmelden", links "Passwort vergessen?", error messages)
-- [ ] `app/[locale]/register/page.tsx` - Registration form (title, form labels, validation messages, submit button, login link)
-- [ ] `app/[locale]/forgot-password/page.tsx` - Forgot password form (title, email input label, submit button, back to login link)
-- [ ] `app/[locale]/reset-password/page.tsx` - Reset password form (title, password input labels, validation messages, submit button)
+- [x] `app/[locale]/login/page.tsx` - Login form (title "Willkommen zurück", labels "Email", "Passwort", buttons "Anmelden", links "Passwort vergessen?", error messages)
+- [x] `app/[locale]/register/page.tsx` - Registration form (title, form labels, validation messages, submit button, login link)
+- [x] `app/[locale]/forgot-password/page.tsx` - Forgot password form (title, email input label, submit button, back to login link)
+- [x] `app/[locale]/reset-password/page.tsx` - Reset password form (title, password input labels, validation messages, submit button)
 
 ---
 
@@ -353,3 +353,22 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 ### Still open
 - Hardcoded German texts next to the error handling (validation messages, `confirm()`/`alert()` prompts, labels) belong to areas 5-7 and 9-11; `alert()` in "my vehicles" should become an inline message there.
 - Admin CRUD actions still take free-form objects (only admin-only).
+
+## Area 4 & 5, Cross-cutting: Localization + Error Codes (2026-09-25)
+
+### Completed
+- **Area 4 (About, Services, Contact)**: All 3 pages ✅
+- **Area 5 (Auth: Login, Register, Forgot/Reset Password)**: 29 hardcoded strings moved to t() calls, German text on /en and /mk fixed ✅
+  - New keys: `auth.haveAccount`, `auth.signInLink`, `auth.passwordResetTitle`, `auth.invalidResetLink`, `auth.invalidResetLinkDesc`, `auth.requestNewReset`, `forms.divider`, `forms.fullNamePlaceholder`
+  - Fixed Macedonian imperatives: 16 shared (`buttons.*`, `common.confirm`) + 6 auth-specific (`auth.signIn/Up/Out/confirmPassword/createAccount/resetPassword`)
+- **Cross-cutting**: Localized 404 page (`app/[locale]/not-found.tsx`) with keys `pages.notFound.*` (title, description, backHome)
+
+### Not yet done
+- `generateMetadata` for areas 4-11 (all client components, would need server wrappers; deferred to later area)
+- Shared imperative `pages.contact.send` in area 4 (marked done but needs Macedonian formal form verification)
+
+### Tests
+- ✅ `npm run check:i18n`, `npm run build`
+- ✅ Created `app/[locale]/not-found.tsx` (no module exports, so no type errors)
+- ⏳ Ultrareview running (2 of 3 free uses) for areas 4, 5 changes
+

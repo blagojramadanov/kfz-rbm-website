@@ -55,7 +55,9 @@
         "price": "Preis",
         "description": "Beschreibung",
         "images": "Bilder",
-        "selectFile": "Datei auswählen"
+        "selectFile": "Datei auswählen",
+        "fullNamePlaceholder": "Max Mustermann",
+        "divider": "oder"
     },
     "validation": {
         "required": "Dieses Feld ist erforderlich",
@@ -318,7 +320,13 @@
         "invalidCredentials": "Ungültige E-Mail oder Passwort",
         "userExists": "Benutzer mit dieser E-Mail existiert bereits",
         "passwordsNotMatch": "Passwörter stimmen nicht überein",
-        "registrationSuccess": "Registrierung erfolgreich"
+        "registrationSuccess": "Registrierung erfolgreich",
+        "haveAccount": "Haben Sie bereits ein Konto?",
+        "signInLink": "Anmelden",
+        "passwordResetTitle": "Passwort zurücksetzen",
+        "invalidResetLink": "Ungültiger oder abgelaufener Link",
+        "invalidResetLinkDesc": "Der Password-Reset-Link ist ungültig oder abgelaufen.",
+        "requestNewReset": "Neuen Reset anfordern"
     },
     "pages": {
         "home": {
@@ -522,6 +530,11 @@
                 "save": "Merken"
             },
             "related": "Ähnliche Fahrzeuge"
+        },
+        "notFound": {
+            "title": "Seite nicht gefunden",
+            "description": "Die angeforderte Seite konnte nicht gefunden werden.",
+            "backHome": "Zurück zur Startseite"
         }
     },
     "common": {

@@ -129,7 +129,7 @@ export default function RegisterPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  placeholder="Max Mustermann"
+                  placeholder={t("forms.fullNamePlaceholder")}
                   className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
                 />
               </div>
@@ -206,13 +206,13 @@ export default function RegisterPage() {
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="flex-1 h-px bg-white/20"></div>
-            <span className="text-sm text-blue-100">oder</span>
+            <span className="text-sm text-blue-100">{t("forms.divider")}</span>
             <div className="flex-1 h-px bg-white/20"></div>
           </div>
 
           {/* Login Link */}
           <p className="text-center text-blue-100">
-            Haben Sie bereits ein Konto?{" "}
+            {t("auth.haveAccount")}{" "}
             <Link href="/login" className="text-white font-semibold hover:underline">
               Anmelden
             </Link>
