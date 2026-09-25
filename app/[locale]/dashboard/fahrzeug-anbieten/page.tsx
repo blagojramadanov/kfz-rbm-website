@@ -12,6 +12,7 @@ import { ChevronRight, ChevronLeft, Upload, X, GripVertical, Check } from "lucid
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { getFuelTypeLabel, getTransmissionLabel, getBodyTypeLabel } from "@/lib/vehicle-labels";
+import { SubmissionWorkflowInfo } from "@/components/submission-workflow-info";
 
 type Step = "fahrzeugdaten" | "preis" | "bilder" | "beschreibung" | "verkaufsart" | "kontrolle" | "absenden";
 
@@ -932,12 +933,17 @@ export default function SubmitVehicleWizardPage() {
 
         {/* Absenden */}
         {currentStep === "absenden" && (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t("final.title")}</h2>
-            <p className="text-gray-600 mb-8">
-              {t("final.message")}
-            </p>
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-md p-8 text-center">
+              <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">{t("final.title")}</h2>
+              <p className="text-gray-600 mb-8">
+                {t("final.message")}
+              </p>
+            </div>
+
+            {/* Workflow Info */}
+            <SubmissionWorkflowInfo />
           </div>
         )}
 
