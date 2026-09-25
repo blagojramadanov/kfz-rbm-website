@@ -502,7 +502,7 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 - ✅ Missing placeholder values fixed; no raw keys visible on /de, /en, /mk
 - ✅ Unit duplication fixed on review step
 
-## Cross-cutting: Middleware Fix + Signed URLs on Submission List Page (2026-09-25)
+## Cross-cutting: Workflow Info Fix + Middleware Fix + Signed URLs (2026-09-25)
 
 ### Part 1: Middleware Fix for Server Action Response Forwarding
 
@@ -540,8 +540,38 @@ Updated `app/[locale]/admin/fahrzeuge/eingereicht/page.tsx` to:
 - Fallback handling: if signing fails, page still renders with original paths (which won't work, but page doesn't break)
 - Both main thumbnails and filmstrip icons now use signed URLs
 
+### Part 3: Workflow Info Content Fix
+
+#### Problem
+The workflow information component described an incorrect submission process:
+- Old: Submit → Admin Review → Approval & Automatic Publication → Vehicle Live
+- Real: Submit (Eingereicht) → Review (In Bearbeitung) → Offer or Reject (Angebot gesendet / Abgelehnt)
+- The component incorrectly stated vehicles are automatically published to the public catalog
+- Publishing only happens via admin's "Veröffentlichen" action, not automatically
+
+#### Solution
+Rewrote `wizard.workflow.*` messages in de.json, en.json, and mk.json to match the actual process:
+- **Title:** Changed from "Vehicle publication process" to "Vehicle valuation process"
+- **Subtitle:** Updated to "Learn how we assess your submitted vehicle"
+- **Step 1:** "Submit your vehicle" - You submit vehicle with photos and details
+- **Step 2:** "Our team reviews it" - Inspection and valuation based on condition and market value
+- **Step 3:** "Receive an offer or decline" - You get offer or decline; we contact you with details
+- **Step 4:** "Next steps" - If you accept, we can optionally list it (not automatic)
+- **Important Note:** "Your vehicle is not published automatically. Publication happens only after you agree and we approve it."
+
+#### Macedonian Language (Formal "Вие" Forms)
+All Macedonian strings use formal "Вие" possessives and verb forms:
+- "Вашиот возило" / "Вашите возила" (formal: your vehicle/vehicles)
+- "Ги процењуваме Вашите поднесени возила" (formal: we assess your vehicles)
+- "Вие го поднесувате Вашиот возило" (formal: you submit your vehicle)
+- "Нашиот тим го инспектира Вашиот возило" (formal: our team inspects your vehicle)
+- "Ќе се обратиме на Вас" (formal: we will contact you)
+- "Ако ја прифатите нашата понуда" (formal: if you accept our offer)
+- "Вашата согласност и наше одобрување" (formal: your agreement and our approval)
+
 ### Tests
 - ✅ `npm run build`: Compilation successful
-- ✅ `npm run check:i18n`: All checks pass
-- ✅ Admin submission list page: both Volkswagen Golf and AUDI A8 thumbnails should display correctly
+- ✅ `npm run check:i18n`: All checks pass (413 keys verified across de/en/mk)
+- ✅ Admin submission list page: thumbnails display correctly
+- ✅ Wizard workflow info component: displays corrected process in all three locales
 

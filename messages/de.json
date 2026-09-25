@@ -906,18 +906,18 @@
             "submitting": "Wird abgesendet..."
         },
         "workflow": {
-            "title": "Fahrzeug-Veröffentlichungsprozess",
-            "subtitle": "Erfahren Sie, wie Ihre eingereichten Fahrzeuge veröffentlicht werden",
+            "title": "Bewertungsprozess für Ihr Fahrzeug",
+            "subtitle": "Erfahren Sie, wie wir Ihr eingereichtes Fahrzeug bewerten",
             "step1Title": "Fahrzeug einreichen",
-            "step1Desc": "Sie reichen Ihr Fahrzeug über das Formular ein und laden Fotos hoch.",
-            "step2Title": "Admin-Überprüfung",
-            "step2Desc": "Unser Team überprüft Ihr Fahrzeug auf Qualität, Genauigkeit und Marktfähigkeit.",
-            "step3Title": "Genehmigung und Veröffentlichung",
-            "step3Desc": "Bei Genehmigung wird Ihr Fahrzeug als \"Kundenfahrzeug\" in unseren Katalog aufgenommen und ist öffentlich sichtbar.",
-            "step4Title": "Fahrzeug ist live!",
-            "step4Desc": "Interessierte können Ihr Fahrzeug sehen, Anfragen stellen und Probefahrten buchen.",
+            "step1Desc": "Sie reichen Ihr Fahrzeug mit Fotos und Details über das Formular ein.",
+            "step2Title": "Überprüfung durch unser Team",
+            "step2Desc": "Unser Team überprüft Ihr Fahrzeug und erstellt eine Bewertung basierend auf Zustand und Marktlage.",
+            "step3Title": "Angebot oder Ablehnung",
+            "step3Desc": "Sie erhalten von uns ein Angebot oder eine Ablehnung. Wir nehmen mit Ihnen Kontakt auf.",
+            "step4Title": "Nächste Schritte",
+            "step4Desc": "Wenn Sie unser Angebot annehmen und Sie interessiert sind, können wir Ihr Fahrzeug optional in unseren Katalog aufnehmen.",
             "importantNoteLabel": "Wichtig:",
-            "importantNoteText": "Nur genehmigt Fahrzeuge werden öffentlich angezeigt. Sie können abgelehnte Fahrzeuge erneut einreichen."
+            "importantNoteText": "Ihr Fahrzeug wird nicht automatisch veröffentlicht. Die Veröffentlichung erfolgt nur nach Ihrer Zustimmung und unserer Freigabe."
         },
         "success": {
             "title": "Vielen Dank!",

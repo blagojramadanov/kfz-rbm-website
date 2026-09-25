@@ -906,18 +906,18 @@
             "submitting": "Submitting..."
         },
         "workflow": {
-            "title": "Vehicle publication process",
-            "subtitle": "Learn how your submitted vehicles are published",
-            "step1Title": "Submit vehicle",
-            "step1Desc": "You submit your vehicle through the form and upload photos.",
-            "step2Title": "Admin review",
-            "step2Desc": "Our team reviews your vehicle for quality, accuracy, and market suitability.",
-            "step3Title": "Approval and publication",
-            "step3Desc": "Upon approval, your vehicle is added to our catalog as a \"customer vehicle\" and is publicly visible.",
-            "step4Title": "Vehicle is live!",
-            "step4Desc": "Interested parties can see your vehicle, ask questions, and book test drives.",
+            "title": "Vehicle valuation process",
+            "subtitle": "Learn how we assess your submitted vehicle",
+            "step1Title": "Submit your vehicle",
+            "step1Desc": "You submit your vehicle with photos and details through our form.",
+            "step2Title": "Our team reviews it",
+            "step2Desc": "Our team inspects your vehicle and prepares a valuation based on condition and market value.",
+            "step3Title": "Receive an offer or decline",
+            "step3Desc": "You receive an offer or a decline from us. We will contact you with the details.",
+            "step4Title": "Next steps",
+            "step4Desc": "If you accept our offer and are interested, we can optionally list your vehicle in our catalog.",
             "importantNoteLabel": "Important:",
-            "importantNoteText": "Only approved vehicles are displayed publicly. You can resubmit rejected vehicles."
+            "importantNoteText": "Your vehicle is not published automatically. Publication happens only after you agree and we approve it."
         },
         "success": {
             "title": "Thank you!",
