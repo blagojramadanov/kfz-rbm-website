@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Heart, Search } from "lucide-react";
 
 export default function FavoritesPage() {
+  const t = useTranslations("dashboard.favorites");
+  const tCommon = useTranslations("common");
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
@@ -27,7 +29,7 @@ export default function FavoritesPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -43,10 +45,10 @@ export default function FavoritesPage() {
               Dashboard
             </Link>
             <h1 className="text-3xl font-bold text-gray-900">
-              Favoriten
+              {t("title")}
             </h1>
             <p className="text-gray-600 mt-1">
-              Ihre gespeicherten Fahrzeuge
+              {t("description")}
             </p>
           </div>
         </div>
@@ -61,14 +63,14 @@ export default function FavoritesPage() {
             </div>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Noch keine Favoriten
+            {t("empty")}
           </h2>
           <p className="text-gray-600 mb-6 max-w-md mx-auto">
-            Sie haben noch keine Fahrzeuge zu Ihren Favoriten hinzugefügt. Markieren Sie Fahrzeuge, um sie hier zu speichern.
+            {t("emptyDescription")}
           </p>
           <Link href="/fahrzeuge">
             <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
-              Fahrzeuge durchsuchen
+              {t("browse")}
               <Search className="ml-2 w-4 h-4" />
             </Button>
           </Link>

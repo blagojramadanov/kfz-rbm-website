@@ -12,48 +12,48 @@ import { useErrorMessage } from "@/lib/use-error-message";
 
 type DashboardVehicleStatus = "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "akzeptiert" | "abgelehnt";
 
-const statusConfig: Record<DashboardVehicleStatus, { label: string; color: string; icon: React.ReactNode; bgColor: string }> = {
-  eingereicht: {
-    label: "Eingereicht",
-    color: "text-blue-600",
-    icon: <Clock className="w-4 h-4" />,
-    bgColor: "bg-blue-100",
-  },
-  in_bearbeitung: {
-    label: "In Bearbeitung",
-    color: "text-yellow-600",
-    icon: <Clock className="w-4 h-4" />,
-    bgColor: "bg-yellow-100",
-  },
-  angebot_gesendet: {
-    label: "Angebot gesendet",
-    color: "text-green-600",
-    icon: <CheckCircle className="w-4 h-4" />,
-    bgColor: "bg-green-100",
-  },
-  akzeptiert: {
-    label: "Angebot angenommen",
-    color: "text-green-700",
-    icon: <CheckCircle className="w-4 h-4" />,
-    bgColor: "bg-green-200",
-  },
-  abgelehnt: {
-    label: "Abgelehnt",
-    color: "text-red-600",
-    icon: <AlertCircle className="w-4 h-4" />,
-    bgColor: "bg-red-100",
-  },
-};
-
 export const dynamic = "force-dynamic";
 
 export default function MyVehiclesPage() {
+  const t = useTranslations("dashboard.vehicles");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
   const errorMessage = useErrorMessage();
   const [vehicles, setVehicles] = useState<SubmittedVehicle[]>([]);
   const [loadingVehicles, setLoadingVehicles] = useState(true);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
+
+  const getStatusConfig = (status: DashboardVehicleStatus): { label: string; color: string; icon: React.ReactNode; bgColor: string } => {
+    const statusLabel = t(`status.${status}`);
+    const icons: Record<DashboardVehicleStatus, React.ReactNode> = {
+      eingereicht: <Clock className="w-4 h-4" />,
+      in_bearbeitung: <Clock className="w-4 h-4" />,
+      angebot_gesendet: <CheckCircle className="w-4 h-4" />,
+      akzeptiert: <CheckCircle className="w-4 h-4" />,
+      abgelehnt: <AlertCircle className="w-4 h-4" />,
+    };
+    const colors: Record<DashboardVehicleStatus, string> = {
+      eingereicht: "text-blue-600",
+      in_bearbeitung: "text-yellow-600",
+      angebot_gesendet: "text-green-600",
+      akzeptiert: "text-green-700",
+      abgelehnt: "text-red-600",
+    };
+    const bgColors: Record<DashboardVehicleStatus, string> = {
+      eingereicht: "bg-blue-100",
+      in_bearbeitung: "bg-yellow-100",
+      angebot_gesendet: "bg-green-100",
+      akzeptiert: "bg-green-200",
+      abgelehnt: "bg-red-100",
+    };
+    return {
+      label: statusLabel,
+      color: colors[status],
+      icon: icons[status],
+      bgColor: bgColors[status],
+    };
+  };
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -101,7 +101,7 @@ export default function MyVehiclesPage() {
   };
 
   const handleAcceptOffer = async (vehicleId: string) => {
-    if (!user || !confirm("Möchten Sie dieses Angebot annehmen?")) {
+    if (!user || !confirm(t("acceptConfirm"))) {
       return;
     }
 
@@ -120,7 +120,7 @@ export default function MyVehiclesPage() {
   };
 
   const handleRejectOffer = async (vehicleId: string) => {
-    if (!user || !confirm("Möchten Sie dieses Angebot ablehnen?")) {
+    if (!user || !confirm(t("rejectConfirm"))) {
       return;
     }
 
@@ -144,7 +144,7 @@ export default function MyVehiclesPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -161,16 +161,16 @@ export default function MyVehiclesPage() {
                 Dashboard
               </Link>
               <h1 className="text-3xl font-bold text-gray-900">
-                Meine Fahrzeuge
+                {t("title")}
               </h1>
               <p className="text-gray-600 mt-1">
-                Verwalten und bearbeiten Sie Ihre angebotenen Fahrzeuge
+                {t("description")}
               </p>
             </div>
             <Link href="/dashboard/fahrzeug-anbieten">
               <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
                 <Plus className="mr-2 w-4 h-4" />
-                Fahrzeug hinzufügen
+                {t("addNew")}
               </Button>
             </Link>
           </div>
@@ -182,7 +182,7 @@ export default function MyVehiclesPage() {
           <div className="flex justify-center py-12">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-              <p className="text-gray-600">Fahrzeuge werden geladen...</p>
+              <p className="text-gray-600">{t("loading")}</p>
             </div>
           </div>
         ) : vehicles.length === 0 ? (
@@ -194,15 +194,15 @@ export default function MyVehiclesPage() {
               </div>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Noch keine Fahrzeuge angeboten
+              {t("empty")}
             </h2>
             <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              Sie haben noch keine Fahrzeuge zum Verkauf angeboten. Klicken Sie unten, um Ihr erstes Fahrzeug hinzuzufügen.
+              {t("emptyDescription")}
             </p>
             <Link href="/dashboard/fahrzeug-anbieten">
               <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
                 <Plus className="mr-2 w-4 h-4" />
-                Erstes Fahrzeug anbieten
+                {t("firstVehicle")}
               </Button>
             </Link>
           </div>
@@ -211,7 +211,7 @@ export default function MyVehiclesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {vehicles.map((vehicle) => {
               const status = (vehicle.status as DashboardVehicleStatus) || "eingereicht";
-              const config = statusConfig[status] || statusConfig["eingereicht"];
+              const config = getStatusConfig(status);
 
               return (
                 <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -267,7 +267,7 @@ export default function MyVehiclesPage() {
                     {status === "angebot_gesendet" && vehicle.offered_price && (
                       <div className="border-t pt-3 mt-3">
                         <div className="bg-green-50 p-3 rounded mb-3">
-                          <p className="text-sm text-gray-600 mb-1">💰 <span className="font-semibold">Angebotspreis:</span></p>
+                          <p className="text-sm text-gray-600 mb-1">{t("offeredPrice")}</p>
                           <p className="text-2xl font-bold text-green-600">€{vehicle.offered_price.toLocaleString("de-DE")}</p>
                           {vehicle.offer_terms && (
                             <p className="text-xs text-gray-600 mt-2">{vehicle.offer_terms}</p>
@@ -278,13 +278,13 @@ export default function MyVehiclesPage() {
                             onClick={() => handleAcceptOffer(vehicle.id)}
                             className="flex-1 px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 font-medium"
                           >
-                            ✓ Annehmen
+                            {t("acceptOffer")}
                           </button>
                           <button
                             onClick={() => handleRejectOffer(vehicle.id)}
                             className="flex-1 px-3 py-2 border border-red-300 text-red-600 text-sm rounded hover:bg-red-50 font-medium"
                           >
-                            ✗ Ablehnen
+                            {t("rejectOffer")}
                           </button>
                         </div>
                       </div>
@@ -293,8 +293,8 @@ export default function MyVehiclesPage() {
                     {/* Accepted/Rejected Status */}
                     {status === "akzeptiert" && (
                       <div className="border-t pt-3 mt-3 bg-green-50 p-3 rounded">
-                        <p className="text-sm text-green-700">✓ <span className="font-semibold">Angebot angenommen!</span></p>
-                        <p className="text-xs text-gray-600 mt-1">Kontaktieren Sie uns für die nächsten Schritte.</p>
+                        <p className="text-sm text-green-700">✓ <span className="font-semibold">{t("offerAccepted")}</span></p>
+                        <p className="text-xs text-gray-600 mt-1">{t("contactUs")}</p>
                       </div>
                     )}
                   </div>

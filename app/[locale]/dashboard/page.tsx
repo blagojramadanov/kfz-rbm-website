@@ -11,7 +11,8 @@ import { Car, MessageSquare, Heart, Plus, FileText, LogOut, ArrowRight, Repeat2 
 export const dynamic = "force-dynamic";
 
 export default function DashboardPage() {
-  const t = useTranslations();
+  const t = useTranslations("dashboard");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string || 'de';
@@ -35,7 +36,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{t("common.loading")}</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -56,10 +57,10 @@ export default function DashboardPage() {
       <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h1 className="text-4xl font-bold mb-2">
-            {t("common.welcome")}, {profile.full_name}!
+            {tCommon("welcome")}, {profile.full_name}!
           </h1>
           <p className="text-blue-100 text-lg">
-            {t("dashboard.welcome")}
+            {t("welcome")}
           </p>
         </div>
       </div>
@@ -71,7 +72,7 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Meine Fahrzeuge</p>
+                  <p className="text-sm text-gray-500">{t("myVehicles")}</p>
                   <p className="text-3xl font-bold text-gray-900">—</p>
                 </div>
                 <Car className="w-10 h-10 text-kfz-blue" />
@@ -83,7 +84,7 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Anfragen</p>
+                  <p className="text-sm text-gray-500">{t("overview.inquiries")}</p>
                   <p className="text-3xl font-bold text-gray-900">—</p>
                 </div>
                 <MessageSquare className="w-10 h-10 text-green-600" />
@@ -95,7 +96,7 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Favoriten</p>
+                  <p className="text-sm text-gray-500">{t("overview.favorites")}</p>
                   <p className="text-3xl font-bold text-gray-900">—</p>
                 </div>
                 <Heart className="w-10 h-10 text-red-600" />
@@ -106,7 +107,7 @@ export default function DashboardPage() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Mitglied seit</p>
+                <p className="text-sm text-gray-500">{t("memberSince")}</p>
                 <p className="text-sm font-semibold text-gray-900">
                   {new Date(profile.created_at).toLocaleDateString("de-DE")}
                 </p>
@@ -126,15 +127,15 @@ export default function DashboardPage() {
                   <Plus className="w-6 h-6 text-kfz-blue" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Fahrzeug anbieten
+                  {t("overview.submitVehicle")}
                 </h2>
               </div>
               <p className="text-gray-600 mb-6">
-                Verkaufen Sie Ihr Fahrzeug über unsere Plattform. Einfach, schnell und sicher.
+                {t("overview.submitDescription")}
               </p>
               <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold w-full">
                 <Plus className="mr-2 w-4 h-4" />
-                Fahrzeug hinzufügen
+                {t("overview.addVehicle")}
               </Button>
             </div>
           </Link>
@@ -147,14 +148,14 @@ export default function DashboardPage() {
                   <Car className="w-6 h-6 text-kfz-blue" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Meine Fahrzeuge
+                  {t("overview.manageVehicles")}
                 </h2>
               </div>
               <p className="text-gray-600 mb-6">
-                Verwalten Sie Ihre angebotenen Fahrzeuge, sehen Sie den Status und bearbeiten Sie Details.
+                {t("overview.manageVehiclesDescription")}
               </p>
               <Button variant="outline" className="border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white w-full">
-                Fahrzeuge ansehen
+                {t("overview.viewVehicles")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
@@ -168,14 +169,14 @@ export default function DashboardPage() {
                   <MessageSquare className="w-6 h-6 text-green-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Anfragen
+                  {t("overview.inquiries")}
                 </h2>
               </div>
               <p className="text-gray-600 mb-6">
-                Sehen Sie Anfragen von Interessenten zu Ihren Fahrzeugen und antworten Sie schnell.
+                {t("overview.inquiriesDescription")}
               </p>
               <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white w-full">
-                Anfragen ansehen
+                {t("overview.viewInquiries")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
@@ -189,14 +190,14 @@ export default function DashboardPage() {
                   <Heart className="w-6 h-6 text-red-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Favoriten
+                  {t("overview.favorites")}
                 </h2>
               </div>
               <p className="text-gray-600 mb-6">
-                Sehen Sie Ihre gespeicherten Fahrzeuge und verwalten Sie Ihre Favoriten.
+                {t("overview.favoritesDescription")}
               </p>
               <Button variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white w-full">
-                Favoriten ansehen
+                {t("overview.viewFavorites")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
@@ -210,14 +211,14 @@ export default function DashboardPage() {
                   <Repeat2 className="w-6 h-6 text-purple-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Inzahlungnahme
+                  {t("overview.tradeIn")}
                 </h2>
               </div>
               <p className="text-gray-600 mb-6">
-                Tauschen Sie Ihr Fahrzeug gegen ein anderes aus unserem Bestand ein.
+                {t("overview.tradeInDescription")}
               </p>
               <Button variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white w-full">
-                Neue Anfrage
+                {t("overview.newRequest")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
@@ -231,14 +232,14 @@ export default function DashboardPage() {
                   <FileText className="w-6 h-6 text-indigo-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Meine Anfragen
+                  {t("overview.myTradeInRequests")}
                 </h2>
               </div>
               <p className="text-gray-600 mb-6">
-                Verwalten Sie Ihre Inzahlungnahmeanfragen und sehen Sie den aktuellen Status.
+                {t("overview.myTradeInRequestsDescription")}
               </p>
               <Button variant="outline" className="border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white w-full">
-                Anfragen ansehen
+                {t("overview.viewInquiries")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
@@ -249,28 +250,28 @@ export default function DashboardPage() {
         <div className="grid md:grid-cols-2 gap-6">
           <Link href="/dashboard/profil">
             <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Profil verwalten</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">{t("overview.manageProfile")}</h3>
               <p className="text-gray-600 mb-4">
-                Bearbeiten Sie Ihre Profilinformationen, Passwort und Sicherheitseinstellungen.
+                {t("overview.manageProfileDescription")}
               </p>
               <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white">
-                Zum Profil
+                {t("overview.toProfile")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
           </Link>
 
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Kontoaktionen</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">{t("overview.accountActions")}</h3>
             <p className="text-gray-600 mb-4">
-              Abmelden und eine neue Sitzung starten.
+              {t("overview.accountActionsDescription")}
             </p>
             <Button
               onClick={handleLogout}
               className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold"
             >
               <LogOut className="mr-2 w-4 h-4" />
-              Abmelden
+              {t("overview.logout")}
             </Button>
           </div>
         </div>

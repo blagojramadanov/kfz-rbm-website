@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare, ArrowRight } from "lucide-react";
 
 export default function InquiriesPage() {
+  const t = useTranslations("dashboard.inquiries");
+  const tCommon = useTranslations("common");
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
@@ -27,7 +29,7 @@ export default function InquiriesPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -43,10 +45,10 @@ export default function InquiriesPage() {
               Dashboard
             </Link>
             <h1 className="text-3xl font-bold text-gray-900">
-              Anfragen
+              {t("title")}
             </h1>
             <p className="text-gray-600 mt-1">
-              Anfragen von Interessenten zu Ihren Fahrzeugen
+              {t("description")}
             </p>
           </div>
         </div>
@@ -61,14 +63,14 @@ export default function InquiriesPage() {
             </div>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Noch keine Anfragen
+            {t("empty")}
           </h2>
           <p className="text-gray-600 mb-6 max-w-md mx-auto">
-            Sie haben noch keine Anfragen erhalten. Sobald Interessenten Ihre Fahrzeuge entdecken, werden ihre Anfragen hier angezeigt.
+            {t("emptyDescription")}
           </p>
           <Link href="/dashboard/fahrzeug-anbieten">
             <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
-              Fahrzeug anbieten
+              {t("submitVehicle")}
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </Link>

@@ -210,17 +210,244 @@
     },
     "dashboard": {
         "title": "Dashboard",
-        "welcome": "Welcome",
+        "welcome": "Welcome to your dashboard",
+        "memberSince": "Member since",
         "myProfile": "My Profile",
         "settings": "Settings",
         "myVehicles": "My Vehicles",
         "myOffers": "My Offers",
         "myInquiries": "My Inquiries",
         "myFavorites": "My Favorites",
-        "tradeInRequests": "Trade-In Requests",
         "statistics": "Statistics",
         "activities": "Activities",
-        "notifications": "Notifications"
+        "notifications": "Notifications",
+        "overview": {
+            "addVehicle": "Add Vehicle",
+            "submitVehicle": "Submit Vehicle",
+            "submitDescription": "Sell your vehicle through our platform. Simple, fast, and secure.",
+            "manageVehicles": "My Vehicles",
+            "manageVehiclesDescription": "Manage your listed vehicles, check their status, and edit details.",
+            "viewVehicles": "View Vehicles",
+            "inquiries": "Inquiries",
+            "inquiriesDescription": "See inquiries from interested buyers about your vehicles and respond quickly.",
+            "viewInquiries": "View Inquiries",
+            "favorites": "Favorites",
+            "favoritesDescription": "See your saved vehicles and manage your favorites.",
+            "viewFavorites": "View Favorites",
+            "tradeIn": "Trade-In",
+            "tradeInDescription": "Trade in your vehicle for another one from our inventory.",
+            "newRequest": "New Request",
+            "myTradeInRequests": "My Requests",
+            "myTradeInRequestsDescription": "Manage your trade-in requests and check their status.",
+            "manageProfile": "Manage Profile",
+            "manageProfileDescription": "Edit your account information, password, and security settings.",
+            "toProfile": "To Profile",
+            "accountActions": "Account Actions",
+            "accountActionsDescription": "Sign out and start a new session.",
+            "logout": "Sign Out"
+        },
+        "vehicles": {
+            "title": "My Vehicles",
+            "description": "Manage and edit your listed vehicles",
+            "addNew": "Add Vehicle",
+            "empty": "No vehicles listed yet",
+            "emptyDescription": "You haven't listed any vehicles for sale yet. Click below to add your first vehicle.",
+            "firstVehicle": "List First Vehicle",
+            "loading": "Loading vehicles...",
+            "status": {
+                "eingereicht": "Submitted",
+                "in_bearbeitung": "In Review",
+                "angebot_gesendet": "Offer Sent",
+                "akzeptiert": "Offer Accepted",
+                "abgelehnt": "Rejected"
+            },
+            "offeredPrice": "💰 Offered Price:",
+            "acceptOffer": "✓ Accept",
+            "rejectOffer": "✗ Reject",
+            "acceptConfirm": "Do you want to accept this offer?",
+            "rejectConfirm": "Do you want to reject this offer?",
+            "offerAccepted": "✓ Offer accepted!",
+            "contactUs": "Contact us for next steps."
+        },
+        "inquiries": {
+            "title": "Inquiries",
+            "description": "Inquiries from interested buyers about your vehicles",
+            "empty": "No inquiries yet",
+            "emptyDescription": "You haven't received any inquiries yet. Once interested buyers discover your vehicles, their inquiries will appear here.",
+            "submitVehicle": "Submit Vehicle"
+        },
+        "favorites": {
+            "title": "Favorites",
+            "description": "Your saved vehicles",
+            "empty": "No favorites yet",
+            "emptyDescription": "You haven't added any vehicles to your favorites yet. Mark vehicles to save them here.",
+            "browse": "Browse Vehicles"
+        },
+        "profile": {
+            "title": "Profile",
+            "description": "Manage your account information and security settings",
+            "tabs": {
+                "profile": "Profile Information",
+                "security": "Security"
+            },
+            "form": {
+                "email": "Email",
+                "emailDisabled": "Email address cannot be changed",
+                "fullName": "Full Name",
+                "phone": "Phone",
+                "company": "Company",
+                "placeholder": {
+                    "fullName": "e.g. John Doe",
+                    "phone": "e.g. +49 123 456789",
+                    "company": "e.g. Auto GmbH"
+                }
+            },
+            "password": {
+                "current": "Current Password",
+                "new": "New Password",
+                "newPlaceholder": "At least 8 characters",
+                "confirm": "Confirm Password"
+            },
+            "buttons": {
+                "cancel": "Cancel",
+                "save": "Save Changes",
+                "saving": "Saving...",
+                "changePassword": "Change Password",
+                "changingPassword": "Saving..."
+            },
+            "messages": {
+                "profileUpdated": "Profile updated successfully",
+                "passwordChanged": "Password changed successfully",
+                "passwordsNotMatch": "Passwords do not match",
+                "passwordTooShort": "Password must be at least 8 characters"
+            }
+        },
+        "tradeIn": {
+            "title": "Trade-In",
+            "loading": "Loading...",
+            "steps": {
+                "current_vehicle": "Current Vehicle",
+                "vehicle_value": "Vehicle Value",
+                "select_desired": "Desired Vehicle",
+                "review": "Review",
+                "success": "Success"
+            },
+            "stepProgress": "Step {current} of {total}",
+            "currentVehicle": {
+                "title": "Your Current Vehicle",
+                "brand": "Brand",
+                "brandPlaceholder": "e.g. BMW, Mercedes",
+                "model": "Model",
+                "modelPlaceholder": "e.g. 330i, C-Class",
+                "year": "First Registration",
+                "mileage": "Mileage",
+                "mileagePlaceholder": "50000"
+            },
+            "vehicleValue": {
+                "title": "Vehicle Value",
+                "description": "Estimate the current value of your vehicle. This is a non-binding estimate.",
+                "label": "Estimated Value (€)",
+                "placeholder": "50000"
+            },
+            "selectDesired": {
+                "title": "Desired Vehicle",
+                "description": "Select the vehicle you wish to purchase:",
+                "loading": "Loading vehicles...",
+                "empty": "No vehicles available."
+            },
+            "review": {
+                "title": "Review",
+                "yourVehicle": "Your Vehicle",
+                "desiredVehicle": "Desired Vehicle",
+                "brand": "Brand:",
+                "model": "Model:",
+                "year": "Year:",
+                "mileage": "Mileage:",
+                "estimatedValue": "Estimated Value:",
+                "vehicle": "Vehicle:",
+                "price": "Price:",
+                "priceEstimate": "Non-Binding Price Estimate",
+                "yourEstimate": "Estimated value of your vehicle:",
+                "desiredPrice": "Price of desired vehicle:",
+                "difference": "Estimated payment/credit:",
+                "importantNote": "ⓘ Important:",
+                "importantNoteText": "The final vehicle appraisal and payment will be determined individually by our team."
+            },
+            "success": {
+                "title": "Request Submitted Successfully!",
+                "description": "Your trade-in request has been submitted successfully. Our experts will review your request and contact you shortly.",
+                "requestId": "Request ID:",
+                "toDashboard": "To Dashboard",
+                "viewRequests": "View Requests"
+            },
+            "validation": {
+                "brandRequired": "Please fill in brand, model, and year",
+                "valueRequired": "Please enter an estimated vehicle value",
+                "vehicleRequired": "Please select a desired vehicle"
+            },
+            "buttons": {
+                "back": "Back",
+                "next": "Next",
+                "submit": "Submit Request",
+                "submitting": "Submitting..."
+            }
+        },
+        "tradeInRequests": {
+            "title": "My Trade-In Requests",
+            "description": "Manage your trade-in requests and check their status",
+            "count": "Requests ({count})",
+            "newRequest": "Create New Request",
+            "loading": "Loading requests...",
+            "empty": "You haven't created any trade-in requests yet.",
+            "firstRequest": "Create First Request",
+            "status": {
+                "new": "New Request",
+                "reviewing": "Under Review",
+                "contact_made": "Contact Made",
+                "completed": "Completed",
+                "cancelled": "Cancelled"
+            },
+            "yourVehicle": "Your Vehicle",
+            "desiredVehicle": "Desired Vehicle",
+            "estimate": "Non-Binding Estimate",
+            "difference": "Estimated payment/credit:"
+        },
+        "tradeInRequestDetail": {
+            "title": "Trade-In Details",
+            "backToList": "Back to Requests",
+            "requestId": "Request ID:",
+            "loading": "Loading request...",
+            "notFound": "Request not found.",
+            "backToOverview": "Back to Overview",
+            "status": {
+                "new": "New Request",
+                "reviewing": "Under Review",
+                "contact_made": "Contact Made",
+                "completed": "Completed",
+                "cancelled": "Cancelled"
+            },
+            "statusDescriptions": {
+                "new": "Your request has been submitted and will be reviewed by our team shortly.",
+                "reviewing": "Our experts are currently reviewing your request and vehicle value estimate.",
+                "contact_made": "We've reviewed your request and will contact you shortly.",
+                "completed": "This request has been completed.",
+                "cancelled": "This request has been cancelled."
+            },
+            "currentVehicle": "Your Vehicle",
+            "desiredVehicle": "Desired Vehicle",
+            "brandModel": "Brand & Model",
+            "firstRegistration": "First Registration",
+            "mileage": "Mileage",
+            "estimatedValue": "Estimated Value",
+            "year": "Year",
+            "price": "Price",
+            "pricingBreakdown": "Non-Binding Price Estimate",
+            "yourVehicleEstimate": "Estimated value of your vehicle:",
+            "desiredVehiclePrice": "Price of desired vehicle:",
+            "difference": "Estimated payment/credit:",
+            "importantNote": "ⓘ Important:",
+            "importantNoteText": "The final vehicle appraisal and payment will be determined individually by our team. The amount shown above is non-binding and for estimation purposes only."
+        }
     },
     "adminDashboard": {
         "title": "Admin Dashboard",

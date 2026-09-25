@@ -210,17 +210,244 @@
     },
     "dashboard": {
         "title": "Dashboard",
-        "welcome": "Willkommen",
+        "welcome": "Willkommen auf Ihrem Dashboard",
+        "memberSince": "Mitglied seit",
         "myProfile": "Mein Profil",
         "settings": "Einstellungen",
         "myVehicles": "Meine Fahrzeuge",
         "myOffers": "Meine Angebote",
         "myInquiries": "Meine Anfragen",
         "myFavorites": "Meine Favoriten",
-        "tradeInRequests": "Inzahlungnahmeanfragen",
         "statistics": "Statistiken",
         "activities": "Aktivitäten",
-        "notifications": "Benachrichtigungen"
+        "notifications": "Benachrichtigungen",
+        "overview": {
+            "addVehicle": "Fahrzeug hinzufügen",
+            "submitVehicle": "Fahrzeug anbieten",
+            "submitDescription": "Verkaufen Sie Ihr Fahrzeug über unsere Plattform. Einfach, schnell und sicher.",
+            "manageVehicles": "Meine Fahrzeuge",
+            "manageVehiclesDescription": "Verwalten Sie Ihre angebotenen Fahrzeuge, sehen Sie den Status und bearbeiten Sie Details.",
+            "viewVehicles": "Fahrzeuge ansehen",
+            "inquiries": "Anfragen",
+            "inquiriesDescription": "Sehen Sie Anfragen von Interessenten zu Ihren Fahrzeugen und antworten Sie schnell.",
+            "viewInquiries": "Anfragen ansehen",
+            "favorites": "Favoriten",
+            "favoritesDescription": "Sehen Sie Ihre gespeicherten Fahrzeuge und verwalten Sie Ihre Favoriten.",
+            "viewFavorites": "Favoriten ansehen",
+            "tradeIn": "Inzahlungnahme",
+            "tradeInDescription": "Tauschen Sie Ihr Fahrzeug gegen ein anderes aus unserem Bestand ein.",
+            "newRequest": "Neue Anfrage",
+            "myTradeInRequests": "Meine Anfragen",
+            "myTradeInRequestsDescription": "Verwalten Sie Ihre Inzahlungnahmeanfragen und sehen Sie den aktuellen Status.",
+            "manageProfile": "Profil verwalten",
+            "manageProfileDescription": "Bearbeiten Sie Ihre Profilinformationen, Passwort und Sicherheitseinstellungen.",
+            "toProfile": "Zum Profil",
+            "accountActions": "Kontoaktionen",
+            "accountActionsDescription": "Abmelden und eine neue Sitzung starten.",
+            "logout": "Abmelden"
+        },
+        "vehicles": {
+            "title": "Meine Fahrzeuge",
+            "description": "Verwalten und bearbeiten Sie Ihre angebotenen Fahrzeuge",
+            "addNew": "Fahrzeug hinzufügen",
+            "empty": "Noch keine Fahrzeuge angeboten",
+            "emptyDescription": "Sie haben noch keine Fahrzeuge zum Verkauf angeboten. Klicken Sie unten, um Ihr erstes Fahrzeug hinzuzufügen.",
+            "firstVehicle": "Erstes Fahrzeug anbieten",
+            "loading": "Fahrzeuge werden geladen...",
+            "status": {
+                "eingereicht": "Eingereicht",
+                "in_bearbeitung": "In Bearbeitung",
+                "angebot_gesendet": "Angebot gesendet",
+                "akzeptiert": "Angebot angenommen",
+                "abgelehnt": "Abgelehnt"
+            },
+            "offeredPrice": "💰 Angebotspreis:",
+            "acceptOffer": "✓ Annehmen",
+            "rejectOffer": "✗ Ablehnen",
+            "acceptConfirm": "Möchten Sie dieses Angebot annehmen?",
+            "rejectConfirm": "Möchten Sie dieses Angebot ablehnen?",
+            "offerAccepted": "✓ Angebot angenommen!",
+            "contactUs": "Kontaktieren Sie uns für die nächsten Schritte."
+        },
+        "inquiries": {
+            "title": "Anfragen",
+            "description": "Anfragen von Interessenten zu Ihren Fahrzeugen",
+            "empty": "Noch keine Anfragen",
+            "emptyDescription": "Sie haben noch keine Anfragen erhalten. Sobald Interessenten Ihre Fahrzeuge entdecken, werden ihre Anfragen hier angezeigt.",
+            "submitVehicle": "Fahrzeug anbieten"
+        },
+        "favorites": {
+            "title": "Favoriten",
+            "description": "Ihre gespeicherten Fahrzeuge",
+            "empty": "Noch keine Favoriten",
+            "emptyDescription": "Sie haben noch keine Fahrzeuge zu Ihren Favoriten hinzugefügt. Markieren Sie Fahrzeuge, um sie hier zu speichern.",
+            "browse": "Fahrzeuge durchsuchen"
+        },
+        "profile": {
+            "title": "Profil",
+            "description": "Verwalten Sie Ihre Kontoinformationen und Sicherheitseinstellungen",
+            "tabs": {
+                "profile": "Profilinformationen",
+                "security": "Sicherheit"
+            },
+            "form": {
+                "email": "Email",
+                "emailDisabled": "Die Email-Adresse kann nicht geändert werden",
+                "fullName": "Vollständiger Name",
+                "phone": "Telefon",
+                "company": "Unternehmen",
+                "placeholder": {
+                    "fullName": "z.B. Max Mustermann",
+                    "phone": "z.B. +49 123 456789",
+                    "company": "z.B. Auto GmbH"
+                }
+            },
+            "password": {
+                "current": "Aktuelles Passwort",
+                "new": "Neues Passwort",
+                "newPlaceholder": "Mindestens 8 Zeichen",
+                "confirm": "Passwort wiederholen"
+            },
+            "buttons": {
+                "cancel": "Abbrechen",
+                "save": "Änderungen speichern",
+                "saving": "Wird gespeichert...",
+                "changePassword": "Passwort ändern",
+                "changingPassword": "Wird gespeichert..."
+            },
+            "messages": {
+                "profileUpdated": "Profil erfolgreich aktualisiert",
+                "passwordChanged": "Passwort erfolgreich geändert",
+                "passwordsNotMatch": "Passwörter stimmen nicht überein",
+                "passwordTooShort": "Passwort muss mindestens 8 Zeichen lang sein"
+            }
+        },
+        "tradeIn": {
+            "title": "Inzahlungnahme",
+            "loading": "Wird geladen...",
+            "steps": {
+                "current_vehicle": "Aktuelles Fahrzeug",
+                "vehicle_value": "Fahrzeugwert",
+                "select_desired": "Gewünschtes Fahrzeug",
+                "review": "Überprüfung",
+                "success": "Erfolg"
+            },
+            "stepProgress": "Schritt {current} von {total}",
+            "currentVehicle": {
+                "title": "Ihr aktuelles Fahrzeug",
+                "brand": "Marke",
+                "brandPlaceholder": "z.B. BMW, Mercedes",
+                "model": "Modell",
+                "modelPlaceholder": "z.B. 330i, C-Class",
+                "year": "Erstzulassung",
+                "mileage": "Kilometerstand",
+                "mileagePlaceholder": "50000"
+            },
+            "vehicleValue": {
+                "title": "Fahrzeugwert",
+                "description": "Schätzen Sie den aktuellen Wert Ihres Fahrzeugs. Dies ist eine unverbindliche Schätzung.",
+                "label": "Geschätzter Wert (€)",
+                "placeholder": "50000"
+            },
+            "selectDesired": {
+                "title": "Gewünschtes Fahrzeug",
+                "description": "Wählen Sie das Fahrzeug aus, das Sie kaufen möchten:",
+                "loading": "Fahrzeuge werden geladen...",
+                "empty": "Keine verfügbaren Fahrzeuge vorhanden."
+            },
+            "review": {
+                "title": "Überprüfung",
+                "yourVehicle": "Ihr Fahrzeug",
+                "desiredVehicle": "Gewünschtes Fahrzeug",
+                "brand": "Marke:",
+                "model": "Modell:",
+                "year": "Jahr:",
+                "mileage": "Kilometer:",
+                "estimatedValue": "Geschätzter Wert:",
+                "vehicle": "Fahrzeug:",
+                "price": "Preis:",
+                "priceEstimate": "Unverbindliche Preisschätzung",
+                "yourEstimate": "Geschätzter Wert Ihres Fahrzeugs:",
+                "desiredPrice": "Preis des gewünschten Fahrzeugs:",
+                "difference": "Geschätzte Zuzahlung/Gutschrift:",
+                "importantNote": "ⓘ Wichtig:",
+                "importantNoteText": "Die endgültige Fahrzeugbewertung und Zuzahlung wird individuell durch unser Team festgelegt."
+            },
+            "success": {
+                "title": "Anfrage erfolgreich eingereicht!",
+                "description": "Ihre Inzahlungnahmeanfrage wurde erfolgreich eingereicht. Unsere Experten werden Ihre Anfrage prüfen und sich in Kürze mit Ihnen in Verbindung setzen.",
+                "requestId": "Anfrage-ID:",
+                "toDashboard": "Zum Dashboard",
+                "viewRequests": "Anfragen ansehen"
+            },
+            "validation": {
+                "brandRequired": "Bitte füllen Sie Marke, Modell und Jahr aus",
+                "valueRequired": "Bitte geben Sie einen geschätzten Fahrzeugwert ein",
+                "vehicleRequired": "Bitte wählen Sie ein gewünschtes Fahrzeug aus"
+            },
+            "buttons": {
+                "back": "Zurück",
+                "next": "Weiter",
+                "submit": "Anfrage einreichen",
+                "submitting": "Wird eingereicht..."
+            }
+        },
+        "tradeInRequests": {
+            "title": "Meine Inzahlungnahmeanfragen",
+            "description": "Verwalten Sie Ihre Inzahlungnahmeanfragen und den Status",
+            "count": "Anfragen ({count})",
+            "newRequest": "Neue Anfrage erstellen",
+            "loading": "Anfragen werden geladen...",
+            "empty": "Sie haben noch keine Inzahlungnahmeanfragen erstellt.",
+            "firstRequest": "Erste Anfrage erstellen",
+            "status": {
+                "new": "Neue Anfrage",
+                "reviewing": "Wird geprüft",
+                "contact_made": "Kontakt aufgenommen",
+                "completed": "Abgeschlossen",
+                "cancelled": "Storniert"
+            },
+            "yourVehicle": "Ihr Fahrzeug",
+            "desiredVehicle": "Gewünschtes Fahrzeug",
+            "estimate": "Unverbindliche Schätzung",
+            "difference": "Geschätzte Zuzahlung/Gutschrift:"
+        },
+        "tradeInRequestDetail": {
+            "title": "Inzahlungnahme-Details",
+            "backToList": "Zurück zu Anfragen",
+            "requestId": "Anfrage-ID:",
+            "loading": "Anfrage wird geladen...",
+            "notFound": "Anfrage nicht gefunden.",
+            "backToOverview": "Zurück zur Übersicht",
+            "status": {
+                "new": "Neue Anfrage",
+                "reviewing": "Wird geprüft",
+                "contact_made": "Kontakt aufgenommen",
+                "completed": "Abgeschlossen",
+                "cancelled": "Storniert"
+            },
+            "statusDescriptions": {
+                "new": "Ihre Anfrage wurde eingereicht und wird in Kürze von unserem Team überprüft.",
+                "reviewing": "Unsere Experten überprüfen derzeit Ihre Anfrage und Ihre Fahrzeugwertschätzung.",
+                "contact_made": "Wir haben Ihre Anfrage geprüft und werden uns in Kürze mit Ihnen in Verbindung setzen.",
+                "completed": "Diese Anfrage wurde abgeschlossen.",
+                "cancelled": "Diese Anfrage wurde storniert."
+            },
+            "currentVehicle": "Ihr Fahrzeug",
+            "desiredVehicle": "Gewünschtes Fahrzeug",
+            "brandModel": "Marke & Modell",
+            "firstRegistration": "Erstzulassung",
+            "mileage": "Kilometerstand",
+            "estimatedValue": "Geschätzter Wert",
+            "year": "Jahr",
+            "price": "Preis",
+            "pricingBreakdown": "Unverbindliche Preisschätzung",
+            "yourVehicleEstimate": "Geschätzter Wert Ihres Fahrzeugs:",
+            "desiredVehiclePrice": "Preis des gewünschten Fahrzeugs:",
+            "difference": "Geschätzte Zuzahlung/Gutschrift:",
+            "importantNote": "ⓘ Wichtig:",
+            "importantNoteText": "Die endgültige Fahrzeugbewertung und Zuzahlung wird individuell durch unser Team festgelegt. Der oben angezeigte Betrag ist unverbindlich und dient nur zur Schätzung."
+        }
     },
     "adminDashboard": {
         "title": "Admin-Dashboard",
