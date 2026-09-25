@@ -850,14 +850,13 @@
         "validation": {
             "requiredFields": "Bitte füllen Sie Marke, Modell und Erstzulassung aus",
             "yearRange": "Erstzulassung muss zwischen 1886 und {max} liegen",
-            "mileageRange": "Kilometerstand muss zwischen 0 und 99.999.999 km liegen",
-            "powerRange": "Leistung muss zwischen 0 und 99.999 PS liegen",
+            "mileageRange": "Kilometerstand muss zwischen 0 und {max} km liegen",
+            "powerRange": "Leistung muss zwischen 0 und {max} PS liegen",
             "priceRequired": "Bitte geben Sie eine Preisvorstellung ein",
             "pricePositive": "Preis muss größer als 0 sein",
-            "priceMax": "Preis darf 99.999.999,99 € nicht übersteigen",
+            "priceMax": "Preis darf {max} nicht übersteigen",
             "imagesRequired": "Bitte laden Sie mindestens ein Bild hoch",
-            "descriptionMinLength": "Bitte geben Sie eine Beschreibung mit mindestens 20 Zeichen ein",
-            "descriptionMinChars": "Minimum 20 Zeichen erforderlich",
+            "descriptionMinLength": "Bitte geben Sie eine Beschreibung mit mindestens {min} Zeichen ein",
             "imageErrorCompressing": "Fehler beim Verarbeiten des Bildes",
             "imageLimitExceeded": "Maximum {maxCount} Bilder erlaubt"
         },
@@ -866,7 +865,7 @@
             "horsePower": "PS"
         },
         "images": {
-            "uploadCount": "Fotos hochladen ({current}/20)",
+            "uploadCount": "Fotos hochladen ({current}/{max})",
             "uploadTitle": "Bilder hochladen",
             "uploadSubtitle": "Ziehen Sie Bilder hierher oder klicken Sie zum Auswählen",
             "uploadMaxReached": "Maximum erreicht",
@@ -876,7 +875,7 @@
         },
         "description": {
             "placeholder": "Beschreiben Sie den Zustand, Ausstattung, Wartungshistorie und besondere Merkmale...",
-            "minCharsNote": "Minimum 20 Zeichen erforderlich"
+            "minCharsNote": "Mindestens {min} Zeichen erforderlich"
         },
         "salesType": {
             "subtitle": "Wählen Sie, wie Sie Ihr Fahrzeug verkaufen möchten:",
@@ -894,7 +893,7 @@
             "imagesSection": "Bilder",
             "descriptionSection": "Beschreibung",
             "salesTypeSection": "Verkaufsart",
-            "imagesCount": "{count} Bilder hochgeladen"
+            "imagesCount": "{count, plural, one {# Bild hochgeladen} other {# Bilder hochgeladen}}"
         },
         "final": {
             "title": "Bereit zum Absenden?",

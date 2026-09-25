@@ -850,14 +850,13 @@
         "validation": {
             "requiredFields": "Please enter brand, model, and first registration",
             "yearRange": "First registration must be between 1886 and {max}",
-            "mileageRange": "Mileage must be between 0 and 99,999,999 km",
-            "powerRange": "Power must be between 0 and 99,999 HP",
+            "mileageRange": "Mileage must be between 0 and {max} km",
+            "powerRange": "Power must be between 0 and {max} HP",
             "priceRequired": "Please enter a price",
             "pricePositive": "Price must be greater than 0",
-            "priceMax": "Price cannot exceed €99,999,999.99",
+            "priceMax": "Price cannot exceed {max}",
             "imagesRequired": "Please upload at least one image",
-            "descriptionMinLength": "Please enter a description with at least 20 characters",
-            "descriptionMinChars": "Minimum 20 characters required",
+            "descriptionMinLength": "Please enter a description with at least {min} characters",
             "imageErrorCompressing": "Error processing image",
             "imageLimitExceeded": "Maximum {maxCount} images allowed"
         },
@@ -866,7 +865,7 @@
             "horsePower": "HP"
         },
         "images": {
-            "uploadCount": "Upload photos ({current}/20)",
+            "uploadCount": "Upload photos ({current}/{max})",
             "uploadTitle": "Upload images",
             "uploadSubtitle": "Drag images here or click to select",
             "uploadMaxReached": "Maximum reached",
@@ -876,7 +875,7 @@
         },
         "description": {
             "placeholder": "Describe the condition, equipment, maintenance history, and special features...",
-            "minCharsNote": "Minimum 20 characters required"
+            "minCharsNote": "Minimum {min} characters required"
         },
         "salesType": {
             "subtitle": "Choose how you want to sell your vehicle:",
@@ -894,7 +893,7 @@
             "imagesSection": "Images",
             "descriptionSection": "Description",
             "salesTypeSection": "Sales type",
-            "imagesCount": "{count} images uploaded"
+            "imagesCount": "{count, plural, one {# image uploaded} other {# images uploaded}}"
         },
         "final": {
             "title": "Ready to submit?",
