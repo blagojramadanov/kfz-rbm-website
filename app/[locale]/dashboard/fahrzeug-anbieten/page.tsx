@@ -1,5 +1,5 @@
 "use client";
-import { useTranslations, useFormatter } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Upload, X, GripVertical, Check } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { getFuelTypeLabel, getTransmissionLabel, getBodyTypeLabel } from "@/lib/vehicle-labels";
 
 type Step = "fahrzeugdaten" | "preis" | "bilder" | "beschreibung" | "verkaufsart" | "kontrolle" | "absenden";
@@ -60,7 +61,7 @@ export default function SubmitVehicleWizardPage() {
   const locale = params.locale as string || 'de';
   const t = useTranslations("wizard");
   const tCommon = useTranslations("common");
-  const format = useFormatter();
+  const format = useLocaleFormatter();
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState<Step>("fahrzeugdaten");

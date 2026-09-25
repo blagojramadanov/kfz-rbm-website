@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Car, Heart, Gauge, Zap, MapPin } from "lucide-react";
 import { Link } from "@/lib/navigation";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatMileage, formatPrice } from "@/lib/format-vehicle";
 import type { PublicVehicle } from "@/lib/public-vehicles";
 import {
@@ -20,7 +21,7 @@ interface VehicleCardProps {
 export function VehicleCard({ vehicle }: VehicleCardProps) {
   const t = useTranslations("vehicles");
   const tCommon = useTranslations("common");
-  const format = useFormatter();
+  const format = useLocaleFormatter();
 
   const handleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();

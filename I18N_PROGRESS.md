@@ -372,6 +372,32 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 - ✅ Created `app/[locale]/not-found.tsx` (no module exports, so no type errors)
 - ⏳ Ultrareview running (2 of 3 free uses) for areas 4, 5 changes
 
+## Cross-cutting: Locale-aware Number Formatting (2026-09-25)
+
+### Completed
+- **Browser Intl support mapping for Macedonian** ✅
+  - Created `lib/i18n/number-locale.ts`: maps app locales to Intl-supported locales (mk → de-DE for number formatting)
+  - Created `lib/use-locale-formatter.ts`: wrapper hook that intercepts format.number() calls and applies locale mapping
+  - Updated `app/[locale]/layout.tsx` to pass `locale` prop to NextIntlClientProvider for proper context
+  - Updated all client-side number formatting to use `useLocaleFormatter()` instead of `useFormatter()`:
+    - `app/[locale]/dashboard/fahrzeug-anbieten/page.tsx` (wizard)
+    - `components/vehicle-card.tsx` (used on listings and detail pages)
+  - Server-side formatters (featured-vehicles, latest-vehicles, vehicle detail page) unchanged (server Intl already supports mk)
+
+### Why this fix was needed
+- Browser Intl API does not have data for "mk" (Macedonian), silently falls back to en-US
+- Results: "85,000" (en-US) instead of "85.000" (Macedonian uses same separators as German)
+- Server-side formatters have full Intl support and work correctly
+- Hydration mismatch when server renders "85.000" but browser renders "85,000"
+
+### Solution chosen: Wrapper hook `useLocaleFormatter()`
+- Maps unsupported locales to supported ones (mk → de-DE)
+- Spreads base formatter for all other methods (dateTime, relativeTime, list, dateTimeRange)
+- Passes through unchanged if locale is already supported (de, en)
+- No configuration needed; transparently handles the mapping
+
+---
+
 ## Area 6: Customer "Mein Auto anbieten" Wizard (2026-09-25)
 
 ### Completed

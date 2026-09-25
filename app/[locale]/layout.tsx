@@ -53,7 +53,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider messages={messages} locale={locale}>
           <AuthProvider>
             <Navbar />
             <main className="min-h-screen">{children}</main>
