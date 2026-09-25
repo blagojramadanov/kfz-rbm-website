@@ -29,7 +29,7 @@ interface SubmittedVehicle {
   description: string;
   features: string[];
   body_type: string;
-  power: number;
+  power_hp: number;
   status: string;
   user_id: string;
   images: string[];
@@ -58,6 +58,39 @@ export default function SubmittedVehicleDetailPage() {
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({}); // Map of path -> signed URL
 
   const vehicleId = params?.id as string;
+
+  // Fetch signed URLs for submission images
+  useEffect(() => {
+    const fetchSignedUrls = async () => {
+      if (!vehicle?.images || vehicle.images.length === 0) {
+        setImageUrls({});
+        return;
+      }
+
+      try {
+        const { getSignedImageUrls } = await import("@/app/actions/storage");
+        const urlsResult = await getSignedImageUrls(vehicle.images);
+        if (urlsResult && urlsResult.ok && urlsResult.urls) {
+          const urlMap = urlsResult.urls.reduce(
+            (acc: Record<string, string>, item: { path: string; url: string | null }) => {
+              if (item.url) {
+                acc[item.path] = item.url;
+              }
+              return acc;
+            },
+            {}
+          );
+          setImageUrls(urlMap);
+        } else {
+          console.error("Failed to fetch signed URLs:", urlsResult);
+        }
+      } catch (err) {
+        console.error("Error fetching signed URLs:", err);
+      }
+    };
+
+    fetchSignedUrls();
+  }, [vehicle?.images]);
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -92,28 +125,6 @@ export default function SubmittedVehicleDetailPage() {
         setPublishPrice(result.vehicle.price);
         setPublishDescription(result.vehicle.description || "");
 
-        // Fetch signed URLs for images
-        if (result.vehicle.images && result.vehicle.images.length > 0) {
-          try {
-            const { getSignedImageUrls } = await import("@/app/actions/storage");
-            const urlsResult = await getSignedImageUrls(result.vehicle.images);
-            if (urlsResult && urlsResult.ok && urlsResult.urls) {
-              const urlMap = urlsResult.urls.reduce(
-                (acc: Record<string, string>, item: { path: string; url: string | null }) => {
-                  if (item.url) {
-                    acc[item.path] = item.url;
-                  }
-                  return acc;
-                },
-                {}
-              );
-              setImageUrls(urlMap);
-            }
-          } catch (urlErr) {
-            console.error("Error fetching signed URLs:", urlErr);
-            // Don't fail the entire page if signed URLs fail
-          }
-        }
       } catch (err) {
         console.error("Error loading vehicle:", err);
         setError(errorMessage(err));
@@ -317,7 +328,7 @@ export default function SubmittedVehicleDetailPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Leistung</p>
-                  <p className="font-semibold text-gray-900">{format.number(vehicle.power)} PS</p>
+                  <p className="font-semibold text-gray-900">{format.number(vehicle.power_hp)} PS</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Karosserie</p>
@@ -333,10 +344,12 @@ export default function SubmittedVehicleDetailPage() {
               <div className="pt-4 border-t">
                 <p className="text-sm text-gray-600 mb-1">Verkaufsart</p>
                 <p className="font-semibold text-gray-900">
-                  {vehicle.sales_type === "Direktverkauf"
-                    ? "🤝 Direktverkauf an RBM"
-                    : vehicle.sales_type === "Inzahlungnahme"
-                    ? "🔄 Inzahlungnahme (Trade-In)"
+                  {vehicle.sales_type === "direct"
+                    ? "🤝 " + t("wizard.salesType.direct")
+                    : vehicle.sales_type === "tradeIn"
+                    ? "🔄 " + t("wizard.salesType.tradeIn")
+                    : vehicle.sales_type === "consignment"
+                    ? "📋 " + t("wizard.salesType.consignment")
                     : vehicle.sales_type}
                 </p>
               </div>

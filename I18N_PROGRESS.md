@@ -392,7 +392,9 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 - Fixed undefined `.ok` access error by adding null/safety checks around server action results
 - Fixed infinite loading state: removed `errorMessage` from useEffect dependency array (was causing effect to run incorrectly)
 - Fixed broken image src fallback: now shows loading state instead of falling back to empty string (which caused browser to use page URL as src)
-- Fixed missing power value display: now uses `format.number(vehicle.power)` via useLocaleFormatter()
+- Fixed NaN power value: corrected field name from `power` to `power_hp` in interface and display (server returns power_hp)
+- Fixed raw sales_type value: now translates DB values (direct, tradeIn, consignment) to signed translation keys (wizard.salesType.*)
+- Fixed missing image loading: moved signed URL fetching to separate effect that runs when vehicle.images changes, with better error logging
 - Fixed raw DB values displayed without translation:
   - fuel_type: now uses `getFuelTypeLabel(tCommon, vehicle.fuel_type)`
   - transmission: now uses `getTransmissionLabel(tCommon, vehicle.transmission)`
