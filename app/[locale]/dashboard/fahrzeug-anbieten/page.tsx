@@ -10,18 +10,11 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Upload, X, GripVertical, Check } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { getFormatter } from "next-intl/server";
 
 type Step = "fahrzeugdaten" | "preis" | "bilder" | "beschreibung" | "verkaufsart" | "kontrolle" | "absenden";
 
-const STEPS: { id: Step; label: string }[] = [
-  { id: "fahrzeugdaten", label: "Fahrzeugdaten" },
-  { id: "preis", label: "Preis" },
-  { id: "bilder", label: "Bilder" },
-  { id: "beschreibung", label: "Beschreibung" },
-  { id: "verkaufsart", label: "Verkaufsart" },
-  { id: "kontrolle", label: "Kontrolle" },
-  { id: "absenden", label: "Absenden" },
-];
+const STEP_IDS: Step[] = ["fahrzeugdaten", "preis", "bilder", "beschreibung", "verkaufsart", "kontrolle", "absenden"];
 
 interface VehicleData {
   // Fahrzeugdaten
@@ -58,6 +51,7 @@ interface UploadedImage {
 export default function SubmitVehicleWizardPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
+  const t = useTranslations("wizard");
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState<Step>("fahrzeugdaten");
@@ -67,18 +61,18 @@ export default function SubmitVehicleWizardPage() {
     variante: "",
     erstzulassung: "",
     kilometerstand: "",
-    kraftstoff: "Benzin",
-    getriebe: "Manuell",
+    kraftstoff: "gasoline",
+    getriebe: "manual",
     leistung: "",
-    karosserie: "Sedan",
+    karosserie: "sedan",
     farbe: "",
     vorbesitzer: "1",
-    huAu: "Ja",
-    unfallhistorie: "Nein",
-    scheckheft: "Ja",
+    huAu: "yes",
+    unfallhistorie: "no",
+    scheckheft: "yes",
     preisvorstellung: "",
     beschreibung: "",
-    verkaufsart: "Direktverkauf",
+    verkaufsart: "direct",
   });
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [saving, setSaving] = useState(false);
@@ -116,18 +110,18 @@ export default function SubmitVehicleWizardPage() {
             variante: "",
             erstzulassung: result.vehicle.year?.toString() || "",
             kilometerstand: result.vehicle.mileage?.toString() || "",
-            kraftstoff: result.vehicle.fuel_type || "Benzin",
-            getriebe: result.vehicle.transmission || "Manuell",
+            kraftstoff: result.vehicle.fuel_type || "gasoline",
+            getriebe: result.vehicle.transmission || "manual",
             leistung: result.vehicle.power_hp?.toString() || "",
-            karosserie: result.vehicle.body_type || "Sedan",
+            karosserie: result.vehicle.body_type || "sedan",
             farbe: result.vehicle.color || "",
             vorbesitzer: "",
-            huAu: "Ja",
-            unfallhistorie: "Nein",
-            scheckheft: "Ja",
+            huAu: "yes",
+            unfallhistorie: "no",
+            scheckheft: "yes",
             preisvorstellung: result.vehicle.price?.toString() || "",
             beschreibung: result.vehicle.description || "",
-            verkaufsart: result.vehicle.sales_type || "Direktverkauf",
+            verkaufsart: result.vehicle.sales_type || "direct",
           });
 
           if (result.images && result.images.length > 0) {
@@ -156,7 +150,7 @@ export default function SubmitVehicleWizardPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{t("loading")}</p>
         </div>
       </div>
     );
@@ -214,7 +208,7 @@ export default function SubmitVehicleWizardPage() {
     if (!files) return;
 
     if (images.length + files.length > 20) {
-      setError("Maximum 20 Bilder erlaubt");
+      setError(t("validation.imageLimitExceeded"));
       return;
     }
 
@@ -232,7 +226,7 @@ export default function SubmitVehicleWizardPage() {
         ]);
       } catch (error) {
         console.error("Error compressing image:", error);
-        setError("Fehler beim Verarbeiten des Bildes");
+        setError(t("validation.imageErrorCompressing"));
       }
     }
     e.target.value = "";
@@ -277,7 +271,7 @@ export default function SubmitVehicleWizardPage() {
     switch (currentStep) {
       case "fahrzeugdaten":
         if (!formData.marke || !formData.modell || !formData.erstzulassung) {
-          setError("Bitte füllen Sie Marke, Modell und Erstzulassung aus");
+          setError(t("validation.requiredFields"));
           return false;
         }
 
@@ -285,52 +279,52 @@ export default function SubmitVehicleWizardPage() {
         const year = parseInt(formData.erstzulassung);
         const currentYear = new Date().getFullYear();
         if (year < 1886 || year > currentYear + 1) {
-          setError(`Erstzulassung muss zwischen 1886 und ${currentYear + 1} liegen`);
+          setError(t("validation.yearRange", { max: currentYear + 1 }));
           return false;
         }
 
         // Validate mileage (max 99,999,999 km)
         const mileage = parseInt(formData.kilometerstand) || 0;
         if (mileage < 0 || mileage > 99999999) {
-          setError("Kilometerstand muss zwischen 0 und 99.999.999 km liegen");
+          setError(t("validation.mileageRange"));
           return false;
         }
 
         // Validate power HP (max 99,999 PS)
         const power = parseInt(formData.leistung) || 0;
         if (power < 0 || power > 99999) {
-          setError("Leistung muss zwischen 0 und 99.999 PS liegen");
+          setError(t("validation.powerRange"));
           return false;
         }
 
         break;
       case "preis":
         if (!formData.preisvorstellung) {
-          setError("Bitte geben Sie eine Preisvorstellung ein");
+          setError(t("validation.priceRequired"));
           return false;
         }
 
         // Validate price (NUMERIC(10,2) max = 99,999,999.99)
         const price = parseFloat(formData.preisvorstellung);
         if (price <= 0) {
-          setError("Preis muss größer als 0 sein");
+          setError(t("validation.pricePositive"));
           return false;
         }
         if (price > 99999999.99) {
-          setError("Preis darf 99.999.999,99 € nicht übersteigen");
+          setError(t("validation.priceMax"));
           return false;
         }
 
         break;
       case "bilder":
         if (images.length === 0) {
-          setError("Bitte laden Sie mindestens ein Bild hoch");
+          setError(t("validation.imagesRequired"));
           return false;
         }
         break;
       case "beschreibung":
         if (!formData.beschreibung || formData.beschreibung.length < 20) {
-          setError("Bitte geben Sie eine Beschreibung mit mindestens 20 Zeichen ein");
+          setError(t("validation.descriptionMinLength"));
           return false;
         }
         break;
@@ -340,17 +334,17 @@ export default function SubmitVehicleWizardPage() {
 
   const handleNext = () => {
     if (!validateStep()) return;
-    const currentIndex = STEPS.findIndex((s) => s.id === currentStep);
-    if (currentIndex < STEPS.length - 1) {
-      setCurrentStep(STEPS[currentIndex + 1].id);
+    const currentIndex = STEP_IDS.findIndex((s) => s === currentStep);
+    if (currentIndex < STEP_IDS.length - 1) {
+      setCurrentStep(STEP_IDS[currentIndex + 1]);
       setError("");
     }
   };
 
   const handlePrev = () => {
-    const currentIndex = STEPS.findIndex((s) => s.id === currentStep);
+    const currentIndex = STEP_IDS.findIndex((s) => s === currentStep);
     if (currentIndex > 0) {
-      setCurrentStep(STEPS[currentIndex - 1].id);
+      setCurrentStep(STEP_IDS[currentIndex - 1]);
       setError("");
     }
   };
@@ -419,8 +413,31 @@ export default function SubmitVehicleWizardPage() {
     }
   };
 
-  const currentIndex = STEPS.findIndex((s) => s.id === currentStep);
-  const stepProgress = ((currentIndex + 1) / STEPS.length) * 100;
+  const currentIndex = STEP_IDS.findIndex((s) => s === currentStep);
+  const stepProgress = ((currentIndex + 1) / STEP_IDS.length) * 100;
+
+  const stepLabels: Record<Step, string> = {
+    fahrzeugdaten: t("steps.vehicleData"),
+    preis: t("steps.price"),
+    bilder: t("steps.images"),
+    beschreibung: t("steps.description"),
+    verkaufsart: t("steps.salesType"),
+    kontrolle: t("steps.review"),
+    absenden: t("steps.submit"),
+  };
+
+  const getSalesTypeLabel = (value: string) => {
+    switch (value) {
+      case "direct":
+        return t("salesType.direct");
+      case "tradeIn":
+        return t("salesType.tradeIn");
+      case "consignment":
+        return t("salesType.consignment");
+      default:
+        return value;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -428,10 +445,10 @@ export default function SubmitVehicleWizardPage() {
       <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link href="/dashboard" className="text-blue-100 hover:text-white mb-2 inline-block text-sm">
-            ← Dashboard
+            {t("dashboardLink")}
           </Link>
-          <h1 className="text-3xl font-bold mb-2">Mein Auto anbieten</h1>
-          <p className="text-blue-100">Schritt {currentIndex + 1} von {STEPS.length}</p>
+          <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
+          <p className="text-blue-100">{t("stepIndicator", { current: currentIndex + 1, total: STEP_IDS.length })}</p>
         </div>
       </div>
 
@@ -445,10 +462,10 @@ export default function SubmitVehicleWizardPage() {
             ></div>
           </div>
           <div className="flex justify-between items-center mt-4 overflow-x-auto">
-            {STEPS.map((step, index) => (
-              <div key={step.id} className="flex items-center flex-shrink-0">
+            {STEP_IDS.map((stepId, index) => (
+              <div key={stepId} className="flex items-center flex-shrink-0">
                 <button
-                  onClick={() => setCurrentStep(step.id)}
+                  onClick={() => setCurrentStep(stepId)}
                   className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
                     index < currentIndex
                       ? "bg-green-500 text-white"
@@ -459,7 +476,7 @@ export default function SubmitVehicleWizardPage() {
                 >
                   {index < currentIndex ? <Check className="w-4 h-4" /> : index + 1}
                 </button>
-                {index < STEPS.length - 1 && (
+                {index < STEP_IDS.length - 1 && (
                   <div
                     className={`w-12 h-0.5 mx-1 transition-colors ${
                       index < currentIndex ? "bg-green-500" : "bg-gray-300"
@@ -484,181 +501,181 @@ export default function SubmitVehicleWizardPage() {
         {/* Fahrzeugdaten */}
         {currentStep === "fahrzeugdaten" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Fahrzeuginformationen</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("sections.vehicleInfo")}</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Marke *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.brandRequired")}</label>
                 <input
                   type="text"
                   name="marke"
                   value={formData.marke}
                   onChange={handleInputChange}
-                  placeholder="z.B. BMW, Mercedes"
+                  placeholder={t("placeholders.brand")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Modell *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.modelRequired")}</label>
                 <input
                   type="text"
                   name="modell"
                   value={formData.modell}
                   onChange={handleInputChange}
-                  placeholder="z.B. 330i, C-Class"
+                  placeholder={t("placeholders.model")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Variante</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.variant")}</label>
                 <input
                   type="text"
                   name="variante"
                   value={formData.variante}
                   onChange={handleInputChange}
-                  placeholder="z.B. Sport, Comfort"
+                  placeholder={t("placeholders.variant")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Erstzulassung *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.firstRegistrationRequired")}</label>
                 <input
                   type="number"
                   name="erstzulassung"
                   value={formData.erstzulassung}
                   onChange={handleInputChange}
-                  placeholder="2020"
+                  placeholder={t("placeholders.year")}
                   min="1990"
                   max={new Date().getFullYear()}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Kilometerstand</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.mileage")}</label>
                 <input
                   type="number"
                   name="kilometerstand"
                   value={formData.kilometerstand}
                   onChange={handleInputChange}
-                  placeholder="50000"
+                  placeholder={t("placeholders.mileage")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Leistung (PS)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.powerHp")}</label>
                 <input
                   type="number"
                   name="leistung"
                   value={formData.leistung}
                   onChange={handleInputChange}
-                  placeholder="200"
+                  placeholder={t("placeholders.power")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Kraftstoff</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.fuel")}</label>
                 <select
                   name="kraftstoff"
                   value={formData.kraftstoff}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option>Benzin</option>
-                  <option>Diesel</option>
-                  <option>Hybrid</option>
-                  <option>Elektro</option>
-                  <option>LPG</option>
+                  <option value="gasoline">{t("options.fuel.gasoline")}</option>
+                  <option value="diesel">{t("options.fuel.diesel")}</option>
+                  <option value="hybrid">{t("options.fuel.hybrid")}</option>
+                  <option value="electric">{t("options.fuel.electric")}</option>
+                  <option value="lpg">{t("options.fuel.lpg")}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Getriebe</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.transmission")}</label>
                 <select
                   name="getriebe"
                   value={formData.getriebe}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option>Manuell</option>
-                  <option>Automatik</option>
+                  <option value="manual">{t("options.transmission.manual")}</option>
+                  <option value="automatic">{t("options.transmission.automatic")}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Karosserie</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.bodyType")}</label>
                 <select
                   name="karosserie"
                   value={formData.karosserie}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option>Sedan</option>
-                  <option>SUV</option>
-                  <option>Kombi</option>
-                  <option>Coupe</option>
-                  <option>Cabriolet</option>
-                  <option>Kleinwagen</option>
-                  <option>Van</option>
+                  <option value="sedan">{t("options.bodyType.sedan")}</option>
+                  <option value="suv">{t("options.bodyType.suv")}</option>
+                  <option value="wagon">{t("options.bodyType.wagon")}</option>
+                  <option value="coupe">{t("options.bodyType.coupe")}</option>
+                  <option value="cabriolet">{t("options.bodyType.cabriolet")}</option>
+                  <option value="smallCar">{t("options.bodyType.smallCar")}</option>
+                  <option value="van">{t("options.bodyType.van")}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Farbe</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.color")}</label>
                 <input
                   type="text"
                   name="farbe"
                   value={formData.farbe}
                   onChange={handleInputChange}
-                  placeholder="z.B. Schwarz, Weiß"
+                  placeholder={t("placeholders.color")}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Vorbesitzer</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.previousOwners")}</label>
                 <select
                   name="vorbesitzer"
                   value={formData.vorbesitzer}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option value="1">1. Besitzer</option>
-                  <option value="2">2. Besitzer</option>
-                  <option value="3">3. Besitzer</option>
-                  <option value="4+">4+ Besitzer</option>
+                  <option value="1">{t("options.previousOwners.one")}</option>
+                  <option value="2">{t("options.previousOwners.two")}</option>
+                  <option value="3">{t("options.previousOwners.three")}</option>
+                  <option value="4+">{t("options.previousOwners.moreThanThree")}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">HU/AU</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.huAu")}</label>
                 <select
                   name="huAu"
                   value={formData.huAu}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option>Ja</option>
-                  <option>Nein</option>
-                  <option>Abgelaufen</option>
+                  <option value="yes">{t("options.huAu.yes")}</option>
+                  <option value="no">{t("options.huAu.no")}</option>
+                  <option value="expired">{t("options.huAu.expired")}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Unfallhistorie</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.accidentHistory")}</label>
                 <select
                   name="unfallhistorie"
                   value={formData.unfallhistorie}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option>Nein</option>
-                  <option>Ja</option>
-                  <option>Unbekannt</option>
+                  <option value="no">{t("options.accidentHistory.no")}</option>
+                  <option value="yes">{t("options.accidentHistory.yes")}</option>
+                  <option value="unknown">{t("options.accidentHistory.unknown")}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Scheckheft</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.serviceBook")}</label>
                 <select
                   name="scheckheft"
                   value={formData.scheckheft}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option>Ja</option>
-                  <option>Nein</option>
+                  <option value="yes">{t("options.serviceBook.yes")}</option>
+                  <option value="no">{t("options.serviceBook.no")}</option>
                 </select>
               </div>
             </div>
@@ -668,15 +685,15 @@ export default function SubmitVehicleWizardPage() {
         {/* Preis */}
         {currentStep === "preis" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Preisvorstellung</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("sections.priceExpectation")}</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Preis (€) *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.priceLabel")}</label>
               <input
                 type="number"
                 name="preisvorstellung"
                 value={formData.preisvorstellung}
                 onChange={handleInputChange}
-                placeholder="50000"
+                placeholder={t("placeholders.price")}
                 step="100"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent text-lg"
               />
@@ -687,7 +704,7 @@ export default function SubmitVehicleWizardPage() {
         {/* Bilder */}
         {currentStep === "bilder" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Fotos hochladen ({images.length}/20)</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("images.uploadCount", { current: images.length })}</h2>
 
             {/* Upload Area */}
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-8 hover:border-kfz-blue transition-colors">
@@ -702,16 +719,16 @@ export default function SubmitVehicleWizardPage() {
               />
               <label htmlFor="image-upload" className="cursor-pointer block">
                 <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-lg font-semibold text-gray-900">Bilder hochladen</p>
-                <p className="text-sm text-gray-600">Ziehen Sie Bilder hierher oder klicken Sie zum Auswählen</p>
-                {images.length >= 20 && <p className="text-sm text-red-600 mt-2">Maximum erreicht</p>}
+                <p className="text-lg font-semibold text-gray-900">{t("images.uploadTitle")}</p>
+                <p className="text-sm text-gray-600">{t("images.uploadSubtitle")}</p>
+                {images.length >= 20 && <p className="text-sm text-red-600 mt-2">{t("images.uploadMaxReached")}</p>}
               </label>
             </div>
 
             {/* Images Grid */}
             {images.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Hochgeladene Bilder</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("images.gridTitle")}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {images.map((image, index) => (
                     <div
@@ -725,12 +742,12 @@ export default function SubmitVehicleWizardPage() {
                       <div className="aspect-square relative">
                         <img
                           src={image.data}
-                          alt={`Fahrzeug ${index + 1}`}
+                          alt={`Vehicle ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
                         {image.isMain && (
                           <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">
-                            Hauptbild
+                            {t("images.mainBadge")}
                           </div>
                         )}
                       </div>
@@ -742,7 +759,7 @@ export default function SubmitVehicleWizardPage() {
                             onClick={() => setMainImage(image.id)}
                             className="bg-white text-gray-900 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100"
                           >
-                            Als Hauptbild
+                            {t("images.setMain")}
                           </button>
                         )}
                       </div>
@@ -762,88 +779,88 @@ export default function SubmitVehicleWizardPage() {
         {/* Beschreibung */}
         {currentStep === "beschreibung" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Fahrzeugbeschreibung</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("sections.vehicleDescription")}</h2>
             <textarea
               name="beschreibung"
               value={formData.beschreibung}
               onChange={handleInputChange}
-              placeholder="Beschreiben Sie den Zustand, Ausstattung, Wartungshistorie und besondere Merkmale..."
+              placeholder={t("description.placeholder")}
               rows={10}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
             />
-            <p className="text-sm text-gray-600 mt-2">Minimum 20 Zeichen erforderlich</p>
+            <p className="text-sm text-gray-600 mt-2">{t("description.minCharsNote")}</p>
           </div>
         )}
 
         {/* Verkaufsart */}
         {currentStep === "verkaufsart" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Verkaufsart</h2>
-            <p className="text-gray-600 mb-8">Wählen Sie, wie Sie Ihr Fahrzeug verkaufen möchten:</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("sections.salesTypeSelection")}</h2>
+            <p className="text-gray-600 mb-8">{t("salesType.subtitle")}</p>
 
             <div className="space-y-4">
               {/* Direktverkauf */}
               <label className={`flex items-start p-6 border-2 rounded-lg cursor-pointer transition-colors ${
-                formData.verkaufsart === "Direktverkauf"
+                formData.verkaufsart === "direct"
                   ? "border-kfz-blue bg-blue-50"
                   : "border-gray-300 hover:bg-gray-50"
               }`}>
                 <input
                   type="radio"
                   name="verkaufsart"
-                  value="Direktverkauf"
-                  checked={formData.verkaufsart === "Direktverkauf"}
+                  value="direct"
+                  checked={formData.verkaufsart === "direct"}
                   onChange={handleInputChange}
                   className="w-4 h-4 text-kfz-blue mt-1 flex-shrink-0"
                 />
                 <div className="ml-4 flex-1">
-                  <p className="font-semibold text-gray-900">Direktverkauf</p>
+                  <p className="font-semibold text-gray-900">{t("salesType.direct")}</p>
                   <p className="text-sm text-gray-600 mt-1">
-                    Sie verkaufen Ihr Fahrzeug direkt. Wir übernehmen den Kauf und Sie erhalten den vereinbarten Preis.
+                    {t("salesType.directDesc")}
                   </p>
                 </div>
               </label>
 
               {/* Inzahlungnahme */}
               <label className={`flex items-start p-6 border-2 rounded-lg cursor-pointer transition-colors ${
-                formData.verkaufsart === "Inzahlungnahme"
+                formData.verkaufsart === "tradeIn"
                   ? "border-kfz-blue bg-blue-50"
                   : "border-gray-300 hover:bg-gray-50"
               }`}>
                 <input
                   type="radio"
                   name="verkaufsart"
-                  value="Inzahlungnahme"
-                  checked={formData.verkaufsart === "Inzahlungnahme"}
+                  value="tradeIn"
+                  checked={formData.verkaufsart === "tradeIn"}
                   onChange={handleInputChange}
                   className="w-4 h-4 text-kfz-blue mt-1 flex-shrink-0"
                 />
                 <div className="ml-4 flex-1">
-                  <p className="font-semibold text-gray-900">Inzahlungnahme</p>
+                  <p className="font-semibold text-gray-900">{t("salesType.tradeIn")}</p>
                   <p className="text-sm text-gray-600 mt-1">
-                    Sie tauschen Ihr Fahrzeug gegen ein anderes Fahrzeug von uns ein. Der Wert Ihres Fahrzeugs wird als Anzahlung verrechnet.
+                    {t("salesType.tradeInDesc")}
                   </p>
                 </div>
               </label>
 
               {/* Verkauf im Kundenauftrag */}
               <label className={`flex items-start p-6 border-2 rounded-lg cursor-pointer transition-colors ${
-                formData.verkaufsart === "Verkauf im Kundenauftrag"
+                formData.verkaufsart === "consignment"
                   ? "border-kfz-blue bg-blue-50"
                   : "border-gray-300 hover:bg-gray-50"
               }`}>
                 <input
                   type="radio"
                   name="verkaufsart"
-                  value="Verkauf im Kundenauftrag"
-                  checked={formData.verkaufsart === "Verkauf im Kundenauftrag"}
+                  value="consignment"
+                  checked={formData.verkaufsart === "consignment"}
                   onChange={handleInputChange}
                   className="w-4 h-4 text-kfz-blue mt-1 flex-shrink-0"
                 />
                 <div className="ml-4 flex-1">
-                  <p className="font-semibold text-gray-900">Verkauf im Kundenauftrag</p>
+                  <p className="font-semibold text-gray-900">{t("salesType.consignment")}</p>
                   <p className="text-sm text-gray-600 mt-1">
-                    Wir verkaufen Ihr Fahrzeug in Ihrem Namen. Sie erhalten den Verkaufspreis abzüglich einer Kommission, die wir mit Ihnen abstimmen. Dies ist ideal, wenn Sie maximale Kontrolle über den Verkauf behalten möchten.
+                    {t("salesType.consignmentDesc")}
                   </p>
                 </div>
               </label>
@@ -854,34 +871,34 @@ export default function SubmitVehicleWizardPage() {
         {/* Kontrolle */}
         {currentStep === "kontrolle" && (
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Überprüfung</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("review.title")}</h2>
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Fahrzeuginformationen</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t("review.vehicleInfo")}</h3>
                 <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-                  <p><span className="font-medium">Marke:</span> {formData.marke}</p>
-                  <p><span className="font-medium">Modell:</span> {formData.modell}</p>
-                  <p><span className="font-medium">Jahr:</span> {formData.erstzulassung}</p>
-                  <p><span className="font-medium">Kilometer:</span> {formData.kilometerstand} km</p>
-                  <p><span className="font-medium">Leistung:</span> {formData.leistung} PS</p>
-                  <p><span className="font-medium">Kraftstoff:</span> {formData.kraftstoff}</p>
+                  <p><span className="font-medium">{t("fields.brand")}:</span> {formData.marke}</p>
+                  <p><span className="font-medium">{t("fields.model")}:</span> {formData.modell}</p>
+                  <p><span className="font-medium">{t("fields.firstRegistration")}:</span> {formData.erstzulassung}</p>
+                  <p><span className="font-medium">{t("fields.mileage")}:</span> {formData.kilometerstand} km</p>
+                  <p><span className="font-medium">{t("fields.powerHp")}:</span> {formData.leistung} PS</p>
+                  <p><span className="font-medium">{t("fields.fuel")}:</span> {formData.kraftstoff}</p>
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Preis</h3>
-                <p className="text-2xl font-bold text-kfz-blue">€ {parseFloat(formData.preisvorstellung).toLocaleString("de-DE")}</p>
+                <h3 className="font-semibold text-gray-900 mb-2">{t("review.priceSection")}</h3>
+                <p className="text-2xl font-bold text-kfz-blue">€ {parseFloat(formData.preisvorstellung).toLocaleString()}</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Bilder</h3>
-                <p className="text-gray-600">{images.length} Bilder hochgeladen</p>
+                <h3 className="font-semibold text-gray-900 mb-2">{t("review.imagesSection")}</h3>
+                <p className="text-gray-600">{t("review.imagesCount", { count: images.length })}</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Beschreibung</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">{t("review.descriptionSection")}</h3>
                 <p className="text-gray-600">{formData.beschreibung.substring(0, 100)}...</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Verkaufsart</h3>
-                <p className="text-gray-600">{formData.verkaufsart}</p>
+                <h3 className="font-semibold text-gray-900 mb-2">{t("review.salesTypeSection")}</h3>
+                <p className="text-gray-600">{getSalesTypeLabel(formData.verkaufsart)}</p>
               </div>
             </div>
           </div>
@@ -891,9 +908,9 @@ export default function SubmitVehicleWizardPage() {
         {currentStep === "absenden" && (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Bereit zum Absenden?</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t("final.title")}</h2>
             <p className="text-gray-600 mb-8">
-              Ihr Fahrzeug wird direkt an uns gesendet. Wir melden uns bei Ihnen.
+              {t("final.message")}
             </p>
           </div>
         )}
@@ -907,7 +924,7 @@ export default function SubmitVehicleWizardPage() {
             className="border-gray-300"
           >
             <ChevronLeft className="mr-2 w-4 h-4" />
-            Zurück
+            {t("buttons.back")}
           </Button>
 
           {currentStep !== "absenden" ? (
@@ -915,7 +932,7 @@ export default function SubmitVehicleWizardPage() {
               onClick={handleNext}
               className="bg-kfz-blue hover:bg-kfz-blue-dark text-white"
             >
-              Weiter
+              {t("buttons.next")}
               <ChevronRight className="ml-2 w-4 h-4" />
             </Button>
           ) : (
@@ -924,7 +941,7 @@ export default function SubmitVehicleWizardPage() {
               disabled={saving}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
-              {saving ? "Wird abgesendet..." : "Fahrzeug absenden"}
+              {saving ? t("buttons.submitting") : t("buttons.submit")}
               <Check className="ml-2 w-4 h-4" />
             </Button>
           )}

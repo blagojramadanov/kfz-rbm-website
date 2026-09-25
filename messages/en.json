@@ -751,5 +751,170 @@
         "confirmDelete": "Are you sure you want to delete this vehicle?",
         "deleteFailed": "The vehicle could not be deleted.",
         "updateFailed": "The vehicle could not be saved."
+    },
+    "wizard": {
+        "title": "Offer my vehicle",
+        "dashboardLink": "← Dashboard",
+        "stepIndicator": "Step {current} of {total}",
+        "loading": "Loading...",
+        "steps": {
+            "vehicleData": "Vehicle data",
+            "price": "Price",
+            "images": "Images",
+            "description": "Description",
+            "salesType": "Sales type",
+            "review": "Review",
+            "submit": "Submit"
+        },
+        "sections": {
+            "vehicleInfo": "Vehicle information",
+            "priceExpectation": "Price expectation",
+            "photos": "Upload photos",
+            "vehicleDescription": "Vehicle description",
+            "salesTypeSelection": "Sales type",
+            "review": "Review",
+            "finalSubmit": "Ready to submit?"
+        },
+        "fields": {
+            "brand": "Brand",
+            "brandRequired": "Brand *",
+            "model": "Model",
+            "modelRequired": "Model *",
+            "variant": "Variant",
+            "firstRegistration": "First registration",
+            "firstRegistrationRequired": "First registration *",
+            "mileage": "Mileage",
+            "powerHp": "Power (HP)",
+            "fuel": "Fuel type",
+            "transmission": "Transmission",
+            "bodyType": "Body type",
+            "color": "Color",
+            "previousOwners": "Previous owners",
+            "huAu": "TÜV/AU",
+            "accidentHistory": "Accident history",
+            "serviceBook": "Service history",
+            "priceLabel": "Price (€) *"
+        },
+        "placeholders": {
+            "brand": "e.g. BMW, Mercedes",
+            "model": "e.g. 330i, C-Class",
+            "variant": "e.g. Sport, Comfort",
+            "color": "e.g. Black, White",
+            "mileage": "50000",
+            "power": "200",
+            "year": "2020",
+            "price": "50000"
+        },
+        "options": {
+            "fuel": {
+                "gasoline": "Gasoline",
+                "diesel": "Diesel",
+                "hybrid": "Hybrid",
+                "electric": "Electric",
+                "lpg": "LPG"
+            },
+            "transmission": {
+                "manual": "Manual",
+                "automatic": "Automatic"
+            },
+            "bodyType": {
+                "sedan": "Sedan",
+                "suv": "SUV",
+                "wagon": "Wagon",
+                "coupe": "Coupe",
+                "cabriolet": "Cabriolet",
+                "smallCar": "Small car",
+                "van": "Van"
+            },
+            "previousOwners": {
+                "one": "1st owner",
+                "two": "2nd owner",
+                "three": "3rd owner",
+                "moreThanThree": "4+ owners"
+            },
+            "huAu": {
+                "yes": "Yes",
+                "no": "No",
+                "expired": "Expired"
+            },
+            "accidentHistory": {
+                "no": "No",
+                "yes": "Yes",
+                "unknown": "Unknown"
+            },
+            "serviceBook": {
+                "yes": "Yes",
+                "no": "No"
+            }
+        },
+        "validation": {
+            "requiredFields": "Please enter brand, model, and first registration",
+            "yearRange": "First registration must be between 1886 and {max}",
+            "mileageRange": "Mileage must be between 0 and 99,999,999 km",
+            "powerRange": "Power must be between 0 and 99,999 HP",
+            "priceRequired": "Please enter a price",
+            "pricePositive": "Price must be greater than 0",
+            "priceMax": "Price cannot exceed €99,999,999.99",
+            "imagesRequired": "Please upload at least one image",
+            "descriptionMinLength": "Please enter a description with at least 20 characters",
+            "descriptionMinChars": "Minimum 20 characters required",
+            "imageErrorCompressing": "Error processing image",
+            "imageLimitExceeded": "Maximum 20 images allowed"
+        },
+        "images": {
+            "uploadCount": "Upload photos ({current}/20)",
+            "uploadTitle": "Upload images",
+            "uploadSubtitle": "Drag images here or click to select",
+            "uploadMaxReached": "Maximum reached",
+            "gridTitle": "Uploaded images",
+            "mainBadge": "Main image",
+            "setMain": "Set as main image"
+        },
+        "description": {
+            "placeholder": "Describe the condition, equipment, maintenance history, and special features...",
+            "minCharsNote": "Minimum 20 characters required"
+        },
+        "salesType": {
+            "subtitle": "Choose how you want to sell your vehicle:",
+            "direct": "Direct sale",
+            "directDesc": "You sell your vehicle directly. We take over the purchase and you receive the agreed price.",
+            "tradeIn": "Trade-in",
+            "tradeInDesc": "You exchange your vehicle for another vehicle from us. Your vehicle's value is credited as a down payment.",
+            "consignment": "Consignment sale",
+            "consignmentDesc": "We sell your vehicle on your behalf. You receive the sale price minus a commission we agree upon. This is ideal if you want to maintain maximum control over the sale."
+        },
+        "review": {
+            "title": "Review",
+            "vehicleInfo": "Vehicle information",
+            "priceSection": "Price",
+            "imagesSection": "Images",
+            "descriptionSection": "Description",
+            "salesTypeSection": "Sales type",
+            "imagesCount": "{count} images uploaded"
+        },
+        "final": {
+            "title": "Ready to submit?",
+            "message": "Your vehicle will be sent directly to us. We will contact you."
+        },
+        "buttons": {
+            "back": "Back",
+            "next": "Next",
+            "submit": "Submit vehicle",
+            "submitting": "Submitting..."
+        },
+        "workflow": {
+            "title": "Vehicle publication process",
+            "subtitle": "Learn how your submitted vehicles are published",
+            "step1Title": "Submit vehicle",
+            "step1Desc": "You submit your vehicle through the form and upload photos.",
+            "step2Title": "Admin review",
+            "step2Desc": "Our team reviews your vehicle for quality, accuracy, and market suitability.",
+            "step3Title": "Approval and publication",
+            "step3Desc": "Upon approval, your vehicle is added to our catalog as a \"customer vehicle\" and is publicly visible.",
+            "step4Title": "Vehicle is live!",
+            "step4Desc": "Interested parties can see your vehicle, ask questions, and book test drives.",
+            "importantNoteLabel": "Important:",
+            "importantNoteText": "Only approved vehicles are displayed publicly. You can resubmit rejected vehicles."
+        }
     }
 }

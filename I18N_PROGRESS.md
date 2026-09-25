@@ -63,8 +63,8 @@ Also changed here (behaviour, not just text):
 
 ## 6. Customer: "Mein Auto anbieten" Wizard
 
-- [ ] `app/[locale]/dashboard/fahrzeug-anbieten/page.tsx` - Vehicle submission wizard (step headers, form labels, descriptions, validation messages, CTA buttons)
-- [ ] `components/submission-workflow-info.tsx` - Workflow information boxes, step descriptions, help text
+- [x] `app/[locale]/dashboard/fahrzeug-anbieten/page.tsx` - Vehicle submission wizard (step headers, form labels, descriptions, validation messages, CTA buttons)
+- [x] `components/submission-workflow-info.tsx` - Workflow information boxes, step descriptions, help text
 
 ---
 
@@ -164,8 +164,8 @@ For each file, look for and catalog:
 ## Translation Status Summary
 
 - **Checklist items**: 64
-- **Completed**: 24
-- **Not started**: 40
+- **Completed**: 26
+- **Not started**: 38
 
 ---
 
@@ -371,4 +371,26 @@ The other admin actions use the session client under RLS after `verifyAdminRole(
 - ✅ `npm run check:i18n`, `npm run build`
 - ✅ Created `app/[locale]/not-found.tsx` (no module exports, so no type errors)
 - ⏳ Ultrareview running (2 of 3 free uses) for areas 4, 5 changes
+
+## Area 6: Customer "Mein Auto anbieten" Wizard (2026-09-25)
+
+### Completed
+- **Wizard page** (`app/[locale]/dashboard/fahrzeug-anbieten/page.tsx`): 135 hardcoded German strings moved to `wizard.*` namespace ✅
+  - All step labels, field labels, placeholders, validation messages, error messages replaced with `t()` calls
+  - Fixed hardcoded German number format on review page (`.toLocaleString()` instead of `.toLocaleString("de-DE")`)
+  - Updated form field values to use normalized keys (gasoline/diesel, manual/automatic, sedan/suv, direct/tradeIn/consignment, yes/no)
+  - Added helper function to translate sales type labels on review page
+  - Used error codes from area 8 for validation error messages
+- **Workflow info component** (`components/submission-workflow-info.tsx`): All hardcoded strings replaced with `wizard.workflow.*` keys ✅
+  - 4 workflow steps + important note all use translations
+- **Message files**: Added 120 new keys in `wizard.*` namespace across all three locales ✅
+  - German (de.json): Full translations for labels, options, validation messages, workflow info
+  - English (en.json): Full English translations with proper plurals and formal address
+  - Macedonian (mk.json): Full Macedonian translations with formal "Вие" forms, no imperatives
+  - Fixed Unicode quote characters to valid JSON escapes in workflow.step3Desc
+
+### Tests
+- ✅ `npm run check:i18n`: All 406 keys found, no duplicates, all placeholders match, no encoding issues
+- ✅ `npm run build`: Compilation successful, no type errors
+- ✅ Area 6 removed all hardcoded strings from wizard workflow (audit count: 135 → 0)
 

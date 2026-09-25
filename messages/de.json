@@ -751,5 +751,170 @@
         "confirmDelete": "Sind Sie sicher, dass Sie dieses Fahrzeug löschen möchten?",
         "deleteFailed": "Das Fahrzeug konnte nicht gelöscht werden.",
         "updateFailed": "Das Fahrzeug konnte nicht gespeichert werden."
+    },
+    "wizard": {
+        "title": "Mein Auto anbieten",
+        "dashboardLink": "← Dashboard",
+        "stepIndicator": "Schritt {current} von {total}",
+        "loading": "Wird geladen...",
+        "steps": {
+            "vehicleData": "Fahrzeugdaten",
+            "price": "Preis",
+            "images": "Bilder",
+            "description": "Beschreibung",
+            "salesType": "Verkaufsart",
+            "review": "Kontrolle",
+            "submit": "Absenden"
+        },
+        "sections": {
+            "vehicleInfo": "Fahrzeuginformationen",
+            "priceExpectation": "Preisvorstellung",
+            "photos": "Fotos hochladen",
+            "vehicleDescription": "Fahrzeugbeschreibung",
+            "salesTypeSelection": "Verkaufsart",
+            "review": "Überprüfung",
+            "finalSubmit": "Bereit zum Absenden?"
+        },
+        "fields": {
+            "brand": "Marke",
+            "brandRequired": "Marke *",
+            "model": "Modell",
+            "modelRequired": "Modell *",
+            "variant": "Variante",
+            "firstRegistration": "Erstzulassung",
+            "firstRegistrationRequired": "Erstzulassung *",
+            "mileage": "Kilometerstand",
+            "powerHp": "Leistung (PS)",
+            "fuel": "Kraftstoff",
+            "transmission": "Getriebe",
+            "bodyType": "Karosserie",
+            "color": "Farbe",
+            "previousOwners": "Vorbesitzer",
+            "huAu": "HU/AU",
+            "accidentHistory": "Unfallhistorie",
+            "serviceBook": "Scheckheft",
+            "priceLabel": "Preis (€) *"
+        },
+        "placeholders": {
+            "brand": "z.B. BMW, Mercedes",
+            "model": "z.B. 330i, C-Class",
+            "variant": "z.B. Sport, Comfort",
+            "color": "z.B. Schwarz, Weiß",
+            "mileage": "50000",
+            "power": "200",
+            "year": "2020",
+            "price": "50000"
+        },
+        "options": {
+            "fuel": {
+                "gasoline": "Benzin",
+                "diesel": "Diesel",
+                "hybrid": "Hybrid",
+                "electric": "Elektro",
+                "lpg": "LPG"
+            },
+            "transmission": {
+                "manual": "Manuell",
+                "automatic": "Automatik"
+            },
+            "bodyType": {
+                "sedan": "Sedan",
+                "suv": "SUV",
+                "wagon": "Kombi",
+                "coupe": "Coupe",
+                "cabriolet": "Cabriolet",
+                "smallCar": "Kleinwagen",
+                "van": "Van"
+            },
+            "previousOwners": {
+                "one": "1. Besitzer",
+                "two": "2. Besitzer",
+                "three": "3. Besitzer",
+                "moreThanThree": "4+ Besitzer"
+            },
+            "huAu": {
+                "yes": "Ja",
+                "no": "Nein",
+                "expired": "Abgelaufen"
+            },
+            "accidentHistory": {
+                "no": "Nein",
+                "yes": "Ja",
+                "unknown": "Unbekannt"
+            },
+            "serviceBook": {
+                "yes": "Ja",
+                "no": "Nein"
+            }
+        },
+        "validation": {
+            "requiredFields": "Bitte füllen Sie Marke, Modell und Erstzulassung aus",
+            "yearRange": "Erstzulassung muss zwischen 1886 und {max} liegen",
+            "mileageRange": "Kilometerstand muss zwischen 0 und 99.999.999 km liegen",
+            "powerRange": "Leistung muss zwischen 0 und 99.999 PS liegen",
+            "priceRequired": "Bitte geben Sie eine Preisvorstellung ein",
+            "pricePositive": "Preis muss größer als 0 sein",
+            "priceMax": "Preis darf 99.999.999,99 € nicht übersteigen",
+            "imagesRequired": "Bitte laden Sie mindestens ein Bild hoch",
+            "descriptionMinLength": "Bitte geben Sie eine Beschreibung mit mindestens 20 Zeichen ein",
+            "descriptionMinChars": "Minimum 20 Zeichen erforderlich",
+            "imageErrorCompressing": "Fehler beim Verarbeiten des Bildes",
+            "imageLimitExceeded": "Maximum 20 Bilder erlaubt"
+        },
+        "images": {
+            "uploadCount": "Fotos hochladen ({current}/20)",
+            "uploadTitle": "Bilder hochladen",
+            "uploadSubtitle": "Ziehen Sie Bilder hierher oder klicken Sie zum Auswählen",
+            "uploadMaxReached": "Maximum erreicht",
+            "gridTitle": "Hochgeladene Bilder",
+            "mainBadge": "Hauptbild",
+            "setMain": "Als Hauptbild"
+        },
+        "description": {
+            "placeholder": "Beschreiben Sie den Zustand, Ausstattung, Wartungshistorie und besondere Merkmale...",
+            "minCharsNote": "Minimum 20 Zeichen erforderlich"
+        },
+        "salesType": {
+            "subtitle": "Wählen Sie, wie Sie Ihr Fahrzeug verkaufen möchten:",
+            "direct": "Direktverkauf",
+            "directDesc": "Sie verkaufen Ihr Fahrzeug direkt. Wir übernehmen den Kauf und Sie erhalten den vereinbarten Preis.",
+            "tradeIn": "Inzahlungnahme",
+            "tradeInDesc": "Sie tauschen Ihr Fahrzeug gegen ein anderes Fahrzeug von uns ein. Der Wert Ihres Fahrzeugs wird als Anzahlung verrechnet.",
+            "consignment": "Verkauf im Kundenauftrag",
+            "consignmentDesc": "Wir verkaufen Ihr Fahrzeug in Ihrem Namen. Sie erhalten den Verkaufspreis abzüglich einer Kommission, die wir mit Ihnen abstimmen. Dies ist ideal, wenn Sie maximale Kontrolle über den Verkauf behalten möchten."
+        },
+        "review": {
+            "title": "Überprüfung",
+            "vehicleInfo": "Fahrzeuginformationen",
+            "priceSection": "Preis",
+            "imagesSection": "Bilder",
+            "descriptionSection": "Beschreibung",
+            "salesTypeSection": "Verkaufsart",
+            "imagesCount": "{count} Bilder hochgeladen"
+        },
+        "final": {
+            "title": "Bereit zum Absenden?",
+            "message": "Ihr Fahrzeug wird direkt an uns gesendet. Wir melden uns bei Ihnen."
+        },
+        "buttons": {
+            "back": "Zurück",
+            "next": "Weiter",
+            "submit": "Fahrzeug absenden",
+            "submitting": "Wird abgesendet..."
+        },
+        "workflow": {
+            "title": "Fahrzeug-Veröffentlichungsprozess",
+            "subtitle": "Erfahren Sie, wie Ihre eingereichten Fahrzeuge veröffentlicht werden",
+            "step1Title": "Fahrzeug einreichen",
+            "step1Desc": "Sie reichen Ihr Fahrzeug über das Formular ein und laden Fotos hoch.",
+            "step2Title": "Admin-Überprüfung",
+            "step2Desc": "Unser Team überprüft Ihr Fahrzeug auf Qualität, Genauigkeit und Marktfähigkeit.",
+            "step3Title": "Genehmigung und Veröffentlichung",
+            "step3Desc": "Bei Genehmigung wird Ihr Fahrzeug als \"Kundenfahrzeug\" in unseren Katalog aufgenommen und ist öffentlich sichtbar.",
+            "step4Title": "Fahrzeug ist live!",
+            "step4Desc": "Interessierte können Ihr Fahrzeug sehen, Anfragen stellen und Probefahrten buchen.",
+            "importantNoteLabel": "Wichtig:",
+            "importantNoteText": "Nur genehmigt Fahrzeuge werden öffentlich angezeigt. Sie können abgelehnte Fahrzeuge erneut einreichen."
+        }
     }
 }
