@@ -10,10 +10,18 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Upload, X, GripVertical, Check } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { getFuelTypeLabel, getTransmissionLabel, getBodyTypeLabel } from "@/lib/vehicle-labels";
 
 type Step = "fahrzeugdaten" | "preis" | "bilder" | "beschreibung" | "verkaufsart" | "kontrolle" | "absenden";
 
 const STEP_IDS: Step[] = ["fahrzeugdaten", "preis", "bilder", "beschreibung", "verkaufsart", "kontrolle", "absenden"];
+
+// Limits for validation
+const MAX_IMAGES = 20;
+const DESCRIPTION_MIN_CHARS = 20;
+const MAX_MILEAGE = 99999999;
+const MAX_POWER = 99999;
+const MAX_PRICE = 99999999.99;
 
 interface VehicleData {
   // Fahrzeugdaten
@@ -51,6 +59,7 @@ export default function SubmitVehicleWizardPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const t = useTranslations("wizard");
+  const tCommon = useTranslations("common");
   const format = useFormatter();
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
@@ -203,14 +212,12 @@ export default function SubmitVehicleWizardPage() {
     });
   };
 
-  const MAX_IMAGES = 20;
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
     if (images.length + files.length > MAX_IMAGES) {
-      setError(t("validation.imageLimitExceeded", { maxCount: MAX_IMAGES }));
+      setError(t("validation.imageLimitExceeded", { maxCount: MAX_IMAGES.toString() }));
       return;
     }
 
@@ -285,17 +292,17 @@ export default function SubmitVehicleWizardPage() {
           return false;
         }
 
-        // Validate mileage (max 99,999,999 km)
+        // Validate mileage
         const mileage = parseInt(formData.kilometerstand) || 0;
-        if (mileage < 0 || mileage > 99999999) {
-          setError(t("validation.mileageRange"));
+        if (mileage < 0 || mileage > MAX_MILEAGE) {
+          setError(t("validation.mileageRange", { max: format.number(MAX_MILEAGE) }));
           return false;
         }
 
-        // Validate power HP (max 99,999 PS)
+        // Validate power HP
         const power = parseInt(formData.leistung) || 0;
-        if (power < 0 || power > 99999) {
-          setError(t("validation.powerRange"));
+        if (power < 0 || power > MAX_POWER) {
+          setError(t("validation.powerRange", { max: format.number(MAX_POWER) }));
           return false;
         }
 
@@ -306,14 +313,14 @@ export default function SubmitVehicleWizardPage() {
           return false;
         }
 
-        // Validate price (NUMERIC(10,2) max = 99,999,999.99)
+        // Validate price
         const price = parseFloat(formData.preisvorstellung);
         if (price <= 0) {
           setError(t("validation.pricePositive"));
           return false;
         }
-        if (price > 99999999.99) {
-          setError(t("validation.priceMax"));
+        if (price > MAX_PRICE) {
+          setError(t("validation.priceMax", { max: format.number(MAX_PRICE, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }) }));
           return false;
         }
 
@@ -325,8 +332,8 @@ export default function SubmitVehicleWizardPage() {
         }
         break;
       case "beschreibung":
-        if (!formData.beschreibung || formData.beschreibung.length < 20) {
-          setError(t("validation.descriptionMinLength"));
+        if (!formData.beschreibung || formData.beschreibung.length < DESCRIPTION_MIN_CHARS) {
+          setError(t("validation.descriptionMinLength", { min: DESCRIPTION_MIN_CHARS }));
           return false;
         }
         break;
@@ -881,9 +888,11 @@ export default function SubmitVehicleWizardPage() {
                   <p><span className="font-medium">{t("fields.brand")}:</span> {formData.marke}</p>
                   <p><span className="font-medium">{t("fields.model")}:</span> {formData.modell}</p>
                   <p><span className="font-medium">{t("fields.firstRegistration")}:</span> {formData.erstzulassung}</p>
-                  <p><span className="font-medium">{t("fields.mileage")}:</span> {formData.kilometerstand} {t("units.kilometers")}</p>
-                  <p><span className="font-medium">{t("fields.powerHp")}:</span> {formData.leistung} {t("units.horsePower")}</p>
-                  <p><span className="font-medium">{t("fields.fuel")}:</span> {formData.kraftstoff}</p>
+                  <p><span className="font-medium">{t("fields.mileage")}:</span> {t("units.mileage", { value: format.number(parseInt(formData.kilometerstand) || 0) })}</p>
+                  <p><span className="font-medium">{t("fields.powerHp")}:</span> {t("units.power", { value: format.number(parseInt(formData.leistung) || 0) })}</p>
+                  <p><span className="font-medium">{t("fields.fuel")}:</span> {getFuelTypeLabel(tCommon, formData.kraftstoff)}</p>
+                  <p><span className="font-medium">{t("fields.transmission")}:</span> {getTransmissionLabel(tCommon, formData.getriebe)}</p>
+                  <p><span className="font-medium">{t("fields.bodyType")}:</span> {getBodyTypeLabel(tCommon, formData.karosserie)}</p>
                 </div>
               </div>
               <div>

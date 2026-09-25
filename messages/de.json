@@ -861,8 +861,8 @@
             "imageLimitExceeded": "Maximum {maxCount} Bilder erlaubt"
         },
         "units": {
-            "kilometers": "km",
-            "horsePower": "PS"
+            "mileage": "{value} km",
+            "power": "{value} PS"
         },
         "images": {
             "uploadCount": "Fotos hochladen ({current}/{max})",

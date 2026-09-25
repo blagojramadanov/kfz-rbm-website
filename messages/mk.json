@@ -861,8 +861,8 @@
             "imageLimitExceeded": "Максимум {maxCount} слики дозволени"
         },
         "units": {
-            "kilometers": "км",
-            "horsePower": "КС"
+            "mileage": "{value} км",
+            "power": "{value} КС"
         },
         "images": {
             "uploadCount": "Прикачете фотографии ({current}/{max})",
