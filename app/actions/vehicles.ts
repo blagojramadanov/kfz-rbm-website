@@ -408,13 +408,15 @@ async function respondToOffer(vehicleId: string, decision: "akzeptiert" | "einge
   // RLS limits this to the caller's own rows (admins would also see others', hence the explicit check).
   const { data: vehicle, error: fetchError } = await supabase
     .from("submitted_vehicles")
-    .select("id, user_id, status")
+    .select("id, user_id, status, offered_price")
     .eq("id", submissionId)
     .maybeSingle();
 
   if (fetchError || !vehicle) throw new ActionError("NOT_FOUND");
   if (vehicle.user_id !== user.id) throw new ActionError("FORBIDDEN");
   if (vehicle.status !== "angebot_gesendet") throw new ActionError("INVALID_STATE");
+  // Rows from the old approve path have the status but no price; there is nothing to answer.
+  if (!(Number(vehicle.offered_price) > 0)) throw new ActionError("INVALID_STATE");
 
   // Only status and timestamps change; the write is pinned to owner + current state.
   const now = new Date().toISOString();

@@ -828,3 +828,7 @@ New keys: `admin.submissions.{askingPrice,sendOffer,updateOffer,offerPriceLabel,
 ### Open items
 - Apply `supabase/migrations/026_add_submission_details.sql` in the Supabase SQL editor.
 - One live submission is `angebot_gesendet` without a price (from the old approve button); an admin can now give it a price with "Angebot ändern" (filter "Angebot gesendet").
+
+### Follow-up (2026-09-26)
+- Read-only DB check confirmed the stuck row (`801e7b66-…`, status `angebot_gesendet`, `offered_price` null; the 3.000 € shown is the customer's asking price `price`). Written by the old approve button on 2026-09-24.
+- `respondToOffer` (accept/reject) now also requires `offered_price` > 0 and returns `INVALID_STATE` otherwise, so a direct server-action call can no longer answer an offer without a price. The check runs before any status update.
