@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
+import { getSubmissionDetails } from "@/lib/submission-details";
 import {
   getFuelTypeLabel,
   getTransmissionLabel,
@@ -47,6 +48,11 @@ interface SubmittedVehicle {
   created_at: string;
   sales_type?: string;
   commission?: number;
+  variant?: string | null;
+  previous_owners?: string | null;
+  hu_au?: string | null;
+  accident_history?: string | null;
+  service_book?: string | null;
 }
 
 export default function SubmittedVehicleDetailPage() {
@@ -57,6 +63,7 @@ export default function SubmittedVehicleDetailPage() {
   const tAdmin = useTranslations("admin");
   const tCommon = useTranslations("common");
   const tButtons = useTranslations("buttons");
+  const tWizard = useTranslations("wizard");
   const format = useLocaleFormatter();
   const errorMessage = useErrorMessage();
   const [vehicle, setVehicle] = useState<SubmittedVehicle | null>(null);
@@ -81,49 +88,19 @@ export default function SubmittedVehicleDetailPage() {
       }
 
       try {
-        console.log("[fetchSignedUrls] Starting - about to import action");
-        const storageModule = await import("@/app/actions/storage");
-        console.log("[fetchSignedUrls] Import successful, module:", Object.keys(storageModule));
-        const { getSignedImageUrls } = storageModule;
-        console.log("[fetchSignedUrls] Got function, type:", typeof getSignedImageUrls, "paths to send:", vehicle.images.length);
+        const { getSignedImageUrls } = await import("@/app/actions/storage");
         const urlsResult = await getSignedImageUrls(vehicle.images);
-        console.log("[fetchSignedUrls] Action returned:", urlsResult, "type:", typeof urlsResult);
-
-        if (!urlsResult) {
-          console.error("[fetchSignedUrls] Result is undefined");
+        if (!urlsResult.ok) {
           setImageUrls({});
           return;
         }
-
-        console.log("[fetchSignedUrls] Result received:", { ok: (urlsResult as any).ok });
-
-        // Type guard: after null check, result exists
-        if ((urlsResult as any).ok === true && (urlsResult as any).urls) {
-          const urlMap = ((urlsResult as any).urls as Array<{ path: string; url: string | null }>).reduce(
-            (acc: Record<string, string>, item) => {
-              if (item.url) {
-                acc[item.path] = item.url;
-              }
-              return acc;
-            },
-            {}
-          );
-          console.log("[fetchSignedUrls] Created map with", Object.keys(urlMap).length, "URLs");
-          setImageUrls(urlMap);
-        } else {
-          console.error("[fetchSignedUrls] Response not ok or missing urls:", {
-            ok: (urlsResult as any).ok,
-            error: (urlsResult as any).error
-          });
-          setImageUrls({});
+        const urlMap: Record<string, string> = {};
+        for (const item of urlsResult.urls) {
+          if (item.url) urlMap[item.path] = item.url;
         }
-      } catch (err: any) {
-        console.error("Error fetching signed URLs:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
-        console.error("Error details:", {
-          message: err?.message,
-          digest: err?.digest,
-          name: err?.name,
-        });
+        setImageUrls(urlMap);
+      } catch (err) {
+        console.error("Error fetching signed URLs:", err);
         setImageUrls({});
       }
     };
@@ -255,6 +232,8 @@ export default function SubmittedVehicleDetailPage() {
     );
   }
 
+  const submissionDetails = getSubmissionDetails(tWizard, vehicle);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -380,6 +359,20 @@ export default function SubmittedVehicleDetailPage() {
                   <p className="font-semibold text-gray-900">{getSubmissionStatusLabel(tCommon, vehicle.status)}</p>
                 </div>
               </div>
+
+            {submissionDetails.length > 0 && (
+              <div className="pt-4 border-t">
+                <p className="text-sm text-gray-600 mb-3">{t("vehicleDetails")}</p>
+                <div className="grid grid-cols-2 gap-4">
+                  {submissionDetails.map((detail) => (
+                    <div key={detail.key}>
+                      <p className="text-sm text-gray-600">{detail.label}</p>
+                      <p className="font-semibold text-gray-900 break-words">{detail.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {vehicle.sales_type && (
               <div className="pt-4 border-t">

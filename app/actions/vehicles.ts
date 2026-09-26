@@ -43,7 +43,16 @@ const submittedVehicleSchema = z.object({
   description: optionalText(5000),
   sales_type: optionalText(100),
   commission: z.number().min(0).max(100).nullable().optional(),
+  // Wizard answers (option values, see migration 026).
+  variant: optionalText(100),
+  previous_owners: z.enum(["1", "2", "3", "4+"]).optional(),
+  hu_au: z.enum(["yes", "no", "expired"]).optional(),
+  accident_history: z.enum(["no", "yes", "unknown"]).optional(),
+  service_book: z.enum(["yes", "no"]).optional(),
 });
+
+/** PostgREST / Postgres codes for "column does not exist" (migration 026 not applied yet). */
+const MISSING_COLUMN_CODES = ["PGRST204", "42703"];
 
 /** Statuses in which the owner may still add photos to a submission. */
 const PHOTO_UPLOAD_STATUSES = ["draft", "eingereicht"];
@@ -115,7 +124,12 @@ async function countSubmittedVehiclesImpl(): Promise<number> {
   return count ?? 0;
 }
 
-/** Uploads decoded images to the private customer bucket and records them. Returns how many succeeded. */
+/**
+ * Uploads decoded images to the private customer bucket and records them.
+ * A failed storage upload is retried once; if the image row cannot be written the
+ * file is removed again, so no orphaned file stays behind. Returns the indexes
+ * (into `dataUrls`) of the images that could not be stored.
+ */
 async function storeSubmissionImages(
   supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
   userId: string,
@@ -124,30 +138,52 @@ async function storeSubmissionImages(
   firstSortOrder: number,
   firstIsMain: boolean
 ) {
-  let uploaded = 0;
+  const failedIndexes: number[] = [];
+  let mainAssigned = !firstIsMain;
   for (let i = 0; i < dataUrls.length; i++) {
     const image = decodeImageDataUrl(dataUrls[i]);
-    if (!image) continue;
+    if (!image) {
+      failedIndexes.push(i);
+      continue;
+    }
 
     // Path layout required by the storage RLS policy: {user_id}/{submission_id}/{file}
     const storagePath = `${userId}/${submissionId}/${Date.now()}-${randomUUID()}.${image.extension}`;
+    const upload = () =>
+      supabase.storage
+        .from("customer-submitted-photos")
+        .upload(storagePath, image.bytes, { contentType: image.contentType, upsert: false });
 
-    const { error: uploadError } = await supabase.storage
-      .from("customer-submitted-photos")
-      .upload(storagePath, image.bytes, { contentType: image.contentType, upsert: false });
-    if (uploadError) continue;
+    let { error: uploadError } = await upload();
+    if (uploadError) ({ error: uploadError } = await upload());
+    if (uploadError) {
+      console.error("[storeSubmissionImages] storage upload:", uploadError.message);
+      failedIndexes.push(i);
+      continue;
+    }
 
     const { error: insertError } = await supabase.from("submitted_vehicle_images").insert({
       submitted_vehicle_id: submissionId,
       image_url: storagePath,
       sort_order: firstSortOrder + i,
-      is_main: firstIsMain && i === 0,
+      is_main: !mainAssigned,
     });
-    if (insertError) continue;
+    if (insertError) {
+      console.error("[storeSubmissionImages] image row:", insertError.message);
+      // Customers have no DELETE right in the private bucket (admin-only policy), so the
+      // cleanup uses the service-role client, limited to the file written just above.
+      const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
+      const { error: removeError } = await getSupabaseAdminClient()
+        .storage.from("customer-submitted-photos")
+        .remove([storagePath]);
+      if (removeError) console.error("[storeSubmissionImages] orphaned file:", storagePath, removeError.message);
+      failedIndexes.push(i);
+      continue;
+    }
 
-    uploaded++;
+    mainAssigned = true;
   }
-  return uploaded;
+  return { uploadedCount: dataUrls.length - failedIndexes.length, failedIndexes };
 }
 
 async function createSubmittedVehicleImpl(vehicleData: unknown, images: unknown) {
@@ -157,35 +193,57 @@ async function createSubmittedVehicleImpl(vehicleData: unknown, images: unknown)
 
   // Explicit field list: user_id and status are fixed here (the insert RLS check
   // also requires status = 'eingereicht' and empty admin/offer columns).
-  const { data: vehicle, error: vehicleError } = await supabase
-    .from("submitted_vehicles")
-    .insert({
-      user_id: user.id,
-      brand: data.brand,
-      model: data.model,
-      year: data.year,
-      mileage: data.mileage,
-      price: data.price,
-      transmission: data.transmission,
-      fuel_type: data.fuel_type,
-      body_type: data.body_type,
-      color: data.color,
-      power_hp: data.power_hp,
-      description: data.description,
-      sales_type: data.sales_type,
-      commission: data.commission,
-      status: "eingereicht",
-    })
-    .select()
-    .single();
+  const baseRow = {
+    user_id: user.id,
+    brand: data.brand,
+    model: data.model,
+    year: data.year,
+    mileage: data.mileage,
+    price: data.price,
+    transmission: data.transmission,
+    fuel_type: data.fuel_type,
+    body_type: data.body_type,
+    color: data.color,
+    power_hp: data.power_hp,
+    description: data.description,
+    sales_type: data.sales_type,
+    commission: data.commission,
+    status: "eingereicht",
+  };
+  const detailColumns = {
+    variant: data.variant || null,
+    previous_owners: data.previous_owners,
+    hu_au: data.hu_au,
+    accident_history: data.accident_history,
+    service_book: data.service_book,
+  };
+  const insert = (row: Record<string, unknown>) =>
+    supabase.from("submitted_vehicles").insert(row).select("id").single();
+
+  let { data: vehicle, error: vehicleError } = await insert({ ...baseRow, ...detailColumns });
+  if (vehicleError && MISSING_COLUMN_CODES.includes(vehicleError.code)) {
+    // Until migration 026 is applied the detail columns do not exist. Keep submissions
+    // working instead of failing every one of them; the details are lost until then.
+    console.error("[createSubmittedVehicle] detail columns missing - apply migration 026:", vehicleError.message);
+    ({ data: vehicle, error: vehicleError } = await insert(baseRow));
+  }
 
   if (vehicleError || !vehicle) throw new ActionError("CREATE_FAILED");
 
-  const uploadedCount = await storeSubmissionImages(supabase, user.id, vehicle.id, imageList, 0, true);
+  const { uploadedCount, failedIndexes } = await storeSubmissionImages(
+    supabase,
+    user.id,
+    vehicle.id,
+    imageList,
+    0,
+    true
+  );
 
   return {
     vehicleId: vehicle.id as string,
     uploadedCount,
+    expectedCount: imageList.length,
+    failedIndexes,
   };
 }
 
@@ -225,7 +283,7 @@ async function uploadSubmissionImagesImpl(submissionId: string, filesData: unkno
   if ((count ?? 0) + files.length > MAX_IMAGES_PER_REQUEST) throw new ActionError("INVALID_INPUT");
 
   const nextSortOrder = (existing?.[0]?.sort_order ?? -1) + 1;
-  const uploaded = await storeSubmissionImages(
+  const { uploadedCount, failedIndexes } = await storeSubmissionImages(
     supabase,
     user.id,
     targetId,
@@ -233,9 +291,10 @@ async function uploadSubmissionImagesImpl(submissionId: string, filesData: unkno
     nextSortOrder,
     (count ?? 0) === 0
   );
-  if (uploaded !== files.length) throw new ActionError("UPLOAD_FAILED");
+  if (uploadedCount === 0) throw new ActionError("UPLOAD_FAILED");
 
-  return { uploadedCount: uploaded };
+  // Partial success is reported, not thrown, so the caller knows which photos to retry.
+  return { uploadedCount, failedIndexes };
 }
 
 /**

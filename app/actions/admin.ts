@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ActionError, runAction, toErrorCode, type ActionErrorCode, type ActionResult } from "@/lib/action-result";
 import { requireAdmin } from "@/lib/auth-guards";
 import { vehicleFieldsSchema, vehicleUpdateSchema } from "@/lib/vehicle-schema";
+import { OFFERABLE_SUBMISSION_STATUSES, REJECTABLE_SUBMISSION_STATUSES } from "@/lib/submission-workflow";
 
 // Helper function to log detailed error information for debugging
 function logAdminError(operation: string, error: unknown, context?: Record<string, any>) {
@@ -279,6 +280,12 @@ export async function getSubmittedVehicles(filters?: { status?: string; search?:
         description,
         status,
         status_reason,
+        rejection_reason,
+        sales_type,
+        commission,
+        offered_price,
+        offer_terms,
+        offered_at,
         created_at,
         updated_at,
         vehicle_id,
@@ -312,40 +319,26 @@ export async function getSubmittedVehicles(filters?: { status?: string; search?:
   });
 }
 
-/** Marks a submission as "offer sent" (angebot_gesendet). */
-export async function approveSubmittedVehicle(submittedVehicleId: string) {
-  return runAction("approveSubmittedVehicle", "UPDATE_FAILED", async () => {
-    await requireAdmin();
-    if (!guid.safeParse(submittedVehicleId).success) throw new ActionError("INVALID_INPUT");
-    const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
-    const supabase = getSupabaseAdminClient();
-
-    const { data: submittedVehicle } = await supabase
-      .from("submitted_vehicles")
-      .select("id")
-      .eq("id", submittedVehicleId)
-      .maybeSingle();
-    if (!submittedVehicle) throw new ActionError("NOT_FOUND");
-
-    const { error } = await supabase
-      .from("submitted_vehicles")
-      .update({ status: "angebot_gesendet", updated_at: new Date().toISOString() })
-      .eq("id", submittedVehicleId);
-    if (error) throw error;
-    return {};
-  });
-}
-
+/**
+ * Sends (or corrects) a price offer: sets offered_price/offer_terms and the status
+ * "angebot_gesendet". The customer answers with acceptOffer/rejectOffer
+ * (app/actions/vehicles.ts). Workflow: lib/submission-workflow.ts.
+ */
 export async function sendOffer(vehicleId: string, offeredPrice: number, offerTerms?: string) {
   return runAction("sendOffer", "UPDATE_FAILED", async () => {
     const { supabase } = await requireAdmin();
     const input = z
-      .object({ id: z.guid(), price: z.number().min(0).max(100_000_000), terms: z.string().max(5000).optional() })
+      .object({
+        id: z.guid(),
+        // The customer page only offers accept/reject for a positive price.
+        price: z.number().positive().max(100_000_000),
+        terms: z.string().trim().max(5000).optional(),
+      })
       .safeParse({ id: vehicleId, price: offeredPrice, terms: offerTerms });
     if (!input.success) throw new ActionError("INVALID_INPUT");
 
     const now = new Date().toISOString();
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("submitted_vehicles")
       .update({
         status: "angebot_gesendet",
@@ -354,8 +347,11 @@ export async function sendOffer(vehicleId: string, offeredPrice: number, offerTe
         offer_terms: input.data.terms || null,
         updated_at: now,
       })
-      .eq("id", input.data.id);
+      .eq("id", input.data.id)
+      .in("status", [...OFFERABLE_SUBMISSION_STATUSES])
+      .select("id");
     if (error) throw error;
+    if (data?.length !== 1) throw new ActionError("INVALID_STATE");
     return {};
   });
 }
@@ -363,14 +359,19 @@ export async function sendOffer(vehicleId: string, offeredPrice: number, offerTe
 export async function rejectSubmittedVehicle(vehicleId: string, reason: string) {
   return runAction("rejectSubmittedVehicle", "UPDATE_FAILED", async () => {
     const { supabase } = await requireAdmin();
-    const input = z.object({ id: z.guid(), reason: z.string().max(2000) }).safeParse({ id: vehicleId, reason });
+    const input = z
+      .object({ id: z.guid(), reason: z.string().trim().min(1).max(2000) })
+      .safeParse({ id: vehicleId, reason });
     if (!input.success) throw new ActionError("INVALID_INPUT");
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("submitted_vehicles")
       .update({ status: "abgelehnt", rejection_reason: input.data.reason, updated_at: new Date().toISOString() })
-      .eq("id", input.data.id);
+      .eq("id", input.data.id)
+      .in("status", [...REJECTABLE_SUBMISSION_STATUSES])
+      .select("id");
     if (error) throw error;
+    if (data?.length !== 1) throw new ActionError("INVALID_STATE");
     return {};
   });
 }

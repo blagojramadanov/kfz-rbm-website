@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
+import { canRejectSubmission, canSendOffer } from "@/lib/submission-workflow";
 import {
   getFuelTypeLabel,
   getTransmissionLabel,
@@ -36,6 +37,9 @@ export default function AdminSubmittedVehiclesPage() {
   const [statusFilter, setStatusFilter] = useState("eingereicht");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [offeringId, setOfferingId] = useState<string | null>(null);
+  const [offerPrice, setOfferPrice] = useState("");
+  const [offerTerms, setOfferTerms] = useState("");
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState<Record<string, number>>({});
 
@@ -116,16 +120,46 @@ export default function AdminSubmittedVehiclesPage() {
     if (isAdmin) loadVehicles();
   }, [statusFilter, isAdmin]);
 
-  const handleApprove = async (vehicleId: string) => {
+  const openOfferForm = (vehicle: any) => {
+    setRejectingId(null);
+    if (offeringId === vehicle.id) {
+      setOfferingId(null);
+      return;
+    }
+    setOfferingId(vehicle.id);
+    // Prefill with the current offer, else the customer's asking price.
+    const prefill = vehicle.offered_price ?? vehicle.price;
+    setOfferPrice(prefill != null && Number(prefill) > 0 ? String(prefill) : "");
+    setOfferTerms(vehicle.offer_terms ?? "");
+  };
+
+  const handleSendOffer = async (vehicleId: string) => {
+    const price = Number(offerPrice);
+    if (!offerPrice.trim() || !Number.isFinite(price) || price <= 0) {
+      setError(t("offerPriceRequired"));
+      return;
+    }
     try {
       setActionInProgress(vehicleId);
-      const { approveSubmittedVehicle } = await import("@/app/actions/admin");
-      const result = await approveSubmittedVehicle(vehicleId);
+      const { sendOffer } = await import("@/app/actions/admin");
+      const result = await sendOffer(vehicleId, price, offerTerms.trim() || undefined);
       if (!result.ok) {
         setError(errorMessage(result));
         return;
       }
-      setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
+      const now = new Date().toISOString();
+      setVehicles((prev) =>
+        statusFilter === "angebot_gesendet"
+          ? prev.map((v) =>
+              v.id === vehicleId
+                ? { ...v, status: "angebot_gesendet", offered_price: price, offer_terms: offerTerms.trim() || null, offered_at: now }
+                : v
+            )
+          : prev.filter((v) => v.id !== vehicleId)
+      );
+      setOfferingId(null);
+      setOfferPrice("");
+      setOfferTerms("");
       setError("");
     } catch (err) {
       setError(errorMessage(err));
@@ -325,7 +359,7 @@ export default function AdminSubmittedVehiclesPage() {
 
                   {/* Price */}
                   <div className="mb-4 pb-4 border-b border-gray-100">
-                    <p className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">{t("offeredPrice")}</p>
+                    <p className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">{t("askingPrice")}</p>
                     <p className="text-2xl font-bold text-kfz-blue">
                       {vehicle.price != null ? formatPrice(format, vehicle.price) : "–"}
                     </p>
@@ -385,30 +419,99 @@ export default function AdminSubmittedVehiclesPage() {
                     )}
                   </div>
 
+                  {/* Current offer / rejection reason */}
+                  {vehicle.status === "angebot_gesendet" && (
+                    <div className="mb-4 pb-4 border-b border-gray-100 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">{t("currentOffer")}:</span>
+                        <span className="font-semibold text-green-700">
+                          {vehicle.offered_price != null ? formatPrice(format, vehicle.offered_price) : t("noOfferPrice")}
+                        </span>
+                      </div>
+                      {vehicle.offer_terms && <p className="text-gray-600 mt-1 whitespace-pre-line break-words">{vehicle.offer_terms}</p>}
+                    </div>
+                  )}
+                  {vehicle.status === "abgelehnt" && (vehicle.rejection_reason || vehicle.status_reason) && (
+                    <div className="mb-4 pb-4 border-b border-gray-100 text-xs">
+                      <p className="text-gray-600">{t("rejectionReason")}:</p>
+                      <p className="text-gray-900 mt-1 whitespace-pre-line break-words">{vehicle.rejection_reason || vehicle.status_reason}</p>
+                    </div>
+                  )}
+
                   {/* Actions */}
-                  {(vehicle.status === "eingereicht" || vehicle.status === "in_bearbeitung") && (
+                  {(canSendOffer(vehicle.status) || canRejectSubmission(vehicle.status)) && (
                     <div
                       className="space-y-2"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => handleApprove(vehicle.id)}
-                          disabled={actionInProgress === vehicle.id}
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <Check className="w-4 h-4" />
-                          {actionInProgress === vehicle.id ? "..." : t("approve")}
-                        </button>
-                        <button
-                          onClick={() => setRejectingId(rejectingId === vehicle.id ? null : vehicle.id)}
-                          disabled={actionInProgress === vehicle.id}
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-red-300 text-red-700 hover:bg-red-50 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <X className="w-4 h-4" />
-                          {t("reject")}
-                        </button>
+                        {canSendOffer(vehicle.status) && (
+                          <button
+                            onClick={() => openOfferForm(vehicle)}
+                            disabled={actionInProgress === vehicle.id}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <Check className="w-4 h-4" />
+                            {vehicle.status === "angebot_gesendet" ? t("updateOffer") : t("sendOffer")}
+                          </button>
+                        )}
+                        {canRejectSubmission(vehicle.status) && (
+                          <button
+                            onClick={() => {
+                              setOfferingId(null);
+                              setRejectingId(rejectingId === vehicle.id ? null : vehicle.id);
+                            }}
+                            disabled={actionInProgress === vehicle.id}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-red-300 text-red-700 hover:bg-red-50 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <X className="w-4 h-4" />
+                            {t("reject")}
+                          </button>
+                        )}
                       </div>
+
+                      {offeringId === vehicle.id && (
+                        <div className="pt-3 border-t border-gray-100 space-y-2">
+                          <label className="block text-xs font-medium text-gray-700">
+                            {t("offerPriceLabel")}
+                            <input
+                              type="number"
+                              min="1"
+                              step="1"
+                              inputMode="decimal"
+                              value={offerPrice}
+                              onChange={(e) => setOfferPrice(e.target.value)}
+                              className="mt-1 w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            />
+                          </label>
+                          <label className="block text-xs font-medium text-gray-700">
+                            {t("offerTermsLabel")}
+                            <textarea
+                              value={offerTerms}
+                              onChange={(e) => setOfferTerms(e.target.value)}
+                              placeholder={t("offerTermsPlaceholder")}
+                              rows={2}
+                              maxLength={5000}
+                              className="mt-1 w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                            />
+                          </label>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleSendOffer(vehicle.id)}
+                              disabled={actionInProgress === vehicle.id || !offerPrice.trim()}
+                              className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {actionInProgress === vehicle.id ? "..." : t("confirmOffer")}
+                            </button>
+                            <button
+                              onClick={() => setOfferingId(null)}
+                              className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium text-sm transition-colors"
+                            >
+                              {tButtons("cancel")}
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
                       {rejectingId === vehicle.id && (
                         <div className="pt-3 border-t border-gray-100">

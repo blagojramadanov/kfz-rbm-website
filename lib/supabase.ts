@@ -101,6 +101,13 @@ export interface SubmittedVehicle {
   status: VehicleStatus;
   images: string[];
   status_reason?: string;
+  rejection_reason?: string | null; // Reason entered by the admin when rejecting (shown to the customer)
+  // Wizard answers (migration 026); option values, labels in messages `wizard.options.*`
+  variant?: string | null;
+  previous_owners?: string | null;
+  hu_au?: string | null;
+  accident_history?: string | null;
+  service_book?: string | null;
   sales_type?: string;
   commission?: number; // Commission percentage for "Verkauf im Kundenauftrag"
   offered_price?: number; // Admin's offered price for angebot_gesendet status

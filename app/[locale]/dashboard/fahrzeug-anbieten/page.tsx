@@ -13,6 +13,7 @@ import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { getFuelTypeLabel, getTransmissionLabel, getBodyTypeLabel } from "@/lib/vehicle-labels";
 import { SubmissionWorkflowInfo } from "@/components/submission-workflow-info";
+import { getSubmissionDetails } from "@/lib/submission-details";
 
 type Step = "fahrzeugdaten" | "preis" | "bilder" | "beschreibung" | "verkaufsart" | "kontrolle" | "absenden";
 
@@ -91,6 +92,9 @@ export default function SubmitVehicleWizardPage() {
   const [error, setError] = useState("");
   const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
   const [editingVehicleId, setEditingVehicleId] = useState<string | null>(null);
+  // Set when the vehicle was submitted but some photos could not be stored.
+  const [partialUpload, setPartialUpload] = useState<{ vehicleId: string; failedIndexes: number[] } | null>(null);
+  const [retryingPhotos, setRetryingPhotos] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -379,16 +383,6 @@ export default function SubmitVehicleWizardPage() {
 
     try {
       setSaving(true);
-      console.log("\n========== FORM SUBMISSION INITIATED ==========");
-      console.log(`[FORM] Total images in state: ${images.length}`);
-      console.log(`[FORM] Images details:`, images.map((img) => ({
-        id: img.id,
-        dataLength: img.data.length,
-        isBase64: img.data.startsWith("data:"),
-        isMain: img.isMain,
-        uploaded: img.uploaded,
-      })));
-      console.log(`[FORM] Editing vehicle ID: ${editingVehicleId || 'NEW'}`);
 
       const { createSubmittedVehicle } = await import("@/app/actions/vehicles");
 
@@ -397,15 +391,6 @@ export default function SubmitVehicleWizardPage() {
         setError(errorMessage("INVALID_STATE"));
         return;
       } else {
-        // Create new vehicle as draft first (so images can be uploaded due to RLS policy)
-        const imagesToPass = images.map((img) => img.data);
-        console.log(`[FORM] About to call createSubmittedVehicle with ${imagesToPass.length} images`);
-        console.log(`[FORM] Image data samples:`, imagesToPass.map((img, idx) => ({
-          index: idx,
-          length: img.length,
-          prefix: img.substring(0, 50),
-        })));
-
         const result = await createSubmittedVehicle(
           {
             brand: formData.marke,
@@ -420,11 +405,21 @@ export default function SubmitVehicleWizardPage() {
             power_hp: formData.leistung ? parseInt(formData.leistung) : undefined,
             description: formData.beschreibung,
             sales_type: formData.verkaufsart,
+            variant: formData.variante.trim() || undefined,
+            previous_owners: formData.vorbesitzer,
+            hu_au: formData.huAu,
+            accident_history: formData.unfallhistorie,
+            service_book: formData.scheckheft,
           },
-          imagesToPass
+          images.map((img) => img.data)
         );
         if (!result.ok) {
           setError(errorMessage(result));
+          return;
+        }
+        if (result.failedIndexes.length > 0) {
+          // The vehicle exists; offer to retry only the photos that were not stored.
+          setPartialUpload({ vehicleId: result.vehicleId, failedIndexes: result.failedIndexes });
           return;
         }
       }
@@ -435,6 +430,34 @@ export default function SubmitVehicleWizardPage() {
       setError(errorMessage(error));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleRetryPhotos = async () => {
+    if (!partialUpload) return;
+    try {
+      setRetryingPhotos(true);
+      setError("");
+      const { uploadSubmissionImages } = await import("@/app/actions/vehicles");
+      const result = await uploadSubmissionImages(
+        partialUpload.vehicleId,
+        partialUpload.failedIndexes.map((index) => ({ data: images[index].data }))
+      );
+      if (!result.ok) {
+        setError(errorMessage(result));
+        return;
+      }
+      // failedIndexes of the retry refer to the retried list; map them back to the wizard's photos.
+      const stillFailed = result.failedIndexes.map((i) => partialUpload.failedIndexes[i]);
+      if (stillFailed.length === 0) {
+        router.push("/dashboard/fahrzeug-angeboten");
+      } else {
+        setPartialUpload({ ...partialUpload, failedIndexes: stillFailed });
+      }
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setRetryingPhotos(false);
     }
   };
 
@@ -909,6 +932,15 @@ export default function SubmitVehicleWizardPage() {
                   <p><span className="font-medium">{t("fields.fuel")}:</span> {getFuelTypeLabel(tCommon, formData.kraftstoff)}</p>
                   <p><span className="font-medium">{t("fields.transmission")}:</span> {getTransmissionLabel(tCommon, formData.getriebe)}</p>
                   <p><span className="font-medium">{t("fields.bodyType")}:</span> {getBodyTypeLabel(tCommon, formData.karosserie)}</p>
+                  {getSubmissionDetails(t, {
+                    variant: formData.variante.trim(),
+                    previous_owners: formData.vorbesitzer,
+                    hu_au: formData.huAu,
+                    accident_history: formData.unfallhistorie,
+                    service_book: formData.scheckheft,
+                  }).map((detail) => (
+                    <p key={detail.key}><span className="font-medium">{detail.label}:</span> {detail.value}</p>
+                  ))}
                 </div>
               </div>
               <div>
@@ -947,7 +979,34 @@ export default function SubmitVehicleWizardPage() {
           </div>
         )}
 
-        {/* Navigation */}
+        {/* Submitted, but some photos could not be stored: retry them or continue.
+            The normal navigation is hidden so the vehicle cannot be submitted twice. */}
+        {partialUpload ? (
+          <div className="bg-amber-50 border border-amber-300 rounded-lg p-6 mt-8">
+            <h3 className="font-semibold text-amber-900 mb-1">{t("photoUpload.title")}</h3>
+            <p className="text-sm text-amber-900 mb-4">
+              {t("photoUpload.message", { failed: partialUpload.failedIndexes.length, total: images.length })}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                onClick={handleRetryPhotos}
+                disabled={retryingPhotos}
+                className="bg-kfz-blue hover:bg-kfz-blue-dark text-white"
+              >
+                <Upload className="mr-2 w-4 h-4" />
+                {retryingPhotos ? t("photoUpload.retrying") : t("photoUpload.retry")}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/dashboard/fahrzeug-angeboten")}
+                disabled={retryingPhotos}
+                className="border-gray-300"
+              >
+                {t("photoUpload.continue")}
+              </Button>
+            </div>
+          </div>
+        ) : (
         <div className="flex gap-4 justify-between mt-8">
           <Button
             variant="outline"
@@ -978,6 +1037,7 @@ export default function SubmitVehicleWizardPage() {
             </Button>
           )}
         </div>
+        )}
       </main>
     </div>
   );

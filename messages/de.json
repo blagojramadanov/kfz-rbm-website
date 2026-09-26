@@ -270,7 +270,8 @@
             "acceptConfirm": "Möchten Sie dieses Angebot annehmen?",
             "rejectConfirm": "Möchten Sie dieses Angebot ablehnen?",
             "offerAccepted": "✓ Angebot angenommen!",
-            "contactUs": "Kontaktieren Sie uns für die nächsten Schritte."
+            "contactUs": "Kontaktieren Sie uns für die nächsten Schritte.",
+            "rejectionReason": "Grund der Ablehnung"
         },
         "inquiries": {
             "title": "Anfragen",
@@ -498,16 +499,25 @@
             "loading": "Fahrzeuge werden geladen...",
             "emptyTitle": "Keine Fahrzeuge gefunden",
             "emptyDescription": "Es gibt derzeit keine eingereichten Fahrzeuge mit diesem Status.",
-            "offeredPrice": "Angebotener Preis",
             "mileage": "Kilometerstand",
             "transmission": "Getriebe",
             "fuel": "Kraftstoff",
             "salesType": "Verkaufsart",
             "commission": "Provision",
-            "approve": "Genehmigen",
             "reject": "Ablehnen",
             "rejectReasonPlaceholder": "Geben Sie den Ablehnungsgrund ein...",
-            "rejectReasonRequired": "Bitte geben Sie einen Ablehnungsgrund ein."
+            "rejectReasonRequired": "Bitte geben Sie einen Ablehnungsgrund ein.",
+            "askingPrice": "Preisvorstellung des Kunden",
+            "sendOffer": "Angebot senden",
+            "updateOffer": "Angebot ändern",
+            "offerPriceLabel": "Angebotspreis (€)",
+            "offerTermsLabel": "Bedingungen (optional)",
+            "offerTermsPlaceholder": "z. B. Zahlungsbedingungen, Abholung ...",
+            "confirmOffer": "Angebot an den Kunden senden",
+            "offerPriceRequired": "Bitte geben Sie einen Angebotspreis größer als 0 ein.",
+            "currentOffer": "Aktuelles Angebot",
+            "noOfferPrice": "Kein Preis angegeben",
+            "rejectionReason": "Ablehnungsgrund"
         },
         "submissionDetail": {
             "backToList": "Zurück zu den eingereichten Fahrzeugen",
@@ -535,7 +545,8 @@
             "markFeatured": "Als Highlight markieren",
             "publishing": "Wird veröffentlicht...",
             "confirmPublish": "Bestätigen und veröffentlichen",
-            "invalidPrice": "Bitte geben Sie einen gültigen Preis ein."
+            "invalidPrice": "Bitte geben Sie einen gültigen Preis ein.",
+            "vehicleDetails": "Angaben des Kunden"
         },
         "inquiries": {
             "title": "Kundenanfragen",
@@ -1387,6 +1398,13 @@
             "description": "Wir melden uns in Kürze bei Ihnen mit weiteren Informationen.",
             "viewVehicles": "Meine Fahrzeuge anschauen",
             "backToDashboard": "Zum Dashboard"
+        },
+        "photoUpload": {
+            "title": "Nicht alle Fotos wurden gespeichert",
+            "message": "Ihr Fahrzeug wurde eingereicht, aber {failed} von {total} Fotos konnten nicht gespeichert werden.",
+            "retry": "Fehlende Fotos erneut hochladen",
+            "retrying": "Fotos werden hochgeladen...",
+            "continue": "Ohne diese Fotos fortfahren"
         }
     },
     "adminVehicles": {

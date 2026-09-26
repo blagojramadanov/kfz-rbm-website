@@ -93,9 +93,10 @@ export default function MyVehiclesPage() {
       const data = result.vehicles;
       setVehicles(data || []);
 
-      // Fetch signed URLs for all images
+      // Signed URLs for the cover photo of each vehicle (the only one this page shows).
+      // The action only signs photos of the customer's own submissions.
       if (data && data.length > 0) {
-        const allPaths = data.flatMap(v => v.images || []);
+        const allPaths = data.map((v) => v.images?.[0]).filter((path): path is string => Boolean(path));
         if (allPaths.length > 0) {
           const { getSignedImageUrls } = await import("@/app/actions/storage");
           const signed = await getSignedImageUrls(allPaths);
@@ -228,7 +229,7 @@ export default function MyVehiclesPage() {
 
               return (
                 <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  {/* Image */}
+                  {/* Image (private photo behind a short-lived signed URL: unoptimized keeps it out of the shared image cache) */}
                   <div className="relative w-full aspect-video bg-gray-200 overflow-hidden">
                     {vehicle.images && vehicle.images.length > 0 && imageUrls[vehicle.images[0]] ? (
                       <Image
@@ -237,6 +238,7 @@ export default function MyVehiclesPage() {
                         fill
                         className="object-cover"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        unoptimized
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -299,6 +301,18 @@ export default function MyVehiclesPage() {
                           >
                             {t("rejectOffer")}
                           </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Rejection reason entered by the admin (older rows keep it in status_reason) */}
+                    {status === "abgelehnt" && (vehicle.rejection_reason || vehicle.status_reason) && (
+                      <div className="border-t pt-3 mt-3">
+                        <div className="bg-red-50 p-3 rounded">
+                          <p className="text-sm font-semibold text-red-700">{t("rejectionReason")}</p>
+                          <p className="text-sm text-gray-700 mt-1 whitespace-pre-line break-words">
+                            {vehicle.rejection_reason || vehicle.status_reason}
+                          </p>
                         </div>
                       </div>
                     )}

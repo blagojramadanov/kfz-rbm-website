@@ -270,7 +270,8 @@
             "acceptConfirm": "Do you want to accept this offer?",
             "rejectConfirm": "Do you want to reject this offer?",
             "offerAccepted": "✓ Offer accepted!",
-            "contactUs": "Contact us for next steps."
+            "contactUs": "Contact us for next steps.",
+            "rejectionReason": "Reason for rejection"
         },
         "inquiries": {
             "title": "Inquiries",
@@ -498,16 +499,25 @@
             "loading": "Loading vehicles...",
             "emptyTitle": "No vehicles found",
             "emptyDescription": "There are currently no submitted vehicles with this status.",
-            "offeredPrice": "Offered price",
             "mileage": "Mileage",
             "transmission": "Transmission",
             "fuel": "Fuel",
             "salesType": "Sales type",
             "commission": "Commission",
-            "approve": "Approve",
             "reject": "Reject",
             "rejectReasonPlaceholder": "Enter the reason for rejection...",
-            "rejectReasonRequired": "Please enter a reason for rejection."
+            "rejectReasonRequired": "Please enter a reason for rejection.",
+            "askingPrice": "Customer's asking price",
+            "sendOffer": "Send offer",
+            "updateOffer": "Change offer",
+            "offerPriceLabel": "Offer price (€)",
+            "offerTermsLabel": "Terms (optional)",
+            "offerTermsPlaceholder": "e.g. payment terms, pick-up ...",
+            "confirmOffer": "Send offer to customer",
+            "offerPriceRequired": "Please enter an offer price greater than 0.",
+            "currentOffer": "Current offer",
+            "noOfferPrice": "No price given",
+            "rejectionReason": "Rejection reason"
         },
         "submissionDetail": {
             "backToList": "Back to submitted vehicles",
@@ -535,7 +545,8 @@
             "markFeatured": "Mark as featured",
             "publishing": "Publishing...",
             "confirmPublish": "Confirm and publish",
-            "invalidPrice": "Please enter a valid price."
+            "invalidPrice": "Please enter a valid price.",
+            "vehicleDetails": "Customer details on the vehicle"
         },
         "inquiries": {
             "title": "Customer Inquiries",
@@ -1387,6 +1398,13 @@
             "description": "We will contact you shortly with further information.",
             "viewVehicles": "View my vehicles",
             "backToDashboard": "Back to dashboard"
+        },
+        "photoUpload": {
+            "title": "Not all photos were saved",
+            "message": "Your vehicle was submitted, but {failed} of {total} photos could not be saved.",
+            "retry": "Upload missing photos again",
+            "retrying": "Uploading photos...",
+            "continue": "Continue without these photos"
         }
     },
     "adminVehicles": {

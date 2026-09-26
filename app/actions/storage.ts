@@ -1,58 +1,66 @@
 "use server";
 
 import { z } from "zod";
-import { ActionError, runAction, toErrorCode } from "@/lib/action-result";
-import { requireAdmin } from "@/lib/auth-guards";
+import { ActionError, runAction } from "@/lib/action-result";
+import { requireUser } from "@/lib/auth-guards";
 
-/** Signed URLs (1 h) for photos in the private customer bucket. Admin only. */
+const BUCKET = "customer-submitted-photos";
+const SIGNED_URL_SECONDS = 3600;
+
+/**
+ * Signed URLs (1 h) for photos in the private customer bucket.
+ *  - Admins: any path (service-role client, after the role check in the database).
+ *  - Customers: only paths recorded as images of a submission they own. Ownership
+ *    comes from the database (`submitted_vehicles.user_id` = session user), and the
+ *    URLs are signed with the customer's own session client, so the storage RLS
+ *    policy ("Customers can view own photos") applies as a second layer.
+ * Paths the caller may not see come back with `url: null`.
+ */
 export async function getSignedImageUrls(paths: unknown) {
-  console.log("[getSignedImageUrls] Server action called with paths count:", Array.isArray(paths) ? (paths as any).length : "unknown");
   return runAction("getSignedImageUrls", "LOAD_FAILED", async () => {
-    console.log("[getSignedImageUrls] Inside runAction handler");
-    // Admin-only: uses service-role client to bypass storage RLS for reading all customers' images
-    try {
-      await requireAdmin();
-      console.log("[getSignedImageUrls] Admin check passed");
-    } catch (error) {
-      console.error("[getSignedImageUrls] Admin check failed:", error);
-      throw new ActionError(toErrorCode(error, "UNAUTHORIZED") === "FORBIDDEN" ? "UNAUTHORIZED" : toErrorCode(error, "UNAUTHORIZED"));
+    const { supabase, user } = await requireUser();
+
+    const parsed = z.array(z.string().min(1).max(300)).max(100).safeParse(paths);
+    if (!parsed.success) throw new ActionError("INVALID_INPUT");
+    const requested = [...new Set(parsed.data)];
+    if (requested.length === 0) return { urls: [] as { path: string; url: string | null }[] };
+
+    const { data: profile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (profileError) throw profileError;
+    const isAdmin = profile?.role === "ADMIN";
+
+    let signer = supabase;
+    let allowed: Set<string>;
+    if (isAdmin) {
+      const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
+      signer = getSupabaseAdminClient() as unknown as typeof supabase;
+      allowed = new Set(requested);
+    } else {
+      // Only image rows whose submission belongs to the session user.
+      const { data: owned, error } = await supabase
+        .from("submitted_vehicle_images")
+        .select("image_url, submitted_vehicles!inner(user_id)")
+        .in("image_url", requested)
+        .eq("submitted_vehicles.user_id", user.id);
+      if (error) throw error;
+      allowed = new Set((owned ?? []).map((row) => row.image_url as string));
     }
-
-    const parsed = z.array(z.string().max(300)).max(100).safeParse(paths);
-    if (!parsed.success) {
-      console.error("[getSignedImageUrls] Validation failed:", parsed.error);
-      throw new ActionError("INVALID_INPUT");
-    }
-
-    console.log(`[getSignedImageUrls] Processing ${parsed.data.length} paths:`, parsed.data.slice(0, 2));
-
-    const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
-    const supabase = getSupabaseAdminClient();
 
     const urls = await Promise.all(
-      parsed.data.map(async (path) => {
-        try {
-          const { data, error } = await supabase.storage.from("customer-submitted-photos").createSignedUrl(path, 3600);
-          if (error) {
-            console.error(`[getSignedImageUrls] createSignedUrl error for path "${path}":`, {
-              message: error.message,
-              status: (error as any).status,
-              statusCode: (error as any).statusCode,
-            });
-            return { path, url: null };
-          }
-          console.log(`[getSignedImageUrls] Got signed URL for ${path}`);
-          return { path, url: data?.signedUrl ?? null };
-        } catch (err) {
-          console.error(`[getSignedImageUrls] Exception for path "${path}":`, {
-            message: err instanceof Error ? err.message : String(err),
-            stack: err instanceof Error ? err.stack : undefined,
-          });
+      requested.map(async (path) => {
+        if (!allowed.has(path)) return { path, url: null };
+        const { data, error } = await signer.storage.from(BUCKET).createSignedUrl(path, SIGNED_URL_SECONDS);
+        if (error) {
+          console.error("[getSignedImageUrls] createSignedUrl failed:", error.message);
           return { path, url: null };
         }
+        return { path, url: data?.signedUrl ?? null };
       })
     );
-    console.log(`[getSignedImageUrls] Returning ${urls.filter(u => u.url).length} successful URLs`);
     return { urls };
   });
 }

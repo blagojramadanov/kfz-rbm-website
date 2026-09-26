@@ -805,3 +805,26 @@ Scope: `app/[locale]/admin/fahrzeuge/page.tsx` (list), `neu/page.tsx` (new), `[i
 - ✅ Rendered numbers checked with the same Intl calls (Node ICU): de "27.500 €", "85.000 km", "1.998 cm³, 190 PS"; en "€27,500", "85,000 km", "1,998 cc, 190 hp"; mk "27.500 €", "85.000 км", "1.998 cm³, 190 КС".
 - ✅ Live check on the production deployment (admin session, read-only; nothing saved) for /de, /en, /mk: list (headers, status filter + badges, source badge, prices "27.500 €" / "€27,500" / "27.500 €", mileage "85.000 км" in mk), detail, edit form and new form (incl. mk export fields). Found one gap: a Macedonian customer submission stored colour "бела", which fell through to the raw value. Fix: Cyrillic colour names added as extra keys to `common.colors` (like the German/English spellings); the DB value is unchanged. Re-checked after deploy.
 - Out of scope, still open: `admin/kunden/[id]` mileage uses `toLocaleString("de-DE")` (area 11); `dashboard/inzahlungnahme-anfragen` mileage appends a hardcoded " km".
+
+## Functional fixes after the full audit (2026-09-26)
+
+Not translation work; recorded here because new message keys were added (de/en/mk).
+
+### Fixes
+1. **Offer flow (blocker).** "Genehmigen" set `angebot_gesendet` without a price, and the customer page shows Accept/Reject only with `offered_price`, so every approved submission got stuck. `approveSubmittedVehicle` is removed; the button in `admin/fahrzeuge/eingereicht` is now "Angebot senden" with an inline price (prefilled with the asking price) + optional terms and calls `sendOffer`. `sendOffer` requires a price > 0, only works in `eingereicht`/`in_bearbeitung`/`angebot_gesendet` (so an offer without a price can be corrected) and checks that one row changed. `rejectSubmittedVehicle` requires a reason and only works in `eingereicht`/`in_bearbeitung`. Workflow constants: `lib/submission-workflow.ts`. The card shows the current offer / rejection reason; its price label now says "Preisvorstellung des Kunden" (`admin.submissions.askingPrice`).
+2. **Secret key name.** `lib/supabase-admin.ts` reads only `SUPABASE_SECRET_KEY`; `.env.example` documented `SUPABASE_SERVICE_ROLE_KEY`. `.env.example` now names the variable the code reads. Both keys work locally (read-only probe). Production not verified end-to-end (no admin session available).
+3. **Customer photos.** `getSignedImageUrls` was admin-only since `d828134`, so "Meine Fahrzeuge" showed no photos. Now: admins sign any path (service role, as before); customers only paths that are image rows of a submission with `user_id` = session user, signed with their own session client (storage RLS as second layer). Debug logging removed. The page requests only each vehicle's cover photo and renders it `unoptimized` (private URL kept out of the shared image cache).
+4. **Wizard details.** Variant, previous owners, HU/AU, accident history and service book are now sent, validated (zod enums of the option values) and stored in new columns (**migration 026, apply by hand**). Until 026 is applied, `createSubmittedVehicle` saves the submission without these columns and logs `apply migration 026`. Shown on the admin submission detail page and on the wizard review step via `lib/submission-details.ts` (labels from `wizard.fields/options`).
+5. **Photo upload failures.** `storeSubmissionImages` retries a failed upload once, deletes the file again if its image row cannot be written (service role, admin-only delete policy), and returns `failedIndexes`. The wizard shows a warning ("x of y photos could not be saved") with "retry missing photos" (`uploadSubmissionImages`, only the failed ones) or "continue"; the submit button is hidden so the vehicle cannot be submitted twice. Wizard debug logs removed.
+6. **Rejection reason** (`rejection_reason`, fallback `status_reason`) is shown on the customer's "Meine Fahrzeuge" card for rejected submissions.
+
+New keys: `admin.submissions.{askingPrice,sendOffer,updateOffer,offerPriceLabel,offerTermsLabel,offerTermsPlaceholder,confirmOffer,offerPriceRequired,currentOffer,noOfferPrice,rejectionReason}`, `admin.submissionDetail.vehicleDetails`, `dashboard.vehicles.rejectionReason`, `wizard.photoUpload.*`. Removed (unused): `admin.submissions.approve`, `admin.submissions.offeredPrice`.
+
+### Verification
+- ✅ `npm run build`, `npm run check:i18n`.
+- ✅ Live DB, read-only: the ownership query returns all 12 image paths for their owner and 0 for an unknown user id; stored paths can be signed. The 5 new columns do not exist yet (migration 026 pending).
+- ⏳ Not run live (no admin/customer test sessions): send offer -> customer accept/reject, customer photo display, partial-upload retry.
+
+### Open items
+- Apply `supabase/migrations/026_add_submission_details.sql` in the Supabase SQL editor.
+- One live submission is `angebot_gesendet` without a price (from the old approve button); an admin can now give it a price with "Angebot ändern" (filter "Angebot gesendet").
