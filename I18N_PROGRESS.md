@@ -1,5 +1,7 @@
 # I18N Translation Progress Checklist
 
+> **Status: i18n phase complete (2026-09-26).** Areas 1-11 done and verified live; see "Area 11" below.
+
 This document tracks all files that contain hardcoded user-visible text requiring internationalization. Files are grouped by functional area.
 
 ---
@@ -743,7 +745,10 @@ Scope: `admin/page.tsx` (overview), `admin/kunden` (list + `[id]`), `admin/stati
 ### Verification
 - ✅ `npm run check:i18n` and `npm run build` pass.
 - ✅ Rendered strings checked with `createTranslator` + the same Intl calls (Node ICU) for de/en/mk.
-- ⏳ Live admin pass on the deployment (needs an admin session).
+- ✅ Live check on production (commit `0fbe033`, admin session, read-only; nothing saved) for /de, /en, /mk: `<title>` "Admin-Dashboard – RBM" / "Admin Dashboard – RBM" / "Админ контролна табла – RBM"; overview (all cards, breakdowns, quick actions "Поднесени возила (1)" / "Прашања (0)" / "Замена (0)"); customer list (real counts 3/0/1, date "14.09.2026" / "09/14/2026"); customer detail (name + history now shown, "50.000 км" / "50,000 km", statuses "Понуда испратена", "Понуда прифатена", "Откажано"); statistics (average price "35.125 €" instead of 0). Area 10 pages (`eingereicht`, `anfragen`, `inzahlungnahmen`) re-read on /mk in the same pass: fully translated.
+- Not checked live: the customer trade-in pages (point 4) need a customer account with trade-in requests; checked with Node only ("85.000 km" / "85,000 km" / "85.000 км").
+
+**i18n phase complete (2026-09-26):** Areas 1-11 are translated and verified live (Areas 1-10 per the earlier live reviews, Area 11 above). Open non-blocking follow-ups stay under "Known follow-ups".
 
 ## Area 10: Admin submissions + shared admin sidebar fixes (2026-09-26)
 
