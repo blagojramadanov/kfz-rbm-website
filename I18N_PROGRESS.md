@@ -98,16 +98,16 @@ Also changed here (behaviour, not just text):
 
 ## 9. Admin: Vehicles List, New, Edit
 
-- [ ] `app/[locale]/admin/fahrzeuge/page.tsx` - Admin vehicles list (page title, table headers "Brand", "Model", "Year", "Mileage", "Price", "Status", action buttons "Edit", "Delete", "View", search/filter labels, confirmation dialogs)
-- [ ] `app/[locale]/admin/fahrzeuge/neu/page.tsx` - New vehicle form (page title "Neues Fahrzeug hinzufügen", form field labels, help text, submit button, validation messages)
-- [ ] `app/[locale]/admin/fahrzeuge/[id]/page.tsx` - Vehicle detail page (title, specifications display, actions "Edit", "Delete", "Mark as Featured")
-- [ ] `app/[locale]/admin/fahrzeuge/[id]/edit/page.tsx` - Vehicle edit form (page title, form labels, update button, cancel link, validation messages)
+- [x] `app/[locale]/admin/fahrzeuge/page.tsx` - Admin vehicles list (page title, table headers "Brand", "Model", "Year", "Mileage", "Price", "Status", action buttons "Edit", "Delete", "View", search/filter labels, confirmation dialogs)
+- [x] `app/[locale]/admin/fahrzeuge/neu/page.tsx` - New vehicle form (page title "Neues Fahrzeug hinzufügen", form field labels, help text, submit button, validation messages)
+- [x] `app/[locale]/admin/fahrzeuge/[id]/page.tsx` - Vehicle detail page (title, specifications display, actions "Edit", "Delete", "Mark as Featured")
+- [x] `app/[locale]/admin/fahrzeuge/[id]/edit/page.tsx` - Vehicle edit form (page title, form labels, update button, cancel link, validation messages)
 - [x] `app/admin/fahrzeuge/neu/page.tsx` - does not exist (legacy `/admin/...` redirects to `/{locale}/admin/...`)
 - [x] `app/admin/fahrzeuge/neu/layout.tsx` - does not exist
 - [x] `app/admin/fahrzeuge/[id]/page.tsx` - does not exist
 - [x] `app/admin/fahrzeuge/[id]/edit/page.tsx` - does not exist
 
-**Code done (2026-09-26), live check pending:** see "Area 9: Admin vehicle management" at the end of this file.
+**Done and verified live (2026-09-26):** see "Area 9: Admin vehicle management" at the end of this file.
 
 ---
 
@@ -774,5 +774,5 @@ Scope: `app/[locale]/admin/fahrzeuge/page.tsx` (list), `neu/page.tsx` (new), `[i
 ### Verification
 - ✅ `npm run check:i18n` and `npm run build` pass.
 - ✅ Rendered numbers checked with the same Intl calls (Node ICU): de "27.500 €", "85.000 km", "1.998 cm³, 190 PS"; en "€27,500", "85,000 km", "1,998 cc, 190 hp"; mk "27.500 €", "85.000 км", "1.998 cm³, 190 КС".
-- ⏳ Live admin check on /de, /en, /mk pending.
+- ✅ Live check on the production deployment (admin session, read-only; nothing saved) for /de, /en, /mk: list (headers, status filter + badges, source badge, prices "27.500 €" / "€27,500" / "27.500 €", mileage "85.000 км" in mk), detail, edit form and new form (incl. mk export fields). Found one gap: a Macedonian customer submission stored colour "бела", which fell through to the raw value. Fix: Cyrillic colour names added as extra keys to `common.colors` (like the German/English spellings); the DB value is unchanged. Re-checked after deploy.
 - Out of scope, still open: `admin/kunden/[id]` mileage uses `toLocaleString("de-DE")` (area 11); `dashboard/inzahlungnahme-anfragen` mileage appends a hardcoded " km".

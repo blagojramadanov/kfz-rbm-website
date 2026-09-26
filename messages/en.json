@@ -917,7 +917,18 @@
             "braun": "Brown",
             "brown": "Brown",
             "beige": "Beige",
-            "orange": "Orange"
+            "orange": "Orange",
+            "црна": "Black",
+            "бела": "White",
+            "сива": "Gray",
+            "сребрена": "Silver",
+            "сина": "Blue",
+            "црвена": "Red",
+            "зелена": "Green",
+            "жолта": "Yellow",
+            "кафеава": "Brown",
+            "беж": "Beige",
+            "портокалова": "Orange"
         },
         "vehicleConditions": {
             "fahrbereit": "Roadworthy",
