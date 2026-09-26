@@ -10,12 +10,25 @@ import { useAuth } from "@/lib/auth-context";
 import { Check, X, AlertCircle, Car, MapPin, Calendar, Gauge } from "lucide-react";
 import Image from "next/image";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { formatPrice } from "@/lib/format-vehicle";
+import {
+  getFuelTypeLabel,
+  getTransmissionLabel,
+  getSubmissionStatusLabel,
+  getSalesTypeLabel,
+} from "@/lib/vehicle-labels";
 
 export default function AdminSubmittedVehiclesPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
   const { loading, isAdmin } = useAuth();
+  const t = useTranslations("admin.submissions");
+  const tAdmin = useTranslations("admin");
+  const tCommon = useTranslations("common");
+  const tButtons = useTranslations("buttons");
+  const format = useLocaleFormatter();
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const errorMessage = useErrorMessage();
@@ -123,7 +136,7 @@ export default function AdminSubmittedVehiclesPage() {
 
   const handleReject = async (vehicleId: string) => {
     if (!rejectReason.trim()) {
-      setError("Bitte geben Sie einen Ablehnungsgrund ein");
+      setError(t("rejectReasonRequired"));
       return;
     }
     try {
@@ -150,18 +163,26 @@ export default function AdminSubmittedVehiclesPage() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
   }
 
   const statuses = [
-    { value: "eingereicht", label: "Eingereicht", icon: "📥" },
-    { value: "in_bearbeitung", label: "In Bearbeitung", icon: "⏳" },
-    { value: "angebot_gesendet", label: "Angebot gesendet", icon: "📤" },
-    { value: "abgelehnt", label: "Abgelehnt", icon: "❌" },
+    { value: "eingereicht", icon: "📥" },
+    { value: "in_bearbeitung", icon: "⏳" },
+    { value: "angebot_gesendet", icon: "📤" },
+    { value: "abgelehnt", icon: "❌" },
   ];
+
+  const salesTypeIcons: Record<string, string> = {
+    direct: "🤝",
+    Direktverkauf: "🤝",
+    tradeIn: "🔄",
+    Inzahlungnahme: "🔄",
+    consignment: "📋",
+  };
 
   const statusConfig: Record<string, { bg: string; text: string; border: string }> = {
     eingereicht: { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
@@ -174,8 +195,8 @@ export default function AdminSubmittedVehiclesPage() {
     <div className="bg-gray-50 min-h-screen -mx-6 -my-6 px-6 py-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Eingereichte Fahrzeuge</h1>
-        <p className="text-gray-600">Überprüfung und Genehmigung von Kundenfahrzeugen</p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{t("title")}</h1>
+        <p className="text-gray-600">{t("description")}</p>
       </div>
 
       {/* Error Alert */}
@@ -200,7 +221,7 @@ export default function AdminSubmittedVehiclesPage() {
               }`}
             >
               <span>{status.icon}</span>
-              {status.label}
+              {getSubmissionStatusLabel(tCommon, status.value)}
             </button>
           ))}
         </div>
@@ -212,14 +233,14 @@ export default function AdminSubmittedVehiclesPage() {
           <div className="flex justify-center py-16">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-              <p className="text-gray-600">Fahrzeuge werden geladen...</p>
+              <p className="text-gray-600">{t("loading")}</p>
             </div>
           </div>
         ) : vehicles.length === 0 ? (
           <div className="bg-white rounded-lg p-16 text-center">
             <Car className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-lg text-gray-600">Keine Fahrzeuge gefunden</p>
-            <p className="text-sm text-gray-500 mt-1">Es gibt aktuell keine eingereichten Fahrzeuge in diesem Status</p>
+            <p className="text-lg text-gray-600">{t("emptyTitle")}</p>
+            <p className="text-sm text-gray-500 mt-1">{t("emptyDescription")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -289,7 +310,7 @@ export default function AdminSubmittedVehiclesPage() {
                         statusConfig[vehicle.status]?.bg
                       } ${statusConfig[vehicle.status]?.text}`}
                     >
-                      {statuses.find((s) => s.value === vehicle.status)?.label}
+                      {getSubmissionStatusLabel(tCommon, vehicle.status)}
                     </span>
                   </div>
                 </div>
@@ -304,8 +325,10 @@ export default function AdminSubmittedVehiclesPage() {
 
                   {/* Price */}
                   <div className="mb-4 pb-4 border-b border-gray-100">
-                    <p className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">Angebotener Preis</p>
-                    <p className="text-2xl font-bold text-kfz-blue">€ {vehicle.price?.toLocaleString("de-DE")}</p>
+                    <p className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">{t("offeredPrice")}</p>
+                    <p className="text-2xl font-bold text-kfz-blue">
+                      {vehicle.price != null ? formatPrice(format, vehicle.price) : "–"}
+                    </p>
                   </div>
 
                   {/* Quick Specs */}
@@ -313,22 +336,24 @@ export default function AdminSubmittedVehiclesPage() {
                     <div className="flex items-center gap-2 text-sm">
                       <Gauge className="w-4 h-4 text-gray-400" />
                       <div>
-                        <p className="text-xs text-gray-500">Kilometer</p>
-                        <p className="font-semibold text-gray-900">{vehicle.mileage?.toLocaleString("de-DE")}</p>
+                        <p className="text-xs text-gray-500">{t("mileage")}</p>
+                        <p className="font-semibold text-gray-900">
+                          {vehicle.mileage != null ? tAdmin("units.mileage", { value: format.number(vehicle.mileage) }) : "–"}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="w-4 h-4 text-gray-400" />
                       <div>
-                        <p className="text-xs text-gray-500">Getriebe</p>
-                        <p className="font-semibold text-gray-900">{vehicle.transmission}</p>
+                        <p className="text-xs text-gray-500">{t("transmission")}</p>
+                        <p className="font-semibold text-gray-900">{getTransmissionLabel(tCommon, vehicle.transmission)}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <MapPin className="w-4 h-4 text-gray-400" />
                       <div>
-                        <p className="text-xs text-gray-500">Kraftstoff</p>
-                        <p className="font-semibold text-gray-900">{vehicle.fuel_type}</p>
+                        <p className="text-xs text-gray-500">{t("fuel")}</p>
+                        <p className="font-semibold text-gray-900">{getFuelTypeLabel(tCommon, vehicle.fuel_type)}</p>
                       </div>
                     </div>
                   </div>
@@ -343,16 +368,19 @@ export default function AdminSubmittedVehiclesPage() {
                   <div className="mb-4 space-y-2">
                     {vehicle.sales_type && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-600">Verkaufsart:</span>
+                        <span className="text-gray-600">{t("salesType")}:</span>
                         <span className="font-semibold text-gray-900">
-                          {vehicle.sales_type === "Direktverkauf" ? "🤝 Direktverkauf" : "🔄 Inzahlungnahme"}
+                          {salesTypeIcons[vehicle.sales_type] ? `${salesTypeIcons[vehicle.sales_type]} ` : ""}
+                          {getSalesTypeLabel(tCommon, vehicle.sales_type)}
                         </span>
                       </div>
                     )}
                     {vehicle.commission && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-600">Commission:</span>
-                        <span className="font-semibold text-purple-600">{vehicle.commission}%</span>
+                        <span className="text-gray-600">{t("commission")}:</span>
+                        <span className="font-semibold text-purple-600">
+                          {format.number(vehicle.commission / 100, { style: "percent", maximumFractionDigits: 2 })}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -370,7 +398,7 @@ export default function AdminSubmittedVehiclesPage() {
                           className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Check className="w-4 h-4" />
-                          {actionInProgress === vehicle.id ? "..." : "Genehmigen"}
+                          {actionInProgress === vehicle.id ? "..." : t("approve")}
                         </button>
                         <button
                           onClick={() => setRejectingId(rejectingId === vehicle.id ? null : vehicle.id)}
@@ -378,7 +406,7 @@ export default function AdminSubmittedVehiclesPage() {
                           className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-red-300 text-red-700 hover:bg-red-50 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <X className="w-4 h-4" />
-                          Ablehnen
+                          {t("reject")}
                         </button>
                       </div>
 
@@ -387,7 +415,7 @@ export default function AdminSubmittedVehiclesPage() {
                           <textarea
                             value={rejectReason}
                             onChange={(e) => setRejectReason(e.target.value)}
-                            placeholder="Grund für Ablehnung eingeben..."
+                            placeholder={t("rejectReasonPlaceholder")}
                             rows={2}
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
                             onClick={(e) => e.stopPropagation()}
@@ -398,7 +426,7 @@ export default function AdminSubmittedVehiclesPage() {
                               disabled={actionInProgress === vehicle.id || !rejectReason.trim()}
                               className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              Bestätigen
+                              {tCommon("confirm")}
                             </button>
                             <button
                               onClick={() => {
@@ -407,7 +435,7 @@ export default function AdminSubmittedVehiclesPage() {
                               }}
                               className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium text-sm transition-colors"
                             >
-                              Abbrechen
+                              {tButtons("cancel")}
                             </button>
                           </div>
                         </div>

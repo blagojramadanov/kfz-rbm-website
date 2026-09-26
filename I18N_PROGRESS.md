@@ -111,19 +111,19 @@ Also changed here (behaviour, not just text):
 
 ## 10. Admin: Submitted Vehicles
 
-- [ ] `app/[locale]/admin/fahrzeuge/eingereicht/page.tsx` - Submitted vehicles list (page title, table headers, status labels, review buttons, action menu)
-- [ ] `app/[locale]/admin/fahrzeuge/eingereicht/[id]/page.tsx` - Submitted vehicle detail/review page (vehicle information, photos, seller details, approval/rejection buttons, notes field)
-- [ ] `app/admin/fahrzeuge/eingereicht/page.tsx` - Alternative submitted vehicles list
-- [ ] `app/admin/fahrzeuge/eingereicht/[id]/page.tsx` - Alternative submitted vehicle detail
-- [ ] `app/admin/fahrzeuge/eingereicht/layout.tsx` - Submitted vehicles layout
+- [x] `app/[locale]/admin/fahrzeuge/eingereicht/page.tsx` - Submitted vehicles list (page title, table headers, status labels, review buttons, action menu)
+- [x] `app/[locale]/admin/fahrzeuge/eingereicht/[id]/page.tsx` - Submitted vehicle detail/review page (vehicle information, photos, seller details, approval/rejection buttons, notes field)
+- [x] `app/admin/fahrzeuge/eingereicht/page.tsx` - does not exist (legacy `/admin/...` redirects to `/{locale}/admin/...`)
+- [x] `app/admin/fahrzeuge/eingereicht/[id]/page.tsx` - does not exist
+- [x] `app/admin/fahrzeuge/eingereicht/layout.tsx` - does not exist
 
 ---
 
 ## 11. Admin: Overview, Inquiries, Trade-ins, Customers, Statistics
 
 - [ ] `app/[locale]/admin/page.tsx` - Admin dashboard overview (welcome message, dashboard stats "Total Vehicles", "Total Customers", "Pending Inquiries", "Trade-in Requests", quick action cards, recent activity)
-- [ ] `app/[locale]/admin/anfragen/page.tsx` - Inquiries list (page title, table headers, inquiry type labels, status filters, view details links, respond buttons)
-- [ ] `app/[locale]/admin/inzahlungnahmen/page.tsx` - Trade-ins overview (page title, stats cards, filter options, trade-in request list with status)
+- [x] `app/[locale]/admin/anfragen/page.tsx` - Inquiries list (page title, table headers, inquiry type labels, status filters, view details links, respond buttons)
+- [x] `app/[locale]/admin/inzahlungnahmen/page.tsx` - Trade-ins overview (page title, stats cards, filter options, trade-in request list with status)
 - [ ] `app/[locale]/admin/kunden/page.tsx` - Customers list (page title, table headers "Name", "Email", "Phone", "Registration Date", search box, view profile link, contact buttons)
 - [ ] `app/[locale]/admin/kunden/[id]/page.tsx` - Customer detail page (customer information sections, activity log, submitted vehicles, inquiries, contact history, edit button)
 - [ ] `app/[locale]/admin/statistik/page.tsx` - Statistics page (page title, chart titles, metric labels "Total Revenue", "Average Price", "Vehicles Sold", "Customer Satisfaction", date range selector)
@@ -164,8 +164,8 @@ For each file, look for and catalog:
 ## Translation Status Summary
 
 - **Checklist items**: 64
-- **Completed**: 26
-- **Not started**: 38
+- **Completed**: 33
+- **Not started**: 31
 
 ---
 
@@ -718,3 +718,26 @@ Fixed gender agreement in wizard.workflow.* messages: "возило" (vehicle) i
 - ✅ `npm run check:i18n` and `npm run build` pass.
 - ✅ Rendered values checked with the same Intl calls (Node ICU) for de/en/mk.
 - ⏳ Live browser re-check on the deployment is still pending. Area 7 is marked complete only after that re-check.
+
+## Area 10: Admin submissions + shared admin sidebar fixes (2026-09-26)
+
+Scope: `admin/fahrzeuge/eingereicht` (list + `[id]` detail), `admin/anfragen`, `admin/inzahlungnahmen` (the last two are listed under area 11 above), plus the admin sidebar strings shared by every admin page.
+
+### Shared admin fixes (mk.json)
+- A. `admin.sidebar.inquiries` was already "Прашања" (no "Испитување" anywhere in the repo); unchanged.
+- B. `admin.sidebar.tradeIns` and `adminDashboard.tradeIns`: "Замени" → "Замена".
+- C. `admin.overview` (a sentence-case subtitle, not a heading) read "Управувајте со вашиот инвентар на возила и следите ги клучните метрики": the formal pronoun is now capitalized ("Вашиот"), and "следите" (indicative) became the formal imperative "следете"; "метрики" → "показатели".
+- Also fixed in shared keys: `adminDashboard.allUsers` "Сви корисници" (Serbian) → "Сите корисници"; `adminDashboard.approve/reject` → "Одобрете"/"Отфрлете"; `buttons.cancel` "Откажи" → "Откажете" (used by the pages below and elsewhere).
+
+### Changes
+- New DB-value label maps in `common.*` with helpers in `lib/vehicle-labels.ts` (same `t.has()` + raw fallback as fuel/transmission): `submissionStatuses` / `getSubmissionStatusLabel`, `tradeInStatuses` / `getTradeInStatusLabel`, `inquiryStatuses` / `getInquiryStatusLabel`, `inquiryTypes` / `getInquiryTypeLabel`, `salesTypes` / `getSalesTypeLabel` (knows `direct`, `tradeIn`, `consignment` and the older "Direktverkauf"/"Inzahlungnahme"). The hardcoded German status/type maps in the four pages are gone.
+- UI strings: `admin.submissions.*`, `admin.submissionDetail.*`, `admin.inquiries.*`, `admin.tradeIns.*`, `admin.units.*` (km/PS, mk "км"/"КС").
+- Formatting: all prices via `formatPrice()` with `useLocaleFormatter()`, mileage via `format.number()` + `admin.units.mileage`, commission via percent style, submission date numeric (`2-digit`). No `toLocaleString`/`Intl.*`/"€" concatenation left.
+- Fixed while there: the submitted list showed raw DB fuel/transmission values (now through the label helpers); the list's sales-type check compared against "Direktverkauf" while the wizard saves `direct`, so every car showed "Inzahlungnahme"; the detail page showed the raw `status` value; de inquiry type "Teiltausch" → "Inzahlungnahme".
+- There are no confirm dialogs or toasts on these pages (errors use the existing `useErrorMessage()` codes).
+
+### Verification
+- ✅ `npm run check:i18n` and `npm run build` pass.
+- ✅ Grep of the 4 pages + admin layout: no hardcoded UI strings, no `toLocaleString`/`Intl.*`, no Cyrillic in code, no Cyrillic brand names in mk.json.
+- ⏳ **Not verified live**: the pages need an admin login and there are no admin test credentials (`AUDIT_ADMIN_*` is not set). Area 10 stays open until a logged-in admin pass on /de, /en, /mk.
+- Follow-up: the customer dashboard still has its own copies of these status labels (`dashboard.vehicles.status`, `dashboard.tradeInRequests.status`, `dashboard.tradeInRequestDetail.status`); they could switch to the new helpers.

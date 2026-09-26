@@ -15,7 +15,7 @@
     },
     "buttons": {
         "save": "Зачувајте",
-        "cancel": "Откажи",
+        "cancel": "Откажете",
         "delete": "Избришите",
         "edit": "Уредите",
         "create": "Создајте",
@@ -456,15 +456,15 @@
         "users": "Корисници",
         "vehicles": "Возила",
         "inquiries": "Прашања",
-        "tradeIns": "Замени",
+        "tradeIns": "Замена",
         "statistics": "Статистика",
         "reports": "Извештаи",
         "settings": "Поставки",
-        "allUsers": "Сви корисници",
+        "allUsers": "Сите корисници",
         "pendingVehicles": "Возила во исчекување",
         "pendingInquiries": "Прашања во исчекување",
-        "approve": "Одобри",
-        "reject": "Отфрли",
+        "approve": "Одобрете",
+        "reject": "Отфрлете",
         "manageVehicles": "Управувајте со возила",
         "manageUsers": "Управувајте со корисници"
     },
@@ -478,15 +478,90 @@
             "newVehicle": "Ново возило",
             "submittedVehicles": "Поднесени возила",
             "inquiries": "Прашања",
-            "tradeIns": "Замени",
+            "tradeIns": "Замена",
             "customers": "Клиенти",
             "statistics": "Статистика"
         },
         "title": "Админ контролна табла",
-        "overview": "Управувајте со вашиот инвентар на возила и следите ги клучните метрики",
+        "overview": "Управувајте со Вашиот инвентар на возила и следете ги клучните показатели",
         "loading_stats": "Грешка при вчитување на статистиката",
         "vehicles": "Вкупно возила",
-        "available": "достапно"
+        "available": "достапно",
+        "units": {
+            "mileage": "{value} км",
+            "power": "{value} КС"
+        },
+        "submissions": {
+            "title": "Поднесени возила",
+            "description": "Прегледајте ги и одобрете ги возилата што ги понудиле клиентите",
+            "loading": "Се вчитуваат возилата...",
+            "emptyTitle": "Не се пронајдени возила",
+            "emptyDescription": "Моментално нема поднесени возила со овој статус.",
+            "offeredPrice": "Понудена цена",
+            "mileage": "Километража",
+            "transmission": "Менувач",
+            "fuel": "Гориво",
+            "salesType": "Вид на продажба",
+            "commission": "Провизија",
+            "approve": "Одобрете",
+            "reject": "Отфрлете",
+            "rejectReasonPlaceholder": "Внесете ја причината за одбивање...",
+            "rejectReasonRequired": "Ве молиме, внесете причина за одбивање."
+        },
+        "submissionDetail": {
+            "backToList": "Назад кон поднесените возила",
+            "loading": "Се вчитува возилото...",
+            "notFound": "Возилото не е пронајдено",
+            "imageLoading": "Се вчитува сликата...",
+            "imageCounter": "Слика {current} од {total}",
+            "previousImage": "Претходна слика",
+            "nextImage": "Следна слика",
+            "fuel": "Гориво",
+            "transmission": "Менувач",
+            "color": "Боја",
+            "power": "Моќност",
+            "bodyType": "Тип на каросерија",
+            "status": "Статус",
+            "salesType": "Вид на продажба",
+            "description": "Опис",
+            "features": "Опрема",
+            "requestedPrice": "Цена побарана од клиентот",
+            "submittedOn": "Поднесено на {date}",
+            "publishTitle": "Објавете во понудата на возила",
+            "publish": "Објавете",
+            "salePrice": "Продажна цена (€)",
+            "descriptionOptional": "Опис (опционално)",
+            "markFeatured": "Означете како истакнато",
+            "publishing": "Се објавува...",
+            "confirmPublish": "Потврдете и објавете",
+            "invalidPrice": "Ве молиме, внесете валидна цена."
+        },
+        "inquiries": {
+            "title": "Прашања од клиенти",
+            "description": "Управувајте со сите прашања од Вашите клиенти",
+            "empty": "Не се пронајдени прашања.",
+            "message": "Порака",
+            "markRead": "Означете како прочитано",
+            "markResponded": "Означете како одговорено",
+            "close": "Затворете"
+        },
+        "tradeIns": {
+            "title": "Барања за замена",
+            "description": "Управувајте со барањата за замена на возила",
+            "empty": "Не се пронајдени барања.",
+            "noPhone": "Нема телефонски број",
+            "currentVehicle": "Сегашно возило",
+            "estimatedValue": "Проценета вредност: {value}",
+            "desiredVehicle": "Посакувано возило",
+            "additionalPayment": "Доплата: {amount}",
+            "credit": "Кредит: {amount}",
+            "vehicleNotFound": "Возилото не е пронајдено",
+            "commission": "Провизија",
+            "adminNotes": "Белешки на администраторот",
+            "notesPlaceholder": "Белешки за барањето...",
+            "status": "Статус",
+            "editStatusNotes": "Уредете ги статусот и белешките"
+        }
     },
     "contact": {
         "title": "Контактирајте нас",
@@ -847,6 +922,39 @@
             "fahrbereit": "Во возна состојба",
             "nicht_fahrbereit": "Не е во возна состојба",
             "unfallwagen": "Возило по несреќа"
+        },
+        "submissionStatuses": {
+            "draft": "Нацрт",
+            "eingereicht": "Поднесено",
+            "in_bearbeitung": "Во обработка",
+            "angebot_gesendet": "Понуда испратена",
+            "akzeptiert": "Понуда прифатена",
+            "abgelehnt": "Отфрлено"
+        },
+        "tradeInStatuses": {
+            "new": "Ново",
+            "reviewing": "Се прегледува",
+            "contact_made": "Контакт остварен",
+            "completed": "Завршено",
+            "cancelled": "Откажано"
+        },
+        "inquiryStatuses": {
+            "new": "Ново",
+            "read": "Прочитано",
+            "responded": "Одговорено",
+            "closed": "Затворено"
+        },
+        "inquiryTypes": {
+            "general": "Општо прашање",
+            "test_drive": "Пробно возење",
+            "part_exchange": "Замена"
+        },
+        "salesTypes": {
+            "direct": "Директна продажба",
+            "tradeIn": "Замена",
+            "consignment": "Продажба на комисија",
+            "direktverkauf": "Директна продажба",
+            "inzahlungnahme": "Замена"
         }
     },
     "hours": {

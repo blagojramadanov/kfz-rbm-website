@@ -9,12 +9,23 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { formatPrice } from "@/lib/format-vehicle";
 import {
   getFuelTypeLabel,
   getTransmissionLabel,
   getBodyTypeLabel,
   getColorLabel,
+  getSubmissionStatusLabel,
+  getSalesTypeLabel,
 } from "@/lib/vehicle-labels";
+
+const SALES_TYPE_ICONS: Record<string, string> = {
+  direct: "🤝",
+  Direktverkauf: "🤝",
+  tradeIn: "🔄",
+  Inzahlungnahme: "🔄",
+  consignment: "📋",
+};
 
 interface SubmittedVehicle {
   id: string;
@@ -42,8 +53,10 @@ export default function SubmittedVehicleDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { loading, isAdmin } = useAuth();
-  const t = useTranslations();
+  const t = useTranslations("admin.submissionDetail");
+  const tAdmin = useTranslations("admin");
   const tCommon = useTranslations("common");
+  const tButtons = useTranslations("buttons");
   const format = useLocaleFormatter();
   const errorMessage = useErrorMessage();
   const [vehicle, setVehicle] = useState<SubmittedVehicle | null>(null);
@@ -142,7 +155,7 @@ export default function SubmittedVehicleDetailPage() {
         }
 
         if (!result.vehicle) {
-          setError("Fahrzeug nicht gefunden");
+          setError(t("notFound"));
           setVehicle(null);
           return;
         }
@@ -169,7 +182,7 @@ export default function SubmittedVehicleDetailPage() {
     if (!vehicle) return;
 
     if (publishPrice === null || publishPrice < 0) {
-      setError("Bitte geben Sie einen gültigen Preis ein");
+      setError(t("invalidPrice"));
       return;
     }
 
@@ -200,7 +213,7 @@ export default function SubmittedVehicleDetailPage() {
       <div className="flex justify-center items-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -212,13 +225,13 @@ export default function SubmittedVehicleDetailPage() {
         <Link href="/admin/fahrzeuge/eingereicht">
           <button className="flex items-center gap-2 text-kfz-blue hover:underline">
             <ArrowLeft className="w-4 h-4" />
-            Zurück
+            {tButtons("back")}
           </button>
         </Link>
         <div className="flex justify-center py-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-            <p className="text-gray-600">Fahrzeug wird geladen...</p>
+            <p className="text-gray-600">{t("loading")}</p>
           </div>
         </div>
       </div>
@@ -231,12 +244,12 @@ export default function SubmittedVehicleDetailPage() {
         <Link href="/admin/fahrzeuge/eingereicht">
           <button className="flex items-center gap-2 text-kfz-blue hover:underline">
             <ArrowLeft className="w-4 h-4" />
-            Zurück
+            {tButtons("back")}
           </button>
         </Link>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
           <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-          <p className="text-red-800">Fahrzeug nicht gefunden</p>
+          <p className="text-red-800">{t("notFound")}</p>
         </div>
       </div>
     );
@@ -248,7 +261,7 @@ export default function SubmittedVehicleDetailPage() {
       <Link href="/admin/fahrzeuge/eingereicht">
         <button className="flex items-center gap-2 text-kfz-blue hover:underline">
           <ArrowLeft className="w-4 h-4" />
-          Zurück zu eingereichten Fahrzeugen
+          {t("backToList")}
         </button>
       </Link>
 
@@ -282,7 +295,7 @@ export default function SubmittedVehicleDetailPage() {
                     <div className="w-full h-full flex items-center justify-center">
                       <div className="text-center">
                         <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">Bild wird geladen...</p>
+                        <p className="text-sm text-gray-500">{t("imageLoading")}</p>
                       </div>
                     </div>
                   );
@@ -298,7 +311,7 @@ export default function SubmittedVehicleDetailPage() {
               <div className="p-4 space-y-3">
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-gray-600">
-                    Bild {currentImageIndex + 1} von {vehicle.images.length}
+                    {t("imageCounter", { current: currentImageIndex + 1, total: vehicle.images.length })}
                   </p>
                   <div className="flex gap-2">
                     <button
@@ -307,6 +320,7 @@ export default function SubmittedVehicleDetailPage() {
                           currentImageIndex > 0 ? currentImageIndex - 1 : vehicle.images.length - 1
                         )
                       }
+                      aria-label={t("previousImage")}
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
                     >
                       ←
@@ -317,6 +331,7 @@ export default function SubmittedVehicleDetailPage() {
                           currentImageIndex < vehicle.images.length - 1 ? currentImageIndex + 1 : 0
                         )
                       }
+                      aria-label={t("nextImage")}
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
                     >
                       →
@@ -335,62 +350,57 @@ export default function SubmittedVehicleDetailPage() {
                   {vehicle.brand} {vehicle.model}
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  {vehicle.year} • {format.number(vehicle.mileage)} km
+                  {vehicle.year} • {tAdmin("units.mileage", { value: format.number(vehicle.mileage) })}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                 <div>
-                  <p className="text-sm text-gray-600">Kraftstoff</p>
+                  <p className="text-sm text-gray-600">{t("fuel")}</p>
                   <p className="font-semibold text-gray-900">{getFuelTypeLabel(tCommon, vehicle.fuel_type)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Getriebe</p>
+                  <p className="text-sm text-gray-600">{t("transmission")}</p>
                   <p className="font-semibold text-gray-900">{getTransmissionLabel(tCommon, vehicle.transmission)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Farbe</p>
+                  <p className="text-sm text-gray-600">{t("color")}</p>
                   <p className="font-semibold text-gray-900">{getColorLabel(tCommon, vehicle.color)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Leistung</p>
-                  <p className="font-semibold text-gray-900">{format.number(vehicle.power_hp)} PS</p>
+                  <p className="text-sm text-gray-600">{t("power")}</p>
+                  <p className="font-semibold text-gray-900">{tAdmin("units.power", { value: format.number(vehicle.power_hp) })}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Karosserie</p>
+                  <p className="text-sm text-gray-600">{t("bodyType")}</p>
                   <p className="font-semibold text-gray-900">{getBodyTypeLabel(tCommon, vehicle.body_type)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Status</p>
-                  <p className="font-semibold text-gray-900 capitalize">{vehicle.status}</p>
+                  <p className="text-sm text-gray-600">{t("status")}</p>
+                  <p className="font-semibold text-gray-900">{getSubmissionStatusLabel(tCommon, vehicle.status)}</p>
                 </div>
               </div>
 
             {vehicle.sales_type && (
               <div className="pt-4 border-t">
-                <p className="text-sm text-gray-600 mb-1">Verkaufsart</p>
+                <p className="text-sm text-gray-600 mb-1">{t("salesType")}</p>
                 <p className="font-semibold text-gray-900">
-                  {vehicle.sales_type === "direct"
-                    ? "🤝 " + t("wizard.salesType.direct")
-                    : vehicle.sales_type === "tradeIn"
-                    ? "🔄 " + t("wizard.salesType.tradeIn")
-                    : vehicle.sales_type === "consignment"
-                    ? "📋 " + t("wizard.salesType.consignment")
-                    : vehicle.sales_type}
+                  {SALES_TYPE_ICONS[vehicle.sales_type] ? `${SALES_TYPE_ICONS[vehicle.sales_type]} ` : ""}
+                  {getSalesTypeLabel(tCommon, vehicle.sales_type)}
                 </p>
               </div>
             )}
 
             {vehicle.description && (
               <div className="pt-4 border-t">
-                <p className="text-sm text-gray-600 mb-2">Beschreibung</p>
+                <p className="text-sm text-gray-600 mb-2">{t("description")}</p>
                 <p className="text-gray-900">{vehicle.description}</p>
               </div>
             )}
 
             {vehicle.features && vehicle.features.length > 0 && (
               <div className="pt-4 border-t">
-                <p className="text-sm text-gray-600 mb-3">Ausstattung</p>
+                <p className="text-sm text-gray-600 mb-3">{t("features")}</p>
                 <div className="grid grid-cols-2 gap-2">
                   {vehicle.features.map((feature, idx) => (
                     <div key={idx} className="flex items-center gap-2">
@@ -404,7 +414,7 @@ export default function SubmittedVehicleDetailPage() {
             </div>
           ) : (
             <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-gray-600">Fahrzeug wird geladen...</p>
+              <p className="text-gray-600">{t("loading")}</p>
             </div>
           )}
         </div>
@@ -415,12 +425,14 @@ export default function SubmittedVehicleDetailPage() {
           {vehicle && (
             <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Eingereicht von Kunde</p>
+                <p className="text-sm text-gray-600 mb-1">{t("requestedPrice")}</p>
                 <p className="text-2xl font-bold text-kfz-blue">
-                  {format.number(vehicle.price, { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}
+                  {formatPrice(format, vehicle.price)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {new Date(vehicle.created_at).toLocaleDateString("de-DE")}
+                  {t("submittedOn", {
+                    date: format.dateTime(new Date(vehicle.created_at), { day: "2-digit", month: "2-digit", year: "numeric" }),
+                  })}
                 </p>
               </div>
             </div>
@@ -429,20 +441,20 @@ export default function SubmittedVehicleDetailPage() {
           {/* Publish Form */}
           {vehicle && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-4">
-            <h3 className="font-bold text-gray-900">In Fahrzeuge veröffentlichen</h3>
+            <h3 className="font-bold text-gray-900">{t("publishTitle")}</h3>
 
             {!showPublishForm ? (
               <button
                 onClick={() => setShowPublishForm(true)}
                 className="w-full px-4 py-2 bg-kfz-blue text-white rounded-lg hover:bg-kfz-blue-dark font-medium transition-colors"
               >
-                Veröffentlichen
+                {t("publish")}
               </button>
             ) : (
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">
-                    Verkaufspreis (€)
+                    {t("salePrice")}
                   </label>
                   <input
                     type="number"
@@ -454,7 +466,7 @@ export default function SubmittedVehicleDetailPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">
-                    Beschreibung (optional)
+                    {t("descriptionOptional")}
                   </label>
                   <textarea
                     value={publishDescription}
@@ -471,7 +483,7 @@ export default function SubmittedVehicleDetailPage() {
                     onChange={(e) => setPublishFeatured(e.target.checked)}
                     className="w-4 h-4 rounded"
                   />
-                  <span className="text-sm text-gray-700">Als Highlight markieren</span>
+                  <span className="text-sm text-gray-700">{t("markFeatured")}</span>
                 </label>
 
                 <div className="space-y-2 pt-2 border-t">
@@ -480,13 +492,13 @@ export default function SubmittedVehicleDetailPage() {
                     disabled={publishing}
                     className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 font-medium transition-colors"
                   >
-                    {publishing ? "Wird veröffentlicht..." : "✓ Bestätigen & Veröffentlichen"}
+                    {publishing ? t("publishing") : `✓ ${t("confirmPublish")}`}
                   </button>
                   <button
                     onClick={() => setShowPublishForm(false)}
                     className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
                   >
-                    Abbrechen
+                    {tButtons("cancel")}
                   </button>
                 </div>
               </div>

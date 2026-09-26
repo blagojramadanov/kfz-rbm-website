@@ -52,3 +52,28 @@ export function getColorLabel(t: Translator, value: string): string {
 export function getVehicleConditionLabel(t: Translator, value: string): string {
   return getLabel(t, "vehicleConditions", value);
 }
+
+/** `submitted_vehicles.status` (eingereicht, in_bearbeitung, ...). `t` must come from the `common` namespace. */
+export function getSubmissionStatusLabel(t: Translator, value: string): string {
+  return getLabel(t, "submissionStatuses", value);
+}
+
+/** `trade_in_requests.status` (new, reviewing, ...). `t` must come from the `common` namespace. */
+export function getTradeInStatusLabel(t: Translator, value: string): string {
+  return getLabel(t, "tradeInStatuses", value);
+}
+
+/** `customer_inquiries.status` (new, read, responded, closed). `t` must come from the `common` namespace. */
+export function getInquiryStatusLabel(t: Translator, value: string): string {
+  return getLabel(t, "inquiryStatuses", value);
+}
+
+/** `customer_inquiries.inquiry_type` (general, test_drive, part_exchange). `t` must come from the `common` namespace. */
+export function getInquiryTypeLabel(t: Translator, value: string): string {
+  return getLabel(t, "inquiryTypes", value);
+}
+
+/** `submitted_vehicles.sales_type` (direct, tradeIn, consignment; older rows: "Direktverkauf"). `t` must come from the `common` namespace. */
+export function getSalesTypeLabel(t: Translator, value: string): string {
+  return getLabel(t, "salesTypes", value);
+}

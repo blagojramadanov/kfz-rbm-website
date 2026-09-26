@@ -486,7 +486,82 @@
         "overview": "Manage your dealership inventory and monitor key metrics",
         "loading_stats": "Error loading statistics",
         "vehicles": "Total Vehicles",
-        "available": "available"
+        "available": "available",
+        "units": {
+            "mileage": "{value} km",
+            "power": "{value} hp"
+        },
+        "submissions": {
+            "title": "Submitted Vehicles",
+            "description": "Review and approve vehicles offered by customers",
+            "loading": "Loading vehicles...",
+            "emptyTitle": "No vehicles found",
+            "emptyDescription": "There are currently no submitted vehicles with this status.",
+            "offeredPrice": "Offered price",
+            "mileage": "Mileage",
+            "transmission": "Transmission",
+            "fuel": "Fuel",
+            "salesType": "Sales type",
+            "commission": "Commission",
+            "approve": "Approve",
+            "reject": "Reject",
+            "rejectReasonPlaceholder": "Enter the reason for rejection...",
+            "rejectReasonRequired": "Please enter a reason for rejection."
+        },
+        "submissionDetail": {
+            "backToList": "Back to submitted vehicles",
+            "loading": "Loading vehicle...",
+            "notFound": "Vehicle not found",
+            "imageLoading": "Loading image...",
+            "imageCounter": "Image {current} of {total}",
+            "previousImage": "Previous image",
+            "nextImage": "Next image",
+            "fuel": "Fuel",
+            "transmission": "Transmission",
+            "color": "Color",
+            "power": "Power",
+            "bodyType": "Body type",
+            "status": "Status",
+            "salesType": "Sales type",
+            "description": "Description",
+            "features": "Features",
+            "requestedPrice": "Customer's asking price",
+            "submittedOn": "Submitted on {date}",
+            "publishTitle": "Publish to vehicle listings",
+            "publish": "Publish",
+            "salePrice": "Sale price (€)",
+            "descriptionOptional": "Description (optional)",
+            "markFeatured": "Mark as featured",
+            "publishing": "Publishing...",
+            "confirmPublish": "Confirm and publish",
+            "invalidPrice": "Please enter a valid price."
+        },
+        "inquiries": {
+            "title": "Customer Inquiries",
+            "description": "Manage all inquiries from your customers",
+            "empty": "No inquiries found.",
+            "message": "Message",
+            "markRead": "Mark as read",
+            "markResponded": "Mark as responded",
+            "close": "Close"
+        },
+        "tradeIns": {
+            "title": "Trade-In Requests",
+            "description": "Manage exchange and trade-in requests",
+            "empty": "No requests found.",
+            "noPhone": "No phone number",
+            "currentVehicle": "Current vehicle",
+            "estimatedValue": "Estimated value: {value}",
+            "desiredVehicle": "Desired vehicle",
+            "additionalPayment": "Additional payment: {amount}",
+            "credit": "Credit: {amount}",
+            "vehicleNotFound": "Vehicle not found",
+            "commission": "Commission",
+            "adminNotes": "Admin notes",
+            "notesPlaceholder": "Notes on this request...",
+            "status": "Status",
+            "editStatusNotes": "Edit status and notes"
+        }
     },
     "contact": {
         "title": "Contact Us",
@@ -847,6 +922,39 @@
             "fahrbereit": "Roadworthy",
             "nicht_fahrbereit": "Not roadworthy",
             "unfallwagen": "Accident vehicle"
+        },
+        "submissionStatuses": {
+            "draft": "Draft",
+            "eingereicht": "Submitted",
+            "in_bearbeitung": "In Review",
+            "angebot_gesendet": "Offer Sent",
+            "akzeptiert": "Offer Accepted",
+            "abgelehnt": "Rejected"
+        },
+        "tradeInStatuses": {
+            "new": "New",
+            "reviewing": "Under Review",
+            "contact_made": "Contact Made",
+            "completed": "Completed",
+            "cancelled": "Cancelled"
+        },
+        "inquiryStatuses": {
+            "new": "New",
+            "read": "Read",
+            "responded": "Responded",
+            "closed": "Closed"
+        },
+        "inquiryTypes": {
+            "general": "General Inquiry",
+            "test_drive": "Test Drive",
+            "part_exchange": "Trade-In"
+        },
+        "salesTypes": {
+            "direct": "Direct sale",
+            "tradeIn": "Trade-in",
+            "consignment": "Consignment sale",
+            "direktverkauf": "Direct sale",
+            "inzahlungnahme": "Trade-in"
         }
     },
     "hours": {

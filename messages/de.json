@@ -486,7 +486,82 @@
         "overview": "Verwalten Sie Ihren Fahrzeugbestand und überwachen Sie wichtige Kennzahlen",
         "loading_stats": "Fehler beim Laden der Statistiken",
         "vehicles": "Gesamtfahrzeuge",
-        "available": "verfügbar"
+        "available": "verfügbar",
+        "units": {
+            "mileage": "{value} km",
+            "power": "{value} PS"
+        },
+        "submissions": {
+            "title": "Eingereichte Fahrzeuge",
+            "description": "Prüfen und genehmigen Sie die von Kunden angebotenen Fahrzeuge",
+            "loading": "Fahrzeuge werden geladen...",
+            "emptyTitle": "Keine Fahrzeuge gefunden",
+            "emptyDescription": "Es gibt derzeit keine eingereichten Fahrzeuge mit diesem Status.",
+            "offeredPrice": "Angebotener Preis",
+            "mileage": "Kilometerstand",
+            "transmission": "Getriebe",
+            "fuel": "Kraftstoff",
+            "salesType": "Verkaufsart",
+            "commission": "Provision",
+            "approve": "Genehmigen",
+            "reject": "Ablehnen",
+            "rejectReasonPlaceholder": "Geben Sie den Ablehnungsgrund ein...",
+            "rejectReasonRequired": "Bitte geben Sie einen Ablehnungsgrund ein."
+        },
+        "submissionDetail": {
+            "backToList": "Zurück zu den eingereichten Fahrzeugen",
+            "loading": "Fahrzeug wird geladen...",
+            "notFound": "Fahrzeug nicht gefunden",
+            "imageLoading": "Bild wird geladen...",
+            "imageCounter": "Bild {current} von {total}",
+            "previousImage": "Vorheriges Bild",
+            "nextImage": "Nächstes Bild",
+            "fuel": "Kraftstoff",
+            "transmission": "Getriebe",
+            "color": "Farbe",
+            "power": "Leistung",
+            "bodyType": "Karosserie",
+            "status": "Status",
+            "salesType": "Verkaufsart",
+            "description": "Beschreibung",
+            "features": "Ausstattung",
+            "requestedPrice": "Preisvorstellung des Kunden",
+            "submittedOn": "Eingereicht am {date}",
+            "publishTitle": "Im Fahrzeugbestand veröffentlichen",
+            "publish": "Veröffentlichen",
+            "salePrice": "Verkaufspreis (€)",
+            "descriptionOptional": "Beschreibung (optional)",
+            "markFeatured": "Als Highlight markieren",
+            "publishing": "Wird veröffentlicht...",
+            "confirmPublish": "Bestätigen und veröffentlichen",
+            "invalidPrice": "Bitte geben Sie einen gültigen Preis ein."
+        },
+        "inquiries": {
+            "title": "Kundenanfragen",
+            "description": "Verwalten Sie alle Anfragen Ihrer Kunden",
+            "empty": "Keine Anfragen gefunden.",
+            "message": "Nachricht",
+            "markRead": "Als gelesen markieren",
+            "markResponded": "Als beantwortet markieren",
+            "close": "Schließen"
+        },
+        "tradeIns": {
+            "title": "Inzahlungnahmen",
+            "description": "Verwalten Sie Tausch- und Inzahlungnahmeanfragen",
+            "empty": "Keine Anfragen gefunden.",
+            "noPhone": "Keine Telefonnummer",
+            "currentVehicle": "Aktuelles Fahrzeug",
+            "estimatedValue": "Geschätzter Wert: {value}",
+            "desiredVehicle": "Gewünschtes Fahrzeug",
+            "additionalPayment": "Zuzahlung: {amount}",
+            "credit": "Gutschrift: {amount}",
+            "vehicleNotFound": "Fahrzeug nicht gefunden",
+            "commission": "Provision",
+            "adminNotes": "Admin-Notizen",
+            "notesPlaceholder": "Notizen zur Anfrage...",
+            "status": "Status",
+            "editStatusNotes": "Status und Notizen bearbeiten"
+        }
     },
     "contact": {
         "title": "Kontaktieren Sie uns",
@@ -847,6 +922,39 @@
             "fahrbereit": "Fahrbereit",
             "nicht_fahrbereit": "Nicht fahrbereit",
             "unfallwagen": "Unfallwagen"
+        },
+        "submissionStatuses": {
+            "draft": "Entwurf",
+            "eingereicht": "Eingereicht",
+            "in_bearbeitung": "In Bearbeitung",
+            "angebot_gesendet": "Angebot gesendet",
+            "akzeptiert": "Angebot angenommen",
+            "abgelehnt": "Abgelehnt"
+        },
+        "tradeInStatuses": {
+            "new": "Neu",
+            "reviewing": "Wird geprüft",
+            "contact_made": "Kontakt aufgenommen",
+            "completed": "Abgeschlossen",
+            "cancelled": "Storniert"
+        },
+        "inquiryStatuses": {
+            "new": "Neu",
+            "read": "Gelesen",
+            "responded": "Beantwortet",
+            "closed": "Geschlossen"
+        },
+        "inquiryTypes": {
+            "general": "Allgemeine Anfrage",
+            "test_drive": "Probefahrt",
+            "part_exchange": "Inzahlungnahme"
+        },
+        "salesTypes": {
+            "direct": "Direktverkauf",
+            "tradeIn": "Inzahlungnahme",
+            "consignment": "Verkauf im Kundenauftrag",
+            "direktverkauf": "Direktverkauf",
+            "inzahlungnahme": "Inzahlungnahme"
         }
     },
     "hours": {

@@ -9,12 +9,15 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, CheckCircle, Mail } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { getInquiryStatusLabel, getInquiryTypeLabel } from "@/lib/vehicle-labels";
 
 export default function AdminInquiriesPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const router = useRouter();
   const { loading, isAdmin } = useAuth();
+  const t = useTranslations("admin.inquiries");
+  const tCommon = useTranslations("common");
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [inquiriesLoading, setInquiriesLoading] = useState(true);
   const errorMessage = useErrorMessage();
@@ -78,18 +81,13 @@ export default function AdminInquiriesPage() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
   }
 
-  const statuses = [
-    { value: "new", label: "Neu" },
-    { value: "read", label: "Gelesen" },
-    { value: "responded", label: "Beantwortet" },
-    { value: "closed", label: "Geschlossen" },
-  ];
+  const statuses = ["new", "read", "responded", "closed"];
 
   const STATUS_COLORS: Record<string, string> = {
     new: "bg-blue-100 text-blue-800",
@@ -98,17 +96,11 @@ export default function AdminInquiriesPage() {
     closed: "bg-gray-100 text-gray-800",
   };
 
-  const INQUIRY_TYPE_LABELS: Record<string, string> = {
-    general: "Allgemeine Anfrage",
-    test_drive: "Probefahrt",
-    part_exchange: "Teiltausch",
-  };
-
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Kundenanfragen</h1>
-        <p className="text-gray-600 mt-1">Verwaltung aller Kundenanfragen und Anfragen</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="text-gray-600 mt-1">{t("description")}</p>
       </div>
 
       {error && (
@@ -121,15 +113,15 @@ export default function AdminInquiriesPage() {
       <div className="flex gap-2 mb-6 flex-wrap">
         {statuses.map((status) => (
           <button
-            key={status.value}
-            onClick={() => setStatusFilter(status.value)}
+            key={status}
+            onClick={() => setStatusFilter(status)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              statusFilter === status.value
+              statusFilter === status
                 ? "bg-kfz-blue text-white"
                 : "bg-gray-200 text-gray-800 hover:bg-gray-300"
             }`}
           >
-            {status.label}
+            {getInquiryStatusLabel(tCommon, status)}
           </button>
         ))}
       </div>
@@ -141,7 +133,7 @@ export default function AdminInquiriesPage() {
           </div>
         ) : inquiries.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <p className="text-gray-600">Keine Anfragen gefunden.</p>
+            <p className="text-gray-600">{t("empty")}</p>
           </div>
         ) : (
           inquiries.map((inquiry) => (
@@ -162,13 +154,13 @@ export default function AdminInquiriesPage() {
                     STATUS_COLORS[inquiry.status] || "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  {statuses.find((s) => s.value === inquiry.status)?.label || inquiry.status}
+                  {getInquiryStatusLabel(tCommon, inquiry.status)}
                 </span>
               </div>
 
               <div className="flex gap-2 mb-4 flex-wrap">
                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                  {INQUIRY_TYPE_LABELS[inquiry.inquiry_type] || inquiry.inquiry_type}
+                  {getInquiryTypeLabel(tCommon, inquiry.inquiry_type)}
                 </span>
                 {inquiry.vehicle && (
                   <Link href={`/admin/fahrzeuge/${inquiry.vehicle_id}`}>
@@ -180,7 +172,7 @@ export default function AdminInquiriesPage() {
               </div>
 
               <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-900 mb-2">Nachricht</p>
+                <p className="text-sm font-medium text-gray-900 mb-2">{t("message")}</p>
                 <p className="text-sm text-gray-700 line-clamp-3">{inquiry.message}</p>
               </div>
 
@@ -191,7 +183,7 @@ export default function AdminInquiriesPage() {
                     disabled={actionInProgress === inquiry.id}
                     className="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Als gelesen markieren
+                    {t("markRead")}
                   </button>
                 )}
                 {statusFilter === "read" && (
@@ -201,7 +193,7 @@ export default function AdminInquiriesPage() {
                     className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <CheckCircle className="w-4 h-4 inline mr-2" />
-                    Als beantwortet markieren
+                    {t("markResponded")}
                   </button>
                 )}
                 {statusFilter !== "closed" && (
@@ -210,7 +202,7 @@ export default function AdminInquiriesPage() {
                     disabled={actionInProgress === inquiry.id}
                     className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Schließen
+                    {t("close")}
                   </button>
                 )}
               </div>
