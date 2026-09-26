@@ -53,6 +53,16 @@ export function getVehicleConditionLabel(t: Translator, value: string): string {
   return getLabel(t, "vehicleConditions", value);
 }
 
+/** `vehicles.status` (draft, available, reserved, sold). `t` must come from the `common` namespace. */
+export function getVehicleStatusLabel(t: Translator, value: string): string {
+  return getLabel(t, "vehicleStatuses", value);
+}
+
+/** `vehicles.listing_type` (verkauf, export). `t` must come from the `common` namespace. */
+export function getListingTypeLabel(t: Translator, value: string): string {
+  return getLabel(t, "listingTypes", value);
+}
+
 /** `submitted_vehicles.status` (eingereicht, in_bearbeitung, ...). `t` must come from the `common` namespace. */
 export function getSubmissionStatusLabel(t: Translator, value: string): string {
   return getLabel(t, "submissionStatuses", value);

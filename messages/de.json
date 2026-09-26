@@ -489,7 +489,8 @@
         "available": "verfügbar",
         "units": {
             "mileage": "{value} km",
-            "power": "{value} PS"
+            "power": "{value} PS",
+            "engine": "{value} cm³"
         },
         "submissions": {
             "title": "Eingereichte Fahrzeuge",
@@ -955,6 +956,12 @@
             "consignment": "Verkauf im Kundenauftrag",
             "direktverkauf": "Direktverkauf",
             "inzahlungnahme": "Inzahlungnahme"
+        },
+        "vehicleStatuses": {
+            "draft": "Entwurf",
+            "available": "Verfügbar",
+            "reserved": "Reserviert",
+            "sold": "Verkauft"
         }
     },
     "hours": {
@@ -1081,7 +1088,55 @@
             "createFailed": "Das Fahrzeug konnte nicht angelegt werden.",
             "uploadRolledBack": "Die Bilder konnten nicht hochgeladen werden, daher wurde das Fahrzeug nicht angelegt. Ihre Eingaben sind erhalten, Sie können es erneut versuchen.",
             "uploadDraftKept": "Die Bilder konnten nicht hochgeladen werden. Das Fahrzeug ist als Entwurf gespeichert und nicht öffentlich sichtbar; bitte prüfen oder löschen Sie es in der Fahrzeugliste.",
-            "publishFailed": "Das Fahrzeug und die Bilder wurden gespeichert, das Fahrzeug konnte aber nicht veröffentlicht werden. Es bleibt ein nicht öffentlicher Entwurf."
+            "publishFailed": "Das Fahrzeug und die Bilder wurden gespeichert, das Fahrzeug konnte aber nicht veröffentlicht werden. Es bleibt ein nicht öffentlicher Entwurf.",
+            "requiredFields": "Bitte füllen Sie alle Pflichtfelder aus."
+        },
+        "backToList": "Zurück zur Fahrzeugliste",
+        "backToVehicle": "Zurück zum Fahrzeug",
+        "newTitle": "Neues Fahrzeug erstellen",
+        "newSubtitle": "Fügen Sie ein neues Fahrzeug zum Inventar hinzu",
+        "editTitle": "Fahrzeug bearbeiten",
+        "loadingVehicle": "Fahrzeug wird geladen...",
+        "loadFailed": "Das Fahrzeug konnte nicht geladen werden.",
+        "updated": "Fahrzeug erfolgreich aktualisiert. Sie werden weitergeleitet...",
+        "create": "Fahrzeug erstellen",
+        "creating": "Wird erstellt...",
+        "saving": "Wird gespeichert...",
+        "fields": {
+            "vin": "VIN",
+            "brand": "Marke",
+            "model": "Modell",
+            "year": "Jahr",
+            "mileage": "Kilometer",
+            "price": "Preis (€)",
+            "transmission": "Getriebe",
+            "fuel": "Kraftstoff",
+            "bodyType": "Karosserie",
+            "colorExterior": "Außenfarbe",
+            "colorInterior": "Innenfarbe",
+            "power": "Motorleistung (PS)",
+            "engine": "Hubraum (cm³)",
+            "description": "Beschreibung",
+            "status": "Status",
+            "featured": "Empfohlenes Fahrzeug",
+            "listingSection": "Fahrzeugtyp",
+            "listingType": "Typ",
+            "exportFields": "Exportspezifische Felder",
+            "condition": "Zustand",
+            "selectPlaceholder": "Bitte wählen",
+            "destination": "Zielland (optional)",
+            "exportNotes": "Export-Notizen (optional)"
+        },
+        "placeholders": {
+            "vin": "Fahrzeug-Identifizierungsnummer",
+            "brand": "z. B. BMW",
+            "model": "z. B. 3er",
+            "bodyType": "z. B. Limousine",
+            "colorExterior": "z. B. Schwarz",
+            "colorInterior": "z. B. Beige",
+            "description": "Fahrzeugbeschreibung...",
+            "destination": "z. B. Marokko, Ägypten",
+            "exportNotes": "z. B. „Nettopreis gemäß §25a UStG“, „Ausfuhrlieferung“..."
         }
     },
     "adminVehicleActions": {
@@ -1262,6 +1317,46 @@
             "description": "Wir melden uns in Kürze bei Ihnen mit weiteren Informationen.",
             "viewVehicles": "Meine Fahrzeuge anschauen",
             "backToDashboard": "Zum Dashboard"
+        }
+    },
+    "adminVehicles": {
+        "title": "Fahrzeuge verwalten",
+        "subtitle": "Verwaltung des Fahrzeuginventars",
+        "newVehicle": "Neues Fahrzeug",
+        "searchPlaceholder": "Nach Marke, Modell oder VIN suchen...",
+        "allStatuses": "Alle Status",
+        "empty": "Keine Fahrzeuge gefunden.",
+        "featured": "Empfohlen",
+        "columns": {
+            "vehicle": "Fahrzeug",
+            "year": "Jahr",
+            "mileage": "Kilometer",
+            "price": "Preis",
+            "source": "Quelle",
+            "status": "Status",
+            "actions": "Aktionen"
+        },
+        "actions": {
+            "view": "Fahrzeug anzeigen",
+            "edit": "Fahrzeug bearbeiten",
+            "delete": "Fahrzeug löschen"
+        },
+        "detail": {
+            "backToList": "Zurück zur Fahrzeugliste",
+            "notFound": "Fahrzeug nicht gefunden.",
+            "vin": "VIN: {vin}",
+            "basicInfo": "Grundinformationen",
+            "specifications": "Spezifikationen",
+            "price": "Preis",
+            "mileage": "Kilometer",
+            "transmission": "Getriebe",
+            "fuel": "Kraftstoff",
+            "bodyType": "Karosserie",
+            "colorExterior": "Farbe (außen)",
+            "colorInterior": "Farbe (innen)",
+            "engine": "Motor",
+            "description": "Beschreibung",
+            "deleting": "Wird gelöscht..."
         }
     }
 }

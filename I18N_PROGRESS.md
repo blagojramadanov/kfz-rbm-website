@@ -102,10 +102,12 @@ Also changed here (behaviour, not just text):
 - [ ] `app/[locale]/admin/fahrzeuge/neu/page.tsx` - New vehicle form (page title "Neues Fahrzeug hinzufügen", form field labels, help text, submit button, validation messages)
 - [ ] `app/[locale]/admin/fahrzeuge/[id]/page.tsx` - Vehicle detail page (title, specifications display, actions "Edit", "Delete", "Mark as Featured")
 - [ ] `app/[locale]/admin/fahrzeuge/[id]/edit/page.tsx` - Vehicle edit form (page title, form labels, update button, cancel link, validation messages)
-- [ ] `app/admin/fahrzeuge/neu/page.tsx` - Alternative new vehicle form route
-- [ ] `app/admin/fahrzeuge/neu/layout.tsx` - New vehicle form layout
-- [ ] `app/admin/fahrzeuge/[id]/page.tsx` - Alternative vehicle detail route
-- [ ] `app/admin/fahrzeuge/[id]/edit/page.tsx` - Alternative vehicle edit route
+- [x] `app/admin/fahrzeuge/neu/page.tsx` - does not exist (legacy `/admin/...` redirects to `/{locale}/admin/...`)
+- [x] `app/admin/fahrzeuge/neu/layout.tsx` - does not exist
+- [x] `app/admin/fahrzeuge/[id]/page.tsx` - does not exist
+- [x] `app/admin/fahrzeuge/[id]/edit/page.tsx` - does not exist
+
+**Code done (2026-09-26), live check pending:** see "Area 9: Admin vehicle management" at the end of this file.
 
 ---
 
@@ -741,3 +743,36 @@ Scope: `admin/fahrzeuge/eingereicht` (list + `[id]` detail), `admin/anfragen`, `
 - ✅ Grep of the 4 pages + admin layout: no hardcoded UI strings, no `toLocaleString`/`Intl.*`, no Cyrillic in code, no Cyrillic brand names in mk.json.
 - ⏳ **Not verified live**: the pages need an admin login and there are no admin test credentials (`AUDIT_ADMIN_*` is not set). Area 10 stays open until a logged-in admin pass on /de, /en, /mk.
 - Follow-up: the customer dashboard still has its own copies of these status labels (`dashboard.vehicles.status`, `dashboard.tradeInRequests.status`, `dashboard.tradeInRequestDetail.status`); they could switch to the new helpers.
+
+## Area 9: Admin vehicle management (2026-09-26)
+
+Scope: `app/[locale]/admin/fahrzeuge/page.tsx` (list), `neu/page.tsx` (new), `[id]/page.tsx` (detail), `[id]/edit/page.tsx` (edit). There are no legacy `app/admin/fahrzeuge/*` routes.
+
+### Price format (site-wide decision)
+- Standard: `formatPrice()` (`lib/format-vehicle.ts`, Intl currency, no decimals) with `useLocaleFormatter()` on the client, `getFormatter()` on the server. Output: de/mk "27.500 €", en "€27,500".
+- Why: it was already the dominant format. The public listing/detail, vehicle cards, homepage sections, customer dashboard, admin submissions and admin trade-ins all use it. Only 4 places built "€ 27.500" / "€27.500" by hand.
+- Aligned: admin vehicle list + detail, `admin/statistik` (average price), `dashboard/inzahlungnahme-anfragen` (value, desired vehicle, difference).
+
+### Changes
+- New DB-value map `common.vehicleStatuses` (draft/available/reserved/sold) with `getVehicleStatusLabel`, and `getListingTypeLabel` for the existing `common.listingTypes`, both in `lib/vehicle-labels.ts`. The hardcoded German `STATUS_LABELS` maps in list and detail are gone.
+- Form dropdowns (transmission, fuel, status, listing type, export condition) list the DB values and label them with the existing helpers (`getTransmissionLabel`, `getFuelTypeLabel`, `getVehicleStatusLabel`, `getListingTypeLabel`, `getVehicleConditionLabel`). No new per-option keys.
+- Detail page: transmission/fuel/body type/colours through the same helpers as Area 10; engine as `admin.units.engine` + `admin.units.power` (empty parts left out instead of "null cc").
+- UI strings: `adminVehicles.*` (list + detail), `adminVehicleForm.*` (titles, fields, placeholders, `errors.requiredFields`, progress/success), `buttons.edit/delete/save/cancel`, `common.loading`. Icon buttons in the list now have `title`/`aria-label`.
+- Mileage via `format.number()` + `admin.units.mileage` (mk "км").
+- mk `buttons`: "Уредите"/"Избришите"/"Објавите"/"Преузмете" (not imperatives) → "Уредете"/"Избришете"/"Објавете"/"Преземете". Only admin pages use `buttons.*`.
+- The source badge (`vehicles.source.rbm/customer/unknown`) was already translated: "RBM Fahrzeug"/"RBM vehicle"/"RBM возило", "Kundenfahrzeug"/"Customer vehicle"/"Возило на клиент".
+- Delete confirmation and delete/update errors already used `adminVehicleActions.*` (Area 8). There are no toasts.
+- Not shown because the `vehicles` table has no such columns: sales type (Verkaufsart) and features (Ausstattung) exist only on `submitted_vehicles`.
+
+### Audit (app/[locale]/admin/fahrzeuge)
+- `toLocaleString` / `Intl.NumberFormat` / `Intl.DateTimeFormat`: none.
+- "€" next to a number: none (only the "Preis (€)" field label, which is a message).
+- Cyrillic in code: none. Cyrillic brand names in mk placeholders: none ("на пр. BMW").
+- Hardcoded UI strings: none (remaining literals are `setError("")` and the Area 10 emoji map keyed by DB values).
+- Ad-hoc DB-value keys bypassing `lib/vehicle-labels.ts`: none.
+
+### Verification
+- ✅ `npm run check:i18n` and `npm run build` pass.
+- ✅ Rendered numbers checked with the same Intl calls (Node ICU): de "27.500 €", "85.000 km", "1.998 cm³, 190 PS"; en "€27,500", "85,000 km", "1,998 cc, 190 hp"; mk "27.500 €", "85.000 км", "1.998 cm³, 190 КС".
+- ⏳ Live admin check on /de, /en, /mk pending.
+- Out of scope, still open: `admin/kunden/[id]` mileage uses `toLocaleString("de-DE")` (area 11); `dashboard/inzahlungnahme-anfragen` mileage appends a hardcoded " km".

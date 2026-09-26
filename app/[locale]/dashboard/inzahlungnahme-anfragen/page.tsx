@@ -12,6 +12,7 @@ import { AlertCircle, Trash2, ArrowRight } from "lucide-react";
 import type { TradeInRequest } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { formatPrice } from "@/lib/format-vehicle";
 
 const STATUS_COLORS: Record<string, string> = {
   new: "bg-blue-100 text-blue-800",
@@ -159,7 +160,7 @@ export default function TradeInRequestsPage() {
                             {formatter.number(request.current_vehicle_mileage || 0)} km
                           </p>
                           <p className="font-semibold text-lg text-kfz-blue">
-                            €{formatter.number(request.current_vehicle_value_estimate || 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                            {formatPrice(formatter, request.current_vehicle_value_estimate || 0)}
                           </p>
                         </div>
                       </div>
@@ -176,7 +177,7 @@ export default function TradeInRequestsPage() {
                               {request.desired_vehicle.model}
                             </p>
                             <p className="font-semibold text-lg text-kfz-blue">
-                              €{formatter.number(request.desired_vehicle.price || 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                              {formatPrice(formatter, request.desired_vehicle.price || 0)}
                             </p>
                           </div>
                         </div>
@@ -204,13 +205,12 @@ export default function TradeInRequestsPage() {
                             0
                               ? "+"
                               : ""}
-                            €{" "}
-                            {formatter.number(
+                            {formatPrice(
+                              formatter,
                               Math.abs(
                                 (request.current_vehicle_value_estimate ?? 0) -
                                   (request.desired_vehicle.price ?? 0)
-                              ),
-                              { minimumFractionDigits: 0, maximumFractionDigits: 0 }
+                              )
                             )}
                           </span>
                         </div>

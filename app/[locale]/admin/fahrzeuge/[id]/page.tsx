@@ -7,11 +7,33 @@ import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, ArrowLeft, Edit2, Trash2, Star } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { formatPrice } from "@/lib/format-vehicle";
+import {
+  getBodyTypeLabel,
+  getColorLabel,
+  getFuelTypeLabel,
+  getTransmissionLabel,
+  getVehicleStatusLabel,
+} from "@/lib/vehicle-labels";
 
 export const dynamic = "force-dynamic";
 
+const STATUS_COLORS: Record<string, string> = {
+  draft: "bg-gray-100 text-gray-800",
+  available: "bg-green-100 text-green-800",
+  reserved: "bg-blue-100 text-blue-800",
+  sold: "bg-red-100 text-red-800",
+};
+
 export default function AdminVehicleDetailPage() {
+  const t = useTranslations("adminVehicles.detail");
+  const tFeatured = useTranslations("adminVehicles");
   const tActions = useTranslations("adminVehicleActions");
+  const tAdmin = useTranslations("admin");
+  const tCommon = useTranslations("common");
+  const tButtons = useTranslations("buttons");
+  const format = useLocaleFormatter();
   const errorMessage = useErrorMessage();
   const params = useParams();
   const locale = params.locale as string || 'de';
@@ -76,7 +98,7 @@ export default function AdminVehicleDetailPage() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -87,7 +109,7 @@ export default function AdminVehicleDetailPage() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -99,37 +121,29 @@ export default function AdminVehicleDetailPage() {
         <Link href="/admin/fahrzeuge">
           <button className="flex items-center gap-2 text-kfz-blue hover:text-kfz-blue-dark font-medium">
             <ArrowLeft className="w-4 h-4" />
-            Zurück zur Fahrzeugliste
+            {t("backToList")}
           </button>
         </Link>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">Fahrzeug nicht gefunden.</p>
+          <p className="text-sm text-red-800">{t("notFound")}</p>
         </div>
       </div>
     );
   }
 
-  const STATUS_LABELS: Record<string, string> = {
-    draft: "Entwurf",
-    available: "Verfügbar",
-    reserved: "Reserviert",
-    sold: "Verkauft",
-  };
-
-  const STATUS_COLORS: Record<string, string> = {
-    draft: "bg-gray-100 text-gray-800",
-    available: "bg-green-100 text-green-800",
-    reserved: "bg-blue-100 text-blue-800",
-    sold: "bg-red-100 text-red-800",
-  };
+  // Engine: "1.998 cm³, 190 PS"; parts without a value are left out.
+  const engineParts = [
+    vehicle.engine_cc ? tAdmin("units.engine", { value: format.number(vehicle.engine_cc) }) : null,
+    vehicle.power_hp ? tAdmin("units.power", { value: format.number(vehicle.power_hp) }) : null,
+  ].filter(Boolean);
 
   return (
     <div className="space-y-6">
       <Link href="/admin/fahrzeuge">
         <button className="flex items-center gap-2 text-kfz-blue hover:text-kfz-blue-dark font-medium">
           <ArrowLeft className="w-4 h-4" />
-          Zurück zur Fahrzeugliste
+          {t("backToList")}
         </button>
       </Link>
 
@@ -148,64 +162,76 @@ export default function AdminVehicleDetailPage() {
                 {vehicle.year} {vehicle.brand} {vehicle.model}
               </h1>
               {vehicle.featured && (
-                <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
+                <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" aria-label={tFeatured("featured")} />
               )}
             </div>
-            <p className="text-gray-600 mt-1">VIN: {vehicle.vin}</p>
+            <p className="text-gray-600 mt-1">{t("vin", { vin: vehicle.vin })}</p>
           </div>
           <span
             className={`px-4 py-2 rounded-full text-sm font-medium ${
               STATUS_COLORS[vehicle.status] || "bg-gray-100 text-gray-800"
             }`}
           >
-            {STATUS_LABELS[vehicle.status] || vehicle.status}
+            {getVehicleStatusLabel(tCommon, vehicle.status)}
           </span>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Grundinformationen</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("basicInfo")}</h3>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-600">Preis</p>
+                <p className="text-xs text-gray-600">{t("price")}</p>
                 <p className="text-2xl font-bold text-kfz-blue">
-                  € {vehicle.price?.toLocaleString("de-DE")}
+                  {vehicle.price != null ? formatPrice(format, vehicle.price) : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">Kilometer</p>
-                <p className="font-medium text-gray-900">{vehicle.mileage?.toLocaleString("de-DE")} km</p>
+                <p className="text-xs text-gray-600">{t("mileage")}</p>
+                <p className="font-medium text-gray-900">
+                  {vehicle.mileage != null ? tAdmin("units.mileage", { value: format.number(vehicle.mileage) }) : "—"}
+                </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">Getriebe</p>
-                <p className="font-medium text-gray-900">{vehicle.transmission}</p>
+                <p className="text-xs text-gray-600">{t("transmission")}</p>
+                <p className="font-medium text-gray-900">
+                  {vehicle.transmission ? getTransmissionLabel(tCommon, vehicle.transmission) : "—"}
+                </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">Kraftstoff</p>
-                <p className="font-medium text-gray-900">{vehicle.fuel_type}</p>
+                <p className="text-xs text-gray-600">{t("fuel")}</p>
+                <p className="font-medium text-gray-900">
+                  {vehicle.fuel_type ? getFuelTypeLabel(tCommon, vehicle.fuel_type) : "—"}
+                </p>
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Spezifikationen</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("specifications")}</h3>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-600">Karosserie</p>
-                <p className="font-medium text-gray-900">{vehicle.body_type || "—"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-600">Farbe (Außen)</p>
-                <p className="font-medium text-gray-900">{vehicle.color_exterior || "—"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-600">Farbe (Innen)</p>
-                <p className="font-medium text-gray-900">{vehicle.color_interior || "—"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-600">Motor</p>
+                <p className="text-xs text-gray-600">{t("bodyType")}</p>
                 <p className="font-medium text-gray-900">
-                  {vehicle.engine_cc} cc, {vehicle.power_hp} PS
+                  {vehicle.body_type ? getBodyTypeLabel(tCommon, vehicle.body_type) : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-600">{t("colorExterior")}</p>
+                <p className="font-medium text-gray-900">
+                  {vehicle.color_exterior ? getColorLabel(tCommon, vehicle.color_exterior) : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-600">{t("colorInterior")}</p>
+                <p className="font-medium text-gray-900">
+                  {vehicle.color_interior ? getColorLabel(tCommon, vehicle.color_interior) : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-600">{t("engine")}</p>
+                <p className="font-medium text-gray-900">
+                  {engineParts.length > 0 ? engineParts.join(", ") : "—"}
                 </p>
               </div>
             </div>
@@ -214,7 +240,7 @@ export default function AdminVehicleDetailPage() {
 
         {vehicle.description && (
           <div className="mb-8 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm font-medium text-gray-900 mb-2">Beschreibung</p>
+            <p className="text-sm font-medium text-gray-900 mb-2">{t("description")}</p>
             <p className="text-sm text-gray-700 whitespace-pre-wrap">{vehicle.description}</p>
           </div>
         )}
@@ -223,7 +249,7 @@ export default function AdminVehicleDetailPage() {
           <Link href={`/admin/fahrzeuge/${vehicleId}/edit`} className="flex-1">
             <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors">
               <Edit2 className="w-4 h-4" />
-              Bearbeiten
+              {tButtons("edit")}
             </button>
           </Link>
           <button
@@ -232,7 +258,7 @@ export default function AdminVehicleDetailPage() {
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Trash2 className="w-4 h-4" />
-            {deleting ? "Wird gelöscht..." : "Löschen"}
+            {deleting ? t("deleting") : tButtons("delete")}
           </button>
         </div>
       </div>

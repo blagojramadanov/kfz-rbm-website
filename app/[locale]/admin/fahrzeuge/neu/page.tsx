@@ -11,6 +11,18 @@ import { useEffect, useState } from "react";
 import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, Save, ArrowLeft, X } from "lucide-react";
+import {
+  getFuelTypeLabel,
+  getListingTypeLabel,
+  getTransmissionLabel,
+  getVehicleConditionLabel,
+} from "@/lib/vehicle-labels";
+
+// DB values; labels come from common.* via lib/vehicle-labels.ts.
+const TRANSMISSIONS = ["automatic", "manual", "cvt"] as const;
+const FUEL_TYPES = ["gasoline", "diesel", "hybrid", "electric"] as const;
+const LISTING_TYPES = ["verkauf", "export"] as const;
+const CONDITIONS = ["fahrbereit", "nicht_fahrbereit", "unfallwagen"] as const;
 
 export default function AdminCreateVehiclePage() {
   const params = useParams();
@@ -41,6 +53,8 @@ export default function AdminCreateVehiclePage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState("");
   const tForm = useTranslations("adminVehicleForm");
+  const tCommon = useTranslations("common");
+  const tButtons = useTranslations("buttons");
   const errorMessage = useErrorMessage();
 
   const MAX_IMAGES = 20;
@@ -162,7 +176,7 @@ export default function AdminCreateVehiclePage() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -173,13 +187,13 @@ export default function AdminCreateVehiclePage() {
       <Link href="/admin/fahrzeuge">
         <button className="flex items-center gap-2 text-kfz-blue hover:text-kfz-blue-dark font-medium">
           <ArrowLeft className="w-4 h-4" />
-          Zurück zur Fahrzeugliste
+          {tForm("backToList")}
         </button>
       </Link>
 
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Neues Fahrzeug erstellen</h1>
-        <p className="text-gray-600">Fügen Sie ein neues Fahrzeug zum Inventar hinzu</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{tForm("newTitle")}</h1>
+        <p className="text-gray-600">{tForm("newSubtitle")}</p>
 
         {error && (
           <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
@@ -193,35 +207,35 @@ export default function AdminCreateVehiclePage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Marke *
+                {tForm("fields.brand")} *
               </label>
               <input
                 type="text"
                 name="brand"
                 value={formData.brand}
                 onChange={handleInputChange}
-                placeholder="z.B. BMW"
+                placeholder={tForm("placeholders.brand")}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Modell *
+                {tForm("fields.model")} *
               </label>
               <input
                 type="text"
                 name="model"
                 value={formData.model}
                 onChange={handleInputChange}
-                placeholder="z.B. 3er Serie"
+                placeholder={tForm("placeholders.model")}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Jahr *
+                {tForm("fields.year")} *
               </label>
               <input
                 type="number"
@@ -239,7 +253,7 @@ export default function AdminCreateVehiclePage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Kilometer
+                {tForm("fields.mileage")}
               </label>
               <input
                 type="number"
@@ -252,7 +266,7 @@ export default function AdminCreateVehiclePage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Preis (€)
+                {tForm("fields.price")}
               </label>
               <input
                 type="number"
@@ -269,7 +283,7 @@ export default function AdminCreateVehiclePage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Getriebe
+                {tForm("fields.transmission")}
               </label>
               <select
                 name="transmission"
@@ -277,14 +291,14 @@ export default function AdminCreateVehiclePage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
               >
-                <option value="automatic">Automatik</option>
-                <option value="manual">Manuell</option>
-                <option value="cvt">CVT</option>
+                {TRANSMISSIONS.map((value) => (
+                  <option key={value} value={value}>{getTransmissionLabel(tCommon, value)}</option>
+                ))}
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Kraftstoff
+                {tForm("fields.fuel")}
               </label>
               <select
                 name="fuel_type"
@@ -292,10 +306,9 @@ export default function AdminCreateVehiclePage() {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
               >
-                <option value="gasoline">Benzin</option>
-                <option value="diesel">Diesel</option>
-                <option value="hybrid">Hybrid</option>
-                <option value="electric">Elektro</option>
+                {FUEL_TYPES.map((value) => (
+                  <option key={value} value={value}>{getFuelTypeLabel(tCommon, value)}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -303,27 +316,27 @@ export default function AdminCreateVehiclePage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Karosserie
+                {tForm("fields.bodyType")}
               </label>
               <input
                 type="text"
                 name="body_type"
                 value={formData.body_type}
                 onChange={handleInputChange}
-                placeholder="z.B. Limousine"
+                placeholder={tForm("placeholders.bodyType")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Außenfarbe
+                {tForm("fields.colorExterior")}
               </label>
               <input
                 type="text"
                 name="color_exterior"
                 value={formData.color_exterior}
                 onChange={handleInputChange}
-                placeholder="z.B. Schwarz"
+                placeholder={tForm("placeholders.colorExterior")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
               />
             </div>
@@ -332,20 +345,20 @@ export default function AdminCreateVehiclePage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Innenfarbe
+                {tForm("fields.colorInterior")}
               </label>
               <input
                 type="text"
                 name="color_interior"
                 value={formData.color_interior}
                 onChange={handleInputChange}
-                placeholder="z.B. Beige"
+                placeholder={tForm("placeholders.colorInterior")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-1">
-                Motorleistung (PS)
+                {tForm("fields.power")}
               </label>
               <input
                 type="number"
@@ -360,7 +373,7 @@ export default function AdminCreateVehiclePage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-1">
-              Motor (cc)
+              {tForm("fields.engine")}
             </label>
             <input
               type="number"
@@ -374,24 +387,24 @@ export default function AdminCreateVehiclePage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-1">
-              Beschreibung
+              {tForm("fields.description")}
             </label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Fahrzeugbeschreibung..."
+              placeholder={tForm("placeholders.description")}
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
             />
           </div>
 
           <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Fahrzeugtyp</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{tForm("fields.listingSection")}</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-1">
-                  Typ
+                  {tForm("fields.listingType")}
                 </label>
                 <select
                   name="listing_type"
@@ -399,20 +412,21 @@ export default function AdminCreateVehiclePage() {
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option value="verkauf">🏪 Verkauf (Normalverkauf)</option>
-                  <option value="export">🌍 Export (Für Export ins Ausland)</option>
+                  {LISTING_TYPES.map((value) => (
+                    <option key={value} value={value}>{getListingTypeLabel(tCommon, value)}</option>
+                  ))}
                 </select>
               </div>
             </div>
 
             {formData.listing_type === "export" && (
               <div className="mt-6 space-y-6 bg-blue-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600 italic">Exportspezifische Felder</p>
+                <p className="text-sm text-gray-600 italic">{tForm("fields.exportFields")}</p>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Zustand
+                      {tForm("fields.condition")}
                     </label>
                     <select
                       name="zustand"
@@ -420,22 +434,22 @@ export default function AdminCreateVehiclePage() {
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                     >
-                      <option value="">-- Wählen --</option>
-                      <option value="fahrbereit">Fahrbereit</option>
-                      <option value="nicht_fahrbereit">Nicht fahrbereit</option>
-                      <option value="unfallwagen">Unfallwagen</option>
+                      <option value="">{tForm("fields.selectPlaceholder")}</option>
+                      {CONDITIONS.map((value) => (
+                        <option key={value} value={value}>{getVehicleConditionLabel(tCommon, value)}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Zielland (optional)
+                      {tForm("fields.destination")}
                     </label>
                     <input
                       type="text"
                       name="zielland"
                       value={formData.zielland}
                       onChange={handleInputChange}
-                      placeholder="z.B. Marokko, Ägypten"
+                      placeholder={tForm("placeholders.destination")}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                     />
                   </div>
@@ -443,13 +457,13 @@ export default function AdminCreateVehiclePage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">
-                    Export-Notizen (optional)
+                    {tForm("fields.exportNotes")}
                   </label>
                   <textarea
                     name="export_notes"
                     value={formData.export_notes}
                     onChange={handleInputChange}
-                    placeholder="z.B. 'Netto-Preis gemäß §25a', 'Ausfuhrlieferung'..."
+                    placeholder={tForm("placeholders.exportNotes")}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                   />
@@ -511,14 +525,14 @@ export default function AdminCreateVehiclePage() {
               className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-kfz-blue text-white rounded-lg hover:bg-kfz-blue-dark font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="w-4 h-4" />
-              {formLoading ? "Wird erstellt..." : "Fahrzeug erstellen"}
+              {formLoading ? tForm("creating") : tForm("create")}
             </button>
             <Link href="/admin/fahrzeuge" className="flex-1">
               <button
                 type="button"
                 className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
               >
-                Abbrechen
+                {tButtons("cancel")}
               </button>
             </Link>
           </div>

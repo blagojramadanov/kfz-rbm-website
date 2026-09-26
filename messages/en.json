@@ -489,7 +489,8 @@
         "available": "available",
         "units": {
             "mileage": "{value} km",
-            "power": "{value} hp"
+            "power": "{value} hp",
+            "engine": "{value} cc"
         },
         "submissions": {
             "title": "Submitted Vehicles",
@@ -955,6 +956,12 @@
             "consignment": "Consignment sale",
             "direktverkauf": "Direct sale",
             "inzahlungnahme": "Trade-in"
+        },
+        "vehicleStatuses": {
+            "draft": "Draft",
+            "available": "Available",
+            "reserved": "Reserved",
+            "sold": "Sold"
         }
     },
     "hours": {
@@ -1081,7 +1088,55 @@
             "createFailed": "The vehicle could not be created.",
             "uploadRolledBack": "The images could not be uploaded, so the vehicle was not created. Your input is kept and you can try again.",
             "uploadDraftKept": "The images could not be uploaded. The vehicle is saved as a draft and is not publicly visible; please review or delete it in the vehicle list.",
-            "publishFailed": "The vehicle and images were saved, but the vehicle could not be published. It remains a non-public draft."
+            "publishFailed": "The vehicle and images were saved, but the vehicle could not be published. It remains a non-public draft.",
+            "requiredFields": "Please fill in all required fields."
+        },
+        "backToList": "Back to vehicle list",
+        "backToVehicle": "Back to vehicle",
+        "newTitle": "Create new vehicle",
+        "newSubtitle": "Add a new vehicle to the inventory",
+        "editTitle": "Edit vehicle",
+        "loadingVehicle": "Loading vehicle...",
+        "loadFailed": "The vehicle could not be loaded.",
+        "updated": "Vehicle updated successfully. Redirecting...",
+        "create": "Create vehicle",
+        "creating": "Creating...",
+        "saving": "Saving...",
+        "fields": {
+            "vin": "VIN",
+            "brand": "Brand",
+            "model": "Model",
+            "year": "Year",
+            "mileage": "Mileage (km)",
+            "price": "Price (€)",
+            "transmission": "Transmission",
+            "fuel": "Fuel",
+            "bodyType": "Body type",
+            "colorExterior": "Exterior color",
+            "colorInterior": "Interior color",
+            "power": "Power (hp)",
+            "engine": "Engine displacement (cc)",
+            "description": "Description",
+            "status": "Status",
+            "featured": "Featured vehicle",
+            "listingSection": "Listing type",
+            "listingType": "Type",
+            "exportFields": "Export-specific fields",
+            "condition": "Condition",
+            "selectPlaceholder": "Please select",
+            "destination": "Destination country (optional)",
+            "exportNotes": "Export notes (optional)"
+        },
+        "placeholders": {
+            "vin": "Vehicle identification number",
+            "brand": "e.g. BMW",
+            "model": "e.g. 3 Series",
+            "bodyType": "e.g. Sedan",
+            "colorExterior": "e.g. Black",
+            "colorInterior": "e.g. Beige",
+            "description": "Vehicle description...",
+            "destination": "e.g. Morocco, Egypt",
+            "exportNotes": "e.g. \"Net price under §25a UStG\", \"Export delivery\"..."
         }
     },
     "adminVehicleActions": {
@@ -1262,6 +1317,46 @@
             "description": "We will contact you shortly with further information.",
             "viewVehicles": "View my vehicles",
             "backToDashboard": "Back to dashboard"
+        }
+    },
+    "adminVehicles": {
+        "title": "Manage vehicles",
+        "subtitle": "Manage the vehicle inventory",
+        "newVehicle": "New vehicle",
+        "searchPlaceholder": "Search by brand, model or VIN...",
+        "allStatuses": "All statuses",
+        "empty": "No vehicles found.",
+        "featured": "Featured",
+        "columns": {
+            "vehicle": "Vehicle",
+            "year": "Year",
+            "mileage": "Mileage",
+            "price": "Price",
+            "source": "Source",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "actions": {
+            "view": "View vehicle",
+            "edit": "Edit vehicle",
+            "delete": "Delete vehicle"
+        },
+        "detail": {
+            "backToList": "Back to vehicle list",
+            "notFound": "Vehicle not found.",
+            "vin": "VIN: {vin}",
+            "basicInfo": "Basic information",
+            "specifications": "Specifications",
+            "price": "Price",
+            "mileage": "Mileage",
+            "transmission": "Transmission",
+            "fuel": "Fuel",
+            "bodyType": "Body type",
+            "colorExterior": "Color (exterior)",
+            "colorInterior": "Color (interior)",
+            "engine": "Engine",
+            "description": "Description",
+            "deleting": "Deleting..."
         }
     }
 }

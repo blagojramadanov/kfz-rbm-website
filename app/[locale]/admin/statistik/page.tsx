@@ -9,6 +9,8 @@ import { useRouter } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { formatPrice } from "@/lib/format-vehicle";
 
 export default function AdminStatisticsPage() {
   const params = useParams();
@@ -18,6 +20,7 @@ export default function AdminStatisticsPage() {
   const [stats, setStats] = useState<any>(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const errorMessage = useErrorMessage();
+  const format = useLocaleFormatter();
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -111,7 +114,7 @@ export default function AdminStatisticsPage() {
             <div className="bg-white rounded-lg shadow-md p-6">
               <p className="text-sm text-gray-600 mb-2">Durchschn. Fahrzeugpreis</p>
               <p className="text-3xl font-bold text-green-600">
-                € {stats.avg_vehicle_price ? Math.round(stats.avg_vehicle_price).toLocaleString("de-DE") : "0"}
+                {formatPrice(format, stats.avg_vehicle_price || 0)}
               </p>
             </div>
           </div>
