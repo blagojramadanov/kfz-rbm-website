@@ -12,8 +12,6 @@ import { ChevronRight, ChevronLeft, AlertCircle, Check } from "lucide-react";
 import type { Vehicle } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
-import { useLocale } from "next-intl";
-import { getNumberLocale } from "@/lib/i18n/number-locale";
 
 type Step = "current_vehicle" | "vehicle_value" | "select_desired" | "review" | "success";
 
@@ -34,19 +32,17 @@ export default function InzahlungnahmePage() {
   const t = useTranslations("dashboard.tradeIn");
   const tCommon = useTranslations("common");
   const tNav = useTranslations("navigation");
-  const locale = useLocale();
   const formatter = useLocaleFormatter();
   const { loading, isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState<Step>("current_vehicle");
 
   const formatCurrency = (value: number) => {
-    const numberLocale = getNumberLocale(locale);
-    return new Intl.NumberFormat(numberLocale, {
+    return formatter.number(value, {
       style: "currency",
       currency: "EUR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(value);
+    });
   };
 
   // Create STEPS array dynamically with translations
@@ -315,7 +311,7 @@ export default function InzahlungnahmePage() {
                   name="current_vehicle_mileage"
                   value={formData.current_vehicle_mileage}
                   onChange={handleInputChange}
-                  placeholder={t("currentVehicle.mileagePlaceholder")}
+                  placeholder={formatter.number(50000)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 />
               </div>
@@ -337,7 +333,7 @@ export default function InzahlungnahmePage() {
                 name="current_vehicle_value_estimate"
                 value={formData.current_vehicle_value_estimate}
                 onChange={handleInputChange}
-                placeholder={t("vehicleValue.placeholder")}
+                placeholder={formatter.number(50000)}
                 step="100"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent text-lg"
               />
@@ -487,8 +483,8 @@ export default function InzahlungnahmePage() {
                       }`}
                     >
                       {estimatedDifference !== null
-                        ? `${estimatedDifference > 0 ? "+" : ""}€${formatter.number(Math.abs(estimatedDifference), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
-                        : `€${formatter.number(0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
+                        ? `${estimatedDifference > 0 ? "+" : ""}${formatCurrency(Math.abs(estimatedDifference))}`
+                        : formatCurrency(0)}
                     </span>
                   </div>
                 </div>

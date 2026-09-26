@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -19,6 +19,8 @@ export default function DashboardPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const { profile, loading, isAuthenticated, isAdmin, signOut } = useAuth();
+  // undefined = loading, null = load failed
+  const [vehicleCount, setVehicleCount] = useState<number | null | undefined>(undefined);
 
   useEffect(() => {
     if (!loading) {
@@ -32,6 +34,15 @@ export default function DashboardPage() {
       }
     }
   }, [loading, isAuthenticated, isAdmin, router]);
+
+  useEffect(() => {
+    if (loading || !isAuthenticated || isAdmin) return;
+    (async () => {
+      const { countSubmittedVehicles } = await import("@/app/actions/vehicles");
+      const result = await countSubmittedVehicles();
+      setVehicleCount(result.ok ? result.count : null);
+    })();
+  }, [loading, isAuthenticated, isAdmin]);
 
   if (loading) {
     return (
@@ -75,7 +86,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">{t("myVehicles")}</p>
-                  <p className="text-3xl font-bold text-gray-900">—</p>
+                  <p className="text-3xl font-bold text-gray-900">{vehicleCount === undefined ? "…" : vehicleCount === null ? "—" : formatter.number(vehicleCount)}</p>
                 </div>
                 <Car className="w-10 h-10 text-kfz-blue" />
               </div>
@@ -87,7 +98,8 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">{t("overview.inquiries")}</p>
-                  <p className="text-3xl font-bold text-gray-900">—</p>
+                  {/* customer_inquiries has no user_id and is admin-only under RLS; /dashboard/anfragen lists none */}
+                  <p className="text-3xl font-bold text-gray-900">{formatter.number(0)}</p>
                 </div>
                 <MessageSquare className="w-10 h-10 text-green-600" />
               </div>
@@ -99,7 +111,8 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">{t("overview.favorites")}</p>
-                  <p className="text-3xl font-bold text-gray-900">—</p>
+                  {/* favorites are not stored yet (no table); /dashboard/favoriten lists none */}
+                  <p className="text-3xl font-bold text-gray-900">{formatter.number(0)}</p>
                 </div>
                 <Heart className="w-10 h-10 text-red-600" />
               </div>
@@ -111,7 +124,7 @@ export default function DashboardPage() {
               <div>
                 <p className="text-sm text-gray-500">{t("memberSince")}</p>
                 <p className="text-sm font-semibold text-gray-900">
-                  {formatter.dateTime(new Date(profile.created_at), { year: "numeric", month: "long", day: "numeric" })}
+                  {formatter.dateTime(new Date(profile.created_at), { year: "numeric", month: "2-digit", day: "2-digit" })}
                 </p>
               </div>
               <FileText className="w-10 h-10 text-orange-600" />
@@ -241,7 +254,7 @@ export default function DashboardPage() {
                 {t("overview.myTradeInRequestsDescription")}
               </p>
               <Button variant="outline" className="border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white w-full">
-                {t("overview.viewInquiries")}
+                {t("overview.viewRequests")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>

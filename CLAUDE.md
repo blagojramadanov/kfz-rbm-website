@@ -19,7 +19,7 @@ Every task ends with build + check:i18n passing, I18N_PROGRESS.md updated, commi
 ## Localization rules
 
 - **Client-side number formatting**: Use `useLocaleFormatter()` from `lib/use-locale-formatter.ts` instead of `useFormatter().number()`, `Intl.NumberFormat` directly, or `toLocaleString()`. The wrapper maps unsupported locales (mk) to supported ones (de-DE) to avoid browser Intl fallback to en-US. Server-side formatters (`getFormatter()`) work correctly for all locales.
-- **Date formatting**: Server-side dates use `getFormatter()` (full Intl support). Client-side dates **also work correctly** because the browser Intl API has date/time data for "mk"; only number formatting falls back to en-US when the browser lacks numeric data. Do not use the wrapper for dates.
+- **Date formatting**: Server-side dates use `getFormatter()` (full Intl support). Client-side dates use `useLocaleFormatter().dateTime()`: browsers can lack "mk" date data too (live test showed "September 14, 2026" on /mk), so the wrapper maps mk to de-DE. Use numeric formats (`month: "2-digit"`), since month names would come out in German.
 
 ## Security rules
 

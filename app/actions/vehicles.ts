@@ -103,6 +103,18 @@ async function getSubmittedVehiclesImpl(): Promise<SubmittedVehicle[]> {
   return vehiclesWithImages as SubmittedVehicle[];
 }
 
+async function countSubmittedVehiclesImpl(): Promise<number> {
+  const { supabase, user } = await requireUser();
+
+  const { count, error } = await supabase
+    .from("submitted_vehicles")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  if (error) throw new ActionError("LOAD_FAILED");
+  return count ?? 0;
+}
+
 /** Uploads decoded images to the private customer bucket and records them. Returns how many succeeded. */
 async function storeSubmissionImages(
   supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
@@ -384,6 +396,10 @@ export async function getSubmittedVehicleById(vehicleId: string) {
 
 export async function getSubmittedVehicles() {
   return runAction("getSubmittedVehicles", "LOAD_FAILED", async () => ({ vehicles: await getSubmittedVehiclesImpl() }));
+}
+
+export async function countSubmittedVehicles() {
+  return runAction("countSubmittedVehicles", "LOAD_FAILED", async () => ({ count: await countSubmittedVehiclesImpl() }));
 }
 
 export async function createSubmittedVehicle(vehicleData: unknown, images: unknown) {

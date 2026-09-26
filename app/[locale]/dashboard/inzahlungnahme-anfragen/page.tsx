@@ -231,7 +231,7 @@ export default function TradeInRequestsPage() {
                     </Link>
 
                     <div className="text-xs text-gray-500 text-center pt-2">
-                      {new Date(request.created_at).toLocaleDateString("de-DE")}
+                      {formatter.dateTime(new Date(request.created_at), { year: "numeric", month: "2-digit", day: "2-digit" })}
                     </div>
                   </div>
                 </div>

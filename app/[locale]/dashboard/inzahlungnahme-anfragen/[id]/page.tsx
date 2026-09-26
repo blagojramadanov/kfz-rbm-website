@@ -9,8 +9,6 @@ import { AlertCircle, ArrowLeft } from "lucide-react";
 import type { TradeInRequest } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
-import { useLocale } from "next-intl";
-import { getNumberLocale } from "@/lib/i18n/number-locale";
 
 const STATUS_COLORS: Record<string, string> = {
   new: "bg-blue-100 text-blue-800 border-blue-300",
@@ -23,7 +21,6 @@ const STATUS_COLORS: Record<string, string> = {
 export default function TradeInRequestDetailPage() {
   const t = useTranslations("dashboard.tradeInRequestDetail");
   const tCommon = useTranslations("common");
-  const locale = useLocale();
   const formatter = useLocaleFormatter();
   const router = useRouter();
   const params = useParams();
@@ -34,13 +31,12 @@ export default function TradeInRequestDetailPage() {
   const [error, setError] = useState("");
 
   const formatCurrency = (value: number) => {
-    const numberLocale = getNumberLocale(locale);
-    return new Intl.NumberFormat(numberLocale, {
+    return formatter.number(value, {
       style: "currency",
       currency: "EUR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(value);
+    });
   };
 
   const requestId = params?.id as string;

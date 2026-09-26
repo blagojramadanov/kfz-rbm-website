@@ -697,3 +697,24 @@ Fixed gender agreement in wizard.workflow.* messages: "возило" (vehicle) i
 - ✅ Commit hash: `409320f`
 - ✅ Pushed to main successfully
 
+## Area 7 Live Testing Fixes, round 2 (2026-09-26)
+
+### Fixed
+1. **"My Requests" card button** used `overview.viewInquiries`; now its own key `dashboard.overview.viewRequests` (de "Anfragen ansehen", en "View Requests", mk "Прегледајте барања").
+2. **Overview stats showed "—"**. Root cause: the three values were hardcoded `—` in `dashboard/page.tsx`; nothing was ever queried (not RLS). Now:
+   - My Vehicles: new server action `countSubmittedVehicles()` (`app/actions/vehicles.ts`, `requireUser()` + RLS session client, `count: "exact", head: true` on `submitted_vehicles` for the session user). Shows "…" while loading, "—" on load error.
+   - Inquiries / Favorites: show 0. There is no per-customer data: `customer_inquiries` has no `user_id` and is admin-only under RLS; favorites have no table. Both pages are empty states. When those features exist, count them here.
+3. **"Member since" date**: `useLocaleFormatter()` now also overrides `dateTime()` (mk → de-DE, like numbers). The live test disproved the assumption that browsers have mk date data. Numeric format: de/mk "14.09.2026", en "09/14/2026". Also fixed `inzahlungnahme-anfragen/page.tsx` (hardcoded `toLocaleDateString("de-DE")`).
+4. **Placeholders**: mk brand/model/company placeholders use Latin brand names ("нпр. BMW, Mercedes", "нпр. 330i, C-Klasse", "нпр. Auto GmbH"); de model placeholder "C-Class" → "C-Klasse". Mileage (step 1) and value (step 2) placeholders are `formatter.number(50000)` ("50.000" de/mk, "50,000" en); the `mileagePlaceholder` / `vehicleValue.placeholder` keys were removed.
+5. **Trade-in step 4 difference** was built as `€` + number; now uses the same `formatCurrency()` as the other amounts ("+12.500 €" de/mk, "+€12,500" en). `formatCurrency()` in `inzahlungnahme`, `fahrzeuge` and `inzahlungnahme-anfragen/[id]` now goes through `formatter.number()` instead of `Intl.NumberFormat` directly.
+6. **mk wording**: "Передачен механизам" → "Менувач"; "уредувајте ги детали" → "уредувајте ги деталите"; "Необврзувачка проценка на цена" → "... на цената" (trade-in review + request detail).
+
+### Audit (app/[locale]/dashboard + imported components/libs)
+- Hardcoded UI strings: none found.
+- Cyrillic brand names in mk placeholders: none left.
+- `toLocaleString` / `Intl.NumberFormat` / `Intl.DateTimeFormat`: only inside `lib/use-locale-formatter.ts` (the wrapper itself).
+
+### Verification
+- ✅ `npm run check:i18n` and `npm run build` pass.
+- ✅ Rendered values checked with the same Intl calls (Node ICU) for de/en/mk.
+- ⏳ Live browser re-check on the deployment is still pending. Area 7 is marked complete only after that re-check.

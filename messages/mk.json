@@ -226,11 +226,12 @@
             "submitVehicle": "Поднесете возило",
             "submitDescription": "Продајте го Вашето возило преку нашата платформа. Едноставно, брзо и безбедно.",
             "manageVehicles": "Моите возила",
-            "manageVehiclesDescription": "Управувајте со Вашите понудени возила, видете го статусот и уредувајте ги детали.",
+            "manageVehiclesDescription": "Управувајте со Вашите понудени возила, видете го статусот и уредувајте ги деталите.",
             "viewVehicles": "Прегледајте возила",
             "inquiries": "Прашања",
             "inquiriesDescription": "Видете ги прашањата од заинтересирани лица за Вашите возила и одговорете брзо.",
             "viewInquiries": "Прегледајте прашања",
+            "viewRequests": "Прегледајте барања",
             "favorites": "Омилени",
             "favoritesDescription": "Видете ги Вашите зачувани возила и управувајте со Вашите омилени.",
             "viewFavorites": "Прегледајте омилени",
@@ -255,7 +256,7 @@
             "firstVehicle": "Поднесете прво возило",
             "loading": "Возилата се вчитуваат...",
             "fuel": "Тип на гориво",
-            "transmission": "Передачен механизам",
+            "transmission": "Менувач",
             "status": {
                 "eingereicht": "Поднесено",
                 "in_bearbeitung": "Во обработка",
@@ -301,7 +302,7 @@
                 "placeholder": {
                     "fullName": "нпр. Максимилијан Мустерман",
                     "phone": "нпр. +49 123 456789",
-                    "company": "нпр. Авто ГмбХ"
+                    "company": "нпр. Auto GmbH"
                 }
             },
             "password": {
@@ -338,18 +339,16 @@
             "currentVehicle": {
                 "title": "Вашето моментално возило",
                 "brand": "Марка",
-                "brandPlaceholder": "нпр. БМВ, Мерцедес",
+                "brandPlaceholder": "нпр. BMW, Mercedes",
                 "model": "Модел",
-                "modelPlaceholder": "нпр. 330i, C-класа",
+                "modelPlaceholder": "нпр. 330i, C-Klasse",
                 "year": "Прва регистрација",
-                "mileage": "Пробег",
-                "mileagePlaceholder": "50000"
+                "mileage": "Пробег"
             },
             "vehicleValue": {
                 "title": "Вредност на возилото",
                 "description": "Проценете ја моменталната вредност на Вашето возило. Ова е необврзувачка проценка.",
-                "label": "Проценета вредност (€)",
-                "placeholder": "50000"
+                "label": "Проценета вредност (€)"
             },
             "selectDesired": {
                 "title": "Сакано возило",
@@ -368,7 +367,7 @@
                 "estimatedValue": "Проценета вредност:",
                 "vehicle": "Возило:",
                 "price": "Цена:",
-                "priceEstimate": "Необврзувачка проценка на цена",
+                "priceEstimate": "Необврзувачка проценка на цената",
                 "yourEstimate": "Проценета вредност на Вашето возило:",
                 "desiredPrice": "Цена на саканото возило:",
                 "difference": "Проценета доплата/кредит:",
@@ -444,7 +443,7 @@
             "estimatedValue": "Проценета вредност",
             "year": "Година",
             "price": "Цена",
-            "pricingBreakdown": "Необврзувачка проценка на цена",
+            "pricingBreakdown": "Необврзувачка проценка на цената",
             "yourVehicleEstimate": "Проценета вредност на Вашето возило:",
             "desiredVehiclePrice": "Цена на саканото возило:",
             "difference": "Проценета доплата/кредит:",

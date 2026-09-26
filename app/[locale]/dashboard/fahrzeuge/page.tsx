@@ -11,8 +11,6 @@ import type { SubmittedVehicle } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { getFuelTypeLabel, getTransmissionLabel } from "@/lib/vehicle-labels";
-import { useLocale } from "next-intl";
-import { getNumberLocale } from "@/lib/i18n/number-locale";
 
 type DashboardVehicleStatus = "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "akzeptiert" | "abgelehnt";
 
@@ -22,7 +20,6 @@ export default function MyVehiclesPage() {
   const t = useTranslations("dashboard.vehicles");
   const tCommon = useTranslations("common");
   const tNav = useTranslations("navigation");
-  const locale = useLocale();
   const formatter = useLocaleFormatter();
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
@@ -32,13 +29,12 @@ export default function MyVehiclesPage() {
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
 
   const formatCurrency = (value: number) => {
-    const numberLocale = getNumberLocale(locale);
-    return new Intl.NumberFormat(numberLocale, {
+    return formatter.number(value, {
       style: "currency",
       currency: "EUR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(value);
+    });
   };
 
   const getStatusConfig = (status: DashboardVehicleStatus): { label: string; color: string; icon: React.ReactNode; bgColor: string } => {

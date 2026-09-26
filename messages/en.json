@@ -231,6 +231,7 @@
             "inquiries": "Inquiries",
             "inquiriesDescription": "See inquiries from interested buyers about your vehicles and respond quickly.",
             "viewInquiries": "View Inquiries",
+            "viewRequests": "View Requests",
             "favorites": "Favorites",
             "favoritesDescription": "See your saved vehicles and manage your favorites.",
             "viewFavorites": "View Favorites",
@@ -342,14 +343,12 @@
                 "model": "Model",
                 "modelPlaceholder": "e.g. 330i, C-Class",
                 "year": "First Registration",
-                "mileage": "Mileage",
-                "mileagePlaceholder": "50000"
+                "mileage": "Mileage"
             },
             "vehicleValue": {
                 "title": "Vehicle Value",
                 "description": "Estimate the current value of your vehicle. This is a non-binding estimate.",
-                "label": "Estimated Value (€)",
-                "placeholder": "50000"
+                "label": "Estimated Value (€)"
             },
             "selectDesired": {
                 "title": "Desired Vehicle",

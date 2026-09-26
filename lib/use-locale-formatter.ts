@@ -5,8 +5,10 @@ import { getNumberLocale } from "./i18n/number-locale";
 
 /**
  * Wrapper around useFormatter that maps unsupported locales (like "mk")
- * to supported Intl locales (like "de-DE") for number and currency formatting.
- * This ensures consistent number formatting across server and client.
+ * to supported Intl locales (like "de-DE") for number, currency and date formatting.
+ * Browsers without "mk" data fall back to en-US ("50,000", "September 14, 2026"),
+ * so mk is formatted with de-DE conventions instead ("50.000", "14.09.2026").
+ * Use numeric date formats: month names would come out in German.
  */
 export function useLocaleFormatter() {
   const baseFormatter = useFormatter();
@@ -18,7 +20,7 @@ export function useLocaleFormatter() {
     return baseFormatter;
   }
 
-  // For unsupported locales like "mk", override the number method
+  // For unsupported locales like "mk", override the number and dateTime methods
   return {
     ...baseFormatter,
     number: (value: number | bigint, formatOrOptions?: any): string => {
@@ -27,6 +29,12 @@ export function useLocaleFormatter() {
         ? undefined
         : formatOrOptions;
       return new Intl.NumberFormat(numberLocale, options).format(value as number);
+    },
+    dateTime: (value: Date | number, formatOrOptions?: any): string => {
+      const options = typeof formatOrOptions === "string"
+        ? undefined
+        : formatOrOptions;
+      return new Intl.DateTimeFormat(numberLocale, options).format(value);
     },
   };
 }

@@ -231,6 +231,7 @@
             "inquiries": "Anfragen",
             "inquiriesDescription": "Sehen Sie Anfragen von Interessenten zu Ihren Fahrzeugen und antworten Sie schnell.",
             "viewInquiries": "Anfragen ansehen",
+            "viewRequests": "Anfragen ansehen",
             "favorites": "Favoriten",
             "favoritesDescription": "Sehen Sie Ihre gespeicherten Fahrzeuge und verwalten Sie Ihre Favoriten.",
             "viewFavorites": "Favoriten ansehen",
@@ -340,16 +341,14 @@
                 "brand": "Marke",
                 "brandPlaceholder": "z.B. BMW, Mercedes",
                 "model": "Modell",
-                "modelPlaceholder": "z.B. 330i, C-Class",
+                "modelPlaceholder": "z.B. 330i, C-Klasse",
                 "year": "Erstzulassung",
-                "mileage": "Kilometerstand",
-                "mileagePlaceholder": "50000"
+                "mileage": "Kilometerstand"
             },
             "vehicleValue": {
                 "title": "Fahrzeugwert",
                 "description": "Schätzen Sie den aktuellen Wert Ihres Fahrzeugs. Dies ist eine unverbindliche Schätzung.",
-                "label": "Geschätzter Wert (€)",
-                "placeholder": "50000"
+                "label": "Geschätzter Wert (€)"
             },
             "selectDesired": {
                 "title": "Gewünschtes Fahrzeug",
