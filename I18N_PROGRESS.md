@@ -832,3 +832,48 @@ New keys: `admin.submissions.{askingPrice,sendOffer,updateOffer,offerPriceLabel,
 ### Follow-up (2026-09-26)
 - Read-only DB check confirmed the stuck row (`801e7b66-…`, status `angebot_gesendet`, `offered_price` null; the 3.000 € shown is the customer's asking price `price`). Written by the old approve button on 2026-09-24.
 - `respondToOffer` (accept/reject) now also requires `offered_price` > 0 and returns `INVALID_STATE` otherwise, so a direct server-action call can no longer answer an offer without a price. The check runs before any status update.
+
+## Post-launch audit — status as of 2026-09-26
+
+Documentation-only handoff after live testing. No functional code changed in this pass.
+
+### Fixes 1–6 (from "Functional fixes after the full audit")
+| Fix | Status |
+| --- | --- |
+| 1. Offer flow | ✅ **Confirmed working live.** A real test offer (3.000 €) was sent on the stuck old submission via "Angebot ändern"; the customer's "Meine Fahrzeuge" shows "Angebotspreis: 3.000 €" with working "Annehmen"/"Ablehnen". |
+| 2. Secret key name | ✅ **Confirmed working live (indirectly):** admin submission photos load in production, which needs a valid `SUPABASE_SECRET_KEY`. |
+| 3. Customer photos | 🟡 **Confirmed via code only.** Live check showed gray boxes on "Meine Fahrzeuge" — not confirmed as real photos yet (see note below). |
+| 4. Wizard details | ⏳ Not yet tested live (depends on migration 026, see open issues). |
+| 5. Photo upload failures | ⏳ Not yet tested live. |
+| 6. Rejection reason | 🟡 **Confirmed via code only; not yet tested live** (no rejected submission with a reason exists yet). |
+
+Security fix: `respondToOffer` requires `offered_price` > 0 before accept/reject (commit `5d78cac`) — ✅ done and confirmed.
+
+**Fix 3 code check.** `dashboard/fahrzeuge/page.tsx` is wired to the fix: after `getSubmittedVehicles()` it collects each vehicle's cover path (`images[0]`, first by `sort_order`) and calls `getSignedImageUrls`, which for customers only signs image rows of their own submissions (session client; storage paths are `{userId}/{submissionId}/…`, matching the "Customers can view own photos" policy). What a gray box means:
+- **Gray box with a car icon** = no signed URL: the vehicle has no image rows (likely for the fake "fffff…"/"sssss…" test submissions), the path was not signed (`url: null`, logged server-side as `[getSignedImageUrls] createSignedUrl failed`), or the whole call returned `ok: false` — this last case is silent on the page (no alert).
+- **Plain gray box without an icon** = a signed URL was set and the `<Image>` is rendered over the gray `bg-gray-200` container; it is still loading (`next/image` lazy-loads by default, so off-screen cards stay gray until scrolled into view) or the request failed.
+- Also: cards render first with the placeholder and switch to the photo once signing finishes, so a brief placeholder is expected.
+
+Next check: open "Meine Fahrzeuge" as a customer whose submission has photos (e.g. one created through the wizard with uploads), scroll through, and look in DevTools → Network for requests to `.../storage/v1/object/sign/customer-submitted-photos/...` (200 = working).
+
+**Fix 6 code check (ready to test).** Admin `admin/fahrzeuge/eingereicht` → "Ablehnen" requires a non-empty reason (`rejectReasonRequired`) → `rejectSubmittedVehicle` (`requireAdmin`, zod: guid + trimmed 1–2000 chars) sets `status = abgelehnt` and `rejection_reason`, only from `eingereicht`/`in_bearbeitung`, and checks that exactly one row changed. The customer page selects `*`, so `rejection_reason` is loaded, and shows it in a red box "Grund der Ablehnung" (`dashboard.vehicles.rejectionReason`, de/en/mk) with fallback to `status_reason`. The admin card shows it too (filter "Abgelehnt").
+To test: use a submission in `eingereicht` or `in_bearbeitung`. The "fffff…" test submission is now `angebot_gesendet` and **cannot** be rejected by the admin (the customer can still reject its offer, which sets `abgelehnt` without a reason).
+
+### Test data
+- The stuck test submission ("fffffffff…", `801e7b66-…`) got a real test offer (3.000 €) during live testing and is now in a normal "offer sent" state — no longer inconsistent, but still a fake vehicle that should eventually be deleted.
+- The leftover "sssssssss" test vehicle is still in the live database (see below).
+
+### Remaining known issues (not addressed yet)
+**High**
+- **Inquiries are never created.** No code path writes to the inquiries table, so the admin and customer inquiry pages are always empty.
+- **Contact form** does not persist anything and logs the submitted personal data (PII) to the console.
+
+**Medium**
+- **Favorites** feature has no database table behind it; it cannot work as built.
+- **Homepage search bar** only calls `console.log`; it does not search or navigate.
+- **Wizard fields after migration 026**: confirm 026 is applied in production and that variant, previous owners, HU/AU, accident history and service book are stored on a new submission and shown on the admin detail page (without 026, `createSubmittedVehicle` saves without them and logs `apply migration 026`).
+
+**Low**
+- Leftover **"sssssssss" test vehicle** in the live database — delete.
+- Dead **`?edit=` branch** in the offer wizard (`dashboard/fahrzeug-anbieten/page.tsx`, `params.get("edit")` ~line 110 / line 389) — unreachable code, remove or wire up.
+- "fffffffff…" test submission — delete when no longer needed for testing.
