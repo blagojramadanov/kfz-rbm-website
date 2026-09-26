@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { ActionError, runAction, toErrorCode, type ActionErrorCode, type ActionResult } from "@/lib/action-result";
 import { requireAdmin } from "@/lib/auth-guards";
+import { vehicleFieldsSchema, vehicleUpdateSchema } from "@/lib/vehicle-schema";
 
 // Helper function to log detailed error information for debugging
 function logAdminError(operation: string, error: unknown, context?: Record<string, any>) {
@@ -24,36 +25,6 @@ function logAdminError(operation: string, error: unknown, context?: Record<strin
 // ============================================================================
 // VEHICLE MANAGEMENT
 // ============================================================================
-
-const optionalText = (max: number) => z.string().trim().max(max).optional().nullable();
-const optionalInt = (max: number) => z.number().int().min(0).max(max).optional().nullable();
-
-// Columns an admin may set from the vehicle forms. Anything else (id, source_type,
-// submitted_vehicle_id, created_at, ...) is stripped.
-const vehicleFieldsSchema = z.object({
-  vin: z.string().trim().min(1).max(17),
-  brand: z.string().trim().min(1).max(50),
-  model: z.string().trim().min(1).max(100),
-  year: z.number().int().min(1900).max(new Date().getFullYear() + 1),
-  mileage: z.number().int().min(0).max(5_000_000),
-  price: z.number().min(0).max(100_000_000),
-  transmission: optionalText(20),
-  fuel_type: optionalText(20),
-  body_type: optionalText(30),
-  color_exterior: optionalText(50),
-  color_interior: optionalText(50),
-  engine_cc: optionalInt(20_000),
-  power_hp: optionalInt(5_000),
-  description: optionalText(10_000),
-  listing_type: z.enum(["verkauf", "export"]).optional(),
-  zustand: optionalText(30),
-  zielland: optionalText(100),
-  export_notes: optionalText(5_000),
-});
-const vehicleUpdateSchema = vehicleFieldsSchema.partial().extend({
-  status: z.enum(["draft", "available", "sold", "reserved"]).optional(),
-  featured: z.boolean().optional(),
-});
 
 /** Session + admin check that returns an error code instead of throwing. */
 async function adminSession(): Promise<
@@ -528,6 +499,10 @@ export async function getDashboardStats() {
       .select("*", { count: "exact", head: true })
       .eq("role", "CUSTOMER");
 
+    const { data: availablePrices } = await supabase.from("vehicles").select("price").eq("status", "available");
+    const prices = (availablePrices || []).map((row) => Number(row.price)).filter((price) => price > 0);
+    const avgVehiclePrice = prices.length ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : 0;
+
     const sum = (counts: Record<string, number>) => Object.values(counts).reduce((a, b) => a + b, 0);
     return {
       stats: {
@@ -551,7 +526,7 @@ export async function getDashboardStats() {
         trade_in_requests_completed: tradeInCounts.completed,
         trade_in_requests_cancelled: tradeInCounts.cancelled,
         total_customers: totalCustomers || 0,
-        avg_vehicle_price: 0,
+        avg_vehicle_price: avgVehiclePrice,
       },
     };
   });
@@ -570,7 +545,30 @@ export async function getCustomers() {
       .eq("role", "CUSTOMER")
       .order("created_at", { ascending: false });
     if (error) throw error;
-    return { customers: data || [] };
+
+    // Per-customer counts for the list columns (same matching as getCustomerDetails).
+    const [{ data: vehicles }, { data: inquiries }, { data: tradeIns }] = await Promise.all([
+      supabase.from("submitted_vehicles").select("user_id"),
+      supabase.from("customer_inquiries").select("customer_email"),
+      supabase.from("trade_in_requests").select("user_id"),
+    ]);
+    const tally = (values: (string | null)[]) => {
+      const counts = new Map<string, number>();
+      for (const value of values) if (value) counts.set(value, (counts.get(value) || 0) + 1);
+      return counts;
+    };
+    const vehicleCounts = tally((vehicles || []).map((row) => row.user_id));
+    const inquiryCounts = tally((inquiries || []).map((row) => row.customer_email));
+    const tradeInCounts = tally((tradeIns || []).map((row) => row.user_id));
+
+    return {
+      customers: (data || []).map((customer) => ({
+        ...customer,
+        submitted_vehicles_count: vehicleCounts.get(customer.id) || 0,
+        inquiries_count: inquiryCounts.get(customer.email) || 0,
+        trade_in_requests_count: tradeInCounts.get(customer.id) || 0,
+      })),
+    };
   });
 }
 

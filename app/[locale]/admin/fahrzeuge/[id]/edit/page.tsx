@@ -7,6 +7,8 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, Save, ArrowLeft } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { vehicleUpdateSchema } from "@/lib/vehicle-schema";
+import { useVehicleValidation } from "@/lib/use-vehicle-validation";
 import { getFuelTypeLabel, getTransmissionLabel, getVehicleStatusLabel } from "@/lib/vehicle-labels";
 
 // DB values; labels come from common.* via lib/vehicle-labels.ts.
@@ -20,6 +22,7 @@ export default function AdminEditVehiclePage() {
   const tCommon = useTranslations("common");
   const tButtons = useTranslations("buttons");
   const errorMessage = useErrorMessage();
+  const validateVehicle = useVehicleValidation();
   const router = useRouter();
   const params = useParams();
   const vehicleId = params?.id as string;
@@ -93,6 +96,11 @@ export default function AdminEditVehiclePage() {
     e.preventDefault();
     if (!formData.vin || !formData.brand || !formData.model) {
       setError(tForm("errors.requiredFields"));
+      return;
+    }
+    const invalid = validateVehicle(vehicleUpdateSchema, formData);
+    if (invalid) {
+      setError(invalid);
       return;
     }
 

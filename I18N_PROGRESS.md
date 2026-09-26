@@ -123,13 +123,15 @@ Also changed here (behaviour, not just text):
 
 ## 11. Admin: Overview, Inquiries, Trade-ins, Customers, Statistics
 
-- [ ] `app/[locale]/admin/page.tsx` - Admin dashboard overview (welcome message, dashboard stats "Total Vehicles", "Total Customers", "Pending Inquiries", "Trade-in Requests", quick action cards, recent activity)
+- [x] `app/[locale]/admin/page.tsx` - Admin dashboard overview (welcome message, dashboard stats "Total Vehicles", "Total Customers", "Pending Inquiries", "Trade-in Requests", quick action cards, recent activity)
 - [x] `app/[locale]/admin/anfragen/page.tsx` - Inquiries list (page title, table headers, inquiry type labels, status filters, view details links, respond buttons)
 - [x] `app/[locale]/admin/inzahlungnahmen/page.tsx` - Trade-ins overview (page title, stats cards, filter options, trade-in request list with status)
-- [ ] `app/[locale]/admin/kunden/page.tsx` - Customers list (page title, table headers "Name", "Email", "Phone", "Registration Date", search box, view profile link, contact buttons)
-- [ ] `app/[locale]/admin/kunden/[id]/page.tsx` - Customer detail page (customer information sections, activity log, submitted vehicles, inquiries, contact history, edit button)
-- [ ] `app/[locale]/admin/statistik/page.tsx` - Statistics page (page title, chart titles, metric labels "Total Revenue", "Average Price", "Vehicles Sold", "Customer Satisfaction", date range selector)
-- [ ] `app/admin/kunden/[id]/page.tsx` - Alternative customer detail route
+- [x] `app/[locale]/admin/kunden/page.tsx` - Customers list (page title, table headers "Name", "Email", "Phone", "Registration Date", search box, view profile link, contact buttons)
+- [x] `app/[locale]/admin/kunden/[id]/page.tsx` - Customer detail page (customer information sections, activity log, submitted vehicles, inquiries, contact history, edit button)
+- [x] `app/[locale]/admin/statistik/page.tsx` - Statistics page (page title, chart titles, metric labels "Total Revenue", "Average Price", "Vehicles Sold", "Customer Satisfaction", date range selector)
+- [x] `app/admin/kunden/[id]/page.tsx` - does not exist (legacy `/admin/...` redirects to `/{locale}/admin/...`)
+
+**Done (2026-09-26):** see "Area 11: Admin overview, customers, statistics + final checks" below.
 
 ---
 
@@ -165,9 +167,9 @@ For each file, look for and catalog:
 
 ## Translation Status Summary
 
-- **Checklist items**: 64
-- **Completed**: 33
-- **Not started**: 31
+- **Checklist items**: 88 (incl. the generic category list below)
+- **Completed**: 65
+- **Not started**: 23 (only the generic "Hardcoded Text Categories" checklist, which is a reference list, not a work item)
 
 ---
 
@@ -720,6 +722,28 @@ Fixed gender agreement in wizard.workflow.* messages: "возило" (vehicle) i
 - ✅ `npm run check:i18n` and `npm run build` pass.
 - ✅ Rendered values checked with the same Intl calls (Node ICU) for de/en/mk.
 - ⏳ Live browser re-check on the deployment is still pending. Area 7 is marked complete only after that re-check.
+
+## Area 11: Admin overview, customers, statistics + final checks (2026-09-26)
+
+Scope: `admin/page.tsx` (overview), `admin/kunden` (list + `[id]`), `admin/statistik`, the admin layout metadata, the customer trade-in pages' mileage, and the admin vehicle form validation. This was the last translation area.
+
+### Changes
+- **Overview** (`admin/page.tsx`): every stat card, both breakdown cards and the quick actions are translated. Card titles reuse `admin.sidebar.*` (mk "Прашања"/"Замена"/"Поднесени возила") and `admin.vehicles`; status rows use `getVehicleStatusLabel` / `getSubmissionStatusLabel` (no new status keys); "Fahrzeuge verwalten" reuses `adminDashboard.manageVehicles`. New: `admin.dashboard.*` (`availableCount`, `submittedCount`, `newRequests`, `registered`, `inventoryTitle`, `manageSubmissions`, `quickActions`, `createVehicle`, `withCount` = "{label} ({count})"). All counts via `useLocaleFormatter().number()`.
+- **Customer list** (`admin/kunden`): `admin.customers.*`; dates numeric via `useLocaleFormatter().dateTime()` (was `toLocaleDateString("de-DE", month: "long")`); the view icon has `title`/`aria-label`. The search box did nothing (it only re-fetched); it now filters by name/email on the client. The Vehicles/Inquiries/Trade-ins columns read `*_count` fields that `getCustomers()` never returned (always 0); the action now returns them (read-only counts).
+- **Customer detail** (`admin/kunden/[id]`): `admin.customerDetail.*`; mileage via `format.number()` + `admin.units.mileage` (was `toLocaleString("de-DE") + " km"`); statuses via `getSubmissionStatusLabel` / `getInquiryStatusLabel` / `getTradeInStatusLabel` (the old German map was keyed `submitted/under_review/...`, which are not DB values, so it never matched); commission as percent. Bug fixed: the page read `full_name` and the history lists from the action's result root, but `getCustomerDetails()` returns `{ customer, vehicles, inquiries, tradeIns }`, so the name and all lists were empty.
+- **Statistics** (`admin/statistik`): `admin.statistics.*`, status rows via the label helpers (trade-in "Kontakt aufgen." is now the full `common.tradeInStatuses.contact_made`). `avg_vehicle_price` was hardcoded to 0 in `getDashboardStats()`; it is now the average price of available vehicles.
+- **Customer trade-in pages** (`dashboard/inzahlungnahme-anfragen` list + `[id]`): the hardcoded " km" is now `wizard.units.mileage` (mk "км"), same as the wizard.
+- **Metadata**: the admin layout was a client component and could not export metadata. It moved to `admin/admin-shell.tsx`; the new server `admin/layout.tsx` has `generateMetadata` with `meta.adminTitle` ("Admin-Dashboard – RBM" / "Admin Dashboard – RBM" / "Админ контролна табла – RBM") and `robots: noindex, nofollow`.
+- **Validation**: the vehicle zod schema moved from `app/actions/admin.ts` to `lib/vehicle-schema.ts` (the server still validates with it). The new/edit forms run the same schema before submitting via `useVehicleValidation()` (`lib/use-vehicle-validation.ts`) and show a translated message for the first invalid field (`adminVehicleForm.validation.*`, limits formatted per locale). Other admin inputs (publish price, reject reason, inquiry/trade-in status + notes) are validated by zod in the actions and report translated error codes (`useErrorMessage()`); publish price and reject reason also have translated client checks (Area 10).
+
+### Final project-wide checks
+- `generateMetadata`: `[locale]/layout.tsx` (default title/description from `meta.*` for every page without its own), `fahrzeuge`, `fahrzeuge/export`, `fahrzeuge/[slug]`, `privacy`, `terms`, `impressum`, and now `admin/layout.tsx`. No hardcoded German metadata anywhere (`app/layout.tsx` sets none). Homepage uses the localized layout default ("RBM – Premium-Gebrauchtwagen" / "RBM – Premium Used Cars" / "RBM – Премиум половни автомобили").
+- Grep of `app/[locale]/admin` (whole tree): no `toLocaleString`/`toLocaleDateString`/`Intl.NumberFormat`/`Intl.DateTimeFormat`; no "€" or "km" next to a number; no Cyrillic in code; no hardcoded UI text or string `placeholder`/`title`/`aria-label`/`alt` attributes; the remaining `Record<string, string>` maps are colours/icons keyed by DB values. No Cyrillic brand names in mk.json.
+
+### Verification
+- ✅ `npm run check:i18n` and `npm run build` pass.
+- ✅ Rendered strings checked with `createTranslator` + the same Intl calls (Node ICU) for de/en/mk.
+- ⏳ Live admin pass on the deployment (needs an admin session).
 
 ## Area 10: Admin submissions + shared admin sidebar fixes (2026-09-26)
 

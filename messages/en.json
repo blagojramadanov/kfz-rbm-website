@@ -562,6 +562,53 @@
             "notesPlaceholder": "Notes on this request...",
             "status": "Status",
             "editStatusNotes": "Edit status and notes"
+        },
+        "dashboard": {
+            "availableCount": "{count} available",
+            "submittedCount": "{count} submitted",
+            "newRequests": "New requests",
+            "registered": "Registered",
+            "inventoryTitle": "Inventory vehicles",
+            "manageSubmissions": "Manage submissions",
+            "quickActions": "Quick actions",
+            "createVehicle": "Create vehicle",
+            "withCount": "{label} ({count})"
+        },
+        "customers": {
+            "title": "Customer management",
+            "description": "Overview of all customers and their activity",
+            "searchPlaceholder": "Search by name or email...",
+            "empty": "No customers found.",
+            "name": "Name",
+            "email": "Email",
+            "phone": "Phone",
+            "joined": "Joined",
+            "vehicles": "Vehicles",
+            "actions": "Actions",
+            "viewProfile": "View profile"
+        },
+        "customerDetail": {
+            "backToList": "Back to customer list",
+            "notFound": "Customer not found.",
+            "profile": "Customer profile",
+            "contactInfo": "Contact information",
+            "address": "Address",
+            "cityPostal": "City / Postal code",
+            "notProvided": "Not provided",
+            "activity": "Activity",
+            "joinedOn": "Joined on"
+        },
+        "statistics": {
+            "description": "System overview and key figures",
+            "availableVehicles": "Available vehicles",
+            "totalCustomers": "Total customers",
+            "newInquiries": "Inquiries (new)",
+            "newTradeIns": "Trade-ins (new)",
+            "avgPrice": "Average vehicle price",
+            "vehicleStatus": "Vehicle status",
+            "tradeInStatus": "Trade-in status",
+            "inquiryStatus": "Inquiry status",
+            "noData": "No data available."
         }
     },
     "contact": {
@@ -982,7 +1029,8 @@
     },
     "meta": {
         "title": "{name} – Premium Used Cars",
-        "description": "Find your perfect car at {name} – your used-car dealership for inspected premium vehicles."
+        "description": "Find your perfect car at {name} – your used-car dealership for inspected premium vehicles.",
+        "adminTitle": "Admin Dashboard – {name}"
     },
     "legalPages": {
         "demoNotice": {
@@ -1148,6 +1196,17 @@
             "description": "Vehicle description...",
             "destination": "e.g. Morocco, Egypt",
             "exportNotes": "e.g. \"Net price under §25a UStG\", \"Export delivery\"..."
+        },
+        "validation": {
+            "vin": "The VIN is required (max. 17 characters).",
+            "brand": "Please enter the brand (max. 50 characters).",
+            "model": "Please enter the model (max. 100 characters).",
+            "year": "The year must be a whole number between {min} and {max}.",
+            "mileage": "The mileage must be a whole number between 0 and {max} km.",
+            "price": "The price must be between 0 and {max}.",
+            "engine": "The engine size must be a whole number between 0 and {max} cc.",
+            "power": "The engine power must be a whole number between 0 and {max} hp.",
+            "invalidField": "Please check the field “{field}”."
         }
     },
     "adminVehicleActions": {

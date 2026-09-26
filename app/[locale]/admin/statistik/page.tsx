@@ -1,6 +1,5 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -11,16 +10,51 @@ import { AlertCircle } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
+import {
+  getInquiryStatusLabel,
+  getSubmissionStatusLabel,
+  getTradeInStatusLabel,
+  getVehicleStatusLabel,
+} from "@/lib/vehicle-labels";
+
+// [DB status, stats field, colour] per breakdown card.
+const VEHICLE_ROWS = [
+  ["draft", "vehicles_draft", "text-gray-900"],
+  ["available", "vehicles_available", "text-green-600"],
+  ["reserved", "vehicles_reserved", "text-blue-600"],
+  ["sold", "vehicles_sold", "text-red-600"],
+] as const;
+const SUBMISSION_ROWS = [
+  ["eingereicht", "submitted_vehicles_eingereicht", "text-gray-900"],
+  ["in_bearbeitung", "submitted_vehicles_in_bearbeitung", "text-yellow-600"],
+  ["angebot_gesendet", "submitted_vehicles_angebot_gesendet", "text-green-600"],
+  ["abgelehnt", "submitted_vehicles_abgelehnt", "text-red-600"],
+] as const;
+const TRADE_IN_ROWS = [
+  ["new", "trade_in_requests_new", "text-blue-600"],
+  ["reviewing", "trade_in_requests_reviewing", "text-yellow-600"],
+  ["contact_made", "trade_in_requests_contact_made", "text-purple-600"],
+  ["completed", "trade_in_requests_completed", "text-green-600"],
+  ["cancelled", "trade_in_requests_cancelled", "text-red-600"],
+] as const;
+const INQUIRY_ROWS = [
+  ["new", "inquiries_new", "text-blue-600"],
+  ["read", "inquiries_read", "text-yellow-600"],
+  ["responded", "inquiries_responded", "text-green-600"],
+  ["closed", "inquiries_closed", "text-gray-600"],
+] as const;
 
 export default function AdminStatisticsPage() {
-  const params = useParams();
-  const locale = params.locale as string || 'de';
+  const t = useTranslations("admin.statistics");
+  const tAdmin = useTranslations("admin");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const { loading, isAdmin } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const errorMessage = useErrorMessage();
   const format = useLocaleFormatter();
+  const n = (value: number | undefined) => format.number(value || 0);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -57,7 +91,7 @@ export default function AdminStatisticsPage() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Wird geladen...</p>
+          <p className="text-gray-600">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -66,8 +100,8 @@ export default function AdminStatisticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Statistiken</h1>
-        <p className="text-gray-600 mt-1">Systemübersicht und Kennzahlen</p>
+        <h1 className="text-3xl font-bold text-gray-900">{tAdmin("sidebar.statistics")}</h1>
+        <p className="text-gray-600 mt-1">{t("description")}</p>
       </div>
 
       {error && (
@@ -85,34 +119,34 @@ export default function AdminStatisticsPage() {
         <div className="space-y-6">
           <div className="grid md:grid-cols-4 gap-4">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">Gesamtfahrzeuge</p>
-              <p className="text-3xl font-bold text-kfz-blue">{stats.total_vehicles || 0}</p>
+              <p className="text-sm text-gray-600 mb-2">{tAdmin("vehicles")}</p>
+              <p className="text-3xl font-bold text-kfz-blue">{n(stats.total_vehicles)}</p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">Verfügbare Fahrzeuge</p>
-              <p className="text-3xl font-bold text-green-600">{stats.vehicles_available || 0}</p>
+              <p className="text-sm text-gray-600 mb-2">{t("availableVehicles")}</p>
+              <p className="text-3xl font-bold text-green-600">{n(stats.vehicles_available)}</p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">Eingereichte Fahrzeuge</p>
-              <p className="text-3xl font-bold text-yellow-600">{stats.total_submitted_vehicles || 0}</p>
+              <p className="text-sm text-gray-600 mb-2">{tAdmin("sidebar.submittedVehicles")}</p>
+              <p className="text-3xl font-bold text-yellow-600">{n(stats.total_submitted_vehicles)}</p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">Gesamtkunden</p>
-              <p className="text-3xl font-bold text-purple-600">{stats.total_customers || 0}</p>
+              <p className="text-sm text-gray-600 mb-2">{t("totalCustomers")}</p>
+              <p className="text-3xl font-bold text-purple-600">{n(stats.total_customers)}</p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">Anfragen (Neu)</p>
-              <p className="text-3xl font-bold text-blue-600">{stats.inquiries_new || 0}</p>
+              <p className="text-sm text-gray-600 mb-2">{t("newInquiries")}</p>
+              <p className="text-3xl font-bold text-blue-600">{n(stats.inquiries_new)}</p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">Inzahlungnahmen (Neu)</p>
-              <p className="text-3xl font-bold text-purple-600">{stats.trade_in_requests_new || 0}</p>
+              <p className="text-sm text-gray-600 mb-2">{t("newTradeIns")}</p>
+              <p className="text-3xl font-bold text-purple-600">{n(stats.trade_in_requests_new)}</p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">Durchschn. Fahrzeugpreis</p>
+              <p className="text-sm text-gray-600 mb-2">{t("avgPrice")}</p>
               <p className="text-3xl font-bold text-green-600">
                 {formatPrice(format, stats.avg_vehicle_price || 0)}
               </p>
@@ -121,101 +155,57 @@ export default function AdminStatisticsPage() {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Fahrzeugstatus</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("vehicleStatus")}</h3>
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Entwurf</span>
-                  <span className="font-medium text-gray-900">{stats.vehicles_draft || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Verfügbar</span>
-                  <span className="font-medium text-green-600">{stats.vehicles_available || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Reserviert</span>
-                  <span className="font-medium text-blue-600">{stats.vehicles_reserved || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Verkauft</span>
-                  <span className="font-medium text-red-600">{stats.vehicles_sold || 0}</span>
-                </div>
+                {VEHICLE_ROWS.map(([status, key, color]) => (
+                  <div key={status} className="flex justify-between">
+                    <span className="text-sm text-gray-600">{getVehicleStatusLabel(tCommon, status)}</span>
+                    <span className={`font-medium ${color}`}>{n(stats[key])}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Eingereichte Fahrzeuge</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{tAdmin("sidebar.submittedVehicles")}</h3>
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Eingereicht</span>
-                  <span className="font-medium text-gray-900">{stats.submitted_vehicles_eingereicht || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">In Bearbeitung</span>
-                  <span className="font-medium text-yellow-600">{stats.submitted_vehicles_in_bearbeitung || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Angebot gesendet</span>
-                  <span className="font-medium text-green-600">{stats.submitted_vehicles_angebot_gesendet || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Abgelehnt</span>
-                  <span className="font-medium text-red-600">{stats.submitted_vehicles_abgelehnt || 0}</span>
-                </div>
+                {SUBMISSION_ROWS.map(([status, key, color]) => (
+                  <div key={status} className="flex justify-between">
+                    <span className="text-sm text-gray-600">{getSubmissionStatusLabel(tCommon, status)}</span>
+                    <span className={`font-medium ${color}`}>{n(stats[key])}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Inzahlungnahmen Status</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("tradeInStatus")}</h3>
             <div className="grid md:grid-cols-5 gap-4">
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Neu</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.trade_in_requests_new || 0}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Wird geprüft</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.trade_in_requests_reviewing || 0}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Kontakt aufgen.</p>
-                <p className="text-2xl font-bold text-purple-600">{stats.trade_in_requests_contact_made || 0}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Abgeschlossen</p>
-                <p className="text-2xl font-bold text-green-600">{stats.trade_in_requests_completed || 0}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Storniert</p>
-                <p className="text-2xl font-bold text-red-600">{stats.trade_in_requests_cancelled || 0}</p>
-              </div>
+              {TRADE_IN_ROWS.map(([status, key, color]) => (
+                <div key={status} className="text-center">
+                  <p className="text-sm text-gray-600 mb-2">{getTradeInStatusLabel(tCommon, status)}</p>
+                  <p className={`text-2xl font-bold ${color}`}>{n(stats[key])}</p>
+                </div>
+              ))}
             </div>
           </div>
 
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Anfragen Status</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("inquiryStatus")}</h3>
             <div className="grid md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Neu</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.inquiries_new || 0}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Gelesen</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.inquiries_read || 0}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Beantwortet</p>
-                <p className="text-2xl font-bold text-green-600">{stats.inquiries_responded || 0}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">Geschlossen</p>
-                <p className="text-2xl font-bold text-gray-600">{stats.inquiries_closed || 0}</p>
-              </div>
+              {INQUIRY_ROWS.map(([status, key, color]) => (
+                <div key={status} className="text-center">
+                  <p className="text-sm text-gray-600 mb-2">{getInquiryStatusLabel(tCommon, status)}</p>
+                  <p className={`text-2xl font-bold ${color}`}>{n(stats[key])}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <p className="text-gray-600">Keine Daten verfügbar.</p>
+          <p className="text-gray-600">{t("noData")}</p>
         </div>
       )}
     </div>

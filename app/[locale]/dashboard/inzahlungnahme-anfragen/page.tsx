@@ -30,6 +30,7 @@ export default function TradeInRequestsPage() {
   const tCommon = useTranslations("common");
   const tNav = useTranslations("navigation");
   const formatter = useLocaleFormatter();
+  const tUnits = useTranslations("wizard.units");
   const { loading, isAuthenticated, user } = useAuth();
   const [requests, setRequests] = useState<TradeInRequest[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(true);
@@ -157,7 +158,7 @@ export default function TradeInRequestsPage() {
                         </p>
                         <div className="space-y-1 text-sm">
                           <p className="text-gray-900">
-                            {formatter.number(request.current_vehicle_mileage || 0)} km
+                            {tUnits("mileage", { value: formatter.number(request.current_vehicle_mileage || 0) })}
                           </p>
                           <p className="font-semibold text-lg text-kfz-blue">
                             {formatPrice(formatter, request.current_vehicle_value_estimate || 0)}

@@ -3,6 +3,8 @@ import { useTranslations } from "next-intl";
 import type { ActionErrorCode } from "@/lib/action-result";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { resizeImageToDataUrl } from "@/lib/resize-image";
+import { vehicleFieldsSchema } from "@/lib/vehicle-schema";
+import { useVehicleValidation } from "@/lib/use-vehicle-validation";
 import { useParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -56,6 +58,7 @@ export default function AdminCreateVehiclePage() {
   const tCommon = useTranslations("common");
   const tButtons = useTranslations("buttons");
   const errorMessage = useErrorMessage();
+  const validateVehicle = useVehicleValidation();
 
   const MAX_IMAGES = 20;
   const errorText = (code: ActionErrorCode) => errorMessage(code);
@@ -116,6 +119,11 @@ export default function AdminCreateVehiclePage() {
       return vin;
     };
     const submitData = { ...formData, vin: generateTestVIN() };
+    const invalid = validateVehicle(vehicleFieldsSchema, submitData);
+    if (invalid) {
+      setError(invalid);
+      return;
+    }
     const actions = await import("@/app/actions/admin");
     const { uploadVehicleImage } = await import("@/app/actions/vehicles");
 

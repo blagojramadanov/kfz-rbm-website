@@ -562,6 +562,53 @@
             "notesPlaceholder": "Notizen zur Anfrage...",
             "status": "Status",
             "editStatusNotes": "Status und Notizen bearbeiten"
+        },
+        "dashboard": {
+            "availableCount": "{count} verfügbar",
+            "submittedCount": "{count} eingereicht",
+            "newRequests": "Neue Anfragen",
+            "registered": "Registriert",
+            "inventoryTitle": "Bestand-Fahrzeuge",
+            "manageSubmissions": "Eingereichte verwalten",
+            "quickActions": "Schnellzugriffe",
+            "createVehicle": "Fahrzeug erstellen",
+            "withCount": "{label} ({count})"
+        },
+        "customers": {
+            "title": "Kundenverwaltung",
+            "description": "Übersicht aller Kunden und ihrer Aktivitäten",
+            "searchPlaceholder": "Nach Name oder E-Mail suchen...",
+            "empty": "Keine Kunden gefunden.",
+            "name": "Name",
+            "email": "E-Mail",
+            "phone": "Telefon",
+            "joined": "Beigetreten",
+            "vehicles": "Fahrzeuge",
+            "actions": "Aktionen",
+            "viewProfile": "Profil ansehen"
+        },
+        "customerDetail": {
+            "backToList": "Zurück zur Kundenliste",
+            "notFound": "Kunde nicht gefunden.",
+            "profile": "Kundenprofil",
+            "contactInfo": "Kontaktinformationen",
+            "address": "Adresse",
+            "cityPostal": "Stadt / Postleitzahl",
+            "notProvided": "Nicht angegeben",
+            "activity": "Aktivität",
+            "joinedOn": "Beigetreten am"
+        },
+        "statistics": {
+            "description": "Systemübersicht und Kennzahlen",
+            "availableVehicles": "Verfügbare Fahrzeuge",
+            "totalCustomers": "Gesamtkunden",
+            "newInquiries": "Anfragen (neu)",
+            "newTradeIns": "Inzahlungnahmen (neu)",
+            "avgPrice": "Durchschn. Fahrzeugpreis",
+            "vehicleStatus": "Fahrzeugstatus",
+            "tradeInStatus": "Status der Inzahlungnahmen",
+            "inquiryStatus": "Status der Anfragen",
+            "noData": "Keine Daten verfügbar."
         }
     },
     "contact": {
@@ -982,7 +1029,8 @@
     },
     "meta": {
         "title": "{name} – Premium-Gebrauchtwagen",
-        "description": "Finden Sie Ihr Traumauto bei {name} – Ihr Gebrauchtwagenhändler für geprüfte Premium-Fahrzeuge."
+        "description": "Finden Sie Ihr Traumauto bei {name} – Ihr Gebrauchtwagenhändler für geprüfte Premium-Fahrzeuge.",
+        "adminTitle": "Admin-Dashboard – {name}"
     },
     "legalPages": {
         "demoNotice": {
@@ -1148,6 +1196,17 @@
             "description": "Fahrzeugbeschreibung...",
             "destination": "z. B. Marokko, Ägypten",
             "exportNotes": "z. B. „Nettopreis gemäß §25a UStG“, „Ausfuhrlieferung“..."
+        },
+        "validation": {
+            "vin": "Die VIN ist erforderlich (max. 17 Zeichen).",
+            "brand": "Bitte geben Sie die Marke ein (max. 50 Zeichen).",
+            "model": "Bitte geben Sie das Modell ein (max. 100 Zeichen).",
+            "year": "Das Jahr muss eine ganze Zahl zwischen {min} und {max} sein.",
+            "mileage": "Der Kilometerstand muss eine ganze Zahl zwischen 0 und {max} km sein.",
+            "price": "Der Preis muss zwischen 0 und {max} liegen.",
+            "engine": "Der Hubraum muss eine ganze Zahl zwischen 0 und {max} cm³ sein.",
+            "power": "Die Motorleistung muss eine ganze Zahl zwischen 0 und {max} PS sein.",
+            "invalidField": "Bitte prüfen Sie das Feld „{field}“."
         }
     },
     "adminVehicleActions": {
