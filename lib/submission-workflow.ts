@@ -6,7 +6,8 @@
  *                                                        -> (customer rejects) -> eingereicht
  *                                                           (offer_rejected_at set, offered_price kept)
  *   eingereicht / in_bearbeitung -> (admin rejects, with reason) -> abgelehnt
- *   akzeptiert -> (admin publishSubmittedVehicle, once) -> vehicle_id set, draft in `vehicles`
+ *   akzeptiert -> (admin publishSubmittedVehicle, once) -> vehicle_id set, vehicle in `vehicles`
+ *                 (draft or available, as the admin chooses; photos copied)
  */
 
 /** Statuses in which an admin may send (or correct) a price offer. */
@@ -26,6 +27,22 @@ export function canRejectSubmission(status: string): boolean {
 /** An accepted offer can be published into the inventory once (vehicle_id is set on publish). */
 export function canPublishSubmission(submission: { status: string; vehicle_id?: string | null }): boolean {
   return submission.status === "akzeptiert" && !submission.vehicle_id;
+}
+
+/**
+ * `vehicles.source_type` for a published submission, from its `sales_type`.
+ * Direct sale and trade-in: RBM buys the car ("rbm"). Consignment: the car still
+ * belongs to the customer ("customer"). An empty value is the DB default (direct
+ * sale). Any other value returns null, so the caller refuses to guess the owner.
+ */
+const RBM_SALES_TYPES = ["direct", "tradeIn", "Direktverkauf", "Direktverkauf an KFZ RBM", "Inzahlungnahme"];
+const CUSTOMER_SALES_TYPES = ["consignment", "Verkauf im Kundenauftrag"];
+
+export function getSourceTypeForSalesType(salesType: string | null | undefined): "rbm" | "customer" | null {
+  const value = salesType?.trim() ?? "";
+  if (value === "" || RBM_SALES_TYPES.includes(value)) return "rbm";
+  if (CUSTOMER_SALES_TYPES.includes(value)) return "customer";
+  return null;
 }
 
 /**

@@ -5,6 +5,7 @@ import {
   getSlugIdPrefix,
   getVehicleSlug,
 } from "@/lib/vehicle-slug";
+import type { SubmissionDetailValues } from "@/lib/submission-details";
 
 /**
  * Public, read-only vehicle queries (homepage, listings, detail page).
@@ -53,6 +54,8 @@ export interface PublicVehicleDetail extends PublicVehicle {
   zustand: string | null;
   zielland: string | null;
   exportNotes: string | null;
+  /** Details taken over from a customer submission (migration 027); raw wizard option values. */
+  details: SubmissionDetailValues;
 }
 
 interface VehicleRow {
@@ -79,11 +82,16 @@ interface VehicleDetailRow extends VehicleRow {
   zustand: string | null;
   zielland: string | null;
   export_notes: string | null;
+  variant: string | null;
+  previous_owners: string | null;
+  hu_au: string | null;
+  accident_history: string | null;
+  service_book: string | null;
 }
 
 const LIST_COLUMNS =
   "id, brand, model, year, price, mileage, fuel_type, transmission, body_type, color_exterior, power_hp, listing_type, featured, created_at, vehicle_images(image_url, sort_order)";
-const DETAIL_COLUMNS = `${LIST_COLUMNS}, engine_cc, description, zustand, zielland, export_notes`;
+const DETAIL_COLUMNS = `${LIST_COLUMNS}, engine_cc, description, zustand, zielland, export_notes, variant, previous_owners, hu_au, accident_history, service_book`;
 
 function getPublicClient() {
   return createClient(
@@ -136,6 +144,13 @@ function toPublicVehicleDetail(row: VehicleDetailRow): PublicVehicleDetail {
     zustand: row.zustand,
     zielland: row.zielland,
     exportNotes: row.export_notes,
+    details: {
+      variant: row.variant,
+      previous_owners: row.previous_owners,
+      hu_au: row.hu_au,
+      accident_history: row.accident_history,
+      service_book: row.service_book,
+    },
   };
 }
 

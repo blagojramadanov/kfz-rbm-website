@@ -870,8 +870,22 @@ To test: use a submission in `eingereicht` or `in_bearbeitung`. The "fffff…" t
 | 6 | Native `window.confirm` on Annehmen/Ablehnen | New `components/ui/confirm-dialog.tsx` (the site had no dialog component; no new dependency; Escape/backdrop cancel, focus handling). The dialog shows the offer price. |
 
 New keys (de/en/mk): `admin.submissions.{customerDeclinedOffer, customerDeclinedOn, acceptedOffer, alreadyPublished}`, `admin.submissionDetail.{customer, offerTitle, openVehicle, publishOnlyAccepted}`, `dashboard.vehicles.{acceptedPrice, youDeclinedOffer, youDeclinedOfferNext, acceptConfirmText, rejectConfirmText}`.
-Verification: `npm run check:i18n` ✅, `npm run build` ✅. Live test pending.
+Verification: `npm run check:i18n` ✅, `npm run build` ✅. ✅ **Verified live** (commit `2a552b2`).
 Note: accepted submissions published before this change have no `vehicle_id`, so they can be published once more; check the inventory for duplicates before doing so.
+
+### Publish flow fixes (2026-09-27)
+Live test of "Im Fahrzeugbestand veröffentlichen" on an accepted consignment (TEST-Mercedes) found five problems:
+| # | Problem | Fix |
+| --- | --- | --- |
+| 1 | Photos never copied | **Cause:** the copy inserted `is_main` into `vehicle_images`, which has no such column (only `submitted_vehicle_images` has it), so every image row failed and the error was only logged. New `lib/submission-photos.ts` (`copySubmissionPhotos`): copies (never moves) from the private `customer-submitted-photos` bucket to the public `vehicle-images` bucket under `{vehicleId}/`, writes `vehicle_images` rows with the public URL; the customer's main photo gets `sort_order` 0 (public pages show the lowest `sort_order` as main image), the rest keep their order. If any photo fails, the new vehicle and its copied files are removed and the action returns `UPLOAD_FAILED` (page: `publishPhotosFailed`). |
+| 2 | Wrong source | `getSourceTypeForSalesType()` (`lib/submission-workflow.ts`), enforced in `publishSubmittedVehicle`: `direct`/`tradeIn` (and legacy "Direktverkauf…", "Inzahlungnahme") → `rbm`; `consignment` → `customer`; unknown value → `INVALID_STATE`. `vehicles.submitted_vehicle_id` is now set too. The form shows "Wird angelegt als: …". |
+| 3 | "Veröffentlichen" created a draft | Status choice in the form: "Als Entwurf anlegen" (default) / "Sofort veröffentlichen (Verfügbar)"; button texts say what happens. The vehicle is always inserted as draft and only switched to `available` after photos and the submission link succeeded. The link is conditional (`vehicle_id IS NULL`), so two parallel publishes cannot both succeed. |
+| 4 | Wizard details lost | No matching `vehicles` columns existed → **migration `027_add_vehicle_details.sql`** adds `variant`, `previous_owners`, `hu_au`, `accident_history`, `service_book` (same names/values as 026). Copied on publish; shown on the public detail page (`lib/public-vehicles.ts` selects them) and the admin vehicle page (plus the source badge), labels via `getSubmissionDetails()`. **027 must be applied before deploying**, otherwise the public detail query fails. |
+| 5 | Sale price prefilled with the asking price | Not prefilled; required (> 0, zod `positive()` server-side). "Preisvorstellung des Kunden" and "Vereinbarter Preis" shown as reference values below the field. |
+| 6 | Backfill of VW Golf + TEST-Mercedes | `scripts/backfill-published-submissions.mjs` (dry run by default, `--apply` writes): sets source + `submitted_vehicle_id` + details, copies photos if the vehicle has none. Status/price untouched. |
+
+Keys (de/en/mk): changed `admin.submissionDetail.{publishTitle, publish, publishing, publishOnlyAccepted, invalidPrice}`; removed `confirmPublish`; new `admin.submissionDetail.{publishSource, agreedPrice, publishStatusLabel, publishAsDraft, publishAsAvailable, confirmPublishDraft, confirmPublishAvailable, publishPhotosFailed}`.
+Verification: `npm run check:i18n` ✅, `npm run build` ✅. Migration 027 + backfill + live test pending.
 
 ### Test data
 - The stuck test submission ("fffffffff…", `801e7b66-…`) got a real test offer (3.000 €) during live testing and is now in a normal "offer sent" state — no longer inconsistent, but still a fake vehicle that should eventually be deleted.

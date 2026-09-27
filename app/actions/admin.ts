@@ -8,7 +8,9 @@ import {
   OFFERABLE_SUBMISSION_STATUSES,
   REJECTABLE_SUBMISSION_STATUSES,
   canPublishSubmission,
+  getSourceTypeForSalesType,
 } from "@/lib/submission-workflow";
+import { copySubmissionPhotos } from "@/lib/submission-photos";
 
 // Helper function to log detailed error information for debugging
 function logAdminError(operation: string, error: unknown, context?: Record<string, any>) {
@@ -620,27 +622,31 @@ export async function getSubmittedVehicleById(submittedVehicleId: string) {
   });
 }
 
-/** Copies an accepted customer submission into `vehicles` (as draft) including its photos. */
-export async function publishSubmittedVehicle(
-  submittedVehicleId: string,
-  overrides?: { price?: number; description?: string; featured?: boolean }
-) {
+const publishSubmissionSchema = z.object({
+  id: z.guid(),
+  options: z.object({
+    // Required and entered by the admin; never taken from the customer's asking price.
+    price: z.number().positive().max(99_999_999),
+    description: z.string().max(10_000).optional(),
+    featured: z.boolean().optional(),
+    // "draft": not public yet; "available": listed right away.
+    status: z.enum(["draft", "available"]).default("draft"),
+  }),
+});
+
+/**
+ * Copies an accepted customer submission into `vehicles`, including its photos and
+ * wizard details. The source follows the sale type (consignment = customer vehicle,
+ * direct sale / trade-in = RBM vehicle). The vehicle is created as draft and only
+ * switched to "available" (if requested) once all photos are copied; if a photo
+ * fails, the vehicle and its copied files are removed again and nothing is linked.
+ */
+export async function publishSubmittedVehicle(submittedVehicleId: string, options: unknown) {
   return runAction("publishSubmittedVehicle", "CREATE_FAILED", async () => {
     await requireAdmin();
-    const input = z
-      .object({
-        id: z.guid(),
-        overrides: z
-          .object({
-            price: z.number().min(0).max(100_000_000).optional(),
-            description: z.string().max(10_000).optional(),
-            featured: z.boolean().optional(),
-          })
-          .optional(),
-      })
-      .safeParse({ id: submittedVehicleId, overrides });
+    const input = publishSubmissionSchema.safeParse({ id: submittedVehicleId, options });
     if (!input.success) throw new ActionError("INVALID_INPUT");
-    const o = input.data.overrides;
+    const { id: submissionId, options: o } = input.data;
 
     const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
     const supabase = getSupabaseAdminClient();
@@ -648,15 +654,17 @@ export async function publishSubmittedVehicle(
     const { data: submittedVehicle } = await supabase
       .from("submitted_vehicles")
       .select("*")
-      .eq("id", input.data.id)
+      .eq("id", submissionId)
       .maybeSingle();
     if (!submittedVehicle) throw new ActionError("NOT_FOUND");
     // Only an offer the customer accepted is published, and only once.
     if (!canPublishSubmission(submittedVehicle)) throw new ActionError("INVALID_STATE");
+    const sourceType = getSourceTypeForSalesType(submittedVehicle.sales_type);
+    if (!sourceType) throw new ActionError("INVALID_STATE");
 
     // Generate a 17-character VIN (standard VIN length) from the submitted vehicle ID.
     // Format: SUBM + first 13 alphanumeric characters of the UUID (VINs are always 17 chars)
-    const vinId = input.data.id.replace(/-/g, "").substring(0, 13).toUpperCase();
+    const vinId = submissionId.replace(/-/g, "").substring(0, 13).toUpperCase();
     const generatedVin = `SUBM${vinId}`;
 
     const { data: newVehicle, error: createError } = await supabase
@@ -667,67 +675,76 @@ export async function publishSubmittedVehicle(
         model: submittedVehicle.model,
         year: submittedVehicle.year,
         mileage: submittedVehicle.mileage,
-        price: o?.price ?? submittedVehicle.price,
+        price: o.price,
         fuel_type: submittedVehicle.fuel_type,
         transmission: submittedVehicle.transmission,
         color_exterior: submittedVehicle.color,
-        description: o?.description ?? submittedVehicle.description,
+        description: o.description ?? submittedVehicle.description,
         body_type: submittedVehicle.body_type,
         power_hp: submittedVehicle.power_hp,
+        variant: submittedVehicle.variant ?? null,
+        previous_owners: submittedVehicle.previous_owners ?? null,
+        hu_au: submittedVehicle.hu_au ?? null,
+        accident_history: submittedVehicle.accident_history ?? null,
+        service_book: submittedVehicle.service_book ?? null,
+        // Draft until the photos are in place, so it is never public without them.
         status: "draft",
-        featured: o?.featured ?? false,
+        featured: o.featured ?? false,
+        source_type: sourceType,
+        submitted_vehicle_id: submissionId,
       })
-      .select()
+      .select("id")
       .single();
     if (createError || !newVehicle) throw createError ?? new ActionError("CREATE_FAILED");
+    const vehicleId = newVehicle.id as string;
 
-    // Copy images from the private customer bucket to the public vehicle bucket.
-    const { data: submittedImages } = await supabase
-      .from("submitted_vehicle_images")
-      .select("image_url, sort_order, is_main")
-      .eq("submitted_vehicle_id", input.data.id)
-      .order("sort_order", { ascending: true });
-
-    for (const submittedImage of submittedImages ?? []) {
-      try {
-        const { data: fileData, error: downloadError } = await supabase.storage
-          .from("customer-submitted-photos")
-          .download(submittedImage.image_url);
-        if (downloadError || !fileData) {
-          console.error(`[publishSubmittedVehicle] download ${submittedImage.image_url}:`, downloadError);
-          continue;
-        }
-
-        const fileName = submittedImage.image_url.split("/").pop() || `image-${Date.now()}.jpg`;
-        const publicPath = `${newVehicle.id}/${fileName}`;
-        const { error: uploadError } = await supabase.storage
-          .from("vehicle-images")
-          .upload(publicPath, fileData, { upsert: false });
-        if (uploadError) {
-          console.error("[publishSubmittedVehicle] upload:", uploadError);
-          continue;
-        }
-
-        const { data: publicUrl } = supabase.storage.from("vehicle-images").getPublicUrl(publicPath);
-        const { error: insertError } = await supabase.from("vehicle_images").insert({
-          vehicle_id: newVehicle.id,
-          image_url: publicUrl.publicUrl,
-          sort_order: submittedImage.sort_order,
-          is_main: submittedImage.is_main,
-        });
-        if (insertError) console.error("[publishSubmittedVehicle] image row:", insertError);
-      } catch (imgError) {
-        console.error(`[publishSubmittedVehicle] image ${submittedImage.image_url}:`, imgError);
+    const discard = async (uploadedPaths: string[]) => {
+      if (uploadedPaths.length > 0) {
+        const { error } = await supabase.storage.from("vehicle-images").remove(uploadedPaths);
+        if (error) console.error("[publishSubmittedVehicle] cleanup files:", error.message);
       }
+      const { error } = await supabase.from("vehicles").delete().eq("id", vehicleId);
+      if (error) console.error("[publishSubmittedVehicle] cleanup vehicle:", error.message);
+    };
+
+    let photos: Awaited<ReturnType<typeof copySubmissionPhotos>>;
+    try {
+      photos = await copySubmissionPhotos(supabase, submissionId, vehicleId);
+    } catch (error) {
+      console.error("[publishSubmittedVehicle] photos:", error);
+      await discard([]);
+      throw new ActionError("UPLOAD_FAILED");
+    }
+    if (photos.failed.length > 0) {
+      await discard(photos.uploadedPaths);
+      throw new ActionError("UPLOAD_FAILED");
     }
 
-    // Links the submission to the new vehicle, which also blocks a second publish.
-    const { error: linkError } = await supabase
+    // Links the submission to the new vehicle, which also blocks a second publish
+    // (conditional, so two admins publishing at once cannot both succeed).
+    const { data: linked, error: linkError } = await supabase
       .from("submitted_vehicles")
-      .update({ vehicle_id: newVehicle.id, updated_at: new Date().toISOString() })
-      .eq("id", input.data.id);
-    if (linkError) console.error("[publishSubmittedVehicle] link vehicle_id:", linkError);
+      .update({ vehicle_id: vehicleId, updated_at: new Date().toISOString() })
+      .eq("id", submissionId)
+      .is("vehicle_id", null)
+      .select("id");
+    if (linkError || !linked || linked.length !== 1) {
+      if (linkError) console.error("[publishSubmittedVehicle] link vehicle_id:", linkError);
+      await discard(photos.uploadedPaths);
+      throw new ActionError("INVALID_STATE");
+    }
 
-    return { vehicleId: newVehicle.id as string };
+    let status: "draft" | "available" = "draft";
+    if (o.status === "available") {
+      const { error: statusError } = await supabase
+        .from("vehicles")
+        .update({ status: "available", updated_at: new Date().toISOString() })
+        .eq("id", vehicleId);
+      // The vehicle stays a (linked) draft; the admin can publish it from the vehicle page.
+      if (statusError) console.error("[publishSubmittedVehicle] set available:", statusError);
+      else status = "available";
+    }
+
+    return { vehicleId, status };
   });
 }

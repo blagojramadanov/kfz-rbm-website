@@ -9,6 +9,8 @@ import { AlertCircle, ArrowLeft, Edit2, Trash2, Star } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
+import { getSubmissionDetails } from "@/lib/submission-details";
+import { VehicleSourceBadge } from "@/components/vehicle-source-badge";
 import {
   getBodyTypeLabel,
   getColorLabel,
@@ -33,6 +35,7 @@ export default function AdminVehicleDetailPage() {
   const tAdmin = useTranslations("admin");
   const tCommon = useTranslations("common");
   const tButtons = useTranslations("buttons");
+  const tWizard = useTranslations("wizard");
   const format = useLocaleFormatter();
   const errorMessage = useErrorMessage();
   const params = useParams();
@@ -234,6 +237,16 @@ export default function AdminVehicleDetailPage() {
                   {engineParts.length > 0 ? engineParts.join(", ") : "—"}
                 </p>
               </div>
+              <div>
+                <p className="text-xs text-gray-600">{tFeatured("columns.source")}</p>
+                <VehicleSourceBadge sourceType={vehicle.source_type || "rbm"} />
+              </div>
+              {getSubmissionDetails(tWizard, vehicle).map((detail) => (
+                <div key={detail.key}>
+                  <p className="text-xs text-gray-600">{detail.label}</p>
+                  <p className="font-medium text-gray-900 break-words">{detail.value}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>

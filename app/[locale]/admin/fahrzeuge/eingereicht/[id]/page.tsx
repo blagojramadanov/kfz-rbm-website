@@ -11,7 +11,7 @@ import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
 import { getSubmissionDetails } from "@/lib/submission-details";
-import { canPublishSubmission } from "@/lib/submission-workflow";
+import { canPublishSubmission, getSourceTypeForSalesType } from "@/lib/submission-workflow";
 import { DeclinedOfferBadge, SubmissionActions, SubmissionCustomer, type SubmissionPatch } from "../submission-actions";
 import {
   getFuelTypeLabel,
@@ -75,6 +75,7 @@ export default function SubmittedVehicleDetailPage() {
   const tButtons = useTranslations("buttons");
   const tWizard = useTranslations("wizard");
   const tSubmissions = useTranslations("admin.submissions");
+  const tSource = useTranslations("vehicles.source");
   const format = useLocaleFormatter();
   const errorMessage = useErrorMessage();
   const [vehicle, setVehicle] = useState<SubmittedVehicle | null>(null);
@@ -84,6 +85,7 @@ export default function SubmittedVehicleDetailPage() {
   const [publishPrice, setPublishPrice] = useState<number | null>(null);
   const [publishDescription, setPublishDescription] = useState("");
   const [publishFeatured, setPublishFeatured] = useState(false);
+  const [publishStatus, setPublishStatus] = useState<"draft" | "available">("draft");
   const [publishing, setPublishing] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({}); // Map of path -> signed URL
@@ -149,7 +151,6 @@ export default function SubmittedVehicleDetailPage() {
         }
 
         setVehicle(result.vehicle);
-        setPublishPrice(result.vehicle.price);
         setPublishDescription(result.vehicle.description || "");
 
       } catch (err) {
@@ -169,7 +170,7 @@ export default function SubmittedVehicleDetailPage() {
   const handlePublish = async () => {
     if (!vehicle) return;
 
-    if (publishPrice === null || publishPrice < 0) {
+    if (publishPrice === null || !(publishPrice > 0)) {
       setError(t("invalidPrice"));
       return;
     }
@@ -181,10 +182,12 @@ export default function SubmittedVehicleDetailPage() {
         price: publishPrice,
         description: publishDescription,
         featured: publishFeatured,
+        status: publishStatus,
       });
 
       if (!result.ok) {
-        setError(errorMessage(result));
+        // UPLOAD_FAILED: a photo could not be copied, so nothing was created.
+        setError(result.error === "UPLOAD_FAILED" ? t("publishPhotosFailed") : errorMessage(result));
         setPublishing(false);
         return;
       }
@@ -244,6 +247,7 @@ export default function SubmittedVehicleDetailPage() {
   }
 
   const submissionDetails = getSubmissionDetails(tWizard, vehicle);
+  const publishSourceType = getSourceTypeForSalesType(vehicle.sales_type);
   const applyPatch = (patch: SubmissionPatch) => setVehicle((prev) => (prev ? { ...prev, ...patch } : prev));
 
   return (
@@ -497,17 +501,57 @@ export default function SubmittedVehicleDetailPage() {
               </button>
             ) : (
               <div className="space-y-4">
+                {publishSourceType && (
+                  <p className="text-sm text-gray-700">
+                    {t("publishSource", { source: tSource(publishSourceType) })}
+                  </p>
+                )}
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
+                  <label htmlFor="publish-price" className="block text-sm font-medium text-gray-900 mb-1">
                     {t("salePrice")}
                   </label>
                   <input
+                    id="publish-price"
                     type="number"
-                    value={publishPrice || ""}
+                    min={1}
+                    required
+                    value={publishPrice ?? ""}
                     onChange={(e) => setPublishPrice(e.target.value ? parseFloat(e.target.value) : null)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                   />
+                  <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <dt className="text-gray-600">{t("requestedPrice")}</dt>
+                      <dd className="font-semibold text-gray-900">{formatPrice(format, vehicle.price)}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-gray-600">{t("agreedPrice")}</dt>
+                      <dd className="font-semibold text-gray-900">
+                        {vehicle.offered_price != null ? formatPrice(format, vehicle.offered_price) : "—"}
+                      </dd>
+                    </div>
+                  </dl>
                 </div>
+
+                <fieldset className="space-y-2">
+                  <legend className="block text-sm font-medium text-gray-900 mb-1">{t("publishStatusLabel")}</legend>
+                  {(["draft", "available"] as const).map((option) => (
+                    <label key={option} className="flex items-start gap-2">
+                      <input
+                        type="radio"
+                        name="publish-status"
+                        value={option}
+                        checked={publishStatus === option}
+                        onChange={() => setPublishStatus(option)}
+                        className="w-4 h-4 mt-0.5"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {option === "draft" ? t("publishAsDraft") : t("publishAsAvailable")}
+                      </span>
+                    </label>
+                  ))}
+                </fieldset>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">
@@ -537,7 +581,9 @@ export default function SubmittedVehicleDetailPage() {
                     disabled={publishing}
                     className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 font-medium transition-colors"
                   >
-                    {publishing ? t("publishing") : `✓ ${t("confirmPublish")}`}
+                    {publishing
+                      ? t("publishing")
+                      : `✓ ${publishStatus === "available" ? t("confirmPublishAvailable") : t("confirmPublishDraft")}`}
                   </button>
                   <button
                     onClick={() => setShowPublishForm(false)}

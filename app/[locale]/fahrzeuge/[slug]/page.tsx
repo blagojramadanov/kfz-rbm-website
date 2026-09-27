@@ -15,6 +15,7 @@ import {
   getRelatedVehicles,
   getVehicleBySlug,
 } from "@/lib/public-vehicles";
+import { getSubmissionDetails } from "@/lib/submission-details";
 import { decodeSlugParam } from "@/lib/vehicle-slug";
 import {
   getBodyTypeLabel,
@@ -86,11 +87,12 @@ export default async function VehicleDetailPage({
   // Same id, outdated or mistyped name part: use the canonical URL.
   if (slug !== vehicle.slug) permanentRedirect(`/${locale}/fahrzeuge/${vehicle.slug}`);
 
-  const [t, tVehicles, tCommon, tContact, format, relatedVehicles] = await Promise.all([
+  const [t, tVehicles, tCommon, tContact, tWizard, format, relatedVehicles] = await Promise.all([
     getTranslations("pages.fahrzeugDetail"),
     getTranslations("vehicles"),
     getTranslations("common"),
     getTranslations("contact"),
+    getTranslations("wizard"),
     getFormatter(),
     getRelatedVehicles(vehicle, 4),
   ]);
@@ -251,6 +253,12 @@ export default async function VehicleDetailPage({
                         : tVehicles("onRequest")}
                     </dd>
                   </div>
+                  {getSubmissionDetails(tWizard, vehicle.details).map((detail) => (
+                    <div key={detail.key}>
+                      <dt className="text-gray-600 text-sm">{detail.label}</dt>
+                      <dd className="text-gray-900 font-semibold break-words">{detail.value}</dd>
+                    </div>
+                  ))}
                 </dl>
               </div>
             </div>
