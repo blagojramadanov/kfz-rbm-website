@@ -5,6 +5,8 @@
 //   node --env-file=.env.local scripts/backfill-published-submissions.mjs --apply    (writes)
 //
 // Per submission it
+//   0. links submitted_vehicles.vehicle_id if missing (published before 2a552b2; the
+//      vehicle is found by its generated VIN), which also blocks a second publish,
 //   1. sets vehicles.source_type from submitted_vehicles.sales_type (consignment ->
 //      customer; direct sale / trade-in -> rbm) and links vehicles.submitted_vehicle_id,
 //   2. copies variant, previous_owners, hu_au, accident_history, service_book
@@ -49,15 +51,33 @@ async function backfill(submissionId) {
     .maybeSingle();
   if (error) throw error;
   if (!submission) return console.log("  ! submission not found, skipped");
-  if (!submission.vehicle_id) return console.log("  ! submission has no vehicle_id (not published), skipped");
-
-  const { data: vehicle, error: vehicleError } = await supabase
+  // Submissions published before commit 2a552b2 have no vehicle_id; publishSubmittedVehicle
+  // always generated the VIN "SUBM" + the first 13 hex digits of the submission id.
+  const generatedVin = `SUBM${submission.id.replace(/-/g, "").substring(0, 13).toUpperCase()}`;
+  let query = supabase
     .from("vehicles")
-    .select(`id, brand, model, status, source_type, submitted_vehicle_id, ${DETAIL_COLUMNS.join(", ")}`)
-    .eq("id", submission.vehicle_id)
-    .maybeSingle();
+    .select(`id, vin, brand, model, status, source_type, submitted_vehicle_id, ${DETAIL_COLUMNS.join(", ")}`);
+  query = submission.vehicle_id ? query.eq("id", submission.vehicle_id) : query.eq("vin", generatedVin);
+  const { data: matches, error: vehicleError } = await query;
   if (vehicleError) throw vehicleError;
-  if (!vehicle) return console.log(`  ! vehicle ${submission.vehicle_id} not found, skipped`);
+  if (!matches || matches.length !== 1) {
+    return console.log(`  ! expected exactly one vehicle (${submission.vehicle_id ? `id ${submission.vehicle_id}` : `vin ${generatedVin}`}), found ${matches?.length ?? 0}, skipped`);
+  }
+  const vehicle = matches[0];
+  if (!submission.vehicle_id) {
+    console.log(`  submission.vehicle_id: null -> "${vehicle.id}" (found by generated VIN ${generatedVin})`);
+    if (apply) {
+      const { data: linked, error: linkError } = await supabase
+        .from("submitted_vehicles")
+        .update({ vehicle_id: vehicle.id, updated_at: new Date().toISOString() })
+        .eq("id", submission.id)
+        .is("vehicle_id", null)
+        .select("id");
+      if (linkError) throw linkError;
+      if (linked?.length !== 1) throw new Error("linking the submission changed no row");
+      console.log("  submission.vehicle_id: updated");
+    }
+  }
   console.log(`  ${submission.brand} ${submission.model}, sales_type=${JSON.stringify(submission.sales_type)}`);
   console.log(`  vehicle ${vehicle.id}: status=${vehicle.status}, source_type=${vehicle.source_type}`);
 
