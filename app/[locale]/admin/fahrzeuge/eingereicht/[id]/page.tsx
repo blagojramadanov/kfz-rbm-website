@@ -11,6 +11,8 @@ import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
 import { getSubmissionDetails } from "@/lib/submission-details";
+import { canPublishSubmission } from "@/lib/submission-workflow";
+import { DeclinedOfferBadge, SubmissionActions, SubmissionCustomer, type SubmissionPatch } from "../submission-actions";
 import {
   getFuelTypeLabel,
   getTransmissionLabel,
@@ -53,6 +55,14 @@ interface SubmittedVehicle {
   hu_au?: string | null;
   accident_history?: string | null;
   service_book?: string | null;
+  offered_price?: number | null;
+  offer_terms?: string | null;
+  offered_at?: string | null;
+  offer_rejected_at?: string | null;
+  vehicle_id?: string | null;
+  rejection_reason?: string | null;
+  status_reason?: string | null;
+  user?: { full_name?: string | null; email?: string | null; phone?: string | null } | null;
 }
 
 export default function SubmittedVehicleDetailPage() {
@@ -64,6 +74,7 @@ export default function SubmittedVehicleDetailPage() {
   const tCommon = useTranslations("common");
   const tButtons = useTranslations("buttons");
   const tWizard = useTranslations("wizard");
+  const tSubmissions = useTranslations("admin.submissions");
   const format = useLocaleFormatter();
   const errorMessage = useErrorMessage();
   const [vehicle, setVehicle] = useState<SubmittedVehicle | null>(null);
@@ -233,6 +244,7 @@ export default function SubmittedVehicleDetailPage() {
   }
 
   const submissionDetails = getSubmissionDetails(tWizard, vehicle);
+  const applyPatch = (patch: SubmissionPatch) => setVehicle((prev) => (prev ? { ...prev, ...patch } : prev));
 
   return (
     <div className="space-y-6">
@@ -431,12 +443,52 @@ export default function SubmittedVehicleDetailPage() {
             </div>
           )}
 
-          {/* Publish Form */}
-          {vehicle && (
+          {/* Customer */}
+          {vehicle.user && (
+            <div className="bg-white rounded-lg shadow-md p-6 text-sm text-gray-600">
+              <h3 className="font-bold text-gray-900 mb-2">{t("customer")}</h3>
+              <SubmissionCustomer user={vehicle.user} />
+            </div>
+          )}
+
+          {/* Offer: current / declined / accepted offer, rejection reason, admin actions */}
+          <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+            <h3 className="font-bold text-gray-900">{t("offerTitle")}</h3>
+            <DeclinedOfferBadge vehicle={vehicle} />
+            {(vehicle.status === "angebot_gesendet" || vehicle.status === "akzeptiert") && (
+              <div className="text-sm">
+                <p className="text-gray-600">
+                  {vehicle.status === "akzeptiert" ? tSubmissions("acceptedOffer") : tSubmissions("currentOffer")}
+                </p>
+                <p className={`text-xl font-bold ${vehicle.status === "akzeptiert" ? "text-emerald-700" : "text-green-700"}`}>
+                  {vehicle.offered_price != null ? formatPrice(format, vehicle.offered_price) : tSubmissions("noOfferPrice")}
+                </p>
+                {vehicle.offer_terms && <p className="text-gray-600 mt-1 whitespace-pre-line break-words">{vehicle.offer_terms}</p>}
+              </div>
+            )}
+            {vehicle.status === "abgelehnt" && (vehicle.rejection_reason || vehicle.status_reason) && (
+              <div className="text-sm">
+                <p className="text-gray-600">{tSubmissions("rejectionReason")}:</p>
+                <p className="text-gray-900 mt-1 whitespace-pre-line break-words">{vehicle.rejection_reason || vehicle.status_reason}</p>
+              </div>
+            )}
+            <SubmissionActions vehicle={vehicle} onChange={applyPatch} />
+          </div>
+
+          {/* Publish Form: only for an accepted offer, once (enforced in publishSubmittedVehicle) */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-4">
             <h3 className="font-bold text-gray-900">{t("publishTitle")}</h3>
 
-            {!showPublishForm ? (
+            {vehicle.vehicle_id ? (
+              <div className="space-y-2 text-sm">
+                <p className="text-gray-700">{tSubmissions("alreadyPublished")}</p>
+                <Link href={`/admin/fahrzeuge/${vehicle.vehicle_id}`} className="text-kfz-blue font-medium hover:underline">
+                  {t("openVehicle")}
+                </Link>
+              </div>
+            ) : !canPublishSubmission(vehicle) ? (
+              <p className="text-sm text-gray-700">{t("publishOnlyAccepted")}</p>
+            ) : !showPublishForm ? (
               <button
                 onClick={() => setShowPublishForm(true)}
                 className="w-full px-4 py-2 bg-kfz-blue text-white rounded-lg hover:bg-kfz-blue-dark font-medium transition-colors"
@@ -497,7 +549,6 @@ export default function SubmittedVehicleDetailPage() {
               </div>
             )}
           </div>
-          )}
         </div>
       </div>
     </div>

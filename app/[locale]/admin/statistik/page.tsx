@@ -28,6 +28,7 @@ const SUBMISSION_ROWS = [
   ["eingereicht", "submitted_vehicles_eingereicht", "text-gray-900"],
   ["in_bearbeitung", "submitted_vehicles_in_bearbeitung", "text-yellow-600"],
   ["angebot_gesendet", "submitted_vehicles_angebot_gesendet", "text-green-600"],
+  ["akzeptiert", "submitted_vehicles_akzeptiert", "text-emerald-700"],
   ["abgelehnt", "submitted_vehicles_abgelehnt", "text-red-600"],
 ] as const;
 const TRADE_IN_ROWS = [

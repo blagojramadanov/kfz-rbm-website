@@ -271,7 +271,12 @@
             "rejectConfirm": "Дали желите да ја отфрлите оваа понуда?",
             "offerAccepted": "✓ Понуда прифатена!",
             "contactUs": "Контактирајте нас за следните чекори.",
-            "rejectionReason": "Причина за одбивање"
+            "rejectionReason": "Причина за одбивање",
+            "acceptedPrice": "Договорена цена",
+            "youDeclinedOffer": "Ја одбивте понудата од {price}.",
+            "youDeclinedOfferNext": "Повторно го разгледуваме Вашето возило. Можеби ќе добиете нова понуда.",
+            "acceptConfirmText": "Ја прифаќате понудата од {price}. Потоа не можете да ја промените оваа одлука.",
+            "rejectConfirmText": "Ја одбивате понудата од {price}. Вашето возило останува поднесено и повторно ќе го разгледаме."
         },
         "inquiries": {
             "title": "Прашања",
@@ -517,7 +522,11 @@
             "offerPriceRequired": "Внесете цена на понудата поголема од 0.",
             "currentOffer": "Тековна понуда",
             "noOfferPrice": "Нема внесена цена",
-            "rejectionReason": "Причина за одбивање"
+            "rejectionReason": "Причина за одбивање",
+            "customerDeclinedOffer": "Клиентот ја одби понудата од {price}",
+            "customerDeclinedOn": "Одбиено на {date}",
+            "acceptedOffer": "Прифатена понуда",
+            "alreadyPublished": "Веќе е додадено во понудата на возила."
         },
         "submissionDetail": {
             "backToList": "Назад кон поднесените возила",
@@ -546,7 +555,11 @@
             "publishing": "Се објавува...",
             "confirmPublish": "Потврдете и објавете",
             "invalidPrice": "Ве молиме, внесете валидна цена.",
-            "vehicleDetails": "Податоци од клиентот за возилото"
+            "vehicleDetails": "Податоци од клиентот за возилото",
+            "customer": "Клиент",
+            "offerTitle": "Понуда",
+            "openVehicle": "Отворете го возилото во понудата",
+            "publishOnlyAccepted": "Можете да го објавите возилото откако клиентот ќе ја прифати Вашата понуда."
         },
         "inquiries": {
             "title": "Прашања од клиенти",

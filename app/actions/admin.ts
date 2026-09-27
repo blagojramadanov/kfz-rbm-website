@@ -4,7 +4,11 @@ import { z } from "zod";
 import { ActionError, runAction, toErrorCode, type ActionErrorCode, type ActionResult } from "@/lib/action-result";
 import { requireAdmin } from "@/lib/auth-guards";
 import { vehicleFieldsSchema, vehicleUpdateSchema } from "@/lib/vehicle-schema";
-import { OFFERABLE_SUBMISSION_STATUSES, REJECTABLE_SUBMISSION_STATUSES } from "@/lib/submission-workflow";
+import {
+  OFFERABLE_SUBMISSION_STATUSES,
+  REJECTABLE_SUBMISSION_STATUSES,
+  canPublishSubmission,
+} from "@/lib/submission-workflow";
 
 // Helper function to log detailed error information for debugging
 function logAdminError(operation: string, error: unknown, context?: Record<string, any>) {
@@ -286,6 +290,8 @@ export async function getSubmittedVehicles(filters?: { status?: string; search?:
         offered_price,
         offer_terms,
         offered_at,
+        offer_accepted_at,
+        offer_rejected_at,
         created_at,
         updated_at,
         vehicle_id,
@@ -293,7 +299,7 @@ export async function getSubmittedVehicles(filters?: { status?: string; search?:
         approved_by,
         approver_name,
         approval_notes,
-        user:user_id (id, email, full_name)
+        user:user_id (id, email, full_name, phone)
       `
       )
       .order("created_at", { ascending: false });
@@ -491,7 +497,7 @@ export async function getDashboardStats() {
     };
 
     const vehicleCounts = await countBy("vehicles", ["draft", "available", "reserved", "sold"]);
-    const submittedCounts = await countBy("submitted_vehicles", ["eingereicht", "in_bearbeitung", "angebot_gesendet", "abgelehnt"]);
+    const submittedCounts = await countBy("submitted_vehicles", ["eingereicht", "in_bearbeitung", "angebot_gesendet", "akzeptiert", "abgelehnt"]);
     const inquiryCounts = await countBy("customer_inquiries", INQUIRY_STATUSES);
     const tradeInCounts = await countBy("trade_in_requests", TRADE_IN_STATUSES);
 
@@ -516,6 +522,7 @@ export async function getDashboardStats() {
         submitted_vehicles_eingereicht: submittedCounts.eingereicht,
         submitted_vehicles_in_bearbeitung: submittedCounts.in_bearbeitung,
         submitted_vehicles_angebot_gesendet: submittedCounts.angebot_gesendet,
+        submitted_vehicles_akzeptiert: submittedCounts.akzeptiert,
         submitted_vehicles_abgelehnt: submittedCounts.abgelehnt,
         inquiries_new: inquiryCounts.new,
         inquiries_read: inquiryCounts.read,
@@ -597,7 +604,7 @@ export async function getSubmittedVehicleById(submittedVehicleId: string) {
 
     const { data: vehicle, error } = await supabase
       .from("submitted_vehicles")
-      .select("*")
+      .select("*, user:user_id (id, email, full_name, phone)")
       .eq("id", submittedVehicleId)
       .maybeSingle();
     if (error) throw error;
@@ -644,6 +651,8 @@ export async function publishSubmittedVehicle(
       .eq("id", input.data.id)
       .maybeSingle();
     if (!submittedVehicle) throw new ActionError("NOT_FOUND");
+    // Only an offer the customer accepted is published, and only once.
+    if (!canPublishSubmission(submittedVehicle)) throw new ActionError("INVALID_STATE");
 
     // Generate a 17-character VIN (standard VIN length) from the submitted vehicle ID.
     // Format: SUBM + first 13 alphanumeric characters of the UUID (VINs are always 17 chars)
@@ -712,10 +721,12 @@ export async function publishSubmittedVehicle(
       }
     }
 
-    await supabase
+    // Links the submission to the new vehicle, which also blocks a second publish.
+    const { error: linkError } = await supabase
       .from("submitted_vehicles")
-      .update({ status: "akzeptiert", updated_at: new Date().toISOString() })
+      .update({ vehicle_id: newVehicle.id, updated_at: new Date().toISOString() })
       .eq("id", input.data.id);
+    if (linkError) console.error("[publishSubmittedVehicle] link vehicle_id:", linkError);
 
     return { vehicleId: newVehicle.id as string };
   });

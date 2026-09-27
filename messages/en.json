@@ -271,7 +271,12 @@
             "rejectConfirm": "Do you want to reject this offer?",
             "offerAccepted": "✓ Offer accepted!",
             "contactUs": "Contact us for next steps.",
-            "rejectionReason": "Reason for rejection"
+            "rejectionReason": "Reason for rejection",
+            "acceptedPrice": "Agreed price",
+            "youDeclinedOffer": "You declined the offer of {price}.",
+            "youDeclinedOfferNext": "We are reviewing your vehicle again. You may receive a new offer.",
+            "acceptConfirmText": "You are accepting the offer of {price}. You cannot change this decision afterwards.",
+            "rejectConfirmText": "You are declining the offer of {price}. Your vehicle stays submitted and we will review it again."
         },
         "inquiries": {
             "title": "Inquiries",
@@ -517,7 +522,11 @@
             "offerPriceRequired": "Please enter an offer price greater than 0.",
             "currentOffer": "Current offer",
             "noOfferPrice": "No price given",
-            "rejectionReason": "Rejection reason"
+            "rejectionReason": "Rejection reason",
+            "customerDeclinedOffer": "Customer declined the offer of {price}",
+            "customerDeclinedOn": "Declined on {date}",
+            "acceptedOffer": "Accepted offer",
+            "alreadyPublished": "Already added to the vehicle listings."
         },
         "submissionDetail": {
             "backToList": "Back to submitted vehicles",
@@ -546,7 +555,11 @@
             "publishing": "Publishing...",
             "confirmPublish": "Confirm and publish",
             "invalidPrice": "Please enter a valid price.",
-            "vehicleDetails": "Customer details on the vehicle"
+            "vehicleDetails": "Customer details on the vehicle",
+            "customer": "Customer",
+            "offerTitle": "Offer",
+            "openVehicle": "Open the vehicle in the listings",
+            "publishOnlyAccepted": "You can publish the vehicle once the customer has accepted your offer."
         },
         "inquiries": {
             "title": "Customer Inquiries",

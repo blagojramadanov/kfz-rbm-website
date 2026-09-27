@@ -5,12 +5,14 @@ import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Plus, Car, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import type { SubmittedVehicle } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { getFuelTypeLabel, getTransmissionLabel } from "@/lib/vehicle-labels";
+import { getDeclinedOfferPrice } from "@/lib/submission-workflow";
 
 type DashboardVehicleStatus = "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "akzeptiert" | "abgelehnt";
 
@@ -20,6 +22,7 @@ export default function MyVehiclesPage() {
   const t = useTranslations("dashboard.vehicles");
   const tCommon = useTranslations("common");
   const tNav = useTranslations("navigation");
+  const tButtons = useTranslations("buttons");
   const formatter = useLocaleFormatter();
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
@@ -27,6 +30,9 @@ export default function MyVehiclesPage() {
   const [vehicles, setVehicles] = useState<SubmittedVehicle[]>([]);
   const [loadingVehicles, setLoadingVehicles] = useState(true);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
+  // Offer answer waiting for confirmation in the dialog.
+  const [pendingAnswer, setPendingAnswer] = useState<{ vehicleId: string; decision: "accept" | "reject"; price: number } | null>(null);
+  const [answering, setAnswering] = useState(false);
 
   const formatCurrency = (value: number) => {
     return formatter.number(value, {
@@ -114,44 +120,26 @@ export default function MyVehiclesPage() {
     }
   };
 
-  const handleAcceptOffer = async (vehicleId: string) => {
-    if (!user || !confirm(t("acceptConfirm"))) {
-      return;
-    }
-
+  const handleConfirmAnswer = async () => {
+    if (!user || !pendingAnswer) return;
     try {
-      const { acceptOffer } = await import("@/app/actions/vehicles");
-      const result = await acceptOffer(vehicleId);
+      setAnswering(true);
+      const { acceptOffer, rejectOffer } = await import("@/app/actions/vehicles");
+      const answer = pendingAnswer.decision === "accept" ? acceptOffer : rejectOffer;
+      const result = await answer(pendingAnswer.vehicleId);
       if (!result.ok) {
         alert(errorMessage(result));
         return;
       }
+      setPendingAnswer(null);
       await fetchVehicles();
     } catch (error) {
-      console.error("Error accepting offer:", error);
+      console.error("Error answering offer:", error);
       alert(errorMessage(error));
+    } finally {
+      setAnswering(false);
     }
   };
-
-  const handleRejectOffer = async (vehicleId: string) => {
-    if (!user || !confirm(t("rejectConfirm"))) {
-      return;
-    }
-
-    try {
-      const { rejectOffer } = await import("@/app/actions/vehicles");
-      const result = await rejectOffer(vehicleId);
-      if (!result.ok) {
-        alert(errorMessage(result));
-        return;
-      }
-      await fetchVehicles();
-    } catch (error) {
-      console.error("Error rejecting offer:", error);
-      alert(errorMessage(error));
-    }
-  };
-
 
   if (loading || !isAuthenticated) {
     return (
@@ -290,13 +278,13 @@ export default function MyVehiclesPage() {
                         </div>
                         <div className="flex gap-2">
                           <button
-                            onClick={() => handleAcceptOffer(vehicle.id)}
+                            onClick={() => setPendingAnswer({ vehicleId: vehicle.id, decision: "accept", price: vehicle.offered_price! })}
                             className="flex-1 px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 font-medium"
                           >
                             {t("acceptOffer")}
                           </button>
                           <button
-                            onClick={() => handleRejectOffer(vehicle.id)}
+                            onClick={() => setPendingAnswer({ vehicleId: vehicle.id, decision: "reject", price: vehicle.offered_price! })}
                             className="flex-1 px-3 py-2 border border-red-300 text-red-600 text-sm rounded hover:bg-red-50 font-medium"
                           >
                             {t("rejectOffer")}
@@ -304,6 +292,21 @@ export default function MyVehiclesPage() {
                         </div>
                       </div>
                     )}
+
+                    {/* The customer declined our last offer; the vehicle is back with us for review */}
+                    {(() => {
+                      const declinedPrice = getDeclinedOfferPrice(vehicle);
+                      return declinedPrice != null ? (
+                        <div className="border-t pt-3 mt-3">
+                          <div className="bg-orange-50 p-3 rounded">
+                            <p className="text-sm font-semibold text-orange-800">
+                              {t("youDeclinedOffer", { price: formatCurrency(declinedPrice) })}
+                            </p>
+                            <p className="text-xs text-gray-600 mt-1">{t("youDeclinedOfferNext")}</p>
+                          </div>
+                        </div>
+                      ) : null;
+                    })()}
 
                     {/* Rejection reason entered by the admin (older rows keep it in status_reason) */}
                     {status === "abgelehnt" && (vehicle.rejection_reason || vehicle.status_reason) && (
@@ -321,6 +324,12 @@ export default function MyVehiclesPage() {
                     {status === "akzeptiert" && (
                       <div className="border-t pt-3 mt-3 bg-green-50 p-3 rounded">
                         <p className="text-sm text-green-700"><span className="font-semibold">{t("offerAccepted")}</span></p>
+                        {Number(vehicle.offered_price) > 0 && (
+                          <>
+                            <p className="text-sm text-gray-600 mt-2">{t("acceptedPrice")}</p>
+                            <p className="text-2xl font-bold text-green-700">{formatCurrency(Number(vehicle.offered_price))}</p>
+                          </>
+                        )}
                         <p className="text-xs text-gray-600 mt-1">{t("contactUs")}</p>
                       </div>
                     )}
@@ -331,6 +340,23 @@ export default function MyVehiclesPage() {
           </div>
         )}
       </main>
+
+      <ConfirmDialog
+        open={pendingAnswer != null}
+        title={pendingAnswer?.decision === "reject" ? t("rejectConfirm") : t("acceptConfirm")}
+        description={
+          pendingAnswer &&
+          t(pendingAnswer.decision === "reject" ? "rejectConfirmText" : "acceptConfirmText", {
+            price: formatCurrency(pendingAnswer.price),
+          })
+        }
+        confirmLabel={pendingAnswer?.decision === "reject" ? t("rejectOffer") : t("acceptOffer")}
+        cancelLabel={tButtons("cancel")}
+        tone={pendingAnswer?.decision === "reject" ? "destructive" : "default"}
+        busy={answering}
+        onConfirm={handleConfirmAnswer}
+        onCancel={() => setPendingAnswer(null)}
+      />
     </div>
   );
 }

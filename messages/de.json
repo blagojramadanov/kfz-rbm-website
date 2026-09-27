@@ -271,7 +271,12 @@
             "rejectConfirm": "Möchten Sie dieses Angebot ablehnen?",
             "offerAccepted": "✓ Angebot angenommen!",
             "contactUs": "Kontaktieren Sie uns für die nächsten Schritte.",
-            "rejectionReason": "Grund der Ablehnung"
+            "rejectionReason": "Grund der Ablehnung",
+            "acceptedPrice": "Vereinbarter Preis",
+            "youDeclinedOffer": "Sie haben das Angebot über {price} abgelehnt.",
+            "youDeclinedOfferNext": "Wir prüfen Ihr Fahrzeug erneut. Sie erhalten gegebenenfalls ein neues Angebot.",
+            "acceptConfirmText": "Sie nehmen das Angebot über {price} an. Diese Entscheidung können Sie danach nicht mehr ändern.",
+            "rejectConfirmText": "Sie lehnen das Angebot über {price} ab. Ihr Fahrzeug bleibt eingereicht und wird von uns erneut geprüft."
         },
         "inquiries": {
             "title": "Anfragen",
@@ -517,7 +522,11 @@
             "offerPriceRequired": "Bitte geben Sie einen Angebotspreis größer als 0 ein.",
             "currentOffer": "Aktuelles Angebot",
             "noOfferPrice": "Kein Preis angegeben",
-            "rejectionReason": "Ablehnungsgrund"
+            "rejectionReason": "Ablehnungsgrund",
+            "customerDeclinedOffer": "Kunde hat Angebot über {price} abgelehnt",
+            "customerDeclinedOn": "Abgelehnt am {date}",
+            "acceptedOffer": "Angenommenes Angebot",
+            "alreadyPublished": "Bereits im Fahrzeugbestand angelegt."
         },
         "submissionDetail": {
             "backToList": "Zurück zu den eingereichten Fahrzeugen",
@@ -546,7 +555,11 @@
             "publishing": "Wird veröffentlicht...",
             "confirmPublish": "Bestätigen und veröffentlichen",
             "invalidPrice": "Bitte geben Sie einen gültigen Preis ein.",
-            "vehicleDetails": "Angaben des Kunden"
+            "vehicleDetails": "Angaben des Kunden",
+            "customer": "Kunde",
+            "offerTitle": "Angebot",
+            "openVehicle": "Fahrzeug im Bestand öffnen",
+            "publishOnlyAccepted": "Sie können das Fahrzeug veröffentlichen, sobald der Kunde Ihr Angebot angenommen hat."
         },
         "inquiries": {
             "title": "Kundenanfragen",

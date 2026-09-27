@@ -5,14 +5,14 @@ import { useParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "@/lib/navigation";
+import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { Check, X, AlertCircle, Car, MapPin, Calendar, Gauge } from "lucide-react";
+import { AlertCircle, Car, MapPin, Calendar, Gauge } from "lucide-react";
 import Image from "next/image";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
-import { canRejectSubmission, canSendOffer } from "@/lib/submission-workflow";
+import { DeclinedOfferBadge, SubmissionActions, SubmissionCustomer, type SubmissionPatch } from "./submission-actions";
 import {
   getFuelTypeLabel,
   getTransmissionLabel,
@@ -28,19 +28,12 @@ export default function AdminSubmittedVehiclesPage() {
   const t = useTranslations("admin.submissions");
   const tAdmin = useTranslations("admin");
   const tCommon = useTranslations("common");
-  const tButtons = useTranslations("buttons");
   const format = useLocaleFormatter();
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState("eingereicht");
-  const [rejectingId, setRejectingId] = useState<string | null>(null);
-  const [rejectReason, setRejectReason] = useState("");
-  const [offeringId, setOfferingId] = useState<string | null>(null);
-  const [offerPrice, setOfferPrice] = useState("");
-  const [offerTerms, setOfferTerms] = useState("");
-  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState<Record<string, number>>({});
 
   const getSelectedImageIndex = (vehicleId: string) => selectedImageIndex[vehicleId] ?? 0;
@@ -120,76 +113,13 @@ export default function AdminSubmittedVehiclesPage() {
     if (isAdmin) loadVehicles();
   }, [statusFilter, isAdmin]);
 
-  const openOfferForm = (vehicle: any) => {
-    setRejectingId(null);
-    if (offeringId === vehicle.id) {
-      setOfferingId(null);
-      return;
-    }
-    setOfferingId(vehicle.id);
-    // Prefill with the current offer, else the customer's asking price.
-    const prefill = vehicle.offered_price ?? vehicle.price;
-    setOfferPrice(prefill != null && Number(prefill) > 0 ? String(prefill) : "");
-    setOfferTerms(vehicle.offer_terms ?? "");
-  };
-
-  const handleSendOffer = async (vehicleId: string) => {
-    const price = Number(offerPrice);
-    if (!offerPrice.trim() || !Number.isFinite(price) || price <= 0) {
-      setError(t("offerPriceRequired"));
-      return;
-    }
-    try {
-      setActionInProgress(vehicleId);
-      const { sendOffer } = await import("@/app/actions/admin");
-      const result = await sendOffer(vehicleId, price, offerTerms.trim() || undefined);
-      if (!result.ok) {
-        setError(errorMessage(result));
-        return;
-      }
-      const now = new Date().toISOString();
-      setVehicles((prev) =>
-        statusFilter === "angebot_gesendet"
-          ? prev.map((v) =>
-              v.id === vehicleId
-                ? { ...v, status: "angebot_gesendet", offered_price: price, offer_terms: offerTerms.trim() || null, offered_at: now }
-                : v
-            )
-          : prev.filter((v) => v.id !== vehicleId)
-      );
-      setOfferingId(null);
-      setOfferPrice("");
-      setOfferTerms("");
-      setError("");
-    } catch (err) {
-      setError(errorMessage(err));
-    } finally {
-      setActionInProgress(null);
-    }
-  };
-
-  const handleReject = async (vehicleId: string) => {
-    if (!rejectReason.trim()) {
-      setError(t("rejectReasonRequired"));
-      return;
-    }
-    try {
-      setActionInProgress(vehicleId);
-      const { rejectSubmittedVehicle } = await import("@/app/actions/admin");
-      const result = await rejectSubmittedVehicle(vehicleId, rejectReason);
-      if (!result.ok) {
-        setError(errorMessage(result));
-        return;
-      }
-      setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
-      setRejectingId(null);
-      setRejectReason("");
-      setError("");
-    } catch (err) {
-      setError(errorMessage(err));
-    } finally {
-      setActionInProgress(null);
-    }
+  // An action moves the submission to another status: keep it only if it still matches the tab.
+  const applyPatch = (vehicleId: string, patch: SubmissionPatch) => {
+    setVehicles((prev) =>
+      patch.status === statusFilter
+        ? prev.map((v) => (v.id === vehicleId ? { ...v, ...patch } : v))
+        : prev.filter((v) => v.id !== vehicleId)
+    );
   };
 
   if (loading || !isAdmin) {
@@ -207,6 +137,7 @@ export default function AdminSubmittedVehiclesPage() {
     { value: "eingereicht", icon: "📥" },
     { value: "in_bearbeitung", icon: "⏳" },
     { value: "angebot_gesendet", icon: "📤" },
+    { value: "akzeptiert", icon: "✅" },
     { value: "abgelehnt", icon: "❌" },
   ];
 
@@ -222,6 +153,7 @@ export default function AdminSubmittedVehiclesPage() {
     eingereicht: { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
     in_bearbeitung: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
     angebot_gesendet: { bg: "bg-green-50", text: "text-green-700", border: "border-green-200" },
+    akzeptiert: { bg: "bg-emerald-100", text: "text-emerald-800", border: "border-emerald-300" },
     abgelehnt: { bg: "bg-red-50", text: "text-red-700", border: "border-red-200" },
   };
 
@@ -243,12 +175,12 @@ export default function AdminSubmittedVehiclesPage() {
 
       {/* Filter Tabs */}
       <div className="mb-8 border-b border-gray-200 bg-white rounded-t-lg">
-        <div className="flex gap-2 px-4">
+        <div className="flex gap-2 px-4 overflow-x-auto">
           {statuses.map((status) => (
             <button
               key={status.value}
               onClick={() => setStatusFilter(status.value)}
-              className={`flex items-center gap-2 px-5 py-4 font-medium text-sm transition-all border-b-2 ${
+              className={`flex flex-shrink-0 items-center gap-2 px-5 py-4 font-medium text-sm transition-all border-b-2 ${
                 statusFilter === status.value
                   ? "border-kfz-blue text-kfz-blue"
                   : "border-transparent text-gray-600 hover:text-gray-900"
@@ -281,12 +213,15 @@ export default function AdminSubmittedVehiclesPage() {
             {vehicles.map((vehicle) => (
               <div
                 key={vehicle.id}
-                onClick={() => router.push(`/admin/fahrzeuge/eingereicht/${vehicle.id}`)}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden cursor-pointer group"
+                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group"
               >
-                {/* Image Section */}
+                {/* Image Section (the main image links to the detail page; thumbnails stay buttons) */}
                 <div className="relative overflow-hidden bg-gray-100">
-                  <div className="relative w-full aspect-video">
+                  <Link
+                    href={`/admin/fahrzeuge/eingereicht/${vehicle.id}`}
+                    aria-label={`${vehicle.brand} ${vehicle.model}`}
+                    className="relative block w-full aspect-video"
+                  >
                     {vehicle.images && vehicle.images.length > 0 ? (
                       <Image
                         src={vehicle.images[getSelectedImageIndex(vehicle.id)]}
@@ -300,11 +235,11 @@ export default function AdminSubmittedVehiclesPage() {
                         <Car className="w-16 h-16 text-gray-400" />
                       </div>
                     )}
-                  </div>
+                  </Link>
 
                   {/* Image Counter */}
                   {vehicle.images && vehicle.images.length > 0 && (
-                    <div className="absolute top-3 right-3 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    <div className="pointer-events-none absolute top-3 right-3 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-medium">
                       {getSelectedImageIndex(vehicle.id) + 1}/{vehicle.images.length}
                     </div>
                   )}
@@ -315,10 +250,7 @@ export default function AdminSubmittedVehiclesPage() {
                       {vehicle.images.map((image: string, index: number) => (
                         <button
                           key={index}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setImageIndex(vehicle.id, index);
-                          }}
+                          onClick={() => setImageIndex(vehicle.id, index)}
                           className={`flex-shrink-0 w-10 h-10 rounded-md overflow-hidden border-2 transition-all ${
                             getSelectedImageIndex(vehicle.id) === index
                               ? "border-white shadow-lg"
@@ -338,7 +270,7 @@ export default function AdminSubmittedVehiclesPage() {
                   )}
 
                   {/* Status Badge */}
-                  <div className="absolute top-3 left-3">
+                  <div className="pointer-events-none absolute top-3 left-3">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         statusConfig[vehicle.status]?.bg
@@ -353,7 +285,9 @@ export default function AdminSubmittedVehiclesPage() {
                 <div className="p-5">
                   {/* Title */}
                   <h3 className="text-xl font-bold text-gray-900 mb-1">
-                    {vehicle.brand} {vehicle.model}
+                    <Link href={`/admin/fahrzeuge/eingereicht/${vehicle.id}`} className="hover:text-kfz-blue hover:underline">
+                      {vehicle.brand} {vehicle.model}
+                    </Link>
                   </h3>
                   <p className="text-sm text-gray-500 mb-4">{vehicle.year}</p>
 
@@ -394,8 +328,7 @@ export default function AdminSubmittedVehiclesPage() {
 
                   {/* Customer Info */}
                   <div className="text-xs text-gray-600 mb-4 pb-4 border-b border-gray-100">
-                    <p className="font-medium text-gray-900">{vehicle.user?.full_name}</p>
-                    <p>{vehicle.user?.email}</p>
+                    <SubmissionCustomer user={vehicle.user} />
                   </div>
 
                   {/* Sales Type & Commission */}
@@ -419,7 +352,10 @@ export default function AdminSubmittedVehiclesPage() {
                     )}
                   </div>
 
-                  {/* Current offer / rejection reason */}
+                  {/* Declined / current / accepted offer, rejection reason */}
+                  <div className="mb-4 empty:hidden">
+                    <DeclinedOfferBadge vehicle={vehicle} />
+                  </div>
                   {vehicle.status === "angebot_gesendet" && (
                     <div className="mb-4 pb-4 border-b border-gray-100 text-xs">
                       <div className="flex items-center justify-between">
@@ -431,6 +367,17 @@ export default function AdminSubmittedVehiclesPage() {
                       {vehicle.offer_terms && <p className="text-gray-600 mt-1 whitespace-pre-line break-words">{vehicle.offer_terms}</p>}
                     </div>
                   )}
+                  {vehicle.status === "akzeptiert" && (
+                    <div className="mb-4 pb-4 border-b border-gray-100 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">{t("acceptedOffer")}:</span>
+                        <span className="font-semibold text-emerald-700">
+                          {vehicle.offered_price != null ? formatPrice(format, vehicle.offered_price) : t("noOfferPrice")}
+                        </span>
+                      </div>
+                      {vehicle.vehicle_id && <p className="text-gray-600 mt-1">{t("alreadyPublished")}</p>}
+                    </div>
+                  )}
                   {vehicle.status === "abgelehnt" && (vehicle.rejection_reason || vehicle.status_reason) && (
                     <div className="mb-4 pb-4 border-b border-gray-100 text-xs">
                       <p className="text-gray-600">{t("rejectionReason")}:</p>
@@ -439,112 +386,7 @@ export default function AdminSubmittedVehiclesPage() {
                   )}
 
                   {/* Actions */}
-                  {(canSendOffer(vehicle.status) || canRejectSubmission(vehicle.status)) && (
-                    <div
-                      className="space-y-2"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="flex gap-2">
-                        {canSendOffer(vehicle.status) && (
-                          <button
-                            onClick={() => openOfferForm(vehicle)}
-                            disabled={actionInProgress === vehicle.id}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <Check className="w-4 h-4" />
-                            {vehicle.status === "angebot_gesendet" ? t("updateOffer") : t("sendOffer")}
-                          </button>
-                        )}
-                        {canRejectSubmission(vehicle.status) && (
-                          <button
-                            onClick={() => {
-                              setOfferingId(null);
-                              setRejectingId(rejectingId === vehicle.id ? null : vehicle.id);
-                            }}
-                            disabled={actionInProgress === vehicle.id}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-red-300 text-red-700 hover:bg-red-50 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <X className="w-4 h-4" />
-                            {t("reject")}
-                          </button>
-                        )}
-                      </div>
-
-                      {offeringId === vehicle.id && (
-                        <div className="pt-3 border-t border-gray-100 space-y-2">
-                          <label className="block text-xs font-medium text-gray-700">
-                            {t("offerPriceLabel")}
-                            <input
-                              type="number"
-                              min="1"
-                              step="1"
-                              inputMode="decimal"
-                              value={offerPrice}
-                              onChange={(e) => setOfferPrice(e.target.value)}
-                              className="mt-1 w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                            />
-                          </label>
-                          <label className="block text-xs font-medium text-gray-700">
-                            {t("offerTermsLabel")}
-                            <textarea
-                              value={offerTerms}
-                              onChange={(e) => setOfferTerms(e.target.value)}
-                              placeholder={t("offerTermsPlaceholder")}
-                              rows={2}
-                              maxLength={5000}
-                              className="mt-1 w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
-                            />
-                          </label>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleSendOffer(vehicle.id)}
-                              disabled={actionInProgress === vehicle.id || !offerPrice.trim()}
-                              className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {actionInProgress === vehicle.id ? "..." : t("confirmOffer")}
-                            </button>
-                            <button
-                              onClick={() => setOfferingId(null)}
-                              className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium text-sm transition-colors"
-                            >
-                              {tButtons("cancel")}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {rejectingId === vehicle.id && (
-                        <div className="pt-3 border-t border-gray-100">
-                          <textarea
-                            value={rejectReason}
-                            onChange={(e) => setRejectReason(e.target.value)}
-                            placeholder={t("rejectReasonPlaceholder")}
-                            rows={2}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          <div className="flex gap-2 mt-2">
-                            <button
-                              onClick={() => handleReject(vehicle.id)}
-                              disabled={actionInProgress === vehicle.id || !rejectReason.trim()}
-                              className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {tCommon("confirm")}
-                            </button>
-                            <button
-                              onClick={() => {
-                                setRejectingId(null);
-                                setRejectReason("");
-                              }}
-                              className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium text-sm transition-colors"
-                            >
-                              {tButtons("cancel")}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <SubmissionActions vehicle={vehicle} onChange={(patch) => applyPatch(vehicle.id, patch)} />
                 </div>
               </div>
             ))}

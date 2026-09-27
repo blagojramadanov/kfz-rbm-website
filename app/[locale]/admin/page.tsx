@@ -19,6 +19,7 @@ interface DashboardStats {
   submitted_vehicles_eingereicht: number;
   submitted_vehicles_in_bearbeitung: number;
   submitted_vehicles_angebot_gesendet: number;
+  submitted_vehicles_akzeptiert: number;
   submitted_vehicles_abgelehnt: number;
   inquiries_new: number;
   trade_in_requests_new: number;
@@ -36,6 +37,7 @@ const SUBMISSION_ROWS: [string, keyof DashboardStats, string][] = [
   ["eingereicht", "submitted_vehicles_eingereicht", "text-blue-600"],
   ["in_bearbeitung", "submitted_vehicles_in_bearbeitung", "text-yellow-600"],
   ["angebot_gesendet", "submitted_vehicles_angebot_gesendet", "text-green-600"],
+  ["akzeptiert", "submitted_vehicles_akzeptiert", "text-emerald-700"],
   ["abgelehnt", "submitted_vehicles_abgelehnt", "text-red-600"],
 ];
 

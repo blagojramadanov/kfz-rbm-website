@@ -113,6 +113,9 @@ export interface SubmittedVehicle {
   offered_price?: number; // Admin's offered price for angebot_gesendet status
   offered_at?: string; // When offer was sent
   offer_terms?: string; // Payment terms and conditions
+  offer_accepted_at?: string | null; // When the customer accepted the offer
+  offer_rejected_at?: string | null; // When the customer declined the offer (offered_price is kept)
+  vehicle_id?: string | null; // Inventory vehicle created from an accepted offer
   created_at: string;
   updated_at: string;
 }

@@ -857,7 +857,21 @@ Security fix: `respondToOffer` requires `offered_price` > 0 before accept/reject
 Next check: open "Meine Fahrzeuge" as a customer whose submission has photos (e.g. one created through the wizard with uploads), scroll through, and look in DevTools → Network for requests to `.../storage/v1/object/sign/customer-submitted-photos/...` (200 = working).
 
 **Fix 6 code check (ready to test).** Admin `admin/fahrzeuge/eingereicht` → "Ablehnen" requires a non-empty reason (`rejectReasonRequired`) → `rejectSubmittedVehicle` (`requireAdmin`, zod: guid + trimmed 1–2000 chars) sets `status = abgelehnt` and `rejection_reason`, only from `eingereicht`/`in_bearbeitung`, and checks that exactly one row changed. The customer page selects `*`, so `rejection_reason` is loaded, and shows it in a red box "Grund der Ablehnung" (`dashboard.vehicles.rejectionReason`, de/en/mk) with fallback to `status_reason`. The admin card shows it too (filter "Abgelehnt").
-To test: use a submission in `eingereicht` or `in_bearbeitung`. The "fffff…" test submission is now `angebot_gesendet` and **cannot** be rejected by the admin (the customer can still reject its offer, which sets `abgelehnt` without a reason).
+To test: use a submission in `eingereicht` or `in_bearbeitung`. The "fffff…" test submission is now `angebot_gesendet` and **cannot** be rejected by the admin (the customer can still decline its offer, which sets it back to `eingereicht`, not `abgelehnt`; see "Submission workflow gaps" below).
+
+### Submission workflow gaps from live testing (2026-09-27)
+| # | Gap | Fix |
+| --- | --- | --- |
+| 1 | Accepted offers invisible to the admin | New tab "Angebot angenommen" (DB status `akzeptiert`) on `admin/fahrzeuge/eingereicht`; `getDashboardStats` counts `akzeptiert` (`submitted_vehicles_akzeptiert`), shown on the admin dashboard and Statistiken and included in the totals. |
+| 2 | Customer-declined offers left no trace | **No migration needed:** `rejectOffer` already sets `offer_rejected_at` and keeps `offered_price`; the next `sendOffer` overwrites the price and moves the status on. `getDeclinedOfferPrice()` (`lib/submission-workflow.ts`) derives the declined price. Admin card + detail page: badge "Kunde hat Angebot über X € abgelehnt / Abgelehnt am …"; customer card: "Sie haben das Angebot über X € abgelehnt." Status still returns to `eingereicht`. |
+| 3 | Detail page unreachable | Card title and main image are real `<Link>`s to `admin/fahrzeuge/eingereicht/[id]` (the old whole-card JS `onClick` was removed). |
+| 4 | Detail page had the wrong actions | Customer card (name, email, phone; `user_profiles.phone` now joined in list + detail). The offer/reject UI was extracted into `eingereicht/submission-actions.tsx` (`SubmissionActions`, `DeclinedOfferBadge`, `SubmissionCustomer`) and is used by both the list and the detail page, with the same server actions. "Im Fahrzeugbestand veröffentlichen" only for `akzeptiert` and not yet published; **enforced server-side** in `publishSubmittedVehicle` (`INVALID_STATE` otherwise), which now stores `vehicle_id` (blocks a second publish) instead of force-setting `akzeptiert`. |
+| 5 | Accepted price not shown to the customer | Customer card shows "Vereinbarter Preis" with `offered_price` for `akzeptiert`. |
+| 6 | Native `window.confirm` on Annehmen/Ablehnen | New `components/ui/confirm-dialog.tsx` (the site had no dialog component; no new dependency; Escape/backdrop cancel, focus handling). The dialog shows the offer price. |
+
+New keys (de/en/mk): `admin.submissions.{customerDeclinedOffer, customerDeclinedOn, acceptedOffer, alreadyPublished}`, `admin.submissionDetail.{customer, offerTitle, openVehicle, publishOnlyAccepted}`, `dashboard.vehicles.{acceptedPrice, youDeclinedOffer, youDeclinedOfferNext, acceptConfirmText, rejectConfirmText}`.
+Verification: `npm run check:i18n` ✅, `npm run build` ✅. Live test pending.
+Note: accepted submissions published before this change have no `vehicle_id`, so they can be published once more; check the inventory for duplicates before doing so.
 
 ### Test data
 - The stuck test submission ("fffffffff…", `801e7b66-…`) got a real test offer (3.000 €) during live testing and is now in a normal "offer sent" state — no longer inconsistent, but still a fake vehicle that should eventually be deleted.
