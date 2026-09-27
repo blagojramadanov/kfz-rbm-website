@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 import { useEffect, useState } from "react";
 import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { Edit2, Trash2, Plus, Search, AlertCircle, Eye, Star } from "lucide-react";
+import { Edit2, Trash2, Plus, Search, AlertCircle, Eye, Star, Heart } from "lucide-react";
 import { VehicleSourceBadge } from "@/components/vehicle-source-badge";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
@@ -33,6 +33,7 @@ interface Vehicle {
   status: string;
   featured: boolean;
   source_type?: string;
+  favoriteCount: number;
 }
 
 export default function AdminVehiclesPage() {
@@ -193,6 +194,7 @@ export default function AdminVehiclesPage() {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.price")}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.source")}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.status")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.favorites")}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.actions")}</th>
                 </tr>
               </thead>
@@ -232,6 +234,15 @@ export default function AdminVehiclesPage() {
                         }`}
                       >
                         {getVehicleStatusLabel(tCommon, vehicle.status)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1">
+                        <Heart
+                          className={`w-4 h-4 ${vehicle.favoriteCount > 0 ? "text-red-500 fill-red-500" : "text-gray-300"}`}
+                          aria-hidden="true"
+                        />
+                        {t("favoriteCount", { value: format.number(vehicle.favoriteCount) })}
                       </span>
                     </td>
                     <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>

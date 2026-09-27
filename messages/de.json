@@ -11,7 +11,9 @@
         "logout": "Abmelden",
         "register": "Registrieren",
         "export": "Export",
-        "settings": "Einstellungen"
+        "settings": "Einstellungen",
+        "favorites": "Favoriten",
+        "favoritesCount": "{count, plural, one {# Favorit} other {# Favoriten}}"
     },
     "buttons": {
         "save": "Speichern",
@@ -156,7 +158,6 @@
         "engineValue": "{value} cm³",
         "onRequest": "Auf Anfrage",
         "card": {
-            "addFavorite": "Zu Favoriten hinzufügen",
             "noImage": "Kein Bild verfügbar"
         },
         "filters": {
@@ -292,8 +293,11 @@
             "title": "Favoriten",
             "description": "Ihre gespeicherten Fahrzeuge",
             "empty": "Noch keine Favoriten",
-            "emptyDescription": "Sie haben noch keine Fahrzeuge zu Ihren Favoriten hinzugefügt. Markieren Sie Fahrzeuge, um sie hier zu speichern.",
-            "browse": "Fahrzeuge durchsuchen"
+            "emptyDescription": "Sie haben noch keine Fahrzeuge gemerkt. Klicken Sie bei einem Fahrzeug auf das Herz, um es hier zu speichern.",
+            "browse": "Fahrzeuge durchsuchen",
+            "count": "{count, plural, one {# gemerktes Fahrzeug} other {# gemerkte Fahrzeuge}}",
+            "unavailableTitle": "Nicht mehr verfügbar",
+            "unavailableHint": "Dieses Fahrzeug wurde verkauft oder ist nicht mehr gelistet."
         },
         "profile": {
             "title": "Profil",
@@ -795,14 +799,17 @@
                 "callCta": "Anrufen: {phone}"
             },
             "search": {
-                "brand": "Marke",
-                "brandPlaceholder": "z.B. BMW, Mercedes",
-                "minPrice": "Mindestpreis (€)",
-                "minPricePlaceholder": "5000",
-                "maxPrice": "Höchstpreis (€)",
-                "maxPricePlaceholder": "50000",
-                "year": "Jahr",
-                "yearPlaceholder": "2023",
+                "title": "Fahrzeug finden",
+                "query": "Marke oder Modell",
+                "queryPlaceholder": "z. B. BMW 320d",
+                "model": "Modell",
+                "priceMax": "Preis bis",
+                "yearMin": "Erstzulassung ab",
+                "mileageMax": "Kilometerstand bis",
+                "bodyType": "Karosserieform",
+                "any": "Beliebig",
+                "upTo": "bis {value}",
+                "from": "ab {value}",
                 "search": "Suchen"
             },
             "services": {
@@ -921,8 +928,7 @@
                 "text": "Kontaktieren Sie uns für weitere Informationen und eine Probefahrt.",
                 "inquiry": "Anfrage senden",
                 "testDrive": "Probefahrt vereinbaren",
-                "share": "Teilen",
-                "save": "Merken"
+                "share": "Teilen"
             },
             "related": "Ähnliche Fahrzeuge"
         },
@@ -1064,7 +1070,8 @@
             "available": "Verfügbar",
             "reserved": "Reserviert",
             "sold": "Verkauft"
-        }
+        },
+        "close": "Schließen"
     },
     "hours": {
         "monFri": "Montag – Freitag",
@@ -1455,7 +1462,8 @@
             "price": "Preis",
             "source": "Quelle",
             "status": "Status",
-            "actions": "Aktionen"
+            "actions": "Aktionen",
+            "favorites": "Gemerkt"
         },
         "actions": {
             "view": "Fahrzeug anzeigen",
@@ -1478,7 +1486,8 @@
             "engine": "Motor",
             "description": "Beschreibung",
             "deleting": "Wird gelöscht..."
-        }
+        },
+        "favoriteCount": "{value}× gemerkt"
     },
     "inquiryForm": {
         "titleGeneral": "Anfrage zu diesem Fahrzeug",
@@ -1502,5 +1511,17 @@
         "successDashboard": "Den Status Ihrer Anfrage sehen Sie in Ihrem Kundenbereich.",
         "toMyInquiries": "Zu meinen Anfragen",
         "vehicleUnavailable": "Dieses Fahrzeug ist nicht mehr verfügbar."
+    },
+    "favorites": {
+        "save": "Merken",
+        "saved": "Gemerkt",
+        "add": "Zu Favoriten hinzufügen",
+        "remove": "Aus Favoriten entfernen",
+        "removeShort": "Entfernen",
+        "addedToast": "Das Fahrzeug wurde zu Ihren Favoriten hinzugefügt.",
+        "removedToast": "Das Fahrzeug wurde aus Ihren Favoriten entfernt.",
+        "toggleFailed": "Ihre Favoriten konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+        "removeFailed": "Der Favorit konnte nicht entfernt werden. Bitte versuchen Sie es erneut.",
+        "notAvailableToast": "Dieses Fahrzeug ist nicht mehr verfügbar."
     }
 }

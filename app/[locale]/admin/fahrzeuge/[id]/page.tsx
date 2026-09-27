@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
-import { AlertCircle, ArrowLeft, Edit2, Trash2, Star } from "lucide-react";
+import { AlertCircle, ArrowLeft, Edit2, Trash2, Star, Heart } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
@@ -44,6 +44,7 @@ export default function AdminVehicleDetailPage() {
   const vehicleId = params?.id as string;
   const { loading, isAdmin } = useAuth();
   const [vehicle, setVehicle] = useState<any>(null);
+  const [favoriteCount, setFavoriteCount] = useState<number | null>(null);
   const [vehicleLoading, setVehicleLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -66,6 +67,7 @@ export default function AdminVehicleDetailPage() {
           return;
         }
         setVehicle(result.vehicle);
+        setFavoriteCount(result.favoriteCount);
         setError("");
       } catch (err) {
         console.error("Error loading vehicle:", err);
@@ -169,6 +171,15 @@ export default function AdminVehicleDetailPage() {
               )}
             </div>
             <p className="text-gray-600 mt-1">{t("vin", { vin: vehicle.vin })}</p>
+            {favoriteCount !== null && (
+              <p className="text-gray-600 mt-1 flex items-center gap-1">
+                <Heart
+                  className={`w-4 h-4 ${favoriteCount > 0 ? "text-red-500 fill-red-500" : "text-gray-300"}`}
+                  aria-hidden="true"
+                />
+                {tFeatured("favoriteCount", { value: format.number(favoriteCount) })}
+              </p>
+            )}
           </div>
           <span
             className={`px-4 py-2 rounded-full text-sm font-medium ${

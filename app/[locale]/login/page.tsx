@@ -9,6 +9,19 @@ import { useErrorMessage } from "@/lib/use-error-message";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Lock, AlertCircle } from "lucide-react";
 
+/**
+ * `next` is a path without locale (the navigation router adds the current one).
+ * Only same-site paths are accepted: no scheme, no "//host", no backslashes, and
+ * not the auth pages themselves.
+ */
+function getSafeNextPath(value: string | null): string | null {
+  if (!value || value.length > 500) return null;
+  if (!value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return null;
+  if (/[\u0000-\u001f]/.test(value)) return null;
+  if (/^\/(login|register)(\/|\?|$)/.test(value)) return null;
+  return value;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const params = useParams();
@@ -23,6 +36,12 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated && profile) {
+      // Back to where the login was requested (e.g. the favorite heart), same locale.
+      const next = getSafeNextPath(new URLSearchParams(window.location.search).get("next"));
+      if (next) {
+        router.push(next);
+        return;
+      }
       // Redirect based on user role
       if (profile.role === "ADMIN") {
         router.push(`/admin`);

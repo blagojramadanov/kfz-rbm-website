@@ -6,6 +6,15 @@ import {
   getVehicleSlug,
 } from "@/lib/vehicle-slug";
 import type { SubmissionDetailValues } from "@/lib/submission-details";
+import {
+  BODY_TYPE_GROUPS,
+  FUEL_GROUPS,
+  TRANSMISSION_GROUPS,
+  containsPattern,
+  groupDbValues,
+  searchWords,
+  type VehicleSearchFilters,
+} from "@/lib/vehicle-search";
 
 /**
  * Public, read-only vehicle queries (homepage, listings, detail page).
@@ -58,7 +67,7 @@ export interface PublicVehicleDetail extends PublicVehicle {
   details: SubmissionDetailValues;
 }
 
-interface VehicleRow {
+export interface VehicleRow {
   id: string;
   brand: string;
   model: string;
@@ -89,7 +98,8 @@ interface VehicleDetailRow extends VehicleRow {
   service_book: string | null;
 }
 
-const LIST_COLUMNS =
+/** Columns for toPublicVehicle(); also used by the favorites actions (session client). */
+export const LIST_COLUMNS =
   "id, brand, model, year, price, mileage, fuel_type, transmission, body_type, color_exterior, power_hp, listing_type, featured, created_at, vehicle_images(image_url, sort_order)";
 const DETAIL_COLUMNS = `${LIST_COLUMNS}, engine_cc, description, zustand, zielland, export_notes, variant, previous_owners, hu_au, accident_history, service_book`;
 
@@ -114,7 +124,7 @@ function sortedImages(row: VehicleRow): string[] {
     .map((image) => image.image_url);
 }
 
-function toPublicVehicle(row: VehicleRow): PublicVehicle {
+export function toPublicVehicle(row: VehicleRow): PublicVehicle {
   return {
     id: row.id,
     slug: getVehicleSlug(row),
@@ -188,6 +198,101 @@ export function getLatestVehicles(limit = 4): Promise<PublicVehicle[]> {
 /** Newest available vehicles that have `vehicles.featured = true`. */
 export function getFeaturedVehicles(limit = 6): Promise<PublicVehicle[]> {
   return getPublicVehicles({ featured: true, limit });
+}
+
+const SORT_COLUMNS = {
+  newest: { column: "created_at", ascending: false },
+  "price-asc": { column: "price", ascending: true },
+  "price-desc": { column: "price", ascending: false },
+  mileage: { column: "mileage", ascending: true },
+  year: { column: "year", ascending: false },
+} as const;
+
+/**
+ * Available vehicles of one listing type matching `filters` (already validated by
+ * parseVehicleSearch()). Free-text words must each appear in the brand or model;
+ * brand/model/color are exact DB values (the filter options come from the DB);
+ * fuel/transmission/body match every DB spelling of their group.
+ * Returns [] (and logs) when the query fails.
+ */
+export async function searchPublicVehicles(
+  listingType: ListingType,
+  filters: VehicleSearchFilters,
+): Promise<PublicVehicle[]> {
+  let query = getPublicClient()
+    .from("vehicles")
+    .select(LIST_COLUMNS)
+    .eq("status", "available")
+    .eq("listing_type", listingType);
+
+  for (const word of searchWords(filters.q)) {
+    const pattern = containsPattern(word);
+    query = query.or(`brand.ilike.${pattern},model.ilike.${pattern}`);
+  }
+  if (filters.brand) query = query.eq("brand", filters.brand);
+  if (filters.model) query = query.eq("model", filters.model);
+  if (filters.color) query = query.eq("color_exterior", filters.color);
+  if (filters.priceMin !== undefined) query = query.gte("price", filters.priceMin);
+  if (filters.priceMax !== undefined) query = query.lte("price", filters.priceMax);
+  if (filters.yearMin !== undefined) query = query.gte("year", filters.yearMin);
+  if (filters.yearMax !== undefined) query = query.lte("year", filters.yearMax);
+  if (filters.mileageMin !== undefined) query = query.gte("mileage", filters.mileageMin);
+  if (filters.mileageMax !== undefined) query = query.lte("mileage", filters.mileageMax);
+  if (filters.fuel) query = query.in("fuel_type", groupDbValues(FUEL_GROUPS[filters.fuel].matches));
+  if (filters.transmission) {
+    query = query.in("transmission", groupDbValues(TRANSMISSION_GROUPS[filters.transmission].matches));
+  }
+  if (filters.body) query = query.in("body_type", groupDbValues(BODY_TYPE_GROUPS[filters.body].matches));
+
+  const sort = SORT_COLUMNS[filters.sort ?? "newest"];
+  let ordered = query.order(sort.column, { ascending: sort.ascending });
+  if (sort.column !== "created_at") ordered = ordered.order("created_at", { ascending: false });
+
+  const { data, error } = await ordered;
+  if (error) {
+    console.error("Failed to search public vehicles:", error.message);
+    return [];
+  }
+  return ((data ?? []) as unknown as VehicleRow[]).map(toPublicVehicle);
+}
+
+export interface VehicleFilterOptions {
+  /** Brand -> its models, both as stored (sorted). */
+  models: Record<string, string[]>;
+  brands: string[];
+  colors: string[];
+}
+
+function uniqueSorted(values: (string | null)[]): string[] {
+  return [...new Set(values.filter((value): value is string => Boolean(value?.trim())))].sort((a, b) =>
+    a.localeCompare(b, "de", { sensitivity: "base" }),
+  );
+}
+
+/**
+ * Brand/model/color choices for the filters: every value used by an available
+ * vehicle of the listing type (not just the current results, so picking a brand
+ * does not hide the others).
+ */
+export async function getPublicFilterOptions(listingType: ListingType): Promise<VehicleFilterOptions> {
+  const { data, error } = await getPublicClient()
+    .from("vehicles")
+    .select("brand, model, color_exterior")
+    .eq("status", "available")
+    .eq("listing_type", listingType)
+    .limit(5000);
+  if (error) {
+    console.error("Failed to load vehicle filter options:", error.message);
+    return { brands: [], models: {}, colors: [] };
+  }
+
+  const rows = (data ?? []) as { brand: string | null; model: string | null; color_exterior: string | null }[];
+  const brands = uniqueSorted(rows.map((row) => row.brand));
+  const models: Record<string, string[]> = {};
+  for (const brand of brands) {
+    models[brand] = uniqueSorted(rows.filter((row) => row.brand === brand).map((row) => row.model));
+  }
+  return { brands, models, colors: uniqueSorted(rows.map((row) => row.color_exterior)) };
 }
 
 /**

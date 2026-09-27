@@ -8,7 +8,7 @@ import { ServicesGrid } from "@/components/services-grid";
 import { ArrowRight, CheckCircle, Users, Award, Shield, Zap } from "lucide-react";
 import { COMPANY } from "@/lib/company";
 import { Link } from "@/lib/navigation";
-import { getFeaturedVehicles, getLatestVehicles } from "@/lib/public-vehicles";
+import { getFeaturedVehicles, getLatestVehicles, getPublicFilterOptions } from "@/lib/public-vehicles";
 
 // ISR: the latest/featured lists are read with the cookie-less anon client
 // (lib/public-vehicles.ts) and the page is regenerated at most once a minute.
@@ -18,9 +18,11 @@ export const revalidate = 60;
 export default async function Home({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
   const t = await getTranslations("pages.home");
-  const [latestVehicles, featuredVehicles] = await Promise.all([
+  const [latestVehicles, featuredVehicles, searchOptions] = await Promise.all([
     getLatestVehicles(4),
     getFeaturedVehicles(6),
+    // The search opens /fahrzeuge (sale listings), so it offers their brands/models.
+    getPublicFilterOptions("verkauf"),
   ]);
   return (
     <div className="w-full">
@@ -114,7 +116,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
       {/* Search Section */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-100 relative -mt-20 z-20">
         <div className="max-w-6xl mx-auto">
-          <SearchBar />
+          <SearchBar filterOptions={searchOptions} />
         </div>
       </section>
 

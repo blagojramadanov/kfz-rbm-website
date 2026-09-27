@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { VehicleListing } from "@/components/vehicle-listing";
 import { COMPANY } from "@/lib/company";
-import { getPublicVehicles } from "@/lib/public-vehicles";
+import { getPublicFilterOptions, searchPublicVehicles } from "@/lib/public-vehicles";
+import { parseVehicleSearch } from "@/lib/vehicle-search";
 
-// ISR: vehicles come from the cookie-less anon client (lib/public-vehicles.ts).
-// Must be a literal for Next to read it; keep in sync with REVALIDATE_SECONDS in that file.
-export const revalidate = 60;
+// The filters come from the URL (searchParams), so the page renders per request.
+// The vehicle queries still go through the cookie-less anon client, whose fetches
+// are cached for REVALIDATE_SECONDS (lib/public-vehicles.ts).
 
 export async function generateMetadata({
   params: { locale },
@@ -22,16 +23,24 @@ export async function generateMetadata({
 
 export default async function FahrzeugeListingPage({
   params: { locale },
+  searchParams,
 }: {
   params: { locale: string };
+  searchParams: Record<string, string | string[] | undefined>;
 }) {
   setRequestLocale(locale);
   const t = await getTranslations("pages.fahrzeuge");
-  const vehicles = await getPublicVehicles({ listingType: "verkauf" });
+  // Invalid or unknown params are ignored (see parseVehicleSearch).
+  const filters = parseVehicleSearch(searchParams);
+  const [vehicles, filterOptions] = await Promise.all([
+    searchPublicVehicles("verkauf", filters),
+    getPublicFilterOptions("verkauf"),
+  ]);
 
   return (
     <VehicleListing
       vehicles={vehicles}
+      filterOptions={filterOptions}
       variant="sale"
       heading={t("heroTitle")}
       subheading={t("heroSubtitle")}

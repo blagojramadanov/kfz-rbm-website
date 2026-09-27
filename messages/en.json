@@ -11,7 +11,9 @@
         "logout": "Sign Out",
         "register": "Register",
         "export": "Export",
-        "settings": "Settings"
+        "settings": "Settings",
+        "favorites": "Favorites",
+        "favoritesCount": "{count, plural, one {# favorite} other {# favorites}}"
     },
     "buttons": {
         "save": "Save",
@@ -156,7 +158,6 @@
         "engineValue": "{value} cm³",
         "onRequest": "On request",
         "card": {
-            "addFavorite": "Add to favorites",
             "noImage": "No image available"
         },
         "filters": {
@@ -292,8 +293,11 @@
             "title": "Favorites",
             "description": "Your saved vehicles",
             "empty": "No favorites yet",
-            "emptyDescription": "You haven't added any vehicles to your favorites yet. Mark vehicles to save them here.",
-            "browse": "Browse Vehicles"
+            "emptyDescription": "You have not saved any vehicles yet. Click the heart on a vehicle to save it here.",
+            "browse": "Browse Vehicles",
+            "count": "{count, plural, one {# saved vehicle} other {# saved vehicles}}",
+            "unavailableTitle": "No longer available",
+            "unavailableHint": "This vehicle has been sold or is no longer listed."
         },
         "profile": {
             "title": "Profile",
@@ -795,14 +799,17 @@
                 "callCta": "Call: {phone}"
             },
             "search": {
-                "brand": "Brand",
-                "brandPlaceholder": "e.g. BMW, Mercedes",
-                "minPrice": "Min Price (€)",
-                "minPricePlaceholder": "5000",
-                "maxPrice": "Max Price (€)",
-                "maxPricePlaceholder": "50000",
-                "year": "Year",
-                "yearPlaceholder": "2023",
+                "title": "Find a vehicle",
+                "query": "Make or model",
+                "queryPlaceholder": "e.g. BMW 320d",
+                "model": "Model",
+                "priceMax": "Max. price",
+                "yearMin": "First registration from",
+                "mileageMax": "Max. mileage",
+                "bodyType": "Body type",
+                "any": "Any",
+                "upTo": "up to {value}",
+                "from": "from {value}",
                 "search": "Search"
             },
             "services": {
@@ -921,8 +928,7 @@
                 "text": "Contact us for more information and a test drive.",
                 "inquiry": "Send Inquiry",
                 "testDrive": "Book a Test Drive",
-                "share": "Share",
-                "save": "Save"
+                "share": "Share"
             },
             "related": "Similar Vehicles"
         },
@@ -1064,7 +1070,8 @@
             "available": "Available",
             "reserved": "Reserved",
             "sold": "Sold"
-        }
+        },
+        "close": "Close"
     },
     "hours": {
         "monFri": "Monday – Friday",
@@ -1455,7 +1462,8 @@
             "price": "Price",
             "source": "Source",
             "status": "Status",
-            "actions": "Actions"
+            "actions": "Actions",
+            "favorites": "Saved"
         },
         "actions": {
             "view": "View vehicle",
@@ -1478,7 +1486,8 @@
             "engine": "Engine",
             "description": "Description",
             "deleting": "Deleting..."
-        }
+        },
+        "favoriteCount": "Saved {value}×"
     },
     "inquiryForm": {
         "titleGeneral": "Inquiry about this vehicle",
@@ -1502,5 +1511,17 @@
         "successDashboard": "You can follow the status of your inquiry in your account.",
         "toMyInquiries": "Go to my inquiries",
         "vehicleUnavailable": "This vehicle is no longer available."
+    },
+    "favorites": {
+        "save": "Save",
+        "saved": "Saved",
+        "add": "Add to favorites",
+        "remove": "Remove from favorites",
+        "removeShort": "Remove",
+        "addedToast": "The vehicle was added to your favorites.",
+        "removedToast": "The vehicle was removed from your favorites.",
+        "toggleFailed": "Your favorites could not be saved. Please try again.",
+        "removeFailed": "The favorite could not be removed. Please try again.",
+        "notAvailableToast": "This vehicle is no longer available."
     }
 }

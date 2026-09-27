@@ -4,6 +4,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeft, Car } from "lucide-react";
 import { BusinessHours } from "@/components/business-hours";
+import { FavoriteButton } from "@/components/favorite-button";
 import { ListingTypeBadge } from "@/components/listing-type-badge";
 import { VehicleGallery } from "@/components/vehicle-gallery";
 import { VehicleInquiry } from "@/components/vehicle-inquiry";
@@ -314,9 +315,7 @@ export default async function VehicleDetailPage({
                 <Button variant="outline" className="flex-1">
                   {t("cta.share")}
                 </Button>
-                <Button variant="outline" className="flex-1">
-                  {t("cta.save")}
-                </Button>
+                <FavoriteButton vehicleId={vehicle.id} variant="button" className="flex-1" />
               </div>
             </div>
           </div>

@@ -219,6 +219,13 @@ function searchTerm(value: string | undefined): string | null {
 }
 
 const guid = z.guid();
+
+/** Value of an embedded `relation(count)` select: `[{ count: n }]`. */
+function embeddedCount(value: unknown): number {
+  const first = Array.isArray(value) ? value[0] : value;
+  const count = first && typeof first === "object" ? (first as { count?: unknown }).count : 0;
+  return typeof count === "number" ? count : 0;
+}
 const listFilterSchema = z
   .object({ status: z.string().max(40).optional(), search: z.string().max(200).optional() })
   .optional();
@@ -228,14 +235,22 @@ export async function getVehicles(filters?: { status?: string; search?: string }
     const { supabase } = await requireAdmin();
     const f = listFilterSchema.parse(filters);
 
-    let query = supabase.from("vehicles").select("*").order("created_at", { ascending: false });
+    // favorites(count): admins read all favorites (RLS "Admins can view all favorites", migration 029).
+    let query = supabase
+      .from("vehicles")
+      .select("*, favorites(count)")
+      .order("created_at", { ascending: false });
     if (f?.status) query = query.eq("status", f.status);
     const term = searchTerm(f?.search);
     if (term) query = query.or(`brand.ilike.%${term}%,model.ilike.%${term}%,vin.ilike.%${term}%`);
 
     const { data, error } = await query;
     if (error) throw error;
-    return { vehicles: data || [] };
+    const vehicles = (data || []).map(({ favorites, ...vehicle }) => ({
+      ...vehicle,
+      favoriteCount: embeddedCount(favorites),
+    }));
+    return { vehicles };
   });
 }
 
@@ -254,7 +269,14 @@ export async function getVehicleById(vehicleId: string) {
       .eq("vehicle_id", vehicleId)
       .order("sort_order");
 
-    return { vehicle, images: images || [] };
+    // Separate from `vehicle`, which the edit form sends back as its update.
+    const { count: favoriteCount, error: favoritesError } = await supabase
+      .from("favorites")
+      .select("id", { count: "exact", head: true })
+      .eq("vehicle_id", vehicleId);
+    if (favoritesError) logAdminError("getVehicleById favorites", favoritesError, { vehicleId });
+
+    return { vehicle, images: images || [], favoriteCount: favoritesError ? null : favoriteCount ?? 0 };
   });
 }
 

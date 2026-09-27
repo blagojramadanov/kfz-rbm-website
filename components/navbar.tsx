@@ -3,10 +3,12 @@
 import { Link, useRouter } from "@/lib/navigation";
 import Image from "next/image";
 import { useState } from "react";
-import { Menu, X, LogOut, Settings, User } from "lucide-react";
+import { Menu, X, LogOut, Settings, User, Heart } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
+import { useFavorites } from "@/lib/favorites-context";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { COMPANY } from "@/lib/company";
 import { LanguageSwitcher } from "./language-switcher";
 
@@ -17,6 +19,14 @@ export function Navbar() {
   const locale = useLocale();
   const t = useTranslations();
   const { isAuthenticated, profile, loading, signOut } = useAuth();
+  const favorites = useFavorites();
+  const format = useLocaleFormatter();
+  const favoriteCount = favorites.ready ? favorites.count : 0;
+  const favoriteBadge = favoriteCount > 0 && (
+    <span className="ml-auto min-w-[1.25rem] h-5 px-1.5 rounded-full bg-red-600 text-white text-xs font-semibold flex items-center justify-center">
+      {format.number(favoriteCount)}
+    </span>
+  );
 
   const handleLogout = async () => {
     await signOut();
@@ -100,8 +110,16 @@ export function Navbar() {
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
                       className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                     >
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-kfz-blue to-kfz-accent flex items-center justify-center text-white text-sm font-bold">
+                      <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-kfz-blue to-kfz-accent flex items-center justify-center text-white text-sm font-bold">
                         {profile.full_name.charAt(0).toUpperCase()}
+                        {favoriteCount > 0 && (
+                          <span
+                            className="absolute -top-1.5 -right-1.5 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-red-600 text-white text-[10px] font-semibold flex items-center justify-center ring-2 ring-white"
+                            aria-label={t("navigation.favoritesCount", { count: favoriteCount })}
+                          >
+                            {format.number(favoriteCount)}
+                          </span>
+                        )}
                       </div>
                       <span className="text-gray-700 font-medium">
                         {profile.full_name.split(" ")[0]}
@@ -110,10 +128,15 @@ export function Navbar() {
 
                     {/* Profile Dropdown */}
                     {isProfileOpen && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-10">
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-10">
                         <Link href={dashboardLink} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
                           <User className="w-4 h-4 text-kfz-blue" />
                           <span>{profile.role === "ADMIN" ? t("navigation.admin") : t("navigation.dashboard")}</span>
+                        </Link>
+                        <Link href="/dashboard/favoriten" className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
+                          <Heart className="w-4 h-4 text-kfz-blue" />
+                          <span>{t("navigation.favorites")}</span>
+                          {favoriteBadge}
                         </Link>
                         <Link href={`/dashboard/profil`} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
                           <Settings className="w-4 h-4 text-kfz-blue" />
@@ -196,6 +219,13 @@ export function Navbar() {
                       <Link href={dashboardLink} className="block w-full">
                         <Button variant="outline" className="w-full border-kfz-blue text-kfz-blue">
                           {profile.role === "ADMIN" ? t("navigation.admin") : t("navigation.dashboard")}
+                        </Button>
+                      </Link>
+                      <Link href="/dashboard/favoriten" className="block w-full">
+                        <Button variant="outline" className="w-full gap-2">
+                          <Heart className="w-4 h-4 text-red-500" aria-hidden="true" />
+                          {t("navigation.favorites")}
+                          {favoriteBadge}
                         </Button>
                       </Link>
                       <Button

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { Car, Heart, MapPin, Gauge } from "lucide-react";
+import { Car, MapPin, Gauge } from "lucide-react";
+import { FavoriteButton } from "@/components/favorite-button";
 import { Button } from "@/components/ui/button";
 import { ListingTypeBadge } from "@/components/listing-type-badge";
 import { formatMileage, formatPrice } from "@/lib/format-vehicle";
@@ -11,7 +12,6 @@ import { getFuelTypeLabel } from "@/lib/vehicle-labels";
 export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }) {
   const t = await getTranslations("pages.home");
   const tCommon = await getTranslations("common");
-  const tVehicles = await getTranslations("vehicles");
   const format = await getFormatter();
 
   if (vehicles.length === 0) {
@@ -49,12 +49,7 @@ export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }
                 <ListingTypeBadge type="export" />
               </div>
             )}
-            <button
-              aria-label={tVehicles("card.addFavorite")}
-              className="absolute top-3 right-3 bg-white rounded-full p-2 shadow hover:bg-gray-100 transition-colors z-10"
-            >
-              <Heart className="w-5 h-5 text-red-500" />
-            </button>
+            <FavoriteButton vehicleId={vehicle.id} className="absolute top-3 right-3 z-10" />
           </div>
 
           {/* Content */}

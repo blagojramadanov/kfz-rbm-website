@@ -6,7 +6,9 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import "../globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { ToastProvider } from "@/components/ui/toast";
 import { AuthProvider } from "@/lib/auth-context";
+import { FavoritesProvider } from "@/lib/favorites-context";
 import { COMPANY } from "@/lib/company";
 import { locales } from "@/lib/locales";
 
@@ -54,11 +56,15 @@ export default async function LocaleLayout({
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
         <NextIntlClientProvider messages={messages} locale={locale}>
-          <AuthProvider>
-            <Navbar />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <FavoritesProvider>
+                <Navbar />
+                <main className="min-h-screen">{children}</main>
+                <Footer />
+              </FavoritesProvider>
+            </AuthProvider>
+          </ToastProvider>
         </NextIntlClientProvider>
       </body>
     </html>

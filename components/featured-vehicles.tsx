@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { Car, Heart, MapPin, Zap } from "lucide-react";
+import { Car, MapPin, Zap } from "lucide-react";
+import { FavoriteButton } from "@/components/favorite-button";
 import { Button } from "@/components/ui/button";
 import { ListingTypeBadge } from "@/components/listing-type-badge";
 import { TEST_DRIVE_HASH } from "@/lib/inquiries";
@@ -12,7 +13,6 @@ import { getFuelTypeLabel } from "@/lib/vehicle-labels";
 export async function FeaturedVehicles({ vehicles }: { vehicles: PublicVehicle[] }) {
   const t = await getTranslations("pages.home");
   const tCommon = await getTranslations("common");
-  const tVehicles = await getTranslations("vehicles");
   const format = await getFormatter();
 
   if (vehicles.length === 0) {
@@ -45,14 +45,7 @@ export async function FeaturedVehicles({ vehicles }: { vehicles: PublicVehicle[]
                 <Car className="w-16 h-16" aria-hidden="true" />
               </div>
             )}
-            <div className="absolute top-4 right-4">
-              <button
-                aria-label={tVehicles("card.addFavorite")}
-                className="bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors"
-              >
-                <Heart className="w-6 h-6 text-red-500" />
-              </button>
-            </div>
+            <FavoriteButton vehicleId={vehicle.id} size="md" className="absolute top-4 right-4 z-10 shadow-md" />
             {(vehicle.featured || vehicle.listingType === "export") && (
               <div className="absolute top-4 left-4 flex flex-col items-start gap-2">
                 {vehicle.featured && (

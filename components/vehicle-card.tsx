@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Car, Heart, Gauge, Zap, MapPin } from "lucide-react";
+import { Car, Gauge, Zap, MapPin } from "lucide-react";
+import { FavoriteButton } from "@/components/favorite-button";
 import { Link } from "@/lib/navigation";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatMileage, formatPrice } from "@/lib/format-vehicle";
@@ -22,12 +23,6 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
   const t = useTranslations("vehicles");
   const tCommon = useTranslations("common");
   const format = useLocaleFormatter();
-
-  const handleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // TODO: Implement favorites
-    console.log("Added to favorites:", vehicle.id);
-  };
 
   const hasExtraInfo = Boolean(vehicle.bodyType || vehicle.color);
 
@@ -49,13 +44,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
               <Car className="w-16 h-16" aria-label={t("card.noImage")} role="img" />
             </div>
           )}
-          <button
-            onClick={handleFavorite}
-            aria-label={t("card.addFavorite")}
-            className="absolute top-4 right-4 bg-white rounded-full p-2 shadow hover:bg-gray-100 transition-colors z-10"
-          >
-            <Heart className="w-5 h-5 text-red-500" />
-          </button>
+          <FavoriteButton vehicleId={vehicle.id} className="absolute top-4 right-4 z-10" />
 
           {/* Price Badge */}
           <div className="absolute bottom-4 left-4 bg-kfz-blue text-white px-3 py-2 rounded-lg font-bold text-lg">

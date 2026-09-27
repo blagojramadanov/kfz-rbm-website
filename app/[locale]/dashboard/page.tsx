@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
+import { useFavorites } from "@/lib/favorites-context";
 import { Button } from "@/components/ui/button";
 import { Car, MessageSquare, Heart, Plus, FileText, LogOut, ArrowRight, Repeat2 } from "lucide-react";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
@@ -19,6 +20,7 @@ export default function DashboardPage() {
   const params = useParams();
   const locale = params.locale as string || 'de';
   const { profile, loading, isAuthenticated, isAdmin, signOut } = useAuth();
+  const favorites = useFavorites();
   // undefined = loading, null = load failed
   const [vehicleCount, setVehicleCount] = useState<number | null | undefined>(undefined);
   const [inquiryCount, setInquiryCount] = useState<number | null | undefined>(undefined);
@@ -115,8 +117,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">{t("overview.favorites")}</p>
-                  {/* favorites are not stored yet (no table); /dashboard/favoriten lists none */}
-                  <p className="text-3xl font-bold text-gray-900">{formatter.number(0)}</p>
+                  <p className="text-3xl font-bold text-gray-900">{favorites.ready ? formatter.number(favorites.count) : "…"}</p>
                 </div>
                 <Heart className="w-10 h-10 text-red-600" />
               </div>
