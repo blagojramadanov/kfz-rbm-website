@@ -946,6 +946,13 @@ Verification: `npm run check:i18n` ✅, `npm run build` ✅. Local production se
 Keys (de/en/mk): new `wizard.images.remove`, `common.fuelTypes.lpg`; changed `dashboard.overview.myTradeInRequests`, mk `wizard.options.previousOwners.*`; removed `wizard.options.{fuel, transmission, bodyType}`.
 Verification: `npm run check:i18n` ✅, `npm run build` ✅.
 
+### Login redirect hardening (2026-09-27)
+
+- Re-test of item 14 (Save as guest → login → back to the vehicle): passed live on the production code for a customer (`/en/login?next=%2Ffahrzeuge%2Fvolkswagen-golf-e9428c9c` → English Golf page). The earlier failure was a login without `next`, not a code bug.
+- Hardening in `app/[locale]/login/page.tsx`: `next` is read and validated once on mount (`getSafeNextPath`, unchanged rules: same-site path with a single leading "/", no `//`, backslashes, control characters or auth pages), the redirect runs only once, and it uses `router.replace` so Back does not return to the login form. Without a valid `next`: admins → `/admin`, customers → `/dashboard`; the locale router keeps the locale.
+- There is no OAuth/Google login, so there is no callback to pass `next` through.
+- No message keys changed.
+
 ### Test data
 - The stuck test submission ("fffffffff…", `801e7b66-…`) got a real test offer (3.000 €) during live testing and is now in a normal "offer sent" state — no longer inconsistent, but still a fake vehicle that should eventually be deleted.
 - The leftover "sssssssss" test vehicle is still in the live database (see below).

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
@@ -24,8 +23,6 @@ function getSafeNextPath(value: string | null): string | null {
 
 export default function LoginPage() {
   const router = useRouter();
-  const params = useParams();
-  const locale = params.locale as string || 'de';
   const t = useTranslations();
   const errorMessage = useErrorMessage();
   const { signIn, isAuthenticated, profile } = useAuth();
@@ -34,22 +31,29 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // `next` is read once on mount and the redirect happens once: a later run of the
+  // redirect effect (profile re-set after SIGNED_IN, token refresh) could otherwise
+  // read a URL the router has already changed and fall back to the dashboard.
+  const nextPathRef = useRef<string | null | undefined>(undefined);
+  const redirectedRef = useRef(false);
   useEffect(() => {
-    if (isAuthenticated && profile) {
-      // Back to where the login was requested (e.g. the favorite heart), same locale.
-      const next = getSafeNextPath(new URLSearchParams(window.location.search).get("next"));
-      if (next) {
-        router.push(next);
-        return;
-      }
-      // Redirect based on user role
-      if (profile.role === "ADMIN") {
-        router.push(`/admin`);
-      } else {
-        router.push(`/dashboard`);
-      }
+    if (nextPathRef.current === undefined) {
+      nextPathRef.current = getSafeNextPath(new URLSearchParams(window.location.search).get("next"));
     }
-  }, [isAuthenticated, profile, router, locale]);
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated || !profile || redirectedRef.current) return;
+    redirectedRef.current = true;
+    // Back to where the login was requested (e.g. the favorite heart), same locale.
+    // Without a valid `next`: admins to /admin, customers to /dashboard.
+    const next = nextPathRef.current;
+    if (next) {
+      router.replace(next);
+    } else {
+      router.replace(profile.role === "ADMIN" ? "/admin" : "/dashboard");
+    }
+  }, [isAuthenticated, profile, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
