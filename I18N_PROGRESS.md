@@ -953,6 +953,18 @@ Verification: `npm run check:i18n` ✅, `npm run build` ✅.
 - There is no OAuth/Google login, so there is no callback to pass `next` through.
 - No message keys changed.
 
+### Password reset fix (2026-09-27)
+
+Root cause of "Ungültiger Link" on every reset link: `/[locale]/reset-password` only accepted a `?token=` parameter, which Supabase never sends. The browser client (`@supabase/ssr` `createBrowserClient`) uses the **PKCE** flow: the email link goes to `/auth/v1/verify`, which redirects to `redirect_to?code=…`. The i18n middleware redirect `/reset-password` → `/de/reset-password` keeps the query (checked live: `Location: /de/reset-password?code=abc123`), so the code arrived but was ignored.
+
+- `resetPasswordForEmail` now sends `redirect_to` = `{origin}/{locale}/reset-password` (current locale).
+- Reset page: `?code=` → the Supabase client exchanges it during `initialize()` (`detectSessionInUrl`, code verifier cookie from the requesting browser), the page awaits `auth.initialize()` and checks for a session (a second `exchangeCodeForSession` would fail: the verifier is single-use). `?token_hash=…&type=recovery` → `verifyOtp` (works in any browser, needs the email template change below). `error`/`error_code` in query or hash (expired/used link) or no parameters → translated "invalid or expired" screen with a button to `/forgot-password`. The one-time parameters are removed from the address bar afterwards.
+- After `updateUser({ password })`: success screen, then `router.replace` to `/admin` (admin) or `/dashboard`.
+- Forgot-password success screen: short heading `auth.resetEmailSentTitle` ("E-Mail gesendet" / "Email sent" / "Е-поштата е испратена") and the sentence below. All remaining hardcoded German on both pages is translated.
+- Keys: new `auth.{resetEmailSentTitle, forgotPasswordDescription, backToLogin, verifyingResetLink, newPasswordTitle, newPasswordDescription, newPassword, repeatPassword, passwordMinLength, passwordTooShort, savePassword, savingPassword, passwordUpdatedTitle, passwordUpdatedRedirect}`; changed `auth.passwordResetSent` (mk used "рестартирање" = restart), `auth.invalidResetLinkDesc`.
+- Tested on a local production build: all three forgot-password locales; reset page without parameters, with a bogus `code`, a bogus `token_hash`, `error_code=otp_expired` in query and in hash, and an old link without locale → invalid screen in the right language, parameters removed. The successful reset with a real email needs a live test.
+- Supabase settings (dashboard): Site URL `https://kfz-rbm-website.vercel.app`; Redirect URLs `https://kfz-rbm-website.vercel.app/de/reset-password`, `…/en/reset-password`, `…/mk/reset-password` (plus `http://localhost:3000/**` for local tests). Optional (links then work in any browser/device): reset-password template link `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery`.
+
 ### Test data
 - The stuck test submission ("fffffffff…", `801e7b66-…`) got a real test offer (3.000 €) during live testing and is now in a normal "offer sent" state — no longer inconsistent, but still a fake vehicle that should eventually be deleted.
 - The leftover "sssssssss" test vehicle is still in the live database (see below).

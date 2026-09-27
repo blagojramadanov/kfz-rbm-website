@@ -15,7 +15,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
+  resetPassword: (email: string, locale: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
@@ -142,9 +142,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(null);
   };
 
-  const resetPassword = async (email: string) => {
+  // The email link must land on the localized page: the i18n redirect from
+  // /reset-password would pick the default locale, not the one the user chose.
+  // The URL has to be listed under Supabase Auth -> URL Configuration -> Redirect URLs.
+  const resetPassword = async (email: string, locale: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}/${locale}/reset-password`,
     });
 
     if (error) throwAuthError(error);

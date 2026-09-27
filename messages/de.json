@@ -712,7 +712,7 @@
         "enterEmail": "Geben Sie Ihre E-Mail-Adresse ein",
         "sendResetLink": "Zurücksetzen-Link senden",
         "enterNewPassword": "Neues Passwort eingeben",
-        "passwordResetSent": "Ein Link zum Zurücksetzen des Passworts wurde an Ihre E-Mail gesendet",
+        "passwordResetSent": "Wir haben Ihnen einen Link zum Zurücksetzen des Passworts per E-Mail gesendet. Öffnen Sie ihn in diesem Browser.",
         "passwordResetSuccess": "Ihr Passwort wurde erfolgreich zurückgesetzt",
         "loginFailed": "Anmeldung fehlgeschlagen",
         "signUpFailed": "Registrierung fehlgeschlagen",
@@ -724,8 +724,22 @@
         "signInLink": "Anmelden",
         "passwordResetTitle": "Passwort zurücksetzen",
         "invalidResetLink": "Ungültiger oder abgelaufener Link",
-        "invalidResetLinkDesc": "Der Password-Reset-Link ist ungültig oder abgelaufen.",
-        "requestNewReset": "Neuen Reset anfordern"
+        "invalidResetLinkDesc": "Der Link zum Zurücksetzen ist ungültig, abgelaufen oder wurde bereits verwendet. Fordern Sie einen neuen Link an und öffnen Sie ihn im selben Browser.",
+        "requestNewReset": "Neuen Reset anfordern",
+        "resetEmailSentTitle": "E-Mail gesendet",
+        "forgotPasswordDescription": "Geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts.",
+        "backToLogin": "Zurück zur Anmeldung",
+        "verifyingResetLink": "Link wird geprüft …",
+        "newPasswordTitle": "Neues Passwort festlegen",
+        "newPasswordDescription": "Geben Sie Ihr neues Passwort ein.",
+        "newPassword": "Neues Passwort",
+        "repeatPassword": "Passwort wiederholen",
+        "passwordMinLength": "Mindestens 8 Zeichen",
+        "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+        "savePassword": "Passwort speichern",
+        "savingPassword": "Wird gespeichert …",
+        "passwordUpdatedTitle": "Passwort geändert",
+        "passwordUpdatedRedirect": "Ihr Passwort wurde geändert. Sie werden weitergeleitet …"
     },
     "pages": {
         "home": {

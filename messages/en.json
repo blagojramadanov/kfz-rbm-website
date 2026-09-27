@@ -712,7 +712,7 @@
         "enterEmail": "Enter your email address",
         "sendResetLink": "Send Reset Link",
         "enterNewPassword": "Enter your new password",
-        "passwordResetSent": "Password reset link has been sent to your email",
+        "passwordResetSent": "We have sent you a link to reset your password. Please open it in this browser.",
         "passwordResetSuccess": "Your password has been reset successfully",
         "loginFailed": "Login failed",
         "signUpFailed": "Sign up failed",
@@ -724,8 +724,22 @@
         "signInLink": "Sign in",
         "passwordResetTitle": "Reset Password",
         "invalidResetLink": "Invalid or expired link",
-        "invalidResetLinkDesc": "The password reset link is invalid or has expired.",
-        "requestNewReset": "Request a new reset"
+        "invalidResetLinkDesc": "The reset link is invalid, has expired or has already been used. Please request a new link and open it in the same browser.",
+        "requestNewReset": "Request a new reset",
+        "resetEmailSentTitle": "Email sent",
+        "forgotPasswordDescription": "Enter your email address and we will send you a link to reset your password.",
+        "backToLogin": "Back to sign in",
+        "verifyingResetLink": "Checking the link …",
+        "newPasswordTitle": "Set a new password",
+        "newPasswordDescription": "Enter your new password.",
+        "newPassword": "New password",
+        "repeatPassword": "Repeat password",
+        "passwordMinLength": "At least 8 characters",
+        "passwordTooShort": "The password must be at least 8 characters long.",
+        "savePassword": "Save password",
+        "savingPassword": "Saving …",
+        "passwordUpdatedTitle": "Password changed",
+        "passwordUpdatedRedirect": "Your password has been changed. Redirecting …"
     },
     "pages": {
         "home": {

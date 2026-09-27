@@ -2,16 +2,14 @@
 
 import { useState } from "react";
 import { Link } from "@/lib/navigation";
-import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function ForgotPasswordPage() {
-  const params = useParams();
-  const locale = params.locale as string || 'de';
+  const locale = useLocale();
   const t = useTranslations();
   const errorMessage = useErrorMessage();
   const { resetPassword } = useAuth();
@@ -26,7 +24,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      await resetPassword(email);
+      await resetPassword(email, locale);
       setSubmitted(true);
     } catch (err) {
       setError(errorMessage(err));
@@ -45,13 +43,13 @@ export default function ForgotPasswordPage() {
                 <CheckCircle className="w-12 h-12 text-green-300" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold mb-2">{t("auth.passwordResetSent")}</h2>
+            <h2 className="text-2xl font-bold mb-2">{t("auth.resetEmailSentTitle")}</h2>
             <p className="text-blue-100 mb-6">
               {t("auth.passwordResetSent")}
             </p>
             <Link href={`/login`}>
               <Button className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold">
-                Zur Anmeldung zurück
+                {t("auth.backToLogin")}
               </Button>
             </Link>
           </div>
@@ -66,10 +64,9 @@ export default function ForgotPasswordPage() {
         <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl p-8 border border-white/20">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Passwort zurücksetzen</h1>
+            <h1 className="text-3xl font-bold mb-2">{t("auth.passwordResetTitle")}</h1>
             <p className="text-blue-100">
-              Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen
-              Anweisungen zum Zurücksetzen Ihres Passworts
+              {t("auth.forgotPasswordDescription")}
             </p>
           </div>
 
@@ -86,7 +83,7 @@ export default function ForgotPasswordPage() {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                E-Mail-Adresse
+                {t("forms.email")}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
@@ -95,7 +92,7 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="ihre@email.com"
+                  placeholder="user@example.com"
                   className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
                 />
               </div>
@@ -107,7 +104,7 @@ export default function ForgotPasswordPage() {
               disabled={loading}
               className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold py-2 rounded-lg transition-all disabled:opacity-50"
             >
-              {loading ? "Wird gesendet..." : "Passwort-Reset anfordern"}
+              {loading ? t("common.loading") : t("auth.sendResetLink")}
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </form>
@@ -122,7 +119,7 @@ export default function ForgotPasswordPage() {
           {/* Back to Login */}
           <p className="text-center text-blue-100">
             <Link href="/login" className="text-white font-semibold hover:underline">
-              Zurück zur Anmeldung
+              {t("auth.backToLogin")}
             </Link>
           </p>
         </div>

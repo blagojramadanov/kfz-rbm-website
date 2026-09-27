@@ -712,7 +712,7 @@
         "enterEmail": "Внесете ја вашата е-пошта",
         "sendResetLink": "Испратете линк за ресетирање",
         "enterNewPassword": "Внесете нова лозинка",
-        "passwordResetSent": "Врска за рестартирање на лозинка е испратена на вашата е-пошта",
+        "passwordResetSent": "Ви испративме линк за ресетирање на лозинката. Отворете го во овој прелистувач.",
         "passwordResetSuccess": "Вашата лозинка е успешно рестартирана",
         "loginFailed": "Пријавата не успеа",
         "signUpFailed": "Регистрацијата не успеа",
@@ -724,8 +724,22 @@
         "signInLink": "Најавете се",
         "passwordResetTitle": "Ресетирајте лозинка",
         "invalidResetLink": "Невалиден или истекол линк",
-        "invalidResetLinkDesc": "Линкот за ресетирање на лозинка е невалиден или истекол.",
-        "requestNewReset": "Побарајте ново ресетирање"
+        "invalidResetLinkDesc": "Линкот за ресетирање е невалиден, истечен или веќе искористен. Побарајте нов линк и отворете го во истиот прелистувач.",
+        "requestNewReset": "Побарајте ново ресетирање",
+        "resetEmailSentTitle": "Е-поштата е испратена",
+        "forgotPasswordDescription": "Внесете ја Вашата е-пошта и ќе Ви испратиме линк за ресетирање на лозинката.",
+        "backToLogin": "Назад кон најавата",
+        "verifyingResetLink": "Линкот се проверува …",
+        "newPasswordTitle": "Поставете нова лозинка",
+        "newPasswordDescription": "Внесете ја Вашата нова лозинка.",
+        "newPassword": "Нова лозинка",
+        "repeatPassword": "Повторете ја лозинката",
+        "passwordMinLength": "Најмалку 8 знаци",
+        "passwordTooShort": "Лозинката мора да има најмалку 8 знаци.",
+        "savePassword": "Зачувајте ја лозинката",
+        "savingPassword": "Се зачувува …",
+        "passwordUpdatedTitle": "Лозинката е променета",
+        "passwordUpdatedRedirect": "Вашата лозинка е променета. Ве пренасочуваме …"
     },
     "pages": {
         "home": {
