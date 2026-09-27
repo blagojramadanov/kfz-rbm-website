@@ -10,6 +10,7 @@ import {
   imageDataUrlSchema,
   imageListSchema,
 } from "@/lib/image-upload";
+import { revalidateVehiclePages } from "@/lib/revalidate-vehicles";
 import type { SubmittedVehicle } from "@/lib/supabase";
 
 /**
@@ -51,9 +52,6 @@ const submittedVehicleSchema = z.object({
   service_book: z.enum(["yes", "no"]).optional(),
 });
 
-/** PostgREST / Postgres codes for "column does not exist" (migration 026 not applied yet). */
-const MISSING_COLUMN_CODES = ["PGRST204", "42703"];
-
 /** Statuses in which the owner may still add photos to a submission. */
 const PHOTO_UPLOAD_STATUSES = ["draft", "eingereicht"];
 
@@ -61,28 +59,6 @@ function parseOrThrow<T extends z.ZodType>(schema: T, value: unknown): z.infer<T
   const result = schema.safeParse(value);
   if (!result.success) throw new ActionError("INVALID_INPUT");
   return result.data;
-}
-
-async function getSubmittedVehicleByIdImpl(vehicleId: string) {
-  const { supabase, user } = await requireUser();
-  const submissionId = parseOrThrow(id, vehicleId);
-
-  const { data: vehicle, error: vehicleError } = await supabase
-    .from("submitted_vehicles")
-    .select("*")
-    .eq("id", submissionId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (vehicleError || !vehicle) throw new ActionError("NOT_FOUND");
-
-  const { data: images } = await supabase
-    .from("submitted_vehicle_images")
-    .select("*")
-    .eq("submitted_vehicle_id", submissionId)
-    .order("sort_order", { ascending: true });
-
-  return { vehicle, images: images || [] };
 }
 
 async function getSubmittedVehiclesImpl(): Promise<SubmittedVehicle[]> {
@@ -217,18 +193,16 @@ async function createSubmittedVehicleImpl(vehicleData: unknown, images: unknown)
     accident_history: data.accident_history,
     service_book: data.service_book,
   };
-  const insert = (row: Record<string, unknown>) =>
-    supabase.from("submitted_vehicles").insert(row).select("id").single();
+  const { data: vehicle, error: vehicleError } = await supabase
+    .from("submitted_vehicles")
+    .insert({ ...baseRow, ...detailColumns })
+    .select("id")
+    .single();
 
-  let { data: vehicle, error: vehicleError } = await insert({ ...baseRow, ...detailColumns });
-  if (vehicleError && MISSING_COLUMN_CODES.includes(vehicleError.code)) {
-    // Until migration 026 is applied the detail columns do not exist. Keep submissions
-    // working instead of failing every one of them; the details are lost until then.
-    console.error("[createSubmittedVehicle] detail columns missing - apply migration 026:", vehicleError.message);
-    ({ data: vehicle, error: vehicleError } = await insert(baseRow));
+  if (vehicleError || !vehicle) {
+    if (vehicleError) console.error("[createSubmittedVehicle] insert:", vehicleError.message);
+    throw new ActionError("CREATE_FAILED");
   }
-
-  if (vehicleError || !vehicle) throw new ActionError("CREATE_FAILED");
 
   const { uploadedCount, failedIndexes } = await storeSubmissionImages(
     supabase,
@@ -323,7 +297,7 @@ export async function uploadVehicleImage(
 
   const { data: vehicle, error: fetchError } = await supabase
     .from("vehicles")
-    .select("id")
+    .select("id, brand, model, status")
     .eq("id", targetId.data)
     .maybeSingle();
   if (fetchError) {
@@ -365,6 +339,8 @@ export async function uploadVehicleImage(
     return { ok: false, error: "UPLOAD_FAILED" };
   }
 
+  // A draft is not public yet (publishVehicle() revalidates when it goes live).
+  if (vehicle.status !== "draft") revalidateVehiclePages(vehicle);
   return { ok: true, url: publicUrl.publicUrl };
 }
 
@@ -450,10 +426,6 @@ async function rejectOfferImpl(vehicleId: string) {
 // ----------------------------------------------------------------------------
 // Exported actions: never throw, never return human-readable text.
 // ----------------------------------------------------------------------------
-
-export async function getSubmittedVehicleById(vehicleId: string) {
-  return runAction("getSubmittedVehicleById", "LOAD_FAILED", () => getSubmittedVehicleByIdImpl(vehicleId));
-}
 
 export async function getSubmittedVehicles() {
   return runAction("getSubmittedVehicles", "LOAD_FAILED", async () => ({ vehicles: await getSubmittedVehiclesImpl() }));

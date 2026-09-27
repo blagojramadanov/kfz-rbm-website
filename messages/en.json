@@ -239,7 +239,7 @@
             "tradeIn": "Trade-In",
             "tradeInDescription": "Trade in your vehicle for another one from our inventory.",
             "newRequest": "New Request",
-            "myTradeInRequests": "My Requests",
+            "myTradeInRequests": "My trade-ins",
             "myTradeInRequestsDescription": "Manage your trade-in requests and check their status.",
             "manageProfile": "Manage Profile",
             "manageProfileDescription": "Edit your account information, password, and security settings.",
@@ -964,7 +964,8 @@
             "diesel": "Diesel",
             "electric": "Electric",
             "hybrid": "Hybrid",
-            "Benzin": "Petrol"
+            "Benzin": "Petrol",
+            "lpg": "LPG"
         },
         "transmissions": {
             "Manual": "Manual",
@@ -1319,26 +1320,6 @@
             "price": "50000"
         },
         "options": {
-            "fuel": {
-                "gasoline": "Gasoline",
-                "diesel": "Diesel",
-                "hybrid": "Hybrid",
-                "electric": "Electric",
-                "lpg": "LPG"
-            },
-            "transmission": {
-                "manual": "Manual",
-                "automatic": "Automatic"
-            },
-            "bodyType": {
-                "sedan": "Sedan",
-                "suv": "SUV",
-                "wagon": "Wagon",
-                "coupe": "Coupe",
-                "cabriolet": "Cabriolet",
-                "smallCar": "Small car",
-                "van": "Van"
-            },
             "previousOwners": {
                 "one": "1st owner",
                 "two": "2nd owner",
@@ -1384,7 +1365,8 @@
             "uploadMaxReached": "Maximum reached",
             "gridTitle": "Uploaded images",
             "mainBadge": "Main image",
-            "setMain": "Set as main image"
+            "setMain": "Set as main image",
+            "remove": "Remove photo {index}"
         },
         "description": {
             "placeholder": "Describe the condition, equipment, maintenance history, and special features...",

@@ -11,6 +11,7 @@ import {
   getSourceTypeForSalesType,
 } from "@/lib/submission-workflow";
 import { copySubmissionPhotos } from "@/lib/submission-photos";
+import { revalidateVehiclePages } from "@/lib/revalidate-vehicles";
 
 // Helper function to log detailed error information for debugging
 function logAdminError(operation: string, error: unknown, context?: Record<string, any>) {
@@ -133,12 +134,14 @@ export async function publishVehicle(vehicleId: string): Promise<ActionResult> {
     .update({ status: "available", updated_at: new Date().toISOString() })
     .eq("id", vehicleId)
     .eq("status", "draft")
-    .select("id");
+    .select("id, brand, model");
   if (error) {
     logAdminError("publishVehicle", error, { vehicleId });
     return { ok: false, error: "UPDATE_FAILED" };
   }
-  return data?.length === 1 ? { ok: true } : { ok: false, error: "INVALID_STATE" };
+  if (data?.length !== 1) return { ok: false, error: "INVALID_STATE" };
+  revalidateVehiclePages(data[0]);
+  return { ok: true };
 }
 
 /**
@@ -179,17 +182,26 @@ export async function updateVehicle(vehicleId: string, updates: unknown): Promis
   const parsed = vehicleUpdateSchema.safeParse(updates);
   if (!z.guid().safeParse(vehicleId).success || !parsed.success) return { ok: false, error: "INVALID_INPUT" };
 
+  // Old brand/model: a changed name changes the slug, and the old detail page must go too.
+  const { data: before } = await session.supabase
+    .from("vehicles")
+    .select("id, brand, model")
+    .eq("id", vehicleId)
+    .maybeSingle();
+
   const { data, error } = await session.supabase
     .from("vehicles")
     .update({ ...parsed.data, updated_at: new Date().toISOString() })
     .eq("id", vehicleId)
-    .select("id");
+    .select("id, brand, model");
 
   if (error) {
     logAdminError("updateVehicle", error, { vehicleId });
     return { ok: false, error: error.code === "23505" ? "DUPLICATE_VIN" : "UPDATE_FAILED" };
   }
-  return data?.length === 1 ? { ok: true } : { ok: false, error: "NOT_FOUND" };
+  if (data?.length !== 1) return { ok: false, error: "NOT_FOUND" };
+  revalidateVehiclePages(before, data[0]);
+  return { ok: true };
 }
 
 /** Deletes a vehicle, its image rows (FK cascade) and its files in the public bucket. */
@@ -198,12 +210,17 @@ export async function deleteVehicle(vehicleId: string): Promise<ActionResult> {
   if (!session.ok) return session;
   if (!z.guid().safeParse(vehicleId).success) return { ok: false, error: "INVALID_INPUT" };
 
-  const { data, error } = await session.supabase.from("vehicles").delete().eq("id", vehicleId).select("id");
+  const { data, error } = await session.supabase
+    .from("vehicles")
+    .delete()
+    .eq("id", vehicleId)
+    .select("id, brand, model");
   if (error) {
     logAdminError("deleteVehicle", error, { vehicleId });
     return { ok: false, error: "DELETE_FAILED" };
   }
   if (data?.length !== 1) return { ok: false, error: "NOT_FOUND" };
+  revalidateVehiclePages(data[0]);
 
   // Row is gone; files are only cleanup (a leftover file is not visible anywhere).
   if (!(await removeVehicleFiles(session.supabase, vehicleId))) {
@@ -795,6 +812,9 @@ export async function publishSubmittedVehicle(submittedVehicleId: string, option
       // The vehicle stays a (linked) draft; the admin can publish it from the vehicle page.
       if (statusError) console.error("[publishSubmittedVehicle] set available:", statusError);
       else status = "available";
+    }
+    if (status === "available") {
+      revalidateVehiclePages({ id: vehicleId, brand: submittedVehicle.brand, model: submittedVehicle.model });
     }
 
     return { vehicleId, status };

@@ -7,6 +7,12 @@
  * raw value so a message key is never rendered.
  */
 
+import {
+  BODY_TYPE_GROUPS,
+  FUEL_GROUPS,
+  TRANSMISSION_GROUPS,
+} from "@/lib/vehicle-search";
+
 // Loose on purpose: next-intl's `t` is typed against the message shape, which
 // does not allow keys built from runtime data.
 type Translator = {
@@ -28,19 +34,36 @@ function getLabel(t: Translator, group: string, value: string): string {
   return value;
 }
 
+/**
+ * Fuel, transmission and body type are stored with several spellings ("Manuell",
+ * "Schaltgetriebe", "manual"; "wagon", "Kombi"). Every spelling of a search filter
+ * group (lib/vehicle-search.ts) gets the group's label, so one thing always has one
+ * label per locale, the same one the filters show.
+ */
+function getGroupedLabel(
+  t: Translator,
+  group: string,
+  groups: Record<string, { labelValue: string; matches: readonly string[] }>,
+  value: string,
+): string {
+  const normalized = value?.trim().toLowerCase();
+  const match = Object.values(groups).find((g) => g.matches.some((m) => m.toLowerCase() === normalized));
+  return getLabel(t, group, match ? match.labelValue : value);
+}
+
 /** `t` must come from `useTranslations("common")` / `getTranslations("common")`. */
 export function getFuelTypeLabel(t: Translator, value: string): string {
-  return getLabel(t, "fuelTypes", value);
+  return getGroupedLabel(t, "fuelTypes", FUEL_GROUPS, value);
 }
 
 /** `t` must come from `useTranslations("common")` / `getTranslations("common")`. */
 export function getTransmissionLabel(t: Translator, value: string): string {
-  return getLabel(t, "transmissions", value);
+  return getGroupedLabel(t, "transmissions", TRANSMISSION_GROUPS, value);
 }
 
-/** Body type (e.g. "Sedan", "SUV"). `t` must come from the `common` namespace. */
+/** Body type (e.g. "Sedan", "SUV", "wagon"). `t` must come from the `common` namespace. */
 export function getBodyTypeLabel(t: Translator, value: string): string {
-  return getLabel(t, "bodyTypes", value);
+  return getGroupedLabel(t, "bodyTypes", BODY_TYPE_GROUPS, value);
 }
 
 /** Exterior colour (free text in the DB, e.g. "Silber"). `t` must come from the `common` namespace. */

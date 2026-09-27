@@ -82,8 +82,11 @@ export default function AdminInquiriesPage() {
         setError(errorMessage(result));
         return;
       }
+      // Keep the inquiry only if it still matches the active status filter.
       setInquiries((prev) =>
-        prev.map((i) => (i.id === inquiryId ? { ...i, status: newStatus } : i))
+        statusFilter && newStatus !== statusFilter
+          ? prev.filter((i) => i.id !== inquiryId)
+          : prev.map((i) => (i.id === inquiryId ? { ...i, status: newStatus } : i))
       );
       setError("");
     } catch (err) {

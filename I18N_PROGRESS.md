@@ -926,6 +926,26 @@ Verification: `npm run check:i18n` ✅, `npm run build` ✅. Migration 028 pendi
 Keys (de/en/mk): new `favorites.*`, `common.close`, `navigation.{favorites, favoritesCount}`, `dashboard.favorites.{count, unavailableTitle, unavailableHint}`, `adminVehicles.{columns.favorites, favoriteCount}`, `pages.home.search.{title, query, queryPlaceholder, model, priceMax, yearMin, mileageMax, bodyType, any, upTo, from}`; changed `dashboard.favorites.emptyDescription`; removed `vehicles.card.addFavorite`, `pages.fahrzeugDetail.cta.save`, `pages.home.search.{brand, brandPlaceholder, minPrice, minPricePlaceholder, maxPrice, maxPricePlaceholder, year, yearPlaceholder}`.
 Verification: `npm run check:i18n` ✅, `npm run build` ✅. Local production server: filter URLs return the expected counts against live data (5 total; petrol 3, diesel 1, hybrid 1; automatic 3 / manual 2; `q=merc` 2), invalid params ignored, PostgREST-syntax input in `q` returns 0 results without an error; homepage search → `/de/fahrzeuge?fuel=petrol`; checkbox/sort/typing update the URL and keep each other. Logged-in toggle, toasts and navbar badge seen working on localhost.
 
+### Small fixes: images, labels, cache, wizard, titles (2026-09-27)
+
+| # | Change |
+| --- | --- |
+| 1 Images | New `lib/vehicle-images.ts` `resolveVehicleImageUrl()`: a raw storage path (`{vehicleId}/x.jpg`, `vehicle-images/...`) or an expired signed URL of the public bucket becomes the public URL (how the working rows are built) instead of being dropped. Used in `lib/public-vehicles.ts`, so cards, detail page, related vehicles and favorites all get it. `getSignedImageUrls()` (private customer photos, dashboard + admin submissions): values that are already URLs are returned resolved; paths with a `customer-submitted-photos/` or leading `/` prefix are signed as the plain object path; if signing a customer's own photo fails, it is retried with the service-role client (ownership already checked via the DB). The admin submissions list no longer renders an unsigned raw path as a broken `<img>`. All 20 current `vehicle_images` rows are public URLs. |
+| 2 C 300 | `ae0119a8-…` (Mercedes-Benz C 300, `source_type = rbm`, no linked submission) has **0 rows in `vehicle_images` and 0 files under `vehicle-images/ae0119a8-…/`**. Nothing to fix; photos must be uploaded by the admin. |
+| 3/4 Labels | `getFuelTypeLabel` / `getTransmissionLabel` / `getBodyTypeLabel` map every spelling of a search filter group (`lib/vehicle-search.ts`) to the group's existing `common.*` key: `wagon`/`estate` → `kombi`, `smallCar` → `kleinwagen`, `convertible` → `cabriolet`, `Manuell`/`Schaltgetriebe`/`manual` → `manual` (de "Schaltgetriebe"). Filters also match the new spellings. The offer wizard's selects use the same `common.*` labels (removed `wizard.options.{fuel, transmission, bodyType}`, which had "Manuell"); added `common.fuelTypes.lpg`. |
+| 5/6 | Removed the dead `?edit=` path in the wizard (and the customer `getSubmittedVehicleById` action it used) and the `PGRST204`/`42703` missing-column fallback in `createSubmittedVehicle`. |
+| 7 Cache | New `lib/revalidate-vehicles.ts`: `revalidatePath` for `/{de,en,mk}`, `/{locale}/fahrzeuge`, `/{locale}/fahrzeuge/export` and the vehicle's detail page (old + new slug on rename). Called after `publishVehicle`, `updateVehicle` (edit and status change), `deleteVehicle`, `publishSubmittedVehicle` (when set to available) and `uploadVehicleImage` on a non-draft vehicle. |
+| 8 Wizard | Remove button (always visible X) per photo in the "Bilder" step; removing the main photo makes the first remaining one main. Photos stay in the browser until submit, so there is nothing in storage to clean up before submit. |
+| 9 Probefahrt | Could not reproduce on production (homepage → "Probefahrt" opened "Probefahrt vereinbaren" with the date field, 3 of 3 attempts). The dialog now also reacts to a later `hashchange`. |
+| 10 Admin Anfragen | A status change removes the inquiry from the list when it no longer matches the active status filter. |
+| 11 Owners | mk `wizard.options.previousOwners`: "Прв/Втор/Трет сопственик", "Четврти или понатамошен сопственик" (was "3 сопственици"). de "3. Besitzer" and en "3rd owner" were already ordinal. |
+| 12 Dashboard | Trade-in card renamed: de "Meine Inzahlungnahmen", en "My trade-ins", mk "Моите замени". |
+| 13 Titles | Each dashboard route has a server `layout.tsx` with `getDashboardMetadata()` (`lib/dashboard-metadata.ts`): "<page heading> – RBM", noindex; overview, Anfragen, Fahrzeug anbieten/angeboten, Meine Fahrzeuge, Favoriten, Inzahlungnahme, Inzahlungnahme-Anfragen (+ detail), Profil. |
+| 14 Login | Verified in code: `getSafeNextPath` accepts only `/…` paths (rejects `//example.com`, `https://example.com`, backslashes, control chars, login/register); the next-intl router keeps the current locale. |
+
+Keys (de/en/mk): new `wizard.images.remove`, `common.fuelTypes.lpg`; changed `dashboard.overview.myTradeInRequests`, mk `wizard.options.previousOwners.*`; removed `wizard.options.{fuel, transmission, bodyType}`.
+Verification: `npm run check:i18n` ✅, `npm run build` ✅.
+
 ### Test data
 - The stuck test submission ("fffffffff…", `801e7b66-…`) got a real test offer (3.000 €) during live testing and is now in a normal "offer sent" state — no longer inconsistent, but still a fake vehicle that should eventually be deleted.
 - The leftover "sssssssss" test vehicle is still in the live database (see below).
@@ -937,9 +957,10 @@ Verification: `npm run check:i18n` ✅, `npm run build` ✅. Local production se
 **Medium**
 - ~~**Favorites** feature has no database table behind it~~ — fixed, see "Favorites + homepage search" (migration 029).
 - ~~**Homepage search bar** only calls `console.log`~~ — fixed, see "Favorites + homepage search".
-- **Wizard fields after migration 026**: confirm 026 is applied in production and that variant, previous owners, HU/AU, accident history and service book are stored on a new submission and shown on the admin detail page (without 026, `createSubmittedVehicle` saves without them and logs `apply migration 026`).
+- ~~**Wizard fields after migration 026**~~ — columns exist in production (queried 2026-09-27); the missing-column fallback is removed.
 
 **Low**
 - Leftover **"sssssssss" test vehicle** in the live database — delete.
-- Dead **`?edit=` branch** in the offer wizard (`dashboard/fahrzeug-anbieten/page.tsx`, `params.get("edit")` ~line 110 / line 389) — unreachable code, remove or wire up.
+- ~~Dead **`?edit=` branch** in the offer wizard~~ — removed.
+- Mercedes-Benz C 300 (`ae0119a8-…`) has no photos at all — upload them in the admin.
 - "fffffffff…" test submission — delete when no longer needed for testing.

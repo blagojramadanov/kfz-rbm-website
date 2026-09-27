@@ -239,7 +239,7 @@
             "tradeIn": "Inzahlungnahme",
             "tradeInDescription": "Tauschen Sie Ihr Fahrzeug gegen ein anderes aus unserem Bestand ein.",
             "newRequest": "Neue Anfrage",
-            "myTradeInRequests": "Meine Anfragen",
+            "myTradeInRequests": "Meine Inzahlungnahmen",
             "myTradeInRequestsDescription": "Verwalten Sie Ihre Inzahlungnahmeanfragen und sehen Sie den aktuellen Status.",
             "manageProfile": "Profil verwalten",
             "manageProfileDescription": "Bearbeiten Sie Ihre Profilinformationen, Passwort und Sicherheitseinstellungen.",
@@ -964,7 +964,8 @@
             "diesel": "Diesel",
             "electric": "Elektro",
             "hybrid": "Hybrid",
-            "Benzin": "Benzin"
+            "Benzin": "Benzin",
+            "lpg": "LPG"
         },
         "transmissions": {
             "Manual": "Schaltgetriebe",
@@ -1319,26 +1320,6 @@
             "price": "50000"
         },
         "options": {
-            "fuel": {
-                "gasoline": "Benzin",
-                "diesel": "Diesel",
-                "hybrid": "Hybrid",
-                "electric": "Elektro",
-                "lpg": "LPG"
-            },
-            "transmission": {
-                "manual": "Manuell",
-                "automatic": "Automatik"
-            },
-            "bodyType": {
-                "sedan": "Sedan",
-                "suv": "SUV",
-                "wagon": "Kombi",
-                "coupe": "Coupe",
-                "cabriolet": "Cabriolet",
-                "smallCar": "Kleinwagen",
-                "van": "Van"
-            },
             "previousOwners": {
                 "one": "1. Besitzer",
                 "two": "2. Besitzer",
@@ -1384,7 +1365,8 @@
             "uploadMaxReached": "Maximum erreicht",
             "gridTitle": "Hochgeladene Bilder",
             "mainBadge": "Hauptbild",
-            "setMain": "Als Hauptbild"
+            "setMain": "Als Hauptbild",
+            "remove": "Bild {index} entfernen"
         },
         "description": {
             "placeholder": "Beschreiben Sie den Zustand, Ausstattung, Wartungshistorie und besondere Merkmale...",

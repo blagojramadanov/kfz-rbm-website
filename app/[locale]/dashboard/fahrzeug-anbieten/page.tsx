@@ -52,10 +52,9 @@ interface VehicleData {
 
 interface UploadedImage {
   id: string;
-  data: string; // base64 for new, URL for existing
+  /** Resized photo as a data URL; photos are only uploaded on submit. */
+  data: string;
   isMain: boolean;
-  uploaded: boolean;
-  dbId?: string; // database ID for existing images
 }
 
 export default function SubmitVehicleWizardPage() {
@@ -91,7 +90,6 @@ export default function SubmitVehicleWizardPage() {
   const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
   const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
-  const [editingVehicleId, setEditingVehicleId] = useState<string | null>(null);
   // Set when the vehicle was submitted but some photos could not be stored.
   const [partialUpload, setPartialUpload] = useState<{ vehicleId: string; failedIndexes: number[] } | null>(null);
   const [retryingPhotos, setRetryingPhotos] = useState(false);
@@ -101,78 +99,6 @@ export default function SubmitVehicleWizardPage() {
       router.push("/login");
     }
   }, [loading, isAuthenticated, router]);
-
-  useEffect(() => {
-    const loadDraftData = async () => {
-      if (typeof window === "undefined" || !user) return;
-
-      const params = new URLSearchParams(window.location.search);
-      const vehicleId = params.get("edit");
-
-      if (vehicleId) {
-        try {
-          const { getSubmittedVehicleById } = await import("@/app/actions/vehicles");
-          const result = await getSubmittedVehicleById(vehicleId);
-          if (!result.ok) {
-            setError(errorMessage(result));
-            return;
-          }
-
-          setEditingVehicleId(vehicleId);
-          setFormData({
-            marke: result.vehicle.brand || "",
-            modell: result.vehicle.model || "",
-            variante: "",
-            erstzulassung: result.vehicle.year?.toString() || "",
-            kilometerstand: result.vehicle.mileage?.toString() || "",
-            kraftstoff: result.vehicle.fuel_type || "gasoline",
-            getriebe: result.vehicle.transmission || "manual",
-            leistung: result.vehicle.power_hp?.toString() || "",
-            karosserie: result.vehicle.body_type || "sedan",
-            farbe: result.vehicle.color || "",
-            vorbesitzer: "",
-            huAu: "yes",
-            unfallhistorie: "no",
-            scheckheft: "yes",
-            preisvorstellung: result.vehicle.price?.toString() || "",
-            beschreibung: result.vehicle.description || "",
-            verkaufsart: result.vehicle.sales_type || "direct",
-          });
-
-          if (result.images && result.images.length > 0) {
-            // Fetch signed URLs for stored images
-            const { getSignedImageUrls } = await import("@/app/actions/storage");
-            const imagePaths = result.images.map((img: any) => img.image_url);
-            const urlsResult = await getSignedImageUrls(imagePaths);
-
-            const urlMap: Record<string, string> = {};
-            if (urlsResult.ok) {
-              urlsResult.urls.forEach((item: { path: string; url: string | null }) => {
-                if (item.url) {
-                  urlMap[item.path] = item.url;
-                }
-              });
-            }
-
-            setImages(
-              result.images.map((img: any) => ({
-                id: img.id,
-                data: urlMap[img.image_url] || img.image_url, // Use signed URL if available, fallback to path
-                isMain: img.is_main || false,
-                uploaded: true,
-                dbId: img.id,
-              }))
-            );
-          }
-        } catch (err) {
-          setError(errorMessage(err));
-          console.error(err);
-        }
-      }
-    };
-
-    loadDraftData();
-  }, [user]);
 
   if (loading || !isAuthenticated) {
     return (
@@ -250,7 +176,6 @@ export default function SubmitVehicleWizardPage() {
             id: `${Date.now()}-${Math.random()}`,
             data: compressedBase64,
             isMain: prev.length === 0,
-            uploaded: false,
           },
         ]);
       } catch (error) {
@@ -268,6 +193,20 @@ export default function SubmitVehicleWizardPage() {
         isMain: img.id === id,
       }))
     );
+  };
+
+  // Photos only live in the browser until the vehicle is submitted, so removing one
+  // before submit leaves nothing behind in storage.
+  const removeImage = (id: string) => {
+    setImages((prev) => {
+      const remaining = prev.filter((img) => img.id !== id);
+      // Keep a main photo when the main one is removed.
+      if (remaining.length > 0 && !remaining.some((img) => img.isMain)) {
+        remaining[0] = { ...remaining[0], isMain: true };
+      }
+      return remaining;
+    });
+    setError("");
   };
 
   const moveImage = (fromIndex: number, toIndex: number) => {
@@ -386,42 +325,36 @@ export default function SubmitVehicleWizardPage() {
 
       const { createSubmittedVehicle } = await import("@/app/actions/vehicles");
 
-      if (editingVehicleId) {
-        // Direct submission only - no editing after submit
-        setError(errorMessage("INVALID_STATE"));
+      const result = await createSubmittedVehicle(
+        {
+          brand: formData.marke,
+          model: formData.modell,
+          year: parseInt(formData.erstzulassung),
+          mileage: parseInt(formData.kilometerstand) || 0,
+          price: formData.preisvorstellung ? parseFloat(formData.preisvorstellung) : undefined,
+          transmission: formData.getriebe,
+          fuel_type: formData.kraftstoff,
+          body_type: formData.karosserie,
+          color: formData.farbe,
+          power_hp: formData.leistung ? parseInt(formData.leistung) : undefined,
+          description: formData.beschreibung,
+          sales_type: formData.verkaufsart,
+          variant: formData.variante.trim() || undefined,
+          previous_owners: formData.vorbesitzer,
+          hu_au: formData.huAu,
+          accident_history: formData.unfallhistorie,
+          service_book: formData.scheckheft,
+        },
+        images.map((img) => img.data)
+      );
+      if (!result.ok) {
+        setError(errorMessage(result));
         return;
-      } else {
-        const result = await createSubmittedVehicle(
-          {
-            brand: formData.marke,
-            model: formData.modell,
-            year: parseInt(formData.erstzulassung),
-            mileage: parseInt(formData.kilometerstand) || 0,
-            price: formData.preisvorstellung ? parseFloat(formData.preisvorstellung) : undefined,
-            transmission: formData.getriebe,
-            fuel_type: formData.kraftstoff,
-            body_type: formData.karosserie,
-            color: formData.farbe,
-            power_hp: formData.leistung ? parseInt(formData.leistung) : undefined,
-            description: formData.beschreibung,
-            sales_type: formData.verkaufsart,
-            variant: formData.variante.trim() || undefined,
-            previous_owners: formData.vorbesitzer,
-            hu_au: formData.huAu,
-            accident_history: formData.unfallhistorie,
-            service_book: formData.scheckheft,
-          },
-          images.map((img) => img.data)
-        );
-        if (!result.ok) {
-          setError(errorMessage(result));
-          return;
-        }
-        if (result.failedIndexes.length > 0) {
-          // The vehicle exists; offer to retry only the photos that were not stored.
-          setPartialUpload({ vehicleId: result.vehicleId, failedIndexes: result.failedIndexes });
-          return;
-        }
+      }
+      if (result.failedIndexes.length > 0) {
+        // The vehicle exists; offer to retry only the photos that were not stored.
+        setPartialUpload({ vehicleId: result.vehicleId, failedIndexes: result.failedIndexes });
+        return;
       }
 
       // Redirect to success page
@@ -627,11 +560,11 @@ export default function SubmitVehicleWizardPage() {
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option value="gasoline">{t("options.fuel.gasoline")}</option>
-                  <option value="diesel">{t("options.fuel.diesel")}</option>
-                  <option value="hybrid">{t("options.fuel.hybrid")}</option>
-                  <option value="electric">{t("options.fuel.electric")}</option>
-                  <option value="lpg">{t("options.fuel.lpg")}</option>
+                  <option value="gasoline">{getFuelTypeLabel(tCommon, "gasoline")}</option>
+                  <option value="diesel">{getFuelTypeLabel(tCommon, "diesel")}</option>
+                  <option value="hybrid">{getFuelTypeLabel(tCommon, "hybrid")}</option>
+                  <option value="electric">{getFuelTypeLabel(tCommon, "electric")}</option>
+                  <option value="lpg">{getFuelTypeLabel(tCommon, "lpg")}</option>
                 </select>
               </div>
               <div>
@@ -642,8 +575,8 @@ export default function SubmitVehicleWizardPage() {
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option value="manual">{t("options.transmission.manual")}</option>
-                  <option value="automatic">{t("options.transmission.automatic")}</option>
+                  <option value="manual">{getTransmissionLabel(tCommon, "manual")}</option>
+                  <option value="automatic">{getTransmissionLabel(tCommon, "automatic")}</option>
                 </select>
               </div>
               <div>
@@ -654,13 +587,13 @@ export default function SubmitVehicleWizardPage() {
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
                 >
-                  <option value="sedan">{t("options.bodyType.sedan")}</option>
-                  <option value="suv">{t("options.bodyType.suv")}</option>
-                  <option value="wagon">{t("options.bodyType.wagon")}</option>
-                  <option value="coupe">{t("options.bodyType.coupe")}</option>
-                  <option value="cabriolet">{t("options.bodyType.cabriolet")}</option>
-                  <option value="smallCar">{t("options.bodyType.smallCar")}</option>
-                  <option value="van">{t("options.bodyType.van")}</option>
+                  <option value="sedan">{getBodyTypeLabel(tCommon, "sedan")}</option>
+                  <option value="suv">{getBodyTypeLabel(tCommon, "suv")}</option>
+                  <option value="wagon">{getBodyTypeLabel(tCommon, "wagon")}</option>
+                  <option value="coupe">{getBodyTypeLabel(tCommon, "coupe")}</option>
+                  <option value="cabriolet">{getBodyTypeLabel(tCommon, "cabriolet")}</option>
+                  <option value="smallCar">{getBodyTypeLabel(tCommon, "smallCar")}</option>
+                  <option value="van">{getBodyTypeLabel(tCommon, "van")}</option>
                 </select>
               </div>
               <div>
@@ -811,6 +744,17 @@ export default function SubmitVehicleWizardPage() {
                           </button>
                         )}
                       </div>
+
+                      {/* Remove (always visible: hover does not exist on touch screens) */}
+                      <button
+                        type="button"
+                        onClick={() => removeImage(image.id)}
+                        aria-label={t("images.remove", { index: index + 1 })}
+                        title={t("images.remove", { index: index + 1 })}
+                        className="absolute top-2 right-2 z-10 bg-white/90 hover:bg-red-600 hover:text-white text-red-600 p-1.5 rounded-full shadow"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
 
                       {/* Drag Handle */}
                       <div className="absolute bottom-2 right-2 bg-gray-500 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">

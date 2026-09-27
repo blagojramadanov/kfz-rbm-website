@@ -239,7 +239,7 @@
             "tradeIn": "Замена",
             "tradeInDescription": "Заменете го Вашето возило со друго од нашиот инвентар.",
             "newRequest": "Ново барање",
-            "myTradeInRequests": "Моите барања",
+            "myTradeInRequests": "Моите замени",
             "myTradeInRequestsDescription": "Управувајте со Вашите барања за замена и видете го статусот.",
             "manageProfile": "Управување со профил",
             "manageProfileDescription": "Уредете ги Вашите информации за сметка, лозинка и поставки за безбедност.",
@@ -964,7 +964,8 @@
             "diesel": "Дизел",
             "electric": "Електричен",
             "hybrid": "Хибриден",
-            "Benzin": "Бензин"
+            "Benzin": "Бензин",
+            "lpg": "LPG"
         },
         "transmissions": {
             "Manual": "Рачен",
@@ -1319,31 +1320,11 @@
             "price": "50000"
         },
         "options": {
-            "fuel": {
-                "gasoline": "Бензин",
-                "diesel": "Дизел",
-                "hybrid": "Хибрид",
-                "electric": "Електрично",
-                "lpg": "LPG"
-            },
-            "transmission": {
-                "manual": "Рачен",
-                "automatic": "Автоматски"
-            },
-            "bodyType": {
-                "sedan": "Седан",
-                "suv": "SUV",
-                "wagon": "Караван",
-                "coupe": "Купе",
-                "cabriolet": "Кабриолет",
-                "smallCar": "Мал автомобил",
-                "van": "Комбе"
-            },
             "previousOwners": {
-                "one": "1 сопственик",
-                "two": "2 сопственици",
-                "three": "3 сопственици",
-                "moreThanThree": "4+ сопственици"
+                "one": "Прв сопственик",
+                "two": "Втор сопственик",
+                "three": "Трет сопственик",
+                "moreThanThree": "Четврти или понатамошен сопственик"
             },
             "huAu": {
                 "yes": "Да",
@@ -1384,7 +1365,8 @@
             "uploadMaxReached": "Достигнат е максималниот број слики",
             "gridTitle": "Прикачени слики",
             "mainBadge": "Главна слика",
-            "setMain": "Поставете како главна слика"
+            "setMain": "Поставете како главна слика",
+            "remove": "Отстранете ја сликата {index}"
         },
         "description": {
             "placeholder": "Опишете ја состојбата, опремата, историјата на одржување и посебните карактеристики...",

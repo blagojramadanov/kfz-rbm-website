@@ -18,7 +18,7 @@ import { VEHICLE_LIMITS } from "@/lib/vehicle-schema";
 interface FilterGroup {
   /** Passed to getFuelTypeLabel() & co. */
   labelValue: string;
-  /** Lowercase DB spellings. */
+  /** DB spellings; compared case-insensitively (camelCase wizard values like "smallCar" included). */
   matches: readonly string[];
 }
 
@@ -37,11 +37,12 @@ export const TRANSMISSION_GROUPS = {
 
 export const BODY_TYPE_GROUPS = {
   sedan: { labelValue: "sedan", matches: ["sedan", "limousine"] },
-  kombi: { labelValue: "kombi", matches: ["kombi"] },
+  // "wagon" and "smallCar" are the customer wizard's option values.
+  kombi: { labelValue: "kombi", matches: ["kombi", "wagon", "estate"] },
   suv: { labelValue: "suv", matches: ["suv"] },
   coupe: { labelValue: "coupe", matches: ["coupe", "coupé"] },
-  cabriolet: { labelValue: "cabriolet", matches: ["cabriolet", "cabrio"] },
-  kleinwagen: { labelValue: "kleinwagen", matches: ["kleinwagen"] },
+  cabriolet: { labelValue: "cabriolet", matches: ["cabriolet", "cabrio", "convertible"] },
+  kleinwagen: { labelValue: "kleinwagen", matches: ["kleinwagen", "smallCar"] },
   van: { labelValue: "van", matches: ["van"] },
 } as const satisfies Record<string, FilterGroup>;
 
@@ -189,6 +190,7 @@ export function groupDbValues(matches: readonly string[]): string[] {
   const variants = new Set<string>();
   for (const value of matches) {
     variants.add(value);
+    variants.add(value.toLowerCase());
     variants.add(value.toUpperCase());
     variants.add(value.charAt(0).toUpperCase() + value.slice(1));
   }

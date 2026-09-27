@@ -87,15 +87,18 @@ export default function AdminSubmittedVehiclesPage() {
               }
             });
 
-            // Replace paths with signed URLs in vehicles
+            // Replace paths with signed URLs. A raw path is not a loadable URL, so a photo
+            // that could not be signed (the action already tried every fallback) is left out
+            // instead of rendering a broken image.
             const vehiclesWithSignedUrls = result.vehicles.map((vehicle: any) => ({
               ...vehicle,
-              images: vehicle.images?.map((path: string) => pathToSignedUrl[path] || path) || [],
+              images: (vehicle.images ?? [])
+                .map((path: string) => pathToSignedUrl[path])
+                .filter((url: string | undefined): url is string => Boolean(url)),
             }));
             setVehicles(vehiclesWithSignedUrls);
           } else {
-            // Fall back to original vehicles if signing fails
-            setVehicles(result.vehicles);
+            setVehicles(result.vehicles.map((vehicle: any) => ({ ...vehicle, images: [] })));
           }
         } else {
           setVehicles(result.vehicles);

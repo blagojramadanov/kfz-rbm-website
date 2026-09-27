@@ -6,6 +6,7 @@ import {
   getVehicleSlug,
 } from "@/lib/vehicle-slug";
 import type { SubmissionDetailValues } from "@/lib/submission-details";
+import { resolveVehicleImageUrl } from "@/lib/vehicle-images";
 import {
   BODY_TYPE_GROUPS,
   FUEL_GROUPS,
@@ -121,7 +122,8 @@ function getPublicClient() {
 function sortedImages(row: VehicleRow): string[] {
   return [...(row.vehicle_images ?? [])]
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-    .map((image) => image.image_url);
+    .map((image) => resolveVehicleImageUrl(image.image_url))
+    .filter((url): url is string => url !== null);
 }
 
 export function toPublicVehicle(row: VehicleRow): PublicVehicle {

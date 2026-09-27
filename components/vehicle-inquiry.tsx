@@ -66,9 +66,15 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
     if (!latest.current.sending) setOpenType(null);
   };
 
-  // /fahrzeuge/<slug>#probefahrt opens the test drive request right away.
+  // /fahrzeuge/<slug>#probefahrt opens the test drive request right away, also when
+  // only the hash changes on an already open detail page (no remount then).
   useEffect(() => {
-    if (window.location.hash === `#${TEST_DRIVE_HASH}`) open("test_drive");
+    const openFromHash = () => {
+      if (window.location.hash === `#${TEST_DRIVE_HASH}`) open("test_drive");
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
