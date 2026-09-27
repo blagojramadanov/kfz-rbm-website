@@ -6,6 +6,7 @@ import { ArrowLeft, Car } from "lucide-react";
 import { BusinessHours } from "@/components/business-hours";
 import { ListingTypeBadge } from "@/components/listing-type-badge";
 import { VehicleGallery } from "@/components/vehicle-gallery";
+import { VehicleInquiry } from "@/components/vehicle-inquiry";
 import { Button } from "@/components/ui/button";
 import { COMPANY } from "@/lib/company";
 import { formatMileage, formatPrice } from "@/lib/format-vehicle";
@@ -279,22 +280,7 @@ export default async function VehicleDetailPage({
                 <h3 className="font-bold text-gray-900">{t("cta.title")}</h3>
                 <p className="text-sm text-gray-600">{t("cta.text")}</p>
 
-                <Button
-                  asChild
-                  className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white py-3 text-lg font-semibold"
-                >
-                  <Link href="/contact">{t("cta.inquiry")}</Link>
-                </Button>
-
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white py-3 text-lg font-semibold"
-                >
-                  <Link href={{ pathname: "/contact", query: { testDrive: vehicleLabel } }}>
-                    {t("cta.testDrive")}
-                  </Link>
-                </Button>
+                <VehicleInquiry vehicleId={vehicle.id} vehicleLabel={vehicleLabel} />
               </div>
 
               {/* Contact Info */}

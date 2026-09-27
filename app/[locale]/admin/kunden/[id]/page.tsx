@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
-import { getInquiryStatusLabel, getSubmissionStatusLabel, getTradeInStatusLabel } from "@/lib/vehicle-labels";
+import { getInquiryStatusLabel, getInquiryTypeLabel, getSubmissionStatusLabel, getTradeInStatusLabel } from "@/lib/vehicle-labels";
 
 export const dynamic = "force-dynamic";
 
@@ -207,8 +207,12 @@ export default function AdminCustomerDetailPage() {
                 key={inquiry.id}
                 className="p-4 border border-gray-200 rounded-lg flex justify-between items-start"
               >
-                <div>
-                  <p className="font-medium text-gray-900 line-clamp-2">{inquiry.message}</p>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-gray-500">
+                    {getInquiryTypeLabel(tCommon, inquiry.inquiry_type)}
+                    {inquiry.vehicle_label ? ` · ${inquiry.vehicle_label}` : ""}
+                  </p>
+                  {inquiry.message && <p className="font-medium text-gray-900 line-clamp-2 break-words">{inquiry.message}</p>}
                   <p className="text-sm text-gray-600 mt-1">{formatDate(inquiry.created_at)}</p>
                 </div>
                 <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">

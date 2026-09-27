@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const { profile, loading, isAuthenticated, isAdmin, signOut } = useAuth();
   // undefined = loading, null = load failed
   const [vehicleCount, setVehicleCount] = useState<number | null | undefined>(undefined);
+  const [inquiryCount, setInquiryCount] = useState<number | null | undefined>(undefined);
 
   useEffect(() => {
     if (!loading) {
@@ -38,9 +39,13 @@ export default function DashboardPage() {
   useEffect(() => {
     if (loading || !isAuthenticated || isAdmin) return;
     (async () => {
-      const { countSubmittedVehicles } = await import("@/app/actions/vehicles");
-      const result = await countSubmittedVehicles();
-      setVehicleCount(result.ok ? result.count : null);
+      const [{ countSubmittedVehicles }, { countMyInquiries }] = await Promise.all([
+        import("@/app/actions/vehicles"),
+        import("@/app/actions/inquiries"),
+      ]);
+      const [vehicles, inquiries] = await Promise.all([countSubmittedVehicles(), countMyInquiries()]);
+      setVehicleCount(vehicles.ok ? vehicles.count : null);
+      setInquiryCount(inquiries.ok ? inquiries.count : null);
     })();
   }, [loading, isAuthenticated, isAdmin]);
 
@@ -98,8 +103,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">{t("overview.inquiries")}</p>
-                  {/* customer_inquiries has no user_id and is admin-only under RLS; /dashboard/anfragen lists none */}
-                  <p className="text-3xl font-bold text-gray-900">{formatter.number(0)}</p>
+                  <p className="text-3xl font-bold text-gray-900">{inquiryCount === undefined ? "…" : inquiryCount === null ? "—" : formatter.number(inquiryCount)}</p>
                 </div>
                 <MessageSquare className="w-10 h-10 text-green-600" />
               </div>

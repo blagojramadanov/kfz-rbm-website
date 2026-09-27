@@ -78,7 +78,7 @@ export function getInquiryStatusLabel(t: Translator, value: string): string {
   return getLabel(t, "inquiryStatuses", value);
 }
 
-/** `customer_inquiries.inquiry_type` (general, test_drive, part_exchange). `t` must come from the `common` namespace. */
+/** `customer_inquiries.inquiry_type` (general, test_drive, part_exchange, contact). `t` must come from the `common` namespace. */
 export function getInquiryTypeLabel(t: Translator, value: string): string {
   return getLabel(t, "inquiryTypes", value);
 }

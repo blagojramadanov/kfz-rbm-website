@@ -1,28 +1,44 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { AlertCircle, CheckCircle, Mail } from "lucide-react";
+import { AlertCircle, Calendar, Mail, Phone, User } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { getInquiryStatusLabel, getInquiryTypeLabel } from "@/lib/vehicle-labels";
+import type { InquiryCategory } from "@/app/actions/admin";
+
+const STATUSES = ["new", "read", "responded", "closed"] as const;
+const CATEGORIES: (InquiryCategory | "")[] = ["", "vehicle", "contact"];
+
+const STATUS_COLORS: Record<string, string> = {
+  new: "bg-blue-100 text-blue-800",
+  read: "bg-yellow-100 text-yellow-800",
+  responded: "bg-green-100 text-green-800",
+  closed: "bg-gray-100 text-gray-800",
+};
+
+const TYPE_COLORS: Record<string, string> = {
+  test_drive: "bg-orange-100 text-orange-800",
+  contact: "bg-teal-100 text-teal-800",
+};
 
 export default function AdminInquiriesPage() {
-  const params = useParams();
-  const locale = params.locale as string || 'de';
   const router = useRouter();
   const { loading, isAdmin } = useAuth();
   const t = useTranslations("admin.inquiries");
   const tCommon = useTranslations("common");
+  const format = useLocaleFormatter();
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [inquiriesLoading, setInquiriesLoading] = useState(true);
   const errorMessage = useErrorMessage();
   const [error, setError] = useState("");
-  const [statusFilter, setStatusFilter] = useState("new");
+  const [statusFilter, setStatusFilter] = useState<string>("new");
+  const [categoryFilter, setCategoryFilter] = useState<InquiryCategory | "">("");
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,6 +54,7 @@ export default function AdminInquiriesPage() {
         const { getInquiries } = await import("@/app/actions/admin");
         const result = await getInquiries({
           status: statusFilter || undefined,
+          category: categoryFilter || undefined,
         });
         if (!result.ok) {
           setError(errorMessage(result));
@@ -54,7 +71,7 @@ export default function AdminInquiriesPage() {
     };
 
     if (isAdmin) loadInquiries();
-  }, [statusFilter, isAdmin]);
+  }, [statusFilter, categoryFilter, isAdmin]);
 
   const handleStatusChange = async (inquiryId: string, newStatus: string) => {
     try {
@@ -87,14 +104,19 @@ export default function AdminInquiriesPage() {
     );
   }
 
-  const statuses = ["new", "read", "responded", "closed"];
+  const numericDate = { year: "numeric", month: "2-digit", day: "2-digit" } as const;
+  const formatReceived = (value: string) =>
+    format.dateTime(new Date(value), { ...numericDate, hour: "2-digit", minute: "2-digit" });
+  // preferred_date is a calendar date (YYYY-MM-DD); format it in UTC so it never shifts a day.
+  const formatDay = (value: string) => format.dateTime(new Date(`${value}T00:00:00Z`), { ...numericDate, timeZone: "UTC" });
 
-  const STATUS_COLORS: Record<string, string> = {
-    new: "bg-blue-100 text-blue-800",
-    read: "bg-yellow-100 text-yellow-800",
-    responded: "bg-green-100 text-green-800",
-    closed: "bg-gray-100 text-gray-800",
-  };
+  const categoryLabel = (category: InquiryCategory | "") =>
+    category === "vehicle" ? t("categoryVehicle") : category === "contact" ? t("categoryContact") : t("categoryAll");
+
+  const filterButton = (active: boolean) =>
+    `px-4 py-2 rounded-lg font-medium transition-colors ${
+      active ? "bg-kfz-blue text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+    }`;
 
   return (
     <div className="space-y-6">
@@ -110,20 +132,30 @@ export default function AdminInquiriesPage() {
         </div>
       )}
 
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {statuses.map((status) => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(status)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              statusFilter === status
-                ? "bg-kfz-blue text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-            }`}
-          >
-            {getInquiryStatusLabel(tCommon, status)}
+      <div className="space-y-3">
+        <div className="flex gap-2 flex-wrap">
+          {STATUSES.map((status) => (
+            <button key={status} onClick={() => setStatusFilter(status)} className={filterButton(statusFilter === status)}>
+              {getInquiryStatusLabel(tCommon, status)}
+            </button>
+          ))}
+          <button onClick={() => setStatusFilter("")} className={filterButton(statusFilter === "")}>
+            {t("allStatuses")}
           </button>
-        ))}
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          {CATEGORIES.map((category) => (
+            <button
+              key={category || "all"}
+              onClick={() => setCategoryFilter(category)}
+              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                categoryFilter === category ? "bg-gray-900 text-white" : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              {categoryLabel(category)}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -138,73 +170,103 @@ export default function AdminInquiriesPage() {
         ) : (
           inquiries.map((inquiry) => (
             <div key={inquiry.id} className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">
-                    {inquiry.user?.full_name}
-                  </h3>
-                  <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
-                    <Mail className="w-4 h-4" />
-                    {inquiry.user?.email}
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold text-gray-900 break-words">{inquiry.customer_name}</h3>
+                  <a
+                    href={`mailto:${inquiry.customer_email}`}
+                    className="text-sm text-kfz-blue hover:underline flex items-center gap-1 mt-1 break-all"
+                  >
+                    <Mail className="w-4 h-4 flex-shrink-0" />
+                    {inquiry.customer_email}
+                  </a>
+                  {inquiry.customer_phone && (
+                    <a
+                      href={`tel:${inquiry.customer_phone.replace(/\s/g, "")}`}
+                      className="text-sm text-gray-600 hover:underline flex items-center gap-1 mt-1"
+                    >
+                      <Phone className="w-4 h-4 flex-shrink-0" />
+                      {inquiry.customer_phone}
+                    </a>
+                  )}
+                  <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                    <User className="w-4 h-4 flex-shrink-0" />
+                    {inquiry.user_id ? (
+                      <Link href={`/admin/kunden/${inquiry.user_id}`} className="hover:underline">
+                        {t("customerAccount")}
+                      </Link>
+                    ) : (
+                      t("guest")
+                    )}
                   </p>
-                  <p className="text-sm text-gray-500">{inquiry.user?.phone}</p>
                 </div>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    STATUS_COLORS[inquiry.status] || "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {getInquiryStatusLabel(tCommon, inquiry.status)}
-                </span>
+                <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0">
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      STATUS_COLORS[inquiry.status] || "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {getInquiryStatusLabel(tCommon, inquiry.status)}
+                  </span>
+                  <p className="text-xs text-gray-500">{t("receivedAt", { date: formatReceived(inquiry.created_at) })}</p>
+                </div>
               </div>
 
-              <div className="flex gap-2 mb-4 flex-wrap">
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+              <div className="flex gap-2 mb-4 flex-wrap items-center">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    TYPE_COLORS[inquiry.inquiry_type] || "bg-purple-100 text-purple-800"
+                  }`}
+                >
                   {getInquiryTypeLabel(tCommon, inquiry.inquiry_type)}
                 </span>
-                {inquiry.vehicle && (
+                {inquiry.vehicle ? (
                   <Link href={`/admin/fahrzeuge/${inquiry.vehicle_id}`}>
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200">
-                      {inquiry.vehicle.brand} {inquiry.vehicle.model}
+                      {inquiry.vehicle.brand} {inquiry.vehicle.model} ({inquiry.vehicle.year})
                     </span>
                   </Link>
+                ) : (
+                  inquiry.vehicle_label && (
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                      {t("vehicleNotListed", { vehicle: inquiry.vehicle_label })}
+                    </span>
+                  )
+                )}
+                {inquiry.preferred_date && (
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-800 flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {t("preferredDate")}: {formatDay(inquiry.preferred_date)}
+                  </span>
                 )}
               </div>
 
               <div className="mb-4 p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm font-medium text-gray-900 mb-2">{t("message")}</p>
-                <p className="text-sm text-gray-700 line-clamp-3">{inquiry.message}</p>
+                {inquiry.message ? (
+                  <p className="text-sm text-gray-700 whitespace-pre-line break-words">{inquiry.message}</p>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">{t("noMessage")}</p>
+                )}
               </div>
 
-              <div className="flex gap-2">
-                {statusFilter === "new" && (
-                  <button
-                    onClick={() => handleStatusChange(inquiry.id, "read")}
-                    disabled={actionInProgress === inquiry.id}
-                    className="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {t("markRead")}
-                  </button>
-                )}
-                {statusFilter === "read" && (
-                  <button
-                    onClick={() => handleStatusChange(inquiry.id, "responded")}
-                    disabled={actionInProgress === inquiry.id}
-                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <CheckCircle className="w-4 h-4 inline mr-2" />
-                    {t("markResponded")}
-                  </button>
-                )}
-                {statusFilter !== "closed" && (
-                  <button
-                    onClick={() => handleStatusChange(inquiry.id, "closed")}
-                    disabled={actionInProgress === inquiry.id}
-                    className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {t("close")}
-                  </button>
-                )}
+              <div className="flex items-center gap-3">
+                <label htmlFor={`status-${inquiry.id}`} className="text-sm font-medium text-gray-700">
+                  {t("status")}
+                </label>
+                <select
+                  id={`status-${inquiry.id}`}
+                  value={inquiry.status}
+                  disabled={actionInProgress === inquiry.id}
+                  onChange={(e) => handleStatusChange(inquiry.id, e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-kfz-accent outline-none disabled:opacity-50"
+                >
+                  {STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      {getInquiryStatusLabel(tCommon, status)}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           ))

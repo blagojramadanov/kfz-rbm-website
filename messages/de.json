@@ -229,7 +229,7 @@
             "manageVehiclesDescription": "Verwalten Sie Ihre angebotenen Fahrzeuge, sehen Sie den Status und bearbeiten Sie Details.",
             "viewVehicles": "Fahrzeuge ansehen",
             "inquiries": "Anfragen",
-            "inquiriesDescription": "Sehen Sie Anfragen von Interessenten zu Ihren Fahrzeugen und antworten Sie schnell.",
+            "inquiriesDescription": "Sehen Sie Ihre Anfragen zu Fahrzeugen und Probefahrten und deren Status.",
             "viewInquiries": "Anfragen ansehen",
             "viewRequests": "Anfragen ansehen",
             "favorites": "Favoriten",
@@ -280,10 +280,13 @@
         },
         "inquiries": {
             "title": "Anfragen",
-            "description": "Anfragen von Interessenten zu Ihren Fahrzeugen",
+            "description": "Ihre Fragen zu Fahrzeugen, Probefahrten und Nachrichten an uns",
             "empty": "Noch keine Anfragen",
-            "emptyDescription": "Sie haben noch keine Anfragen erhalten. Sobald Interessenten Ihre Fahrzeuge entdecken, werden ihre Anfragen hier angezeigt.",
-            "submitVehicle": "Fahrzeug anbieten"
+            "emptyDescription": "Sie haben noch keine Anfrage gesendet. Auf jeder Fahrzeugseite können Sie eine Frage stellen oder eine Probefahrt vereinbaren.",
+            "browseVehicles": "Fahrzeuge ansehen",
+            "sentAt": "Gesendet am {date}",
+            "preferredDate": "Wunschtermin: {date}",
+            "vehicleNotListed": "{vehicle} (nicht mehr gelistet)"
         },
         "favorites": {
             "title": "Favoriten",
@@ -570,12 +573,20 @@
         },
         "inquiries": {
             "title": "Kundenanfragen",
-            "description": "Verwalten Sie alle Anfragen Ihrer Kunden",
+            "description": "Fahrzeuganfragen, Probefahrten und Nachrichten aus dem Kontaktformular",
             "empty": "Keine Anfragen gefunden.",
             "message": "Nachricht",
-            "markRead": "Als gelesen markieren",
-            "markResponded": "Als beantwortet markieren",
-            "close": "Schließen"
+            "allStatuses": "Alle",
+            "categoryAll": "Alle Arten",
+            "categoryVehicle": "Fahrzeuganfragen",
+            "categoryContact": "Kontaktformular",
+            "preferredDate": "Wunschtermin",
+            "receivedAt": "Eingegangen am {date}",
+            "customerAccount": "Kundenkonto",
+            "guest": "Gast",
+            "vehicleNotListed": "{vehicle} (nicht mehr gelistet)",
+            "noMessage": "Keine Nachricht",
+            "status": "Status"
         },
         "tradeIns": {
             "title": "Inzahlungnahmen",
@@ -653,7 +664,8 @@
         "messageSent": "Nachricht erfolgreich gesendet",
         "messageError": "Fehler beim Senden der Nachricht",
         "followUs": "Folgen Sie uns",
-        "testDriveMessage": "Ich interessiere mich für eine Probefahrt mit dem Fahrzeug {vehicle}. Bitte teilen Sie mir die verfügbaren Termine mit."
+        "sending": "Wird gesendet …",
+        "messageSentText": "Vielen Dank für Ihre Nachricht. Wir melden uns so schnell wie möglich bei Ihnen."
     },
     "footer": {
         "allRightsReserved": "Alle Rechte vorbehalten",
@@ -1037,7 +1049,8 @@
         "inquiryTypes": {
             "general": "Allgemeine Anfrage",
             "test_drive": "Probefahrt",
-            "part_exchange": "Inzahlungnahme"
+            "part_exchange": "Inzahlungnahme",
+            "contact": "Kontaktformular"
         },
         "salesTypes": {
             "direct": "Direktverkauf",
@@ -1466,5 +1479,28 @@
             "description": "Beschreibung",
             "deleting": "Wird gelöscht..."
         }
+    },
+    "inquiryForm": {
+        "titleGeneral": "Anfrage zu diesem Fahrzeug",
+        "titleTestDrive": "Probefahrt vereinbaren",
+        "type": "Art der Anfrage",
+        "typeGeneral": "Frage zum Fahrzeug",
+        "typeTestDrive": "Probefahrt",
+        "preferredDate": "Wunschtermin",
+        "preferredDateHint": "Wir bestätigen den Termin telefonisch oder per E-Mail.",
+        "phoneOptional": "Telefon (optional)",
+        "messageOptional": "Nachricht (optional)",
+        "messagePlaceholder": "Ihre Frage zu diesem Fahrzeug",
+        "honeypot": "Bitte lassen Sie dieses Feld leer",
+        "privacy": "Wir verwenden Ihre Angaben nur, um Ihre Anfrage zu bearbeiten.",
+        "submit": "Anfrage senden",
+        "sending": "Wird gesendet …",
+        "cancel": "Abbrechen",
+        "close": "Schließen",
+        "successTitle": "Vielen Dank für Ihre Anfrage",
+        "successText": "Wir melden uns so schnell wie möglich bei Ihnen.",
+        "successDashboard": "Den Status Ihrer Anfrage sehen Sie in Ihrem Kundenbereich.",
+        "toMyInquiries": "Zu meinen Anfragen",
+        "vehicleUnavailable": "Dieses Fahrzeug ist nicht mehr verfügbar."
     }
 }

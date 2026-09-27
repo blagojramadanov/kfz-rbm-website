@@ -390,10 +390,20 @@ export async function rejectSubmittedVehicle(vehicleId: string, reason: string) 
 
 const INQUIRY_STATUSES = ["new", "read", "responded", "closed"] as const;
 
-export async function getInquiries(filters?: { status?: string }) {
+/** "vehicle" = asked from a vehicle page (general, test_drive, part_exchange), "contact" = /contact form. */
+const INQUIRY_CATEGORIES = ["vehicle", "contact"] as const;
+export type InquiryCategory = (typeof INQUIRY_CATEGORIES)[number];
+
+const inquiryFilterSchema = z
+  .object({ status: z.enum(INQUIRY_STATUSES).optional(), category: z.enum(INQUIRY_CATEGORIES).optional() })
+  .optional();
+
+export async function getInquiries(filters?: { status?: string; category?: InquiryCategory }) {
   return runAction("getInquiries", "LOAD_FAILED", async () => {
     const { supabase } = await requireAdmin();
-    const f = listFilterSchema.parse(filters);
+    const parsed = inquiryFilterSchema.safeParse(filters);
+    if (!parsed.success) throw new ActionError("INVALID_INPUT");
+    const f = parsed.data;
 
     let query = supabase
       .from("customer_inquiries")
@@ -405,6 +415,8 @@ export async function getInquiries(filters?: { status?: string }) {
       )
       .order("created_at", { ascending: false });
     if (f?.status) query = query.eq("status", f.status);
+    if (f?.category === "contact") query = query.eq("inquiry_type", "contact");
+    if (f?.category === "vehicle") query = query.neq("inquiry_type", "contact");
 
     const { data, error } = await query;
     if (error) throw error;
@@ -559,7 +571,7 @@ export async function getCustomers() {
     // Per-customer counts for the list columns (same matching as getCustomerDetails).
     const [{ data: vehicles }, { data: inquiries }, { data: tradeIns }] = await Promise.all([
       supabase.from("submitted_vehicles").select("user_id"),
-      supabase.from("customer_inquiries").select("customer_email"),
+      supabase.from("customer_inquiries").select("user_id, customer_email"),
       supabase.from("trade_in_requests").select("user_id"),
     ]);
     const tally = (values: (string | null)[]) => {
@@ -568,18 +580,29 @@ export async function getCustomers() {
       return counts;
     };
     const vehicleCounts = tally((vehicles || []).map((row) => row.user_id));
-    const inquiryCounts = tally((inquiries || []).map((row) => row.customer_email));
+    // An inquiry belongs to a customer by user_id (sent while logged in) or, for guest
+    // inquiries, by the same email address (compared case-insensitively).
+    const inquiryCounts = tally((inquiries || []).map((row) => row.user_id));
+    const guestInquiryCounts = tally(
+      (inquiries || []).filter((row) => !row.user_id).map((row) => row.customer_email?.toLowerCase() ?? null)
+    );
     const tradeInCounts = tally((tradeIns || []).map((row) => row.user_id));
 
     return {
       customers: (data || []).map((customer) => ({
         ...customer,
         submitted_vehicles_count: vehicleCounts.get(customer.id) || 0,
-        inquiries_count: inquiryCounts.get(customer.email) || 0,
+        inquiries_count:
+          (inquiryCounts.get(customer.id) || 0) + (guestInquiryCounts.get(customer.email?.toLowerCase()) || 0),
         trade_in_requests_count: tradeInCounts.get(customer.id) || 0,
       })),
     };
   });
+}
+
+/** Escapes LIKE wildcards so ilike() compares the whole value, case-insensitively. */
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => `\\${char}`);
 }
 
 export async function getCustomerDetails(customerId: string) {
@@ -592,7 +615,14 @@ export async function getCustomerDetails(customerId: string) {
     if (!customer) throw new ActionError("NOT_FOUND");
 
     const { data: vehicles } = await supabase.from("submitted_vehicles").select("*").eq("user_id", customerId);
-    const { data: inquiries } = await supabase.from("customer_inquiries").select("*").eq("customer_email", customer.email);
+    // Same matching as getCustomers(): by user_id, or guest inquiries with the same email.
+    const [{ data: ownInquiries }, { data: guestInquiries }] = await Promise.all([
+      supabase.from("customer_inquiries").select("*").eq("user_id", customerId),
+      supabase.from("customer_inquiries").select("*").is("user_id", null).ilike("customer_email", escapeLike(customer.email)),
+    ]);
+    const inquiries = [...(ownInquiries || []), ...(guestInquiries || [])].sort((a, b) =>
+      b.created_at.localeCompare(a.created_at)
+    );
     const { data: tradeIns } = await supabase.from("trade_in_requests").select("*").eq("user_id", customerId);
 
     return { customer, vehicles: vehicles || [], inquiries: inquiries || [], tradeIns: tradeIns || [] };

@@ -229,7 +229,7 @@
             "manageVehiclesDescription": "Manage your listed vehicles, check their status, and edit details.",
             "viewVehicles": "View Vehicles",
             "inquiries": "Inquiries",
-            "inquiriesDescription": "See inquiries from interested buyers about your vehicles and respond quickly.",
+            "inquiriesDescription": "See your inquiries about vehicles and test drives and their status.",
             "viewInquiries": "View Inquiries",
             "viewRequests": "View Requests",
             "favorites": "Favorites",
@@ -280,10 +280,13 @@
         },
         "inquiries": {
             "title": "Inquiries",
-            "description": "Inquiries from interested buyers about your vehicles",
+            "description": "Your questions about vehicles, test drives and messages to us",
             "empty": "No inquiries yet",
-            "emptyDescription": "You haven't received any inquiries yet. Once interested buyers discover your vehicles, their inquiries will appear here.",
-            "submitVehicle": "Submit Vehicle"
+            "emptyDescription": "You have not sent an inquiry yet. On every vehicle page you can ask a question or book a test drive.",
+            "browseVehicles": "Browse vehicles",
+            "sentAt": "Sent on {date}",
+            "preferredDate": "Preferred date: {date}",
+            "vehicleNotListed": "{vehicle} (no longer listed)"
         },
         "favorites": {
             "title": "Favorites",
@@ -570,12 +573,20 @@
         },
         "inquiries": {
             "title": "Customer Inquiries",
-            "description": "Manage all inquiries from your customers",
+            "description": "Vehicle inquiries, test drives and messages from the contact form",
             "empty": "No inquiries found.",
             "message": "Message",
-            "markRead": "Mark as read",
-            "markResponded": "Mark as responded",
-            "close": "Close"
+            "allStatuses": "All",
+            "categoryAll": "All types",
+            "categoryVehicle": "Vehicle inquiries",
+            "categoryContact": "Contact form",
+            "preferredDate": "Preferred date",
+            "receivedAt": "Received on {date}",
+            "customerAccount": "Customer account",
+            "guest": "Guest",
+            "vehicleNotListed": "{vehicle} (no longer listed)",
+            "noMessage": "No message",
+            "status": "Status"
         },
         "tradeIns": {
             "title": "Trade-In Requests",
@@ -653,7 +664,8 @@
         "messageSent": "Message sent successfully",
         "messageError": "Error sending message",
         "followUs": "Follow Us",
-        "testDriveMessage": "I am interested in a test drive of the {vehicle}. Please let me know which appointments are available."
+        "sending": "Sending …",
+        "messageSentText": "Thank you for your message. We will get back to you as soon as possible."
     },
     "footer": {
         "allRightsReserved": "All rights reserved",
@@ -1037,7 +1049,8 @@
         "inquiryTypes": {
             "general": "General Inquiry",
             "test_drive": "Test Drive",
-            "part_exchange": "Trade-In"
+            "part_exchange": "Trade-In",
+            "contact": "Contact form"
         },
         "salesTypes": {
             "direct": "Direct sale",
@@ -1466,5 +1479,28 @@
             "description": "Description",
             "deleting": "Deleting..."
         }
+    },
+    "inquiryForm": {
+        "titleGeneral": "Inquiry about this vehicle",
+        "titleTestDrive": "Book a test drive",
+        "type": "Type of inquiry",
+        "typeGeneral": "Question about the vehicle",
+        "typeTestDrive": "Test drive",
+        "preferredDate": "Preferred date",
+        "preferredDateHint": "We will confirm the appointment by phone or email.",
+        "phoneOptional": "Phone (optional)",
+        "messageOptional": "Message (optional)",
+        "messagePlaceholder": "Your question about this vehicle",
+        "honeypot": "Please leave this field empty",
+        "privacy": "We only use your details to handle your inquiry.",
+        "submit": "Send inquiry",
+        "sending": "Sending …",
+        "cancel": "Cancel",
+        "close": "Close",
+        "successTitle": "Thank you for your inquiry",
+        "successText": "We will get back to you as soon as possible.",
+        "successDashboard": "You can follow the status of your inquiry in your account.",
+        "toMyInquiries": "Go to my inquiries",
+        "vehicleUnavailable": "This vehicle is no longer available."
     }
 }

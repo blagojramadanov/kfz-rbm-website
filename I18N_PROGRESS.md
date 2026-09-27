@@ -888,14 +888,34 @@ Keys (de/en/mk): changed `admin.submissionDetail.{publishTitle, publish, publish
 Verification: `npm run check:i18n` ✅, `npm run build` ✅, migration 027 applied ✅, backfill ✅. Live test of a new publish pending.
 Open follow-ups: the TEST-Mercedes price is still the customer's asking price (24.900; set the real price in the admin). The Golf's submission has no `offered_price` (accepted before `5d78cac`).
 
+### Vehicle inquiries + contact form (2026-09-27)
+Before: nothing inserted into `customer_inquiries`; the vehicle page buttons only linked to `/contact`; the contact form saved nothing and `console.log`ged name/email/phone.
+
+**Schema before (01 + 023):** `customer_inquiries(id, vehicle_id → vehicles ON DELETE SET NULL, customer_name(100), customer_email(100), customer_phone(20), message NOT NULL, inquiry_type general|test_drive|part_exchange, status new|read|responded|closed, created_at, updated_at)`. No `user_id`, so customers could not be linked. RLS: INSERT for everyone `WITH CHECK (true)`; SELECT/UPDATE/DELETE admin only.
+
+**Migration `028_inquiries_and_contact_messages.sql`** (must be applied before deploying): adds `user_id` (→ `user_profiles`, set null), `preferred_date` (date, test drives only, CHECK), `vehicle_label` (snapshot "Brand Model (Year)"); `inquiry_type` also allows `contact`; phone widened to 30; drops the public INSERT policy and revokes INSERT from anon/authenticated (the anon key is public, so that policy let anyone bypass validation and the honeypot); new policy "Customers can view own inquiries" (`user_id = auth.uid()`).
+
+| Part | Change |
+| --- | --- |
+| Actions | New `app/actions/inquiries.ts`: `sendVehicleInquiry`, `sendContactMessage` (public, guests allowed: zod-validated, unknown fields stripped, honeypot `website` → silently dropped, `user_id` only from the session, vehicle must be publicly listed (read with a cookie-less anon client, so RLS decides), then insert with the service-role client and an explicit column list); `getMyInquiries`, `countMyInquiries` (`requireUser`, RLS client). These two public actions are the documented exception to "every action starts with requireUser/requireAdmin". |
+| Vehicle page | `components/vehicle-inquiry.tsx`: "Anfrage senden" / "Probefahrt vereinbaren" open a dialog (portal, Escape/backdrop close, focus handling) tied to the vehicle; type select (question / test drive + required preferred date, today..+1 year); name/email/phone prefilled from the profile. Homepage "Probefahrt" links to `/fahrzeuge/<slug>#probefahrt`, which opens the dialog (`lib/inquiries.ts`). |
+| Contact form | Saves via `sendContactMessage` as `inquiry_type = 'contact'`, honeypot, prefill, success/error states; the `console.log` and the `?testDrive=` prefill are gone. |
+| Admin | `admin/anfragen`: status filter (+ "Alle") and type filter (Alle Arten / Fahrzeuganfragen / Kontaktformular); card shows name, email (mailto), phone (tel), account or guest (links to the customer), type, vehicle (or "nicht mehr gelistet" snapshot), preferred date, full message, received date, status select. `getCustomers`/`getCustomerDetails` match inquiries by `user_id` or, for guests, by email (case-insensitive). |
+| Customer | `dashboard/anfragen` lists own inquiries (type, vehicle link, sent date, preferred date, status, message); dashboard counter is real. Admin dashboard and Statistiken already counted `customer_inquiries` and now show real numbers. |
+
+**Why contact messages live in `customer_inquiries`** (type `contact`) instead of their own table: same fields and status workflow, the admin page, the counters, the customer detail page and the customer dashboard all work on this table already, and the type filter separates them. A separate list would duplicate all of that.
+
+PII logging: the contact form was the only `console.log` with personal data (the remaining ones in `components/search-bar.tsx` / `vehicle-card.tsx` log search filters / a vehicle id; scripts log vehicle ids).
+Keys (de/en/mk): new `inquiryForm.*`, `common.inquiryTypes.contact`, `contact.{sending, messageSentText}`, `admin.inquiries.{allStatuses, categoryAll, categoryVehicle, categoryContact, preferredDate, receivedAt, customerAccount, guest, vehicleNotListed, noMessage, status}`, `dashboard.inquiries.{browseVehicles, sentAt, preferredDate, vehicleNotListed}`; changed `admin.inquiries.description`, `dashboard.inquiries.{description, emptyDescription}`, `dashboard.overview.inquiriesDescription`; removed `admin.inquiries.{markRead, markResponded, close}`, `dashboard.inquiries.submitVehicle`, `contact.testDriveMessage`.
+Verification: `npm run check:i18n` ✅, `npm run build` ✅. Migration 028 pending; live test pending.
+
 ### Test data
 - The stuck test submission ("fffffffff…", `801e7b66-…`) got a real test offer (3.000 €) during live testing and is now in a normal "offer sent" state — no longer inconsistent, but still a fake vehicle that should eventually be deleted.
 - The leftover "sssssssss" test vehicle is still in the live database (see below).
 
 ### Remaining known issues (not addressed yet)
 **High**
-- **Inquiries are never created.** No code path writes to the inquiries table, so the admin and customer inquiry pages are always empty.
-- **Contact form** does not persist anything and logs the submitted personal data (PII) to the console.
+- ~~Inquiries are never created~~ / ~~Contact form does not persist and logs PII~~ — fixed, see "Vehicle inquiries + contact form" (needs migration 028).
 
 **Medium**
 - **Favorites** feature has no database table behind it; it cannot work as built.

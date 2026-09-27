@@ -3,6 +3,7 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import { Car, Heart, MapPin, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ListingTypeBadge } from "@/components/listing-type-badge";
+import { TEST_DRIVE_HASH } from "@/lib/inquiries";
 import { formatMileage, formatPrice } from "@/lib/format-vehicle";
 import { Link } from "@/lib/navigation";
 import type { PublicVehicle } from "@/lib/public-vehicles";
@@ -104,12 +105,7 @@ export async function FeaturedVehicles({ vehicles }: { vehicles: PublicVehicle[]
                 variant="outline"
                 className="w-full border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white"
               >
-                <Link
-                  href={{
-                    pathname: "/contact",
-                    query: { testDrive: `${vehicle.brand} ${vehicle.model} (${vehicle.year})` },
-                  }}
-                >
+                <Link href={`/fahrzeuge/${vehicle.slug}#${TEST_DRIVE_HASH}`}>
                   {t("featured.testDrive")}
                 </Link>
               </Button>

@@ -2,45 +2,55 @@
 
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
-import { FormEvent, Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { Phone, Mail, MapPin, Clock, CheckCircle } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
 import { COMPANY, getFormattedAddress } from "@/lib/company";
 import { BusinessHours } from "@/components/business-hours";
+import { HoneypotField } from "@/components/honeypot-field";
+import { useAuth } from "@/lib/auth-context";
+import { useErrorMessage } from "@/lib/use-error-message";
 
-// Longest vehicle label accepted from the `testDrive` query param.
-const MAX_TEST_DRIVE_LENGTH = 100;
+const EMPTY_FORM = { name: "", email: "", phone: "", message: "", website: "" };
 
 export default function ContactPage() {
-  return (
-    <Suspense fallback={null}>
-      <ContactContent />
-    </Suspense>
-  );
-}
-
-function ContactContent() {
   const t = useTranslations();
   const tCompany = useTranslations("company");
-  const searchParams = useSearchParams();
-  // `?testDrive=<vehicle label>` (set by the homepage "Test drive" button)
-  // prefills the message once; the visitor can edit it freely afterwards.
-  const testDriveVehicle = searchParams
-    .get("testDrive")
-    ?.trim()
-    .slice(0, MAX_TEST_DRIVE_LENGTH);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: testDriveVehicle
-      ? t("contact.testDriveMessage", { vehicle: testDriveVehicle })
-      : "",
-  });
+  const errorMessage = useErrorMessage();
+  const { profile } = useAuth();
+  const [formData, setFormData] = useState(EMPTY_FORM);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  // Logged-in customers get their name, email and phone prefilled (the profile loads after the page).
+  useEffect(() => {
+    if (!profile) return;
+    setFormData((prev) => ({
+      ...prev,
+      name: prev.name || profile.full_name || "",
+      email: prev.email || profile.email || "",
+      phone: prev.phone || profile.phone || "",
+    }));
+  }, [profile]);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    setSending(true);
+    setError("");
+    try {
+      const { sendContactMessage } = await import("@/app/actions/inquiries");
+      const result = await sendContactMessage(formData);
+      if (!result.ok) {
+        setError(errorMessage(result));
+        return;
+      }
+      setSent(true);
+      setFormData((prev) => ({ ...prev, message: "" }));
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -109,7 +119,20 @@ function ContactContent() {
               {t("contact.sendMessage")}
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            {sent ? (
+              <div className="text-center py-8" role="status">
+                <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" aria-hidden="true" />
+                <p className="text-lg font-semibold text-gray-900 mb-2">{t("contact.messageSent")}</p>
+                <p className="text-gray-600">{t("contact.messageSentText")}</p>
+              </div>
+            ) : (
+            <form onSubmit={handleSubmit} className="relative space-y-6">
+              <HoneypotField
+                label={t("inquiryForm.honeypot")}
+                value={formData.website}
+                onChange={(value) => setFormData({ ...formData, website: value })}
+              />
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   {t("forms.fullName")}
@@ -117,6 +140,9 @@ function ContactContent() {
                 <input
                   type="text"
                   required
+                  minLength={2}
+                  maxLength={100}
+                  autoComplete="name"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -133,6 +159,8 @@ function ContactContent() {
                 <input
                   type="email"
                   required
+                  maxLength={100}
+                  autoComplete="email"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
@@ -144,10 +172,12 @@ function ContactContent() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {t("forms.phone")}
+                  {t("inquiryForm.phoneOptional")}
                 </label>
                 <input
                   type="tel"
+                  maxLength={30}
+                  autoComplete="tel"
                   value={formData.phone}
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
@@ -163,6 +193,7 @@ function ContactContent() {
                 </label>
                 <textarea
                   required
+                  maxLength={2000}
                   rows={5}
                   value={formData.message}
                   onChange={(e) =>
@@ -173,13 +204,23 @@ function ContactContent() {
                 />
               </div>
 
+              {error && (
+                <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3" role="alert">
+                  {error}
+                </p>
+              )}
+
+              <p className="text-xs text-gray-500">{t("inquiryForm.privacy")}</p>
+
               <Button
                 type="submit"
+                disabled={sending}
                 className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white py-2 font-semibold"
               >
-                {t("contact.sendMessage")}
+                {sending ? t("contact.sending") : t("contact.sendMessage")}
               </Button>
             </form>
+            )}
           </div>
         </div>
       </div>

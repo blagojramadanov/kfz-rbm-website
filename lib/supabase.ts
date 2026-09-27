@@ -49,12 +49,15 @@ export interface VehicleImage {
 
 export interface CustomerInquiry {
   id: string;
-  vehicle_id?: string;
+  vehicle_id?: string | null;
+  user_id?: string | null; // Logged-in sender (migration 028); null for guests
+  vehicle_label?: string | null; // "Brand Model (Year)" at the time of the inquiry
+  preferred_date?: string | null; // YYYY-MM-DD, test drives only
   customer_name: string;
   customer_email: string;
-  customer_phone: string;
+  customer_phone: string | null;
   message: string;
-  inquiry_type: "general" | "test_drive" | "part_exchange";
+  inquiry_type: "general" | "test_drive" | "part_exchange" | "contact";
   status: "new" | "read" | "responded" | "closed";
   created_at: string;
   updated_at: string;
