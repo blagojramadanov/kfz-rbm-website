@@ -1,5 +1,6 @@
 "use client";
 import { useTranslations } from "next-intl";
+import { StatusBadge } from "@/components/status-badge";
 import { useParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -129,8 +130,8 @@ export default function AdminSubmittedVehiclesPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -152,32 +153,25 @@ export default function AdminSubmittedVehiclesPage() {
     consignment: "📋",
   };
 
-  const statusConfig: Record<string, { bg: string; text: string; border: string }> = {
-    eingereicht: { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
-    in_bearbeitung: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
-    angebot_gesendet: { bg: "bg-green-50", text: "text-green-700", border: "border-green-200" },
-    akzeptiert: { bg: "bg-emerald-100", text: "text-emerald-800", border: "border-emerald-300" },
-    abgelehnt: { bg: "bg-red-50", text: "text-red-700", border: "border-red-200" },
-  };
 
   return (
-    <div className="bg-gray-50 min-h-screen -mx-6 -my-6 px-6 py-6">
+    <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">{t("title")}</h1>
-        <p className="text-gray-600">{t("description")}</p>
+        <h1 className="page-title text-foreground mb-2">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("description")}</p>
       </div>
 
       {/* Error Alert */}
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="mb-6 bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 flex gap-3">
+          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-destructive-subtle-foreground">{error}</p>
         </div>
       )}
 
       {/* Filter Tabs */}
-      <div className="mb-8 border-b border-gray-200 bg-white rounded-t-lg">
+      <div className="mb-8 border-b border-border bg-card rounded-t-lg">
         <div className="flex gap-2 px-4 overflow-x-auto">
           {statuses.map((status) => (
             <button
@@ -185,8 +179,8 @@ export default function AdminSubmittedVehiclesPage() {
               onClick={() => setStatusFilter(status.value)}
               className={`flex flex-shrink-0 items-center gap-2 px-5 py-4 font-medium text-sm transition-all border-b-2 ${
                 statusFilter === status.value
-                  ? "border-kfz-blue text-kfz-blue"
-                  : "border-transparent text-gray-600 hover:text-gray-900"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               <span>{status.icon}</span>
@@ -201,25 +195,25 @@ export default function AdminSubmittedVehiclesPage() {
         {vehiclesLoading ? (
           <div className="flex justify-center py-16">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-              <p className="text-gray-600">{t("loading")}</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">{t("loading")}</p>
             </div>
           </div>
         ) : vehicles.length === 0 ? (
-          <div className="bg-white rounded-lg p-16 text-center">
-            <Car className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-lg text-gray-600">{t("emptyTitle")}</p>
-            <p className="text-sm text-gray-500 mt-1">{t("emptyDescription")}</p>
+          <div className="bg-card rounded-lg p-16 text-center">
+            <Car className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+            <p className="text-lg text-muted-foreground">{t("emptyTitle")}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t("emptyDescription")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {vehicles.map((vehicle) => (
               <div
                 key={vehicle.id}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group"
+                className="card hover:shadow-lg transition-shadow duration-200 overflow-hidden group"
               >
                 {/* Image Section (the main image links to the detail page; thumbnails stay buttons) */}
-                <div className="relative overflow-hidden bg-gray-100">
+                <div className="relative overflow-hidden bg-secondary">
                   <Link
                     href={`/admin/fahrzeuge/eingereicht/${vehicle.id}`}
                     aria-label={`${vehicle.brand} ${vehicle.model}`}
@@ -234,15 +228,15 @@ export default function AdminSubmittedVehiclesPage() {
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                        <Car className="w-16 h-16 text-gray-400" />
+                      <div className="w-full h-full flex items-center justify-center bg-border">
+                        <Car className="w-16 h-16 text-muted-foreground/70" />
                       </div>
                     )}
                   </Link>
 
                   {/* Image Counter */}
                   {vehicle.images && vehicle.images.length > 0 && (
-                    <div className="pointer-events-none absolute top-3 right-3 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    <div className="pointer-events-none absolute top-3 right-3 bg-black/60 text-primary-foreground px-3 py-1 rounded-full text-xs font-medium">
                       {getSelectedImageIndex(vehicle.id) + 1}/{vehicle.images.length}
                     </div>
                   )}
@@ -256,7 +250,7 @@ export default function AdminSubmittedVehiclesPage() {
                           onClick={() => setImageIndex(vehicle.id, index)}
                           className={`flex-shrink-0 w-10 h-10 rounded-md overflow-hidden border-2 transition-all ${
                             getSelectedImageIndex(vehicle.id) === index
-                              ? "border-white shadow-lg"
+                              ? "border-primary-foreground shadow-lg"
                               : "border-white/40 opacity-70 hover:opacity-100"
                           }`}
                         >
@@ -274,30 +268,26 @@ export default function AdminSubmittedVehiclesPage() {
 
                   {/* Status Badge */}
                   <div className="pointer-events-none absolute top-3 left-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        statusConfig[vehicle.status]?.bg
-                      } ${statusConfig[vehicle.status]?.text}`}
-                    >
+                    <StatusBadge kind="submission" status={vehicle.status} className="shadow-sm">
                       {getSubmissionStatusLabel(tCommon, vehicle.status)}
-                    </span>
+                    </StatusBadge>
                   </div>
                 </div>
 
                 {/* Content Section */}
                 <div className="p-5">
                   {/* Title */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">
-                    <Link href={`/admin/fahrzeuge/eingereicht/${vehicle.id}`} className="hover:text-kfz-blue hover:underline">
+                  <h3 className="card-title mb-1">
+                    <Link href={`/admin/fahrzeuge/eingereicht/${vehicle.id}`} className="hover:text-primary hover:underline">
                       {vehicle.brand} {vehicle.model}
                     </Link>
                   </h3>
-                  <p className="text-sm text-gray-500 mb-4">{vehicle.year}</p>
+                  <p className="text-sm text-muted-foreground mb-4">{vehicle.year}</p>
 
                   {/* Price */}
-                  <div className="mb-4 pb-4 border-b border-gray-100">
-                    <p className="text-xs text-gray-600 uppercase tracking-wide font-semibold mb-1">{t("askingPrice")}</p>
-                    <p className="text-2xl font-bold text-kfz-blue">
+                  <div className="mb-4 pb-4 border-b border-border">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">{t("askingPrice")}</p>
+                    <p className="text-2xl font-bold text-primary">
                       {vehicle.price != null ? formatPrice(format, vehicle.price) : "–"}
                     </p>
                   </div>
@@ -305,32 +295,32 @@ export default function AdminSubmittedVehiclesPage() {
                   {/* Quick Specs */}
                   <div className="grid grid-cols-3 gap-3 mb-5">
                     <div className="flex items-center gap-2 text-sm">
-                      <Gauge className="w-4 h-4 text-gray-400" />
+                      <Gauge className="w-4 h-4 text-muted-foreground/70" />
                       <div>
-                        <p className="text-xs text-gray-500">{t("mileage")}</p>
-                        <p className="font-semibold text-gray-900">
+                        <p className="text-xs text-muted-foreground">{t("mileage")}</p>
+                        <p className="font-semibold text-foreground">
                           {vehicle.mileage != null ? tAdmin("units.mileage", { value: format.number(vehicle.mileage) }) : "–"}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <Calendar className="w-4 h-4 text-muted-foreground/70" />
                       <div>
-                        <p className="text-xs text-gray-500">{t("transmission")}</p>
-                        <p className="font-semibold text-gray-900">{getTransmissionLabel(tCommon, vehicle.transmission)}</p>
+                        <p className="text-xs text-muted-foreground">{t("transmission")}</p>
+                        <p className="font-semibold text-foreground">{getTransmissionLabel(tCommon, vehicle.transmission)}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="w-4 h-4 text-gray-400" />
+                      <MapPin className="w-4 h-4 text-muted-foreground/70" />
                       <div>
-                        <p className="text-xs text-gray-500">{t("fuel")}</p>
-                        <p className="font-semibold text-gray-900">{getFuelTypeLabel(tCommon, vehicle.fuel_type)}</p>
+                        <p className="text-xs text-muted-foreground">{t("fuel")}</p>
+                        <p className="font-semibold text-foreground">{getFuelTypeLabel(tCommon, vehicle.fuel_type)}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Customer Info */}
-                  <div className="text-xs text-gray-600 mb-4 pb-4 border-b border-gray-100">
+                  <div className="text-xs text-muted-foreground mb-4 pb-4 border-b border-border">
                     <SubmissionCustomer user={vehicle.user} />
                   </div>
 
@@ -338,8 +328,8 @@ export default function AdminSubmittedVehiclesPage() {
                   <div className="mb-4 space-y-2">
                     {vehicle.sales_type && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-600">{t("salesType")}:</span>
-                        <span className="font-semibold text-gray-900">
+                        <span className="text-muted-foreground">{t("salesType")}:</span>
+                        <span className="font-semibold text-foreground">
                           {salesTypeIcons[vehicle.sales_type] ? `${salesTypeIcons[vehicle.sales_type]} ` : ""}
                           {getSalesTypeLabel(tCommon, vehicle.sales_type)}
                         </span>
@@ -347,8 +337,8 @@ export default function AdminSubmittedVehiclesPage() {
                     )}
                     {vehicle.commission && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-600">{t("commission")}:</span>
-                        <span className="font-semibold text-purple-600">
+                        <span className="text-muted-foreground">{t("commission")}:</span>
+                        <span className="font-semibold text-highlight">
                           {format.number(vehicle.commission / 100, { style: "percent", maximumFractionDigits: 2 })}
                         </span>
                       </div>
@@ -360,31 +350,31 @@ export default function AdminSubmittedVehiclesPage() {
                     <DeclinedOfferBadge vehicle={vehicle} />
                   </div>
                   {vehicle.status === "angebot_gesendet" && (
-                    <div className="mb-4 pb-4 border-b border-gray-100 text-xs">
+                    <div className="mb-4 pb-4 border-b border-border text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600">{t("currentOffer")}:</span>
-                        <span className="font-semibold text-green-700">
+                        <span className="text-muted-foreground">{t("currentOffer")}:</span>
+                        <span className="font-semibold text-success">
                           {vehicle.offered_price != null ? formatPrice(format, vehicle.offered_price) : t("noOfferPrice")}
                         </span>
                       </div>
-                      {vehicle.offer_terms && <p className="text-gray-600 mt-1 whitespace-pre-line break-words">{vehicle.offer_terms}</p>}
+                      {vehicle.offer_terms && <p className="text-muted-foreground mt-1 whitespace-pre-line break-words">{vehicle.offer_terms}</p>}
                     </div>
                   )}
                   {vehicle.status === "akzeptiert" && (
-                    <div className="mb-4 pb-4 border-b border-gray-100 text-xs">
+                    <div className="mb-4 pb-4 border-b border-border text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600">{t("acceptedOffer")}:</span>
-                        <span className="font-semibold text-emerald-700">
+                        <span className="text-muted-foreground">{t("acceptedOffer")}:</span>
+                        <span className="font-semibold text-success">
                           {vehicle.offered_price != null ? formatPrice(format, vehicle.offered_price) : t("noOfferPrice")}
                         </span>
                       </div>
-                      {vehicle.vehicle_id && <p className="text-gray-600 mt-1">{t("alreadyPublished")}</p>}
+                      {vehicle.vehicle_id && <p className="text-muted-foreground mt-1">{t("alreadyPublished")}</p>}
                     </div>
                   )}
                   {vehicle.status === "abgelehnt" && (vehicle.rejection_reason || vehicle.status_reason) && (
-                    <div className="mb-4 pb-4 border-b border-gray-100 text-xs">
-                      <p className="text-gray-600">{t("rejectionReason")}:</p>
-                      <p className="text-gray-900 mt-1 whitespace-pre-line break-words">{vehicle.rejection_reason || vehicle.status_reason}</p>
+                    <div className="mb-4 pb-4 border-b border-border text-xs">
+                      <p className="text-muted-foreground">{t("rejectionReason")}:</p>
+                      <p className="text-foreground mt-1 whitespace-pre-line break-words">{vehicle.rejection_reason || vehicle.status_reason}</p>
                     </div>
                   )}
 

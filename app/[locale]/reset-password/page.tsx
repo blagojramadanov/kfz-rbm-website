@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
   };
 
   const card = (content: React.ReactNode, centered = true) => (
-    <div className="min-h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-primary-foreground flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className={`bg-white/10 backdrop-blur-md rounded-lg shadow-2xl p-8 border border-white/20${centered ? " text-center" : ""}`}>
           {content}
@@ -125,17 +125,17 @@ export default function ResetPasswordPage() {
   );
 
   if (status === "verifying") {
-    return card(<p className="text-blue-100">{t("auth.verifyingResetLink")}</p>);
+    return card(<p className="text-primary-foreground/80">{t("auth.verifyingResetLink")}</p>);
   }
 
   if (status === "invalid") {
     return card(
       <>
-        <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-4" />
+        <AlertCircle className="w-12 h-12 text-destructive-border mx-auto mb-4" />
         <h2 className="text-2xl font-bold mb-2">{t("auth.invalidResetLink")}</h2>
-        <p className="text-blue-100 mb-6">{t("auth.invalidResetLinkDesc")}</p>
+        <p className="text-primary-foreground/80 mb-6">{t("auth.invalidResetLinkDesc")}</p>
         <Link href="/forgot-password">
-          <Button className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold">
+          <Button variant="accent" className="w-full">
             {t("auth.requestNewReset")}
           </Button>
         </Link>
@@ -147,12 +147,12 @@ export default function ResetPasswordPage() {
     return card(
       <>
         <div className="mb-4 flex justify-center">
-          <div className="bg-green-500/20 rounded-full p-4">
-            <CheckCircle className="w-12 h-12 text-green-300" />
+          <div className="bg-success/20 rounded-full p-4">
+            <CheckCircle className="w-12 h-12 text-success-border" />
           </div>
         </div>
         <h2 className="text-2xl font-bold mb-2">{t("auth.passwordUpdatedTitle")}</h2>
-        <p className="text-blue-100">{t("auth.passwordUpdatedRedirect")}</p>
+        <p className="text-primary-foreground/80">{t("auth.passwordUpdatedRedirect")}</p>
       </>
     );
   }
@@ -161,15 +161,15 @@ export default function ResetPasswordPage() {
     <>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{t("auth.newPasswordTitle")}</h1>
-        <p className="text-blue-100">{t("auth.newPasswordDescription")}</p>
+        <h1 className="page-title mb-2">{t("auth.newPasswordTitle")}</h1>
+        <p className="text-primary-foreground/80">{t("auth.newPasswordDescription")}</p>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-500/20 border border-red-400/50 rounded-lg p-4 mb-6 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-300 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-200">{error}</p>
+        <div className="bg-destructive/20 border border-destructive-border/50 rounded-lg p-4 mb-6 flex gap-3">
+          <AlertCircle className="w-5 h-5 text-destructive-border flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-destructive-subtle">{error}</p>
         </div>
       )}
 
@@ -179,7 +179,7 @@ export default function ResetPasswordPage() {
         <div>
           <label className="block text-sm font-medium mb-2">{t("auth.newPassword")}</label>
           <div className="relative">
-            <Lock className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
+            <Lock className="absolute left-3 top-3 w-5 h-5 text-primary-foreground/70" />
             <input
               type="password"
               value={password}
@@ -187,17 +187,17 @@ export default function ResetPasswordPage() {
               required
               autoComplete="new-password"
               placeholder={t("auth.passwordMinLength")}
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
+              className="field-inverse"
             />
           </div>
-          <p className="text-xs text-blue-200 mt-1">{t("auth.passwordMinLength")}</p>
+          <p className="text-xs text-primary-foreground/70 mt-1">{t("auth.passwordMinLength")}</p>
         </div>
 
         {/* Confirm Password */}
         <div>
           <label className="block text-sm font-medium mb-2">{t("auth.repeatPassword")}</label>
           <div className="relative">
-            <Lock className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
+            <Lock className="absolute left-3 top-3 w-5 h-5 text-primary-foreground/70" />
             <input
               type="password"
               value={confirmPassword}
@@ -205,16 +205,16 @@ export default function ResetPasswordPage() {
               required
               autoComplete="new-password"
               placeholder="••••••••"
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
+              className="field-inverse"
             />
           </div>
         </div>
 
         {/* Submit Button */}
-        <Button
+        <Button variant="accent"
           type="submit"
           disabled={loading}
-          className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold py-2 rounded-lg transition-all disabled:opacity-50 mt-6"
+          className="w-full mt-6"
         >
           {loading ? t("auth.savingPassword") : t("auth.savePassword")}
           <ArrowRight className="ml-2 w-4 h-4" />
@@ -223,7 +223,7 @@ export default function ResetPasswordPage() {
 
       {/* Back to Login */}
       <div className="mt-6 text-center">
-        <Link href="/login" className="text-blue-100 hover:text-white transition-colors">
+        <Link href="/login" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
           {t("auth.backToLogin")}
         </Link>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { StatusBadge } from "@/components/status-badge";
 import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
@@ -13,6 +14,7 @@ import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { getFuelTypeLabel, getTransmissionLabel } from "@/lib/vehicle-labels";
 import { getDeclinedOfferPrice } from "@/lib/submission-workflow";
+import { PageHeader } from "@/components/page-header";
 
 type DashboardVehicleStatus = "eingereicht" | "in_bearbeitung" | "angebot_gesendet" | "akzeptiert" | "abgelehnt";
 
@@ -43,7 +45,7 @@ export default function MyVehiclesPage() {
     });
   };
 
-  const getStatusConfig = (status: DashboardVehicleStatus): { label: string; color: string; icon: React.ReactNode; bgColor: string } => {
+  const getStatusConfig = (status: DashboardVehicleStatus): { label: string; icon: React.ReactNode } => {
     const statusLabel = t(`status.${status}`);
     const icons: Record<DashboardVehicleStatus, React.ReactNode> = {
       eingereicht: <Clock className="w-4 h-4" />,
@@ -52,25 +54,9 @@ export default function MyVehiclesPage() {
       akzeptiert: <CheckCircle className="w-4 h-4" />,
       abgelehnt: <AlertCircle className="w-4 h-4" />,
     };
-    const colors: Record<DashboardVehicleStatus, string> = {
-      eingereicht: "text-blue-600",
-      in_bearbeitung: "text-yellow-600",
-      angebot_gesendet: "text-green-600",
-      akzeptiert: "text-green-700",
-      abgelehnt: "text-red-600",
-    };
-    const bgColors: Record<DashboardVehicleStatus, string> = {
-      eingereicht: "bg-blue-100",
-      in_bearbeitung: "bg-yellow-100",
-      angebot_gesendet: "bg-green-100",
-      akzeptiert: "bg-green-200",
-      abgelehnt: "bg-red-100",
-    };
     return {
       label: statusLabel,
-      color: colors[status],
       icon: icons[status],
-      bgColor: bgColors[status],
     };
   };
 
@@ -143,66 +129,56 @@ export default function MyVehiclesPage() {
 
   if (loading || !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <Link href="/dashboard" className="text-kfz-blue hover:underline mb-2 inline-block text-sm">
-                ← {tNav("dashboard")}
-              </Link>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {t("title")}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                {t("description")}
-              </p>
-            </div>
-            <Link href="/dashboard/fahrzeug-anbieten">
-              <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
-                <Plus className="mr-2 w-4 h-4" />
-                {t("addNew")}
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-muted">
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        backHref="/dashboard"
+        backLabel={<>← {tNav("dashboard")}</>}
+        actions={
+          <Link href="/dashboard/fahrzeug-anbieten">
+            <Button variant="inverse">
+              <Plus className="mr-2 w-4 h-4" />
+              {t("addNew")}
+            </Button>
+          </Link>
+        }
+      />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="page-container">
         {loadingVehicles ? (
           <div className="flex justify-center py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-              <p className="text-gray-600">{t("loading")}</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">{t("loading")}</p>
             </div>
           </div>
         ) : vehicles.length === 0 ? (
           // Empty State
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="card p-8 sm:p-12 text-center">
             <div className="flex justify-center mb-4">
-              <div className="bg-gray-100 rounded-lg p-6">
-                <Car className="w-12 h-12 text-gray-400" />
+              <div className="bg-secondary rounded-lg p-6">
+                <Car className="w-12 h-12 text-muted-foreground/70" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="section-title mb-2">
               {t("empty")}
             </h2>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               {t("emptyDescription")}
             </p>
             <Link href="/dashboard/fahrzeug-anbieten">
-              <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
+              <Button>
                 <Plus className="mr-2 w-4 h-4" />
                 {t("firstVehicle")}
               </Button>
@@ -216,9 +192,9 @@ export default function MyVehiclesPage() {
               const config = getStatusConfig(status);
 
               return (
-                <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                <div key={vehicle.id} className="card overflow-hidden hover:shadow-lg transition-shadow">
                   {/* Image (private photo behind a short-lived signed URL: unoptimized keeps it out of the shared image cache) */}
-                  <div className="relative w-full aspect-video bg-gray-200 overflow-hidden">
+                  <div className="relative w-full aspect-video bg-border overflow-hidden">
                     {vehicle.images && vehicle.images.length > 0 && imageUrls[vehicle.images[0]] ? (
                       <Image
                         src={imageUrls[vehicle.images[0]]}
@@ -230,7 +206,7 @@ export default function MyVehiclesPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Car className="w-12 h-12 text-gray-400" />
+                        <Car className="w-12 h-12 text-muted-foreground/70" />
                       </div>
                     )}
                   </div>
@@ -238,26 +214,26 @@ export default function MyVehiclesPage() {
                   {/* Content */}
                   <div className="p-4">
                     {/* Status Badge */}
-                    <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium mb-3 ${config.bgColor} ${config.color}`}>
+                    <StatusBadge kind="submission" status={status} className="mb-3">
                       {config.icon}
                       {config.label}
-                    </div>
+                    </StatusBadge>
 
                     {/* Vehicle Info */}
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    <h3 className="card-title mb-1">
                       {vehicle.brand} {vehicle.model}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-3">
+                    <p className="text-sm text-muted-foreground mb-3">
                       {vehicle.year} • {formatter.number(vehicle.mileage || 0)} km
                     </p>
 
                     {/* Price */}
-                    <p className="text-2xl font-bold text-kfz-blue mb-4">
+                    <p className="text-2xl font-bold text-primary mb-4">
                       {formatCurrency(vehicle.price || 0)}
                     </p>
 
                     {/* Quick Specs */}
-                    <div className="grid grid-cols-2 gap-2 mb-4 text-sm text-gray-600">
+                    <div className="grid grid-cols-2 gap-2 mb-4 text-sm text-muted-foreground">
                       <div>
                         <span className="font-semibold">{t("fuel")}:</span> {getFuelTypeLabel(tCommon, vehicle.fuel_type)}
                       </div>
@@ -269,23 +245,23 @@ export default function MyVehiclesPage() {
                     {/* Offer Section */}
                     {status === "angebot_gesendet" && vehicle.offered_price && (
                       <div className="border-t pt-3 mt-3">
-                        <div className="bg-green-50 p-3 rounded mb-3">
-                          <p className="text-sm text-gray-600 mb-1">{t("offeredPrice")}</p>
-                          <p className="text-2xl font-bold text-green-600">{formatCurrency(vehicle.offered_price)}</p>
+                        <div className="bg-success-subtle/50 p-3 rounded mb-3">
+                          <p className="text-sm text-muted-foreground mb-1">{t("offeredPrice")}</p>
+                          <p className="text-2xl font-bold text-success">{formatCurrency(vehicle.offered_price)}</p>
                           {vehicle.offer_terms && (
-                            <p className="text-xs text-gray-600 mt-2">{vehicle.offer_terms}</p>
+                            <p className="text-xs text-muted-foreground mt-2">{vehicle.offer_terms}</p>
                           )}
                         </div>
                         <div className="flex gap-2">
                           <button
                             onClick={() => setPendingAnswer({ vehicleId: vehicle.id, decision: "accept", price: vehicle.offered_price! })}
-                            className="flex-1 px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 font-medium"
+                            className="flex-1 px-3 py-2 bg-success text-primary-foreground text-sm rounded hover:bg-success-hover font-medium"
                           >
                             {t("acceptOffer")}
                           </button>
                           <button
                             onClick={() => setPendingAnswer({ vehicleId: vehicle.id, decision: "reject", price: vehicle.offered_price! })}
-                            className="flex-1 px-3 py-2 border border-red-300 text-red-600 text-sm rounded hover:bg-red-50 font-medium"
+                            className="flex-1 px-3 py-2 border border-destructive-border text-destructive text-sm rounded hover:bg-destructive-subtle/50 font-medium"
                           >
                             {t("rejectOffer")}
                           </button>
@@ -298,11 +274,11 @@ export default function MyVehiclesPage() {
                       const declinedPrice = getDeclinedOfferPrice(vehicle);
                       return declinedPrice != null ? (
                         <div className="border-t pt-3 mt-3">
-                          <div className="bg-orange-50 p-3 rounded">
-                            <p className="text-sm font-semibold text-orange-800">
+                          <div className="bg-warning-subtle/50 p-3 rounded">
+                            <p className="text-sm font-semibold text-warning-subtle-foreground">
                               {t("youDeclinedOffer", { price: formatCurrency(declinedPrice) })}
                             </p>
-                            <p className="text-xs text-gray-600 mt-1">{t("youDeclinedOfferNext")}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t("youDeclinedOfferNext")}</p>
                           </div>
                         </div>
                       ) : null;
@@ -311,9 +287,9 @@ export default function MyVehiclesPage() {
                     {/* Rejection reason entered by the admin (older rows keep it in status_reason) */}
                     {status === "abgelehnt" && (vehicle.rejection_reason || vehicle.status_reason) && (
                       <div className="border-t pt-3 mt-3">
-                        <div className="bg-red-50 p-3 rounded">
-                          <p className="text-sm font-semibold text-red-700">{t("rejectionReason")}</p>
-                          <p className="text-sm text-gray-700 mt-1 whitespace-pre-line break-words">
+                        <div className="bg-destructive-subtle/50 p-3 rounded">
+                          <p className="text-sm font-semibold text-destructive">{t("rejectionReason")}</p>
+                          <p className="text-sm text-foreground mt-1 whitespace-pre-line break-words">
                             {vehicle.rejection_reason || vehicle.status_reason}
                           </p>
                         </div>
@@ -322,15 +298,15 @@ export default function MyVehiclesPage() {
 
                     {/* Accepted/Rejected Status */}
                     {status === "akzeptiert" && (
-                      <div className="border-t pt-3 mt-3 bg-green-50 p-3 rounded">
-                        <p className="text-sm text-green-700"><span className="font-semibold">{t("offerAccepted")}</span></p>
+                      <div className="border-t pt-3 mt-3 bg-success-subtle/50 p-3 rounded">
+                        <p className="text-sm text-success"><span className="font-semibold">{t("offerAccepted")}</span></p>
                         {Number(vehicle.offered_price) > 0 && (
                           <>
-                            <p className="text-sm text-gray-600 mt-2">{t("acceptedPrice")}</p>
-                            <p className="text-2xl font-bold text-green-700">{formatCurrency(Number(vehicle.offered_price))}</p>
+                            <p className="text-sm text-muted-foreground mt-2">{t("acceptedPrice")}</p>
+                            <p className="text-2xl font-bold text-success">{formatCurrency(Number(vehicle.offered_price))}</p>
                           </>
                         )}
-                        <p className="text-xs text-gray-600 mt-1">{t("contactUs")}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t("contactUs")}</p>
                       </div>
                     )}
                   </div>

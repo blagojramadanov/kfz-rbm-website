@@ -12,7 +12,12 @@ import { FavoritesProvider } from "@/lib/favorites-context";
 import { COMPANY } from "@/lib/company";
 import { locales } from "@/lib/locales";
 
-const inter = Inter({ subsets: ["latin"] });
+// Cyrillic subset for Macedonian; otherwise mk text falls back to a system font.
+const inter = Inter({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export async function generateMetadata({
   params: { locale },
@@ -53,8 +58,8 @@ export default async function LocaleLayout({
   }
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className={inter.className}>
+    <html lang={locale} className={inter.variable} suppressHydrationWarning>
+      <body className="font-sans">
         <NextIntlClientProvider messages={messages} locale={locale}>
           <ToastProvider>
             <AuthProvider>

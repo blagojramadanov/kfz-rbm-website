@@ -152,20 +152,20 @@ export function VehicleListing({
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white py-12 px-4 sm:px-6 lg:px-8">
+      <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-primary-foreground py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-4">
             {variant === "export" && <Globe className="w-8 h-8" aria-hidden="true" />}
-            <h1 className="text-4xl sm:text-5xl font-bold">{heading}</h1>
+            <h1 className="display">{heading}</h1>
           </div>
-          <p className="text-xl text-blue-100">{subheading}</p>
+          <p className="text-xl text-primary-foreground/80">{subheading}</p>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="bg-white border-b py-6 px-4 sm:px-6 lg:px-8 sticky top-0 z-40 shadow-sm">
+      <div className="bg-card border-b py-6 px-4 sm:px-6 lg:px-8 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Search Input */}
@@ -177,7 +177,7 @@ export function VehicleListing({
                 commitQuery(query);
               }}
             >
-              <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" aria-hidden="true" />
+              <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground/70" aria-hidden="true" />
               <input
                 type="search"
                 placeholder={t("listing.searchPlaceholder")}
@@ -190,7 +190,7 @@ export function VehicleListing({
                   clearTimeout(queryTimer.current);
                   queryTimer.current = setTimeout(() => commitQuery(text), INPUT_DEBOUNCE_MS);
                 }}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-accent focus:border-transparent outline-none"
+                className="field pl-10 pr-4"
               />
             </form>
 
@@ -199,7 +199,7 @@ export function VehicleListing({
               value={sort}
               aria-label={t("listing.sortLabel")}
               onChange={(e) => handleSortChange(e.target.value as SortOption)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-accent focus:border-transparent outline-none bg-white"
+              className="field w-auto"
             >
               {SORT_OPTIONS.map((option) => (
                 <option key={option} value={option}>
@@ -235,15 +235,15 @@ export function VehicleListing({
           {/* Vehicle Grid */}
           <div className="lg:col-span-3">
             {!hasAnyVehicles ? (
-              <div className="bg-white rounded-lg shadow p-12 text-center">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{emptyTitle}</h3>
-                <p className="text-gray-600">{emptyHint}</p>
+              <div className="card p-8 sm:p-12 text-center">
+                <h3 className="card-title mb-2">{emptyTitle}</h3>
+                <p className="text-muted-foreground">{emptyHint}</p>
               </div>
             ) : (
               <>
                 {/* Results Info */}
                 <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-                  <h2 className="text-2xl font-bold text-gray-900" aria-live="polite">
+                  <h2 className="section-title" aria-live="polite">
                     {t("listing.resultsCount", { count: sortedVehicles.length })}
                   </h2>
                   <div className="flex items-center gap-2">
@@ -275,12 +275,12 @@ export function VehicleListing({
                       ))}
                     </div>
                   ) : (
-                    <div className="bg-white rounded-lg shadow p-12 text-center">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <div className="card p-8 sm:p-12 text-center">
+                      <h3 className="card-title mb-2">
                         {t("listing.noResultsTitle")}
                       </h3>
-                      <p className="text-gray-600 mb-6">{t("listing.noResultsHint")}</p>
-                      <Button onClick={resetAll} className="bg-kfz-blue hover:bg-kfz-blue-dark text-white">
+                      <p className="text-muted-foreground mb-6">{t("listing.noResultsHint")}</p>
+                      <Button onClick={resetAll} >
                         {t("listing.resetFilters")}
                       </Button>
                     </div>

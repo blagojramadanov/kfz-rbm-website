@@ -72,9 +72,9 @@ export function SearchBar({ filterOptions }: { filterOptions: VehicleFilterOptio
   const newestYear = VEHICLE_LIMITS.maxYear - 1;
   const years = Array.from({ length: YEARS_BACK + 1 }, (_, index) => newestYear - index);
 
-  const labelClass = "block text-sm font-semibold text-gray-700 mb-2";
+  const labelClass = "block text-sm font-semibold text-foreground mb-2";
   const inputClass =
-    "w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-kfz-accent focus:border-transparent outline-none disabled:bg-gray-50 disabled:text-gray-400";
+    "field disabled:bg-muted";
 
   const select = (field: Field, label: string, options: { value: string; label: string }[], disabled = false) => (
     <div>
@@ -103,16 +103,16 @@ export function SearchBar({ filterOptions }: { filterOptions: VehicleFilterOptio
       onSubmit={handleSearch}
       role="search"
       aria-label={t("title")}
-      className="bg-white rounded-lg shadow-xl p-6"
+      className="bg-card rounded-lg shadow-xl p-6"
     >
-      <h2 className="text-xl font-bold text-gray-900 mb-4">{t("title")}</h2>
+      <h2 className="section-title mb-4">{t("title")}</h2>
 
       <div className="mb-4">
         <label htmlFor="home-search-q" className={labelClass}>
           {t("query")}
         </label>
         <div className="relative">
-          <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" aria-hidden="true" />
+          <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground/70" aria-hidden="true" />
           <input
             id="home-search-q"
             type="search"
@@ -185,9 +185,9 @@ export function SearchBar({ filterOptions }: { filterOptions: VehicleFilterOptio
       </div>
 
       <div className="mt-6 flex justify-end">
-        <Button
+        <Button variant="accent"
           type="submit"
-          className="w-full sm:w-auto bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold py-2 px-8"
+          className="w-full sm:w-auto px-8"
         >
           <Search className="w-5 h-5 mr-2" aria-hidden="true" />
           {t("search")}

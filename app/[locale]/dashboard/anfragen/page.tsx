@@ -11,14 +11,10 @@ import { AlertCircle, ArrowRight, Calendar, MessageSquare } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { getInquiryStatusLabel, getInquiryTypeLabel } from "@/lib/vehicle-labels";
+import { StatusBadge } from "@/components/status-badge";
 import type { MyInquiry } from "@/app/actions/inquiries";
+import { PageHeader } from "@/components/page-header";
 
-const STATUS_COLORS: Record<string, string> = {
-  new: "bg-blue-100 text-blue-800",
-  read: "bg-yellow-100 text-yellow-800",
-  responded: "bg-green-100 text-green-800",
-  closed: "bg-gray-100 text-gray-800",
-};
 
 export default function InquiriesPage() {
   const t = useTranslations("dashboard.inquiries");
@@ -59,10 +55,10 @@ export default function InquiriesPage() {
 
   if (loading || !isAuthenticated || inquiries === null) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -73,47 +69,37 @@ export default function InquiriesPage() {
   const formatDay = (value: string) => format.dateTime(new Date(`${value}T00:00:00Z`), { ...numericDate, timeZone: "UTC" });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div>
-            <Link href="/dashboard" className="text-kfz-blue hover:underline mb-2 inline-block">
-              {tNav("dashboard")}
-            </Link>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {t("title")}
-            </h1>
-            <p className="text-gray-600 mt-1">
-              {t("description")}
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-muted">
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        backHref="/dashboard"
+        backLabel={<>← {tNav("dashboard")}</>}
+      />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-4">
+      <main className="page-container space-y-4">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 flex gap-3">
+            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-destructive-subtle-foreground">{error}</p>
           </div>
         )}
 
         {inquiries.length === 0 && !error ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="card p-8 sm:p-12 text-center">
             <div className="flex justify-center mb-4">
-              <div className="bg-gray-100 rounded-lg p-6">
-                <MessageSquare className="w-12 h-12 text-gray-400" />
+              <div className="bg-secondary rounded-lg p-6">
+                <MessageSquare className="w-12 h-12 text-muted-foreground/70" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="section-title mb-2">
               {t("empty")}
             </h2>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               {t("emptyDescription")}
             </p>
             <Link href="/fahrzeuge">
-              <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
+              <Button>
                 {t("browseVehicles")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -121,47 +107,41 @@ export default function InquiriesPage() {
           </div>
         ) : (
           inquiries.map((inquiry) => (
-            <div key={inquiry.id} className="bg-white rounded-lg shadow-md p-6">
+            <div key={inquiry.id} className="card p-6">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3">
                 <div className="min-w-0">
                   <div className="flex gap-2 flex-wrap items-center mb-2">
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-highlight-subtle text-highlight-subtle-foreground">
                       {getInquiryTypeLabel(tCommon, inquiry.inquiry_type)}
                     </span>
                     {inquiry.vehicle_label &&
                       (inquiry.vehicle_slug ? (
                         <Link
                           href={`/fahrzeuge/${inquiry.vehicle_slug}`}
-                          className="font-semibold text-gray-900 hover:text-kfz-blue"
+                          className="font-semibold text-foreground hover:text-primary"
                         >
                           {inquiry.vehicle_label}
                         </Link>
                       ) : (
-                        <span className="font-semibold text-gray-700">
+                        <span className="font-semibold text-foreground">
                           {t("vehicleNotListed", { vehicle: inquiry.vehicle_label })}
                         </span>
                       ))}
                   </div>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     {t("sentAt", { date: format.dateTime(new Date(inquiry.created_at), numericDate) })}
                   </p>
                   {inquiry.preferred_date && (
-                    <p className="text-sm text-gray-700 flex items-center gap-1 mt-1">
+                    <p className="text-sm text-foreground flex items-center gap-1 mt-1">
                       <Calendar className="w-4 h-4" />
                       {t("preferredDate", { date: formatDay(inquiry.preferred_date) })}
                     </p>
                   )}
                 </div>
-                <span
-                  className={`self-start px-3 py-1 rounded-full text-sm font-medium flex-shrink-0 ${
-                    STATUS_COLORS[inquiry.status] || "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {getInquiryStatusLabel(tCommon, inquiry.status)}
-                </span>
+                <StatusBadge kind="inquiry" status={inquiry.status} className="self-start">{getInquiryStatusLabel(tCommon, inquiry.status)}</StatusBadge>
               </div>
               {inquiry.message && (
-                <p className="text-sm text-gray-700 whitespace-pre-line break-words bg-gray-50 rounded-lg p-4">
+                <p className="text-sm text-foreground whitespace-pre-line break-words bg-muted rounded-lg p-4">
                   {inquiry.message}
                 </p>
               )}

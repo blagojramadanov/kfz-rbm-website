@@ -11,6 +11,7 @@ import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
 import { getSubmissionDetails } from "@/lib/submission-details";
 import { VehicleSourceBadge } from "@/components/vehicle-source-badge";
+import { StatusBadge } from "@/components/status-badge";
 import {
   getBodyTypeLabel,
   getColorLabel,
@@ -21,12 +22,6 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const STATUS_COLORS: Record<string, string> = {
-  draft: "bg-gray-100 text-gray-800",
-  available: "bg-green-100 text-green-800",
-  reserved: "bg-blue-100 text-blue-800",
-  sold: "bg-red-100 text-red-800",
-};
 
 export default function AdminVehicleDetailPage() {
   const t = useTranslations("adminVehicles.detail");
@@ -102,8 +97,8 @@ export default function AdminVehicleDetailPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -113,8 +108,8 @@ export default function AdminVehicleDetailPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -124,14 +119,14 @@ export default function AdminVehicleDetailPage() {
     return (
       <div className="space-y-6">
         <Link href="/admin/fahrzeuge">
-          <button className="flex items-center gap-2 text-kfz-blue hover:text-kfz-blue-dark font-medium">
+          <button className="flex items-center gap-2 text-primary hover:text-primary-hover font-medium">
             <ArrowLeft className="w-4 h-4" />
             {t("backToList")}
           </button>
         </Link>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{t("notFound")}</p>
+        <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 flex gap-3">
+          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-destructive-subtle-foreground">{t("notFound")}</p>
         </div>
       </div>
     );
@@ -146,75 +141,69 @@ export default function AdminVehicleDetailPage() {
   return (
     <div className="space-y-6">
       <Link href="/admin/fahrzeuge">
-        <button className="flex items-center gap-2 text-kfz-blue hover:text-kfz-blue-dark font-medium">
+        <button className="flex items-center gap-2 text-primary hover:text-primary-hover font-medium">
           <ArrowLeft className="w-4 h-4" />
           {t("backToList")}
         </button>
       </Link>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 flex gap-3">
+          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-destructive-subtle-foreground">{error}</p>
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="card p-6">
         <div className="flex justify-between items-start mb-6">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="page-title text-foreground">
                 {vehicle.year} {vehicle.brand} {vehicle.model}
               </h1>
               {vehicle.featured && (
-                <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" aria-label={tFeatured("featured")} />
+                <Star className="w-6 h-6 text-featured fill-featured" aria-label={tFeatured("featured")} />
               )}
             </div>
-            <p className="text-gray-600 mt-1">{t("vin", { vin: vehicle.vin })}</p>
+            <p className="text-muted-foreground mt-1">{t("vin", { vin: vehicle.vin })}</p>
             {favoriteCount !== null && (
-              <p className="text-gray-600 mt-1 flex items-center gap-1">
+              <p className="text-muted-foreground mt-1 flex items-center gap-1">
                 <Heart
-                  className={`w-4 h-4 ${favoriteCount > 0 ? "text-red-500 fill-red-500" : "text-gray-300"}`}
+                  className={`w-4 h-4 ${favoriteCount > 0 ? "text-destructive fill-destructive" : "text-muted-foreground/50"}`}
                   aria-hidden="true"
                 />
                 {tFeatured("favoriteCount", { value: format.number(favoriteCount) })}
               </p>
             )}
           </div>
-          <span
-            className={`px-4 py-2 rounded-full text-sm font-medium ${
-              STATUS_COLORS[vehicle.status] || "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {getVehicleStatusLabel(tCommon, vehicle.status)}
-          </span>
+          <StatusBadge kind="vehicle" status={vehicle.status}>{getVehicleStatusLabel(tCommon, vehicle.status)}</StatusBadge>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("basicInfo")}</h3>
+            <h3 className="card-title mb-4">{t("basicInfo")}</h3>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-600">{t("price")}</p>
-                <p className="text-2xl font-bold text-kfz-blue">
+                <p className="text-xs text-muted-foreground">{t("price")}</p>
+                <p className="text-2xl font-bold text-primary">
                   {vehicle.price != null ? formatPrice(format, vehicle.price) : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">{t("mileage")}</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-xs text-muted-foreground">{t("mileage")}</p>
+                <p className="font-medium text-foreground">
                   {vehicle.mileage != null ? tAdmin("units.mileage", { value: format.number(vehicle.mileage) }) : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">{t("transmission")}</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-xs text-muted-foreground">{t("transmission")}</p>
+                <p className="font-medium text-foreground">
                   {vehicle.transmission ? getTransmissionLabel(tCommon, vehicle.transmission) : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">{t("fuel")}</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-xs text-muted-foreground">{t("fuel")}</p>
+                <p className="font-medium text-foreground">
                   {vehicle.fuel_type ? getFuelTypeLabel(tCommon, vehicle.fuel_type) : "—"}
                 </p>
               </div>
@@ -222,40 +211,40 @@ export default function AdminVehicleDetailPage() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("specifications")}</h3>
+            <h3 className="card-title mb-4">{t("specifications")}</h3>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-600">{t("bodyType")}</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-xs text-muted-foreground">{t("bodyType")}</p>
+                <p className="font-medium text-foreground">
                   {vehicle.body_type ? getBodyTypeLabel(tCommon, vehicle.body_type) : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">{t("colorExterior")}</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-xs text-muted-foreground">{t("colorExterior")}</p>
+                <p className="font-medium text-foreground">
                   {vehicle.color_exterior ? getColorLabel(tCommon, vehicle.color_exterior) : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">{t("colorInterior")}</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-xs text-muted-foreground">{t("colorInterior")}</p>
+                <p className="font-medium text-foreground">
                   {vehicle.color_interior ? getColorLabel(tCommon, vehicle.color_interior) : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">{t("engine")}</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-xs text-muted-foreground">{t("engine")}</p>
+                <p className="font-medium text-foreground">
                   {engineParts.length > 0 ? engineParts.join(", ") : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">{tFeatured("columns.source")}</p>
+                <p className="text-xs text-muted-foreground">{tFeatured("columns.source")}</p>
                 <VehicleSourceBadge sourceType={vehicle.source_type || "rbm"} />
               </div>
               {getSubmissionDetails(tWizard, vehicle).map((detail) => (
                 <div key={detail.key}>
-                  <p className="text-xs text-gray-600">{detail.label}</p>
-                  <p className="font-medium text-gray-900 break-words">{detail.value}</p>
+                  <p className="text-xs text-muted-foreground">{detail.label}</p>
+                  <p className="font-medium text-foreground break-words">{detail.value}</p>
                 </div>
               ))}
             </div>
@@ -263,15 +252,15 @@ export default function AdminVehicleDetailPage() {
         </div>
 
         {vehicle.description && (
-          <div className="mb-8 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm font-medium text-gray-900 mb-2">{t("description")}</p>
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{vehicle.description}</p>
+          <div className="mb-8 p-4 bg-muted rounded-lg">
+            <p className="text-sm font-medium text-foreground mb-2">{t("description")}</p>
+            <p className="text-sm text-foreground whitespace-pre-wrap">{vehicle.description}</p>
           </div>
         )}
 
         <div className="flex gap-3">
           <Link href={`/admin/fahrzeuge/${vehicleId}/edit`} className="flex-1">
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors">
+            <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors">
               <Edit2 className="w-4 h-4" />
               {tButtons("edit")}
             </button>
@@ -279,7 +268,7 @@ export default function AdminVehicleDetailPage() {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-destructive-border text-destructive rounded-lg hover:bg-destructive-subtle/50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Trash2 className="w-4 h-4" />
             {deleting ? t("deleting") : tButtons("delete")}

@@ -23,7 +23,7 @@ export function Navbar() {
   const format = useLocaleFormatter();
   const favoriteCount = favorites.ready ? favorites.count : 0;
   const favoriteBadge = favoriteCount > 0 && (
-    <span className="ml-auto min-w-[1.25rem] h-5 px-1.5 rounded-full bg-red-600 text-white text-xs font-semibold flex items-center justify-center">
+    <span className="ml-auto min-w-[1.25rem] h-5 px-1.5 rounded-full bg-destructive text-primary-foreground text-xs font-semibold flex items-center justify-center">
       {format.number(favoriteCount)}
     </span>
   );
@@ -43,7 +43,7 @@ export function Navbar() {
   const dashboardLink = getDashboardLink();
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-card shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
@@ -59,8 +59,8 @@ export function Navbar() {
               />
             </div>
             <div className="hidden sm:block">
-              <div className="text-xl font-bold text-kfz-blue">{COMPANY.name}</div>
-              <div className="text-xs text-gray-600">Premium Cars</div>
+              <div className="text-xl font-bold text-primary">{COMPANY.name}</div>
+              <div className="text-xs text-muted-foreground">Premium Cars</div>
             </div>
           </Link>
 
@@ -68,32 +68,32 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-8">
             <Link
               href={`/fahrzeuge`}
-              className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
+              className="text-foreground hover:text-primary transition-colors font-medium"
             >
               {t("navigation.vehicles")}
             </Link>
             <Link
               href={`/fahrzeuge/export`}
-              className="text-gray-700 hover:text-kfz-blue transition-colors font-medium flex items-center gap-1"
+              className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-1"
             >
               <span>🌍</span>
               <span>{t("navigation.export")}</span>
             </Link>
             <Link
               href={`/about`}
-              className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
+              className="text-foreground hover:text-primary transition-colors font-medium"
             >
               {t("navigation.about")}
             </Link>
             <Link
               href={`/services`}
-              className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
+              className="text-foreground hover:text-primary transition-colors font-medium"
             >
               {t("navigation.services")}
             </Link>
             <Link
               href={`/contact`}
-              className="text-gray-700 hover:text-kfz-blue transition-colors font-medium"
+              className="text-foreground hover:text-primary transition-colors font-medium"
             >
               {t("navigation.contact")}
             </Link>
@@ -108,43 +108,43 @@ export function Navbar() {
                   <div className="relative">
                     <button
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-secondary transition-colors"
                     >
-                      <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-kfz-blue to-kfz-accent flex items-center justify-center text-white text-sm font-bold">
+                      <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-kfz-blue to-kfz-accent flex items-center justify-center text-primary-foreground text-sm font-bold">
                         {profile.full_name.charAt(0).toUpperCase()}
                         {favoriteCount > 0 && (
                           <span
-                            className="absolute -top-1.5 -right-1.5 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-red-600 text-white text-[10px] font-semibold flex items-center justify-center ring-2 ring-white"
+                            className="absolute -top-1.5 -right-1.5 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-destructive text-primary-foreground text-[10px] font-semibold flex items-center justify-center ring-2 ring-card"
                             aria-label={t("navigation.favoritesCount", { count: favoriteCount })}
                           >
                             {format.number(favoriteCount)}
                           </span>
                         )}
                       </div>
-                      <span className="text-gray-700 font-medium">
+                      <span className="text-foreground font-medium">
                         {profile.full_name.split(" ")[0]}
                       </span>
                     </button>
 
                     {/* Profile Dropdown */}
                     {isProfileOpen && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-10">
-                        <Link href={dashboardLink} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
-                          <User className="w-4 h-4 text-kfz-blue" />
+                      <div className="absolute right-0 mt-2 w-56 bg-card rounded-lg shadow-lg border border-border overflow-hidden z-10">
+                        <Link href={dashboardLink} className="flex items-center gap-2 px-4 py-3 hover:bg-muted border-b">
+                          <User className="w-4 h-4 text-primary" />
                           <span>{profile.role === "ADMIN" ? t("navigation.admin") : t("navigation.dashboard")}</span>
                         </Link>
-                        <Link href="/dashboard/favoriten" className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
-                          <Heart className="w-4 h-4 text-kfz-blue" />
+                        <Link href="/dashboard/favoriten" className="flex items-center gap-2 px-4 py-3 hover:bg-muted border-b">
+                          <Heart className="w-4 h-4 text-primary" />
                           <span>{t("navigation.favorites")}</span>
                           {favoriteBadge}
                         </Link>
-                        <Link href={`/dashboard/profil`} className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 border-b">
-                          <Settings className="w-4 h-4 text-kfz-blue" />
+                        <Link href={`/dashboard/profil`} className="flex items-center gap-2 px-4 py-3 hover:bg-muted border-b">
+                          <Settings className="w-4 h-4 text-primary" />
                           <span>{t("navigation.settings")}</span>
                         </Link>
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2 px-4 py-3 hover:bg-gray-50 text-red-600"
+                          className="w-full flex items-center gap-2 px-4 py-3 hover:bg-muted text-destructive"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>{t("auth.signOut")}</span>
@@ -154,7 +154,7 @@ export function Navbar() {
                   </div>
                 ) : (
                   <Link href={`/login`}>
-                    <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white">
+                    <Button>
                       {t("auth.signIn")}
                     </Button>
                   </Link>
@@ -170,9 +170,9 @@ export function Navbar() {
             aria-label="Toggle menu"
           >
             {isOpen ? (
-              <X className="w-6 h-6 text-gray-700" />
+              <X className="w-6 h-6 text-foreground" />
             ) : (
-              <Menu className="w-6 h-6 text-gray-700" />
+              <Menu className="w-6 h-6 text-foreground" />
             )}
           </button>
         </div>
@@ -182,31 +182,31 @@ export function Navbar() {
           <div className="md:hidden pb-4 border-t">
             <Link
               href={`/fahrzeuge`}
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              className="block px-4 py-2 text-foreground hover:bg-secondary"
             >
               {t("navigation.vehicles")}
             </Link>
             <Link
               href={`/fahrzeuge/export`}
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              className="block px-4 py-2 text-foreground hover:bg-secondary"
             >
               🌍 {t("navigation.export")}
             </Link>
             <Link
               href={`/about`}
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              className="block px-4 py-2 text-foreground hover:bg-secondary"
             >
               {t("navigation.about")}
             </Link>
             <Link
               href={`/services`}
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              className="block px-4 py-2 text-foreground hover:bg-secondary"
             >
               {t("navigation.services")}
             </Link>
             <Link
               href={`/contact`}
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              className="block px-4 py-2 text-foreground hover:bg-secondary"
             >
               {t("navigation.contact")}
             </Link>
@@ -217,27 +217,27 @@ export function Navbar() {
                   {isAuthenticated && profile ? (
                     <>
                       <Link href={dashboardLink} className="block w-full">
-                        <Button variant="outline" className="w-full border-kfz-blue text-kfz-blue">
+                        <Button variant="outline-primary" className="w-full">
                           {profile.role === "ADMIN" ? t("navigation.admin") : t("navigation.dashboard")}
                         </Button>
                       </Link>
                       <Link href="/dashboard/favoriten" className="block w-full">
                         <Button variant="outline" className="w-full gap-2">
-                          <Heart className="w-4 h-4 text-red-500" aria-hidden="true" />
+                          <Heart className="w-4 h-4 text-destructive" aria-hidden="true" />
                           {t("navigation.favorites")}
                           {favoriteBadge}
                         </Button>
                       </Link>
-                      <Button
+                      <Button variant="destructive"
                         onClick={handleLogout}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white"
+                        className="w-full"
                       >
                         {t("auth.signOut")}
                       </Button>
                     </>
                   ) : (
                     <Link href={`/login`} className="block w-full">
-                      <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white">
+                      <Button className="w-full">
                         {t("auth.signIn")}
                       </Button>
                     </Link>

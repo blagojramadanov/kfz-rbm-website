@@ -183,8 +183,8 @@ export default function AdminCreateVehiclePage() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -193,20 +193,20 @@ export default function AdminCreateVehiclePage() {
   return (
     <div className="space-y-6">
       <Link href="/admin/fahrzeuge">
-        <button className="flex items-center gap-2 text-kfz-blue hover:text-kfz-blue-dark font-medium">
+        <button className="flex items-center gap-2 text-primary hover:text-primary-hover font-medium">
           <ArrowLeft className="w-4 h-4" />
           {tForm("backToList")}
         </button>
       </Link>
 
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{tForm("newTitle")}</h1>
-        <p className="text-gray-600">{tForm("newSubtitle")}</p>
+      <div className="card p-6">
+        <h1 className="page-title text-foreground mb-2">{tForm("newTitle")}</h1>
+        <p className="text-muted-foreground">{tForm("newSubtitle")}</p>
 
         {error && (
-          <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="mt-6 bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 flex gap-3">
+            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-destructive-subtle-foreground">{error}</p>
           </div>
         )}
 
@@ -214,7 +214,7 @@ export default function AdminCreateVehiclePage() {
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.brand")} *
               </label>
               <input
@@ -224,11 +224,11 @@ export default function AdminCreateVehiclePage() {
                 onChange={handleInputChange}
                 placeholder={tForm("placeholders.brand")}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.model")} *
               </label>
               <input
@@ -238,11 +238,11 @@ export default function AdminCreateVehiclePage() {
                 onChange={handleInputChange}
                 placeholder={tForm("placeholders.model")}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.year")} *
               </label>
               <input
@@ -253,14 +253,14 @@ export default function AdminCreateVehiclePage() {
                 min="1900"
                 max={new Date().getFullYear() + 1}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               />
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.mileage")}
               </label>
               <input
@@ -269,11 +269,11 @@ export default function AdminCreateVehiclePage() {
                 value={formData.mileage}
                 onChange={handleInputChange}
                 min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.price")}
               </label>
               <input
@@ -283,21 +283,21 @@ export default function AdminCreateVehiclePage() {
                 onChange={handleInputChange}
                 min="0"
                 step="100"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               />
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.transmission")}
               </label>
               <select
                 name="transmission"
                 value={formData.transmission}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               >
                 {TRANSMISSIONS.map((value) => (
                   <option key={value} value={value}>{getTransmissionLabel(tCommon, value)}</option>
@@ -305,14 +305,14 @@ export default function AdminCreateVehiclePage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.fuel")}
               </label>
               <select
                 name="fuel_type"
                 value={formData.fuel_type}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               >
                 {FUEL_TYPES.map((value) => (
                   <option key={value} value={value}>{getFuelTypeLabel(tCommon, value)}</option>
@@ -323,7 +323,7 @@ export default function AdminCreateVehiclePage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.bodyType")}
               </label>
               <input
@@ -332,11 +332,11 @@ export default function AdminCreateVehiclePage() {
                 value={formData.body_type}
                 onChange={handleInputChange}
                 placeholder={tForm("placeholders.bodyType")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.colorExterior")}
               </label>
               <input
@@ -345,14 +345,14 @@ export default function AdminCreateVehiclePage() {
                 value={formData.color_exterior}
                 onChange={handleInputChange}
                 placeholder={tForm("placeholders.colorExterior")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               />
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.colorInterior")}
               </label>
               <input
@@ -361,11 +361,11 @@ export default function AdminCreateVehiclePage() {
                 value={formData.color_interior}
                 onChange={handleInputChange}
                 placeholder={tForm("placeholders.colorInterior")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {tForm("fields.power")}
               </label>
               <input
@@ -374,13 +374,13 @@ export default function AdminCreateVehiclePage() {
                 value={formData.power_hp}
                 onChange={handleInputChange}
                 min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                className="field"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               {tForm("fields.engine")}
             </label>
             <input
@@ -389,12 +389,12 @@ export default function AdminCreateVehiclePage() {
               value={formData.engine_cc}
               onChange={handleInputChange}
               min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+              className="field"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               {tForm("fields.description")}
             </label>
             <textarea
@@ -403,22 +403,22 @@ export default function AdminCreateVehiclePage() {
               onChange={handleInputChange}
               placeholder={tForm("placeholders.description")}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+              className="field"
             />
           </div>
 
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{tForm("fields.listingSection")}</h3>
+          <div className="border-t border-border pt-6">
+            <h3 className="card-title mb-4">{tForm("fields.listingSection")}</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   {tForm("fields.listingType")}
                 </label>
                 <select
                   name="listing_type"
                   value={formData.listing_type}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 >
                   {LISTING_TYPES.map((value) => (
                     <option key={value} value={value}>{getListingTypeLabel(tCommon, value)}</option>
@@ -428,19 +428,19 @@ export default function AdminCreateVehiclePage() {
             </div>
 
             {formData.listing_type === "export" && (
-              <div className="mt-6 space-y-6 bg-blue-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600 italic">{tForm("fields.exportFields")}</p>
+              <div className="mt-6 space-y-6 bg-info-subtle/50 rounded-lg p-4">
+                <p className="text-sm text-muted-foreground italic">{tForm("fields.exportFields")}</p>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                       {tForm("fields.condition")}
                     </label>
                     <select
                       name="zustand"
                       value={formData.zustand}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                      className="field"
                     >
                       <option value="">{tForm("fields.selectPlaceholder")}</option>
                       {CONDITIONS.map((value) => (
@@ -449,7 +449,7 @@ export default function AdminCreateVehiclePage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                       {tForm("fields.destination")}
                     </label>
                     <input
@@ -458,13 +458,13 @@ export default function AdminCreateVehiclePage() {
                       value={formData.zielland}
                       onChange={handleInputChange}
                       placeholder={tForm("placeholders.destination")}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                      className="field"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     {tForm("fields.exportNotes")}
                   </label>
                   <textarea
@@ -473,17 +473,17 @@ export default function AdminCreateVehiclePage() {
                     onChange={handleInputChange}
                     placeholder={tForm("placeholders.exportNotes")}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                    className="field"
                   />
                 </div>
               </div>
             )}
           </div>
 
-          <div className="pt-6 border-t border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">{tForm("images.title")}</h2>
-            <p className="text-sm text-gray-600 mb-4">{tForm("images.hint", { max: MAX_IMAGES })}</p>
-            <label className="block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-kfz-blue transition-colors">
+          <div className="pt-6 border-t border-border">
+            <h2 className="text-lg font-semibold text-foreground mb-1">{tForm("images.title")}</h2>
+            <p className="text-sm text-muted-foreground mb-4">{tForm("images.hint", { max: MAX_IMAGES })}</p>
+            <label className="block border-2 border-dashed border-input rounded-lg p-6 text-center cursor-pointer hover:border-primary transition-colors">
               <input
                 type="file"
                 multiple
@@ -492,8 +492,8 @@ export default function AdminCreateVehiclePage() {
                 disabled={formLoading || selectedFiles.length >= MAX_IMAGES}
                 className="sr-only"
               />
-              <span className="font-medium text-gray-900">{tForm("images.select")}</span>
-              <span className="block text-xs text-gray-500 mt-1">
+              <span className="font-medium text-foreground">{tForm("images.select")}</span>
+              <span className="block text-xs text-muted-foreground mt-1">
                 {tForm("images.selected", { count: selectedFiles.length })}
               </span>
             </label>
@@ -504,7 +504,7 @@ export default function AdminCreateVehiclePage() {
                     <img
                       src={URL.createObjectURL(file)}
                       alt={tForm("images.previewAlt", { index: idx + 1 })}
-                      className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                      className="w-full h-24 object-cover rounded-lg border border-border"
                     />
                     <button
                       type="button"
@@ -515,7 +515,7 @@ export default function AdminCreateVehiclePage() {
                     >
                       <X className="w-4 h-4" aria-hidden="true" />
                     </button>
-                    <p className="text-xs text-gray-600 mt-1 truncate">{file.name}</p>
+                    <p className="text-xs text-muted-foreground mt-1 truncate">{file.name}</p>
                   </li>
                 ))}
               </ul>
@@ -523,14 +523,14 @@ export default function AdminCreateVehiclePage() {
           </div>
 
           {progress && (
-            <p role="status" className="text-sm text-gray-700">{progress}</p>
+            <p role="status" className="text-sm text-foreground">{progress}</p>
           )}
 
-          <div className="flex gap-3 pt-6 border-t border-gray-200">
+          <div className="flex gap-3 pt-6 border-t border-border">
             <button
               type="submit"
               disabled={formLoading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-kfz-blue text-white rounded-lg hover:bg-kfz-blue-dark font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="w-4 h-4" />
               {formLoading ? tForm("creating") : tForm("create")}
@@ -538,7 +538,7 @@ export default function AdminCreateVehiclePage() {
             <Link href="/admin/fahrzeuge" className="flex-1">
               <button
                 type="button"
-                className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                className="w-full px-4 py-3 border border-input text-foreground rounded-lg hover:bg-muted font-medium transition-colors"
               >
                 {tButtons("cancel")}
               </button>

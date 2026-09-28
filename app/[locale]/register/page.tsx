@@ -72,20 +72,20 @@ export default function RegisterPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-white flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-primary-foreground flex items-center justify-center px-4">
         <div className="w-full max-w-md">
           <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl p-8 border border-white/20 text-center">
             <div className="mb-4 flex justify-center">
-              <div className="bg-green-500/20 rounded-full p-4">
-                <CheckCircle className="w-12 h-12 text-green-300" />
+              <div className="bg-success/20 rounded-full p-4">
+                <CheckCircle className="w-12 h-12 text-success-border" />
               </div>
             </div>
             <h2 className="text-2xl font-bold mb-2">{t("auth.registrationSuccess")}</h2>
-            <p className="text-blue-100 mb-6">
+            <p className="text-primary-foreground/80 mb-6">
               {t("pages.contact.contactInfo")}
             </p>
             <Link href={`/login`}>
-              <Button className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold">
+              <Button variant="accent" className="w-full">
                 {t("auth.signIn")}
               </Button>
             </Link>
@@ -96,22 +96,22 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-primary-foreground flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl p-8 border border-white/20">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">{t("auth.createAccount")}</h1>
-            <p className="text-blue-100">
+            <h1 className="page-title mb-2">{t("auth.createAccount")}</h1>
+            <p className="text-primary-foreground/80">
               {t("auth.createAccountMessage")}
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-500/20 border border-red-400/50 rounded-lg p-4 mb-6 flex gap-3">
-              <AlertCircle className="w-5 h-5 text-red-300 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-200">{error}</p>
+            <div className="bg-destructive/20 border border-destructive-border/50 rounded-lg p-4 mb-6 flex gap-3">
+              <AlertCircle className="w-5 h-5 text-destructive-border flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-destructive-subtle">{error}</p>
             </div>
           )}
 
@@ -123,14 +123,14 @@ export default function RegisterPage() {
                 {t("forms.fullName")}
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
+                <User className="absolute left-3 top-3 w-5 h-5 text-primary-foreground/70" />
                 <input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
                   placeholder={t("forms.fullNamePlaceholder")}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
+                  className="field-inverse"
                 />
               </div>
             </div>
@@ -141,14 +141,14 @@ export default function RegisterPage() {
                 {t("forms.email")}
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
+                <Mail className="absolute left-3 top-3 w-5 h-5 text-primary-foreground/70" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="ihre@email.com"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
+                  className="field-inverse"
                 />
               </div>
             </div>
@@ -159,17 +159,17 @@ export default function RegisterPage() {
                 {t("auth.password")}
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
+                <Lock className="absolute left-3 top-3 w-5 h-5 text-primary-foreground/70" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
+                  className="field-inverse"
                 />
               </div>
-              <p className="text-xs text-blue-200 mt-1">
+              <p className="text-xs text-primary-foreground/70 mt-1">
                 {t("validation.passwordTooShort")}
               </p>
             </div>
@@ -180,23 +180,23 @@ export default function RegisterPage() {
                 {t("auth.confirmPassword")}
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
+                <Lock className="absolute left-3 top-3 w-5 h-5 text-primary-foreground/70" />
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
+                  className="field-inverse"
                 />
               </div>
             </div>
 
             {/* Submit Button */}
-            <Button
+            <Button variant="accent"
               type="submit"
               disabled={loading}
-              className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold py-2 rounded-lg transition-all disabled:opacity-50 mt-6"
+              className="w-full mt-6"
             >
               {loading ? t("common.loading") : t("auth.createAccount")}
               <ArrowRight className="ml-2 w-4 h-4" />
@@ -206,14 +206,14 @@ export default function RegisterPage() {
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="flex-1 h-px bg-white/20"></div>
-            <span className="text-sm text-blue-100">{t("forms.divider")}</span>
+            <span className="text-sm text-primary-foreground/80">{t("forms.divider")}</span>
             <div className="flex-1 h-px bg-white/20"></div>
           </div>
 
           {/* Login Link */}
-          <p className="text-center text-blue-100">
+          <p className="text-center text-primary-foreground/80">
             {t("auth.haveAccount")}{" "}
-            <Link href="/login" className="text-white font-semibold hover:underline">
+            <Link href="/login" className="text-primary-foreground font-semibold hover:underline">
               Anmelden
             </Link>
           </p>

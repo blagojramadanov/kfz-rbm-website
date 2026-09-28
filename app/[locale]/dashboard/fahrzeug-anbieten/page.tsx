@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter, Link } from "@/lib/navigation";
+import { useRouter } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Upload, X, GripVertical, Check } from "lucide-react";
@@ -14,6 +14,7 @@ import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { getFuelTypeLabel, getTransmissionLabel, getBodyTypeLabel } from "@/lib/vehicle-labels";
 import { SubmissionWorkflowInfo } from "@/components/submission-workflow-info";
 import { getSubmissionDetails } from "@/lib/submission-details";
+import { PageHeader } from "@/components/page-header";
 
 type Step = "fahrzeugdaten" | "preis" | "bilder" | "beschreibung" | "verkaufsart" | "kontrolle" | "absenden";
 
@@ -102,10 +103,10 @@ export default function SubmitVehicleWizardPage() {
 
   if (loading || !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{t("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{t("loading")}</p>
         </div>
       </div>
     );
@@ -430,24 +431,21 @@ export default function SubmitVehicleWizardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Link href="/dashboard" className="text-blue-100 hover:text-white mb-2 inline-block text-sm">
-            {t("dashboardLink")}
-          </Link>
-          <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
-          <p className="text-blue-100">{t("stepIndicator", { current: currentIndex + 1, total: STEP_IDS.length })}</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-muted">
+      <PageHeader
+        title={t("title")}
+        description={t("stepIndicator", { current: currentIndex + 1, total: STEP_IDS.length })}
+        backHref="/dashboard"
+        backLabel={t("dashboardLink")}
+        width="narrow"
+      />
 
       {/* Progress Bar */}
-      <div className="bg-white border-b">
+      <div className="bg-card border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-border rounded-full h-2">
             <div
-              className="bg-kfz-blue h-2 rounded-full transition-all duration-300"
+              className="bg-primary h-2 rounded-full transition-all duration-300"
               style={{ width: `${stepProgress}%` }}
             ></div>
           </div>
@@ -458,10 +456,10 @@ export default function SubmitVehicleWizardPage() {
                   onClick={() => setCurrentStep(stepId)}
                   className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
                     index < currentIndex
-                      ? "bg-green-500 text-white"
+                      ? "bg-success text-primary-foreground"
                       : index === currentIndex
-                      ? "bg-kfz-blue text-white"
-                      : "bg-gray-300 text-gray-600"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-input text-muted-foreground"
                   }`}
                 >
                   {index < currentIndex ? <Check className="w-4 h-4" /> : index + 1}
@@ -469,7 +467,7 @@ export default function SubmitVehicleWizardPage() {
                 {index < STEP_IDS.length - 1 && (
                   <div
                     className={`w-12 h-0.5 mx-1 transition-colors ${
-                      index < currentIndex ? "bg-green-500" : "bg-gray-300"
+                      index < currentIndex ? "bg-success" : "bg-input"
                     }`}
                   ></div>
                 )}
@@ -480,54 +478,54 @@ export default function SubmitVehicleWizardPage() {
       </div>
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="page-container-narrow">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex gap-3">
-            <X className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 mb-6 flex gap-3">
+            <X className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-destructive-subtle-foreground">{error}</p>
           </div>
         )}
 
         {/* Fahrzeugdaten */}
         {currentStep === "fahrzeugdaten" && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("sections.vehicleInfo")}</h2>
+          <div className="card p-6 sm:p-8">
+            <h2 className="section-title mb-6">{t("sections.vehicleInfo")}</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.brandRequired")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.brandRequired")}</label>
                 <input
                   type="text"
                   name="marke"
                   value={formData.marke}
                   onChange={handleInputChange}
                   placeholder={t("placeholders.brand")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.modelRequired")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.modelRequired")}</label>
                 <input
                   type="text"
                   name="modell"
                   value={formData.modell}
                   onChange={handleInputChange}
                   placeholder={t("placeholders.model")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.variant")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.variant")}</label>
                 <input
                   type="text"
                   name="variante"
                   value={formData.variante}
                   onChange={handleInputChange}
                   placeholder={t("placeholders.variant")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.firstRegistrationRequired")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.firstRegistrationRequired")}</label>
                 <input
                   type="number"
                   name="erstzulassung"
@@ -536,38 +534,38 @@ export default function SubmitVehicleWizardPage() {
                   placeholder={t("placeholders.year")}
                   min="1990"
                   max={new Date().getFullYear()}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.mileage")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.mileage")}</label>
                 <input
                   type="number"
                   name="kilometerstand"
                   value={formData.kilometerstand}
                   onChange={handleInputChange}
                   placeholder={t("placeholders.mileage")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.powerHp")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.powerHp")}</label>
                 <input
                   type="number"
                   name="leistung"
                   value={formData.leistung}
                   onChange={handleInputChange}
                   placeholder={t("placeholders.power")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.fuel")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.fuel")}</label>
                 <select
                   name="kraftstoff"
                   value={formData.kraftstoff}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 >
                   <option value="gasoline">{getFuelTypeLabel(tCommon, "gasoline")}</option>
                   <option value="diesel">{getFuelTypeLabel(tCommon, "diesel")}</option>
@@ -577,24 +575,24 @@ export default function SubmitVehicleWizardPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.transmission")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.transmission")}</label>
                 <select
                   name="getriebe"
                   value={formData.getriebe}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 >
                   <option value="manual">{getTransmissionLabel(tCommon, "manual")}</option>
                   <option value="automatic">{getTransmissionLabel(tCommon, "automatic")}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.bodyType")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.bodyType")}</label>
                 <select
                   name="karosserie"
                   value={formData.karosserie}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 >
                   <option value="sedan">{getBodyTypeLabel(tCommon, "sedan")}</option>
                   <option value="suv">{getBodyTypeLabel(tCommon, "suv")}</option>
@@ -606,23 +604,23 @@ export default function SubmitVehicleWizardPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.color")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.color")}</label>
                 <input
                   type="text"
                   name="farbe"
                   value={formData.farbe}
                   onChange={handleInputChange}
                   placeholder={t("placeholders.color")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.previousOwners")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.previousOwners")}</label>
                 <select
                   name="vorbesitzer"
                   value={formData.vorbesitzer}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 >
                   <option value="1">{t("options.previousOwners.one")}</option>
                   <option value="2">{t("options.previousOwners.two")}</option>
@@ -631,12 +629,12 @@ export default function SubmitVehicleWizardPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.huAu")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.huAu")}</label>
                 <select
                   name="huAu"
                   value={formData.huAu}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 >
                   <option value="yes">{t("options.huAu.yes")}</option>
                   <option value="no">{t("options.huAu.no")}</option>
@@ -644,12 +642,12 @@ export default function SubmitVehicleWizardPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.accidentHistory")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.accidentHistory")}</label>
                 <select
                   name="unfallhistorie"
                   value={formData.unfallhistorie}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 >
                   <option value="no">{t("options.accidentHistory.no")}</option>
                   <option value="yes">{t("options.accidentHistory.yes")}</option>
@@ -657,12 +655,12 @@ export default function SubmitVehicleWizardPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.serviceBook")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("fields.serviceBook")}</label>
                 <select
                   name="scheckheft"
                   value={formData.scheckheft}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 >
                   <option value="yes">{t("options.serviceBook.yes")}</option>
                   <option value="no">{t("options.serviceBook.no")}</option>
@@ -674,10 +672,10 @@ export default function SubmitVehicleWizardPage() {
 
         {/* Preis */}
         {currentStep === "preis" && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("sections.priceExpectation")}</h2>
+          <div className="card p-6 sm:p-8">
+            <h2 className="section-title mb-6">{t("sections.priceExpectation")}</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("fields.priceLabel")}</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t("fields.priceLabel")}</label>
               <input
                 type="number"
                 name="preisvorstellung"
@@ -685,7 +683,7 @@ export default function SubmitVehicleWizardPage() {
                 onChange={handleInputChange}
                 placeholder={t("placeholders.price")}
                 step="100"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent text-lg"
+                className="field text-lg"
               />
             </div>
           </div>
@@ -693,11 +691,11 @@ export default function SubmitVehicleWizardPage() {
 
         {/* Bilder */}
         {currentStep === "bilder" && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("images.uploadCount", { current: images.length, max: MAX_IMAGES })}</h2>
+          <div className="card p-6 sm:p-8">
+            <h2 className="section-title mb-6">{t("images.uploadCount", { current: images.length, max: MAX_IMAGES })}</h2>
 
             {/* Upload Area */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-8 hover:border-kfz-blue transition-colors">
+            <div className="border-2 border-dashed border-input rounded-lg p-8 text-center mb-8 hover:border-primary transition-colors">
               <input
                 type="file"
                 multiple
@@ -708,17 +706,17 @@ export default function SubmitVehicleWizardPage() {
                 disabled={images.length >= MAX_IMAGES}
               />
               <label htmlFor="image-upload" className="cursor-pointer block">
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-lg font-semibold text-gray-900">{t("images.uploadTitle")}</p>
-                <p className="text-sm text-gray-600">{t("images.uploadSubtitle")}</p>
-                {images.length >= MAX_IMAGES && <p className="text-sm text-red-600 mt-2">{t("images.uploadMaxReached")}</p>}
+                <Upload className="w-12 h-12 text-muted-foreground/70 mx-auto mb-2" />
+                <p className="text-lg font-semibold text-foreground">{t("images.uploadTitle")}</p>
+                <p className="text-sm text-muted-foreground">{t("images.uploadSubtitle")}</p>
+                {images.length >= MAX_IMAGES && <p className="text-sm text-destructive mt-2">{t("images.uploadMaxReached")}</p>}
               </label>
             </div>
 
             {/* Images Grid */}
             {images.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("images.gridTitle")}</h3>
+                <h3 className="card-title mb-4">{t("images.gridTitle")}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {images.map((image, index) => (
                     <div
@@ -727,7 +725,7 @@ export default function SubmitVehicleWizardPage() {
                       onDragStart={(e) => handleDragStart(e, image.id)}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, image.id)}
-                      className="relative group bg-gray-100 rounded-lg overflow-hidden cursor-move"
+                      className="relative group bg-secondary rounded-lg overflow-hidden cursor-move"
                     >
                       <div className="aspect-square relative">
                         <img
@@ -736,7 +734,7 @@ export default function SubmitVehicleWizardPage() {
                           className="w-full h-full object-cover"
                         />
                         {image.isMain && (
-                          <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">
+                          <div className="absolute top-2 left-2 bg-success text-primary-foreground px-2 py-1 rounded text-xs font-semibold">
                             {t("images.mainBadge")}
                           </div>
                         )}
@@ -747,7 +745,7 @@ export default function SubmitVehicleWizardPage() {
                         {!image.isMain && (
                           <button
                             onClick={() => setMainImage(image.id)}
-                            className="bg-white text-gray-900 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100"
+                            className="bg-card text-foreground px-3 py-1 rounded text-sm font-medium hover:bg-secondary"
                           >
                             {t("images.setMain")}
                           </button>
@@ -760,13 +758,13 @@ export default function SubmitVehicleWizardPage() {
                         onClick={() => removeImage(image.id)}
                         aria-label={t("images.remove", { index: index + 1 })}
                         title={t("images.remove", { index: index + 1 })}
-                        className="absolute top-2 right-2 z-10 bg-white/90 hover:bg-red-600 hover:text-white text-red-600 p-1.5 rounded-full shadow"
+                        className="absolute top-2 right-2 z-10 bg-white/90 hover:bg-destructive hover:text-primary-foreground text-destructive p-1.5 rounded-full shadow"
                       >
                         <X className="w-4 h-4" />
                       </button>
 
                       {/* Drag Handle */}
-                      <div className="absolute bottom-2 right-2 bg-gray-500 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="absolute bottom-2 right-2 bg-foreground/60 text-primary-foreground p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                         <GripVertical className="w-4 h-4" />
                       </div>
                     </div>
@@ -779,32 +777,32 @@ export default function SubmitVehicleWizardPage() {
 
         {/* Beschreibung */}
         {currentStep === "beschreibung" && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("sections.vehicleDescription")}</h2>
+          <div className="card p-6 sm:p-8">
+            <h2 className="section-title mb-6">{t("sections.vehicleDescription")}</h2>
             <textarea
               name="beschreibung"
               value={formData.beschreibung}
               onChange={handleInputChange}
               placeholder={t("description.placeholder")}
               rows={10}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+              className="field"
             />
-            <p className="text-sm text-gray-600 mt-2">{t("description.minCharsNote", { min: DESCRIPTION_MIN_CHARS })}</p>
+            <p className="text-sm text-muted-foreground mt-2">{t("description.minCharsNote", { min: DESCRIPTION_MIN_CHARS })}</p>
           </div>
         )}
 
         {/* Verkaufsart */}
         {currentStep === "verkaufsart" && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("sections.salesTypeSelection")}</h2>
-            <p className="text-gray-600 mb-8">{t("salesType.subtitle")}</p>
+          <div className="card p-6 sm:p-8">
+            <h2 className="section-title mb-2">{t("sections.salesTypeSelection")}</h2>
+            <p className="text-muted-foreground mb-8">{t("salesType.subtitle")}</p>
 
             <div className="space-y-4">
               {/* Direktverkauf */}
               <label className={`flex items-start p-6 border-2 rounded-lg cursor-pointer transition-colors ${
                 formData.verkaufsart === "direct"
-                  ? "border-kfz-blue bg-blue-50"
-                  : "border-gray-300 hover:bg-gray-50"
+                  ? "border-primary bg-info-subtle/50"
+                  : "border-input hover:bg-muted"
               }`}>
                 <input
                   type="radio"
@@ -812,11 +810,11 @@ export default function SubmitVehicleWizardPage() {
                   value="direct"
                   checked={formData.verkaufsart === "direct"}
                   onChange={handleInputChange}
-                  className="w-4 h-4 text-kfz-blue mt-1 flex-shrink-0"
+                  className="w-4 h-4 text-primary mt-1 flex-shrink-0"
                 />
                 <div className="ml-4 flex-1">
-                  <p className="font-semibold text-gray-900">{t("salesType.direct")}</p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="font-semibold text-foreground">{t("salesType.direct")}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {t("salesType.directDesc")}
                   </p>
                 </div>
@@ -825,8 +823,8 @@ export default function SubmitVehicleWizardPage() {
               {/* Inzahlungnahme */}
               <label className={`flex items-start p-6 border-2 rounded-lg cursor-pointer transition-colors ${
                 formData.verkaufsart === "tradeIn"
-                  ? "border-kfz-blue bg-blue-50"
-                  : "border-gray-300 hover:bg-gray-50"
+                  ? "border-primary bg-info-subtle/50"
+                  : "border-input hover:bg-muted"
               }`}>
                 <input
                   type="radio"
@@ -834,11 +832,11 @@ export default function SubmitVehicleWizardPage() {
                   value="tradeIn"
                   checked={formData.verkaufsart === "tradeIn"}
                   onChange={handleInputChange}
-                  className="w-4 h-4 text-kfz-blue mt-1 flex-shrink-0"
+                  className="w-4 h-4 text-primary mt-1 flex-shrink-0"
                 />
                 <div className="ml-4 flex-1">
-                  <p className="font-semibold text-gray-900">{t("salesType.tradeIn")}</p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="font-semibold text-foreground">{t("salesType.tradeIn")}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {t("salesType.tradeInDesc")}
                   </p>
                 </div>
@@ -847,8 +845,8 @@ export default function SubmitVehicleWizardPage() {
               {/* Verkauf im Kundenauftrag */}
               <label className={`flex items-start p-6 border-2 rounded-lg cursor-pointer transition-colors ${
                 formData.verkaufsart === "consignment"
-                  ? "border-kfz-blue bg-blue-50"
-                  : "border-gray-300 hover:bg-gray-50"
+                  ? "border-primary bg-info-subtle/50"
+                  : "border-input hover:bg-muted"
               }`}>
                 <input
                   type="radio"
@@ -856,11 +854,11 @@ export default function SubmitVehicleWizardPage() {
                   value="consignment"
                   checked={formData.verkaufsart === "consignment"}
                   onChange={handleInputChange}
-                  className="w-4 h-4 text-kfz-blue mt-1 flex-shrink-0"
+                  className="w-4 h-4 text-primary mt-1 flex-shrink-0"
                 />
                 <div className="ml-4 flex-1">
-                  <p className="font-semibold text-gray-900">{t("salesType.consignment")}</p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="font-semibold text-foreground">{t("salesType.consignment")}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {t("salesType.consignmentDesc")}
                   </p>
                 </div>
@@ -871,12 +869,12 @@ export default function SubmitVehicleWizardPage() {
 
         {/* Kontrolle */}
         {currentStep === "kontrolle" && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("review.title")}</h2>
+          <div className="card p-6 sm:p-8">
+            <h2 className="section-title mb-6">{t("review.title")}</h2>
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">{t("review.vehicleInfo")}</h3>
-                <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+                <h3 className="font-semibold text-foreground mb-2">{t("review.vehicleInfo")}</h3>
+                <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
                   <p><span className="font-medium">{t("fields.brand")}:</span> {formData.marke}</p>
                   <p><span className="font-medium">{t("fields.model")}:</span> {formData.modell}</p>
                   <p><span className="font-medium">{t("fields.firstRegistration")}:</span> {formData.erstzulassung}</p>
@@ -897,20 +895,20 @@ export default function SubmitVehicleWizardPage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">{t("review.priceSection")}</h3>
-                <p className="text-2xl font-bold text-kfz-blue">{format.number(parseFloat(formData.preisvorstellung) || 0, { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}</p>
+                <h3 className="font-semibold text-foreground mb-2">{t("review.priceSection")}</h3>
+                <p className="text-2xl font-bold text-primary">{format.number(parseFloat(formData.preisvorstellung) || 0, { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">{t("review.imagesSection")}</h3>
-                <p className="text-gray-600">{t("review.imagesCount", { count: images.length })}</p>
+                <h3 className="font-semibold text-foreground mb-2">{t("review.imagesSection")}</h3>
+                <p className="text-muted-foreground">{t("review.imagesCount", { count: images.length })}</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">{t("review.descriptionSection")}</h3>
-                <p className="text-gray-600 line-clamp-3">{formData.beschreibung}</p>
+                <h3 className="font-semibold text-foreground mb-2">{t("review.descriptionSection")}</h3>
+                <p className="text-muted-foreground line-clamp-3">{formData.beschreibung}</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">{t("review.salesTypeSection")}</h3>
-                <p className="text-gray-600">{getSalesTypeLabel(formData.verkaufsart)}</p>
+                <h3 className="font-semibold text-foreground mb-2">{t("review.salesTypeSection")}</h3>
+                <p className="text-muted-foreground">{getSalesTypeLabel(formData.verkaufsart)}</p>
               </div>
             </div>
           </div>
@@ -919,10 +917,10 @@ export default function SubmitVehicleWizardPage() {
         {/* Absenden */}
         {currentStep === "absenden" && (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-md p-8 text-center">
-              <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">{t("final.title")}</h2>
-              <p className="text-gray-600 mb-8">
+            <div className="card p-6 sm:p-8 text-center">
+              <Check className="w-16 h-16 text-success mx-auto mb-4" />
+              <h2 className="section-title mb-4">{t("final.title")}</h2>
+              <p className="text-muted-foreground mb-8">
                 {t("final.message")}
               </p>
             </div>
@@ -935,16 +933,16 @@ export default function SubmitVehicleWizardPage() {
         {/* Submitted, but some photos could not be stored: retry them or continue.
             The normal navigation is hidden so the vehicle cannot be submitted twice. */}
         {partialUpload ? (
-          <div className="bg-amber-50 border border-amber-300 rounded-lg p-6 mt-8">
-            <h3 className="font-semibold text-amber-900 mb-1">{t("photoUpload.title")}</h3>
-            <p className="text-sm text-amber-900 mb-4">
+          <div className="bg-warning-subtle/50 border border-warning-border rounded-lg p-6 mt-8">
+            <h3 className="font-semibold text-warning-subtle-foreground mb-1">{t("photoUpload.title")}</h3>
+            <p className="text-sm text-warning-subtle-foreground mb-4">
               {t("photoUpload.message", { failed: partialUpload.failedIndexes.length, total: images.length })}
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 onClick={handleRetryPhotos}
                 disabled={retryingPhotos}
-                className="bg-kfz-blue hover:bg-kfz-blue-dark text-white"
+
               >
                 <Upload className="mr-2 w-4 h-4" />
                 {retryingPhotos ? t("photoUpload.retrying") : t("photoUpload.retry")}
@@ -953,7 +951,7 @@ export default function SubmitVehicleWizardPage() {
                 variant="outline"
                 onClick={() => router.push("/dashboard/fahrzeug-angeboten")}
                 disabled={retryingPhotos}
-                className="border-gray-300"
+
               >
                 {t("photoUpload.continue")}
               </Button>
@@ -965,7 +963,7 @@ export default function SubmitVehicleWizardPage() {
             variant="outline"
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className="border-gray-300"
+
           >
             <ChevronLeft className="mr-2 w-4 h-4" />
             {t("buttons.back")}
@@ -974,16 +972,16 @@ export default function SubmitVehicleWizardPage() {
           {currentStep !== "absenden" ? (
             <Button
               onClick={handleNext}
-              className="bg-kfz-blue hover:bg-kfz-blue-dark text-white"
+
             >
               {t("buttons.next")}
               <ChevronRight className="ml-2 w-4 h-4" />
             </Button>
           ) : (
-            <Button
+            <Button variant="success"
               onClick={handleSubmit}
               disabled={saving}
-              className="bg-green-600 hover:bg-green-700 text-white"
+
             >
               {saving ? t("buttons.submitting") : t("buttons.submit")}
               <Check className="ml-2 w-4 h-4" />

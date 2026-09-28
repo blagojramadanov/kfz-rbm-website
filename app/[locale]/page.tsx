@@ -27,11 +27,11 @@ export default async function Home({ params: { locale } }: { params: { locale: s
   return (
     <div className="w-full">
       {/* Hero Section with Background Image */}
-      <section className="relative h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-white overflow-hidden flex items-center">
+      <section className="relative h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-primary-foreground overflow-hidden flex items-center">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-10 right-10 w-96 h-96 rounded-full border-2 border-white"></div>
-          <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full border-2 border-white"></div>
+          <div className="absolute top-10 right-10 w-96 h-96 rounded-full border-2 border-primary-foreground"></div>
+          <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full border-2 border-primary-foreground"></div>
         </div>
 
         {/* Background automotive image overlay */}
@@ -50,7 +50,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
           <div className="max-w-6xl mx-auto">
             {/* Logo */}
             <div className="mb-12 flex items-center gap-4">
-              <div className="relative w-16 h-16 bg-white rounded-lg p-2">
+              <div className="relative w-16 h-16 bg-card rounded-lg p-2">
                 <Image
                   src="/assets/logo.png"
                   alt={t("hero.logoAlt", { name: COMPANY.name })}
@@ -62,7 +62,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
               </div>
               <div>
                 <h1 className="text-4xl font-bold">{COMPANY.name}</h1>
-                <p className="text-blue-100">{t("hero.tagline")}</p>
+                <p className="text-primary-foreground/80">{t("hero.tagline")}</p>
               </div>
             </div>
 
@@ -73,17 +73,17 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                 {t("hero.headline2")}<br />
                 {t("hero.headline3")}
               </h2>
-              <p className="text-xl sm:text-2xl text-blue-100 max-w-3xl">
+              <p className="text-xl sm:text-2xl text-primary-foreground/80 max-w-3xl">
                 {t("hero.subheadline")}
               </p>
             </div>
 
             {/* Primary CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Button
+              <Button variant="accent"
                 asChild
                 size="lg"
-                className="bg-kfz-accent hover:bg-kfz-accent-light text-white px-8 py-6 text-lg font-semibold rounded-lg shadow-lg transition-all hover:shadow-xl"
+                className="px-8 py-6 text-lg shadow-lg hover:shadow-xl"
               >
                 <Link href="/fahrzeuge">
                   {t("hero.discoverVehicles")}
@@ -93,8 +93,8 @@ export default async function Home({ params: { locale } }: { params: { locale: s
               <Button
                 asChild
                 size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-kfz-blue px-8 py-6 text-lg font-semibold rounded-lg"
+                variant="outline-inverse"
+                className="px-8 py-6 text-lg"
               >
                 <Link href="/dashboard/fahrzeug-anbieten">
                   {t("hero.offerVehicle")}
@@ -107,38 +107,38 @@ export default async function Home({ params: { locale } }: { params: { locale: s
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white rounded-full flex items-center justify-center">
-            <div className="w-1 h-2 bg-white rounded-full"></div>
+          <div className="w-6 h-10 border-2 border-primary-foreground rounded-full flex items-center justify-center">
+            <div className="w-1 h-2 bg-card rounded-full"></div>
           </div>
         </div>
       </section>
 
       {/* Search Section */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-100 relative -mt-20 z-20">
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-secondary relative -mt-20 z-20">
         <div className="max-w-6xl mx-auto">
           <SearchBar filterOptions={searchOptions} />
         </div>
       </section>
 
       {/* Latest Vehicles Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-card">
         <div className="max-w-7xl mx-auto">
           <div className="mb-12">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-4xl font-bold text-gray-900">
+              <h2 className="display-section">
                 {t("latest.title")}
               </h2>
               <Button
                 asChild
                 variant="ghost"
-                className="text-kfz-accent hover:text-kfz-blue"
+                className="text-kfz-accent hover:text-primary"
               >
                 <Link href="/fahrzeuge">
                   {t("latest.viewAll")} <ArrowRight className="ml-2 w-4 h-4" />
                 </Link>
               </Button>
             </div>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-muted-foreground">
               {t("latest.description")}
             </p>
           </div>
@@ -148,13 +148,13 @@ export default async function Home({ params: { locale } }: { params: { locale: s
       </section>
 
       {/* Featured Vehicles Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted">
         <div className="max-w-7xl mx-auto">
           <div className="mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="display-section mb-4">
               {t("featured.title")}
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-muted-foreground">
               {t("featured.description")}
             </p>
           </div>
@@ -164,9 +164,9 @@ export default async function Home({ params: { locale } }: { params: { locale: s
           <div className="text-center mt-12">
             <Button
               asChild
-              variant="outline"
+              variant="outline-primary"
               size="lg"
-              className="border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white px-8 py-6 text-lg font-semibold"
+              className="px-8 py-6 text-lg font-semibold"
             >
               <Link href="/fahrzeuge">
                 {t("featured.viewAll")}
@@ -178,13 +178,13 @@ export default async function Home({ params: { locale } }: { params: { locale: s
       </section>
 
       {/* Services Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-card">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="display-section mb-4">
               {t("services.title")}
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t("services.description")}
             </p>
           </div>
@@ -194,39 +194,39 @@ export default async function Home({ params: { locale } }: { params: { locale: s
       </section>
 
       {/* Trust & Quality Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="display-section mb-4">
               {t("trustSection.title")}
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t("trustSection.description")}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Quality Guarantee */}
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              <div className="bg-gradient-to-br from-kfz-blue to-kfz-blue-light text-white w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+            <div className="bg-card p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-gradient-to-br from-kfz-blue to-kfz-blue-light text-primary-foreground w-16 h-16 rounded-lg flex items-center justify-center mb-6">
                 <Award className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              <h3 className="section-title mb-3">
                 {t("qualityGuarantee.title")}
               </h3>
-              <p className="text-gray-700 mb-4">
+              <p className="text-foreground mb-4">
                 {t("qualityGuarantee.description")}
               </p>
               <ul className="space-y-2">
-                <li className="flex items-center text-gray-700">
+                <li className="flex items-center text-foreground">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
                   {t("qualityGuarantee.item1")}
                 </li>
-                <li className="flex items-center text-gray-700">
+                <li className="flex items-center text-foreground">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
                   {t("qualityGuarantee.item2")}
                 </li>
-                <li className="flex items-center text-gray-700">
+                <li className="flex items-center text-foreground">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
                   {t("qualityGuarantee.item3")}
                 </li>
@@ -234,26 +234,26 @@ export default async function Home({ params: { locale } }: { params: { locale: s
             </div>
 
             {/* Expert Team */}
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              <div className="bg-gradient-to-br from-kfz-blue to-kfz-blue-light text-white w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+            <div className="bg-card p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-gradient-to-br from-kfz-blue to-kfz-blue-light text-primary-foreground w-16 h-16 rounded-lg flex items-center justify-center mb-6">
                 <Users className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              <h3 className="section-title mb-3">
                 {t("expertTeam.title")}
               </h3>
-              <p className="text-gray-700 mb-4">
+              <p className="text-foreground mb-4">
                 {t("expertTeam.description")}
               </p>
               <ul className="space-y-2">
-                <li className="flex items-center text-gray-700">
+                <li className="flex items-center text-foreground">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
                   {t("expertTeam.item1")}
                 </li>
-                <li className="flex items-center text-gray-700">
+                <li className="flex items-center text-foreground">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
                   {t("expertTeam.item2")}
                 </li>
-                <li className="flex items-center text-gray-700">
+                <li className="flex items-center text-foreground">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
                   {t("expertTeam.item3")}
                 </li>
@@ -261,26 +261,26 @@ export default async function Home({ params: { locale } }: { params: { locale: s
             </div>
 
             {/* Transparent Pricing */}
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              <div className="bg-gradient-to-br from-kfz-blue to-kfz-blue-light text-white w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+            <div className="bg-card p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-gradient-to-br from-kfz-blue to-kfz-blue-light text-primary-foreground w-16 h-16 rounded-lg flex items-center justify-center mb-6">
                 <Shield className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              <h3 className="section-title mb-3">
                 {t("transparentPricing.title")}
               </h3>
-              <p className="text-gray-700 mb-4">
+              <p className="text-foreground mb-4">
                 {t("transparentPricing.description")}
               </p>
               <ul className="space-y-2">
-                <li className="flex items-center text-gray-700">
+                <li className="flex items-center text-foreground">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
                   {t("transparentPricing.item1")}
                 </li>
-                <li className="flex items-center text-gray-700">
+                <li className="flex items-center text-foreground">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
                   {t("transparentPricing.item2")}
                 </li>
-                <li className="flex items-center text-gray-700">
+                <li className="flex items-center text-foreground">
                   <CheckCircle className="w-5 h-5 text-kfz-accent mr-2 flex-shrink-0" />
                   {t("transparentPricing.item3")}
                 </li>
@@ -291,7 +291,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
       </section>
 
       {/* About Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-card">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left: Image */}
@@ -307,13 +307,13 @@ export default async function Home({ params: { locale } }: { params: { locale: s
 
             {/* Right: Content */}
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              <h2 className="display-section mb-6">
                 {t("aboutSection.title")}
               </h2>
-              <p className="text-lg text-gray-600 mb-4">
+              <p className="text-lg text-muted-foreground mb-4">
                 {t("aboutSection.paragraph1")}
               </p>
-              <p className="text-lg text-gray-600 mb-6">
+              <p className="text-lg text-muted-foreground mb-6">
                 {t("aboutSection.paragraph2")}
               </p>
 
@@ -321,22 +321,22 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                 <div className="flex items-start gap-3">
                   <Zap className="w-6 h-6 text-kfz-accent flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">{t("aboutSection.quickProcess")}</h3>
-                    <p className="text-gray-600">{t("aboutSection.quickProcessDesc")}</p>
+                    <h3 className="font-semibold text-foreground">{t("aboutSection.quickProcess")}</h3>
+                    <p className="text-muted-foreground">{t("aboutSection.quickProcessDesc")}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Zap className="w-6 h-6 text-kfz-accent flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">{t("aboutSection.fairPrices")}</h3>
-                    <p className="text-gray-600">{t("aboutSection.fairPricesDesc")}</p>
+                    <h3 className="font-semibold text-foreground">{t("aboutSection.fairPrices")}</h3>
+                    <p className="text-muted-foreground">{t("aboutSection.fairPricesDesc")}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Zap className="w-6 h-6 text-kfz-accent flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">{t("aboutSection.completeSolution")}</h3>
-                    <p className="text-gray-600">{t("aboutSection.completeSolutionDesc")}</p>
+                    <h3 className="font-semibold text-foreground">{t("aboutSection.completeSolution")}</h3>
+                    <p className="text-muted-foreground">{t("aboutSection.completeSolutionDesc")}</p>
                   </div>
                 </div>
               </div>
@@ -344,7 +344,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
               <Button
                 asChild
                 size="lg"
-                className="bg-kfz-blue hover:bg-kfz-blue-dark text-white px-8 py-6 text-lg font-semibold"
+                className="px-8 py-6 text-lg"
               >
                 <Link href="/about">
                   {t("aboutSection.learnMore")}
@@ -357,19 +357,19 @@ export default async function Home({ params: { locale } }: { params: { locale: s
       </section>
 
       {/* Contact CTA Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-primary-foreground">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-4">
+          <h2 className="display-section mb-4">
             {t("contact.title")}
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-primary-foreground/80 mb-8">
             {t("contact.description")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
+            <Button variant="accent"
               asChild
               size="lg"
-              className="bg-kfz-accent hover:bg-kfz-accent-light text-white px-8 py-6 text-lg font-semibold"
+              className="px-8 py-6 text-lg"
             >
               <Link href="/contact">
                 {t("contact.contactCta")}
@@ -379,8 +379,8 @@ export default async function Home({ params: { locale } }: { params: { locale: s
             <Button
               asChild
               size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-kfz-blue px-8 py-6 text-lg font-semibold"
+              variant="outline-inverse"
+              className="px-8 py-6 text-lg"
             >
               <a href={`tel:${COMPANY.phone.replace(/\s/g, "")}`}>
                 {t("contact.callCta", { phone: COMPANY.phone })}

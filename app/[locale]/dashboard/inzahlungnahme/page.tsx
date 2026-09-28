@@ -5,13 +5,14 @@ import { useParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter, Link } from "@/lib/navigation";
+import { useRouter } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, AlertCircle, Check } from "lucide-react";
 import type { Vehicle } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { PageHeader } from "@/components/page-header";
 
 type Step = "current_vehicle" | "vehicle_value" | "select_desired" | "review" | "success";
 
@@ -100,10 +101,10 @@ export default function InzahlungnahmePage() {
 
   if (loading || !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -206,24 +207,21 @@ export default function InzahlungnahmePage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Link href="/dashboard" className="text-blue-100 hover:text-white mb-2 inline-block text-sm">
-            ← {tNav("dashboard")}
-          </Link>
-          <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
-          <p className="text-blue-100">{t("stepProgress", { current: currentIndex + 1, total: STEPS.length })}</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-muted">
+      <PageHeader
+        title={t("title")}
+        description={t("stepProgress", { current: currentIndex + 1, total: STEPS.length })}
+        backHref="/dashboard"
+        backLabel={<>← {tNav("dashboard")}</>}
+        width="narrow"
+      />
 
       {/* Progress Bar */}
-      <div className="bg-white border-b">
+      <div className="bg-card border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-border rounded-full h-2">
             <div
-              className="bg-kfz-blue h-2 rounded-full transition-all duration-300"
+              className="bg-primary h-2 rounded-full transition-all duration-300"
               style={{ width: `${stepProgress}%` }}
             ></div>
           </div>
@@ -235,10 +233,10 @@ export default function InzahlungnahmePage() {
                   disabled={index > currentIndex}
                   className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
                     index < currentIndex
-                      ? "bg-green-500 text-white"
+                      ? "bg-success text-primary-foreground"
                       : index === currentIndex
-                      ? "bg-kfz-blue text-white"
-                      : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-input text-muted-foreground cursor-not-allowed"
                   }`}
                 >
                   {index < currentIndex ? <Check className="w-4 h-4" /> : index + 1}
@@ -246,7 +244,7 @@ export default function InzahlungnahmePage() {
                 {index < STEPS.length - 1 && (
                   <div
                     className={`w-12 h-0.5 mx-1 transition-colors ${
-                      index < currentIndex ? "bg-green-500" : "bg-gray-300"
+                      index < currentIndex ? "bg-success" : "bg-input"
                     }`}
                   ></div>
                 )}
@@ -257,43 +255,43 @@ export default function InzahlungnahmePage() {
       </div>
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="page-container-narrow">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 mb-6 flex gap-3">
+            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-destructive-subtle-foreground">{error}</p>
           </div>
         )}
 
         {/* Current Vehicle */}
         {currentStep === "current_vehicle" && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("currentVehicle.title")}</h2>
+          <div className="card p-6 sm:p-8">
+            <h2 className="section-title mb-6">{t("currentVehicle.title")}</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("currentVehicle.brand")} *</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("currentVehicle.brand")} *</label>
                 <input
                   type="text"
                   name="current_vehicle_brand"
                   value={formData.current_vehicle_brand}
                   onChange={handleInputChange}
                   placeholder={t("currentVehicle.brandPlaceholder")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("currentVehicle.model")} *</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("currentVehicle.model")} *</label>
                 <input
                   type="text"
                   name="current_vehicle_model"
                   value={formData.current_vehicle_model}
                   onChange={handleInputChange}
                   placeholder={t("currentVehicle.modelPlaceholder")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("currentVehicle.year")} *</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("currentVehicle.year")} *</label>
                 <input
                   type="number"
                   name="current_vehicle_year"
@@ -301,18 +299,18 @@ export default function InzahlungnahmePage() {
                   onChange={handleInputChange}
                   min="1990"
                   max={new Date().getFullYear()}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t("currentVehicle.mileage")}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("currentVehicle.mileage")}</label>
                 <input
                   type="number"
                   name="current_vehicle_mileage"
                   value={formData.current_vehicle_mileage}
                   onChange={handleInputChange}
                   placeholder={formatter.number(50000)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                  className="field"
                 />
               </div>
             </div>
@@ -321,13 +319,13 @@ export default function InzahlungnahmePage() {
 
         {/* Vehicle Value */}
         {currentStep === "vehicle_value" && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("vehicleValue.title")}</h2>
-            <p className="text-gray-600 mb-8">
+          <div className="card p-6 sm:p-8">
+            <h2 className="section-title mb-2">{t("vehicleValue.title")}</h2>
+            <p className="text-muted-foreground mb-8">
               {t("vehicleValue.description")}
             </p>
             <div className="max-w-md">
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("vehicleValue.label")} *</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t("vehicleValue.label")} *</label>
               <input
                 type="number"
                 name="current_vehicle_value_estimate"
@@ -335,7 +333,7 @@ export default function InzahlungnahmePage() {
                 onChange={handleInputChange}
                 placeholder={formatter.number(50000)}
                 step="100"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent text-lg"
+                className="field text-lg"
               />
             </div>
           </div>
@@ -343,17 +341,17 @@ export default function InzahlungnahmePage() {
 
         {/* Select Desired Vehicle */}
         {currentStep === "select_desired" && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("selectDesired.title")}</h2>
-            <p className="text-gray-600 mb-6">{t("selectDesired.description")}</p>
+          <div className="card p-6 sm:p-8">
+            <h2 className="section-title mb-6">{t("selectDesired.title")}</h2>
+            <p className="text-muted-foreground mb-6">{t("selectDesired.description")}</p>
 
             {vehiclesLoading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto"></div>
-                <p className="text-gray-600 mt-4">{t("selectDesired.loading")}</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <p className="text-muted-foreground mt-4">{t("selectDesired.loading")}</p>
               </div>
             ) : availableVehicles.length === 0 ? (
-              <p className="text-gray-600">{t("selectDesired.empty")}</p>
+              <p className="text-muted-foreground">{t("selectDesired.empty")}</p>
             ) : (
               <div className="grid md:grid-cols-2 gap-4">
                 {availableVehicles.map((vehicle) => (
@@ -361,8 +359,8 @@ export default function InzahlungnahmePage() {
                     key={vehicle.id}
                     className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                       formData.desired_vehicle_id === vehicle.id
-                        ? "border-kfz-blue bg-blue-50"
-                        : "border-gray-300 hover:bg-gray-50"
+                        ? "border-primary bg-info-subtle/50"
+                        : "border-input hover:bg-muted"
                     }`}
                   >
                     <input
@@ -371,16 +369,16 @@ export default function InzahlungnahmePage() {
                       value={vehicle.id}
                       checked={formData.desired_vehicle_id === vehicle.id}
                       onChange={(e) => handleVehicleSelect(e.target.value)}
-                      className="w-4 h-4 text-kfz-blue mt-1 flex-shrink-0"
+                      className="w-4 h-4 text-primary mt-1 flex-shrink-0"
                     />
                     <div className="ml-4 flex-1">
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-foreground">
                         {vehicle.year} {vehicle.brand} {vehicle.model}
                       </p>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {formatter.number(vehicle.mileage || 0)} km
                       </p>
-                      <p className="text-lg font-bold text-kfz-blue mt-2">
+                      <p className="text-lg font-bold text-primary mt-2">
                         {formatCurrency(vehicle.price || 0)}
                       </p>
                     </div>
@@ -393,36 +391,36 @@ export default function InzahlungnahmePage() {
 
         {/* Review */}
         {currentStep === "review" && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("review.title")}</h2>
+          <div className="card p-6 sm:p-8">
+            <h2 className="section-title mb-6">{t("review.title")}</h2>
 
             <div className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">{t("review.yourVehicle")}</h3>
+                  <h3 className="font-semibold text-foreground mb-3">{t("review.yourVehicle")}</h3>
                   <div className="space-y-1 text-sm">
                     <p>
-                      <span className="text-gray-600">{t("review.brand")}</span>{" "}
+                      <span className="text-muted-foreground">{t("review.brand")}</span>{" "}
                       <span className="font-medium">{formData.current_vehicle_brand}</span>
                     </p>
                     <p>
-                      <span className="text-gray-600">{t("review.model")}</span>{" "}
+                      <span className="text-muted-foreground">{t("review.model")}</span>{" "}
                       <span className="font-medium">{formData.current_vehicle_model}</span>
                     </p>
                     <p>
-                      <span className="text-gray-600">{t("review.year")}</span>{" "}
+                      <span className="text-muted-foreground">{t("review.year")}</span>{" "}
                       <span className="font-medium">{formData.current_vehicle_year}</span>
                     </p>
                     {formData.current_vehicle_mileage && (
                       <p>
-                        <span className="text-gray-600">{t("review.mileage")}</span>{" "}
+                        <span className="text-muted-foreground">{t("review.mileage")}</span>{" "}
                         <span className="font-medium">
                           {formatter.number(parseInt(formData.current_vehicle_mileage))} km
                         </span>
                       </p>
                     )}
                     <p className="mt-2">
-                      <span className="text-gray-600">{t("review.estimatedValue")}</span>{" "}
+                      <span className="text-muted-foreground">{t("review.estimatedValue")}</span>{" "}
                       <span className="font-bold text-lg">
                         {formatCurrency(parseFloat(formData.current_vehicle_value_estimate))}
                       </span>
@@ -431,24 +429,24 @@ export default function InzahlungnahmePage() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">{t("review.desiredVehicle")}</h3>
+                  <h3 className="font-semibold text-foreground mb-3">{t("review.desiredVehicle")}</h3>
                   {desiredVehicle && (
                     <div className="space-y-1 text-sm">
                       <p>
-                        <span className="text-gray-600">{t("review.vehicle")}</span>{" "}
+                        <span className="text-muted-foreground">{t("review.vehicle")}</span>{" "}
                         <span className="font-medium">
                           {desiredVehicle.year} {desiredVehicle.brand} {desiredVehicle.model}
                         </span>
                       </p>
                       <p>
-                        <span className="text-gray-600">{t("review.mileage")}</span>{" "}
+                        <span className="text-muted-foreground">{t("review.mileage")}</span>{" "}
                         <span className="font-medium">
                           {formatter.number(desiredVehicle.mileage || 0)} km
                         </span>
                       </p>
                       <p className="mt-2">
-                        <span className="text-gray-600">{t("review.price")}</span>{" "}
-                        <span className="font-bold text-lg text-kfz-blue">
+                        <span className="text-muted-foreground">{t("review.price")}</span>{" "}
+                        <span className="font-bold text-lg text-primary">
                           {formatCurrency(desiredVehicle.price || 0)}
                         </span>
                       </p>
@@ -458,28 +456,28 @@ export default function InzahlungnahmePage() {
               </div>
 
               {/* Estimated Price Difference */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">{t("review.priceEstimate")}</h3>
+              <div className="bg-info-subtle/50 border border-info-border rounded-lg p-6">
+                <h3 className="font-semibold text-foreground mb-4">{t("review.priceEstimate")}</h3>
                 <div className="mb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600">{t("review.yourEstimate")}</span>
+                    <span className="text-muted-foreground">{t("review.yourEstimate")}</span>
                     <span className="font-bold">
                       {formatCurrency(parseFloat(formData.current_vehicle_value_estimate))}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-gray-600">{t("review.desiredPrice")}</span>
+                    <span className="text-muted-foreground">{t("review.desiredPrice")}</span>
                     <span className="font-bold">
                       {formatCurrency(desiredVehicle?.price || 0)}
                     </span>
                   </div>
-                  <div className="border-t border-blue-300 pt-4 flex justify-between items-center">
-                    <span className="font-semibold text-gray-900">{t("review.difference")}</span>
+                  <div className="border-t border-info-border pt-4 flex justify-between items-center">
+                    <span className="font-semibold text-foreground">{t("review.difference")}</span>
                     <span
                       className={`text-2xl font-bold ${
                         estimatedDifference !== null && estimatedDifference > 0
-                          ? "text-red-600"
-                          : "text-green-600"
+                          ? "text-destructive"
+                          : "text-success"
                       }`}
                     >
                       {estimatedDifference !== null
@@ -489,8 +487,8 @@ export default function InzahlungnahmePage() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded p-4 border border-blue-200">
-                  <p className="text-xs text-gray-600 italic">
+                <div className="bg-card rounded p-4 border border-info-border">
+                  <p className="text-xs text-muted-foreground italic">
                     {t("review.importantNote")} <strong>{t("review.importantNoteText")}</strong>
                   </p>
                 </div>
@@ -501,24 +499,24 @@ export default function InzahlungnahmePage() {
 
         {/* Success */}
         {currentStep === "success" && (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <Check className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t("success.title")}</h2>
-            <p className="text-gray-600 mb-4">
+          <div className="card p-6 sm:p-8 text-center">
+            <Check className="w-16 h-16 text-success mx-auto mb-4" />
+            <h2 className="section-title mb-4">{t("success.title")}</h2>
+            <p className="text-muted-foreground mb-4">
               {t("success.description")}
             </p>
-            <p className="text-sm text-gray-500 mb-8">{t("success.requestId")} {successId}</p>
+            <p className="text-sm text-muted-foreground mb-8">{t("success.requestId")} {successId}</p>
             <div className="flex gap-4 justify-center">
               <Button
                 onClick={() => router.push("/dashboard")}
-                className="bg-kfz-blue hover:bg-kfz-blue-dark text-white"
+
               >
                 {t("success.toDashboard")}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => router.push("/dashboard/inzahlungnahme-anfragen")}
-                className="border-gray-300"
+
               >
                 {t("success.viewRequests")}
               </Button>
@@ -533,7 +531,7 @@ export default function InzahlungnahmePage() {
               variant="outline"
               onClick={handlePrev}
               disabled={currentIndex === 0}
-              className="border-gray-300"
+
             >
               <ChevronLeft className="mr-2 w-4 h-4" />
               {t("buttons.back")}
@@ -542,16 +540,16 @@ export default function InzahlungnahmePage() {
             {currentStep !== "review" ? (
               <Button
                 onClick={handleNext}
-                className="bg-kfz-blue hover:bg-kfz-blue-dark text-white"
+
               >
                 {t("buttons.next")}
                 <ChevronRight className="ml-2 w-4 h-4" />
               </Button>
             ) : (
-              <Button
+              <Button variant="success"
                 onClick={handleSubmit}
                 disabled={saving}
-                className="bg-green-600 hover:bg-green-700 text-white"
+
               >
                 {saving ? t("buttons.submitting") : t("buttons.submit")}
                 <Check className="ml-2 w-4 h-4" />

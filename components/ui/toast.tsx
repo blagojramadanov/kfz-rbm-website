@@ -67,21 +67,21 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-start gap-3 rounded-lg shadow-lg border px-4 py-3 bg-white ${
-              toast.variant === "error" ? "border-red-200" : "border-green-200"
+            className={`pointer-events-auto flex items-start gap-3 rounded-lg shadow-lg border px-4 py-3 bg-card ${
+              toast.variant === "error" ? "border-destructive-border" : "border-success-border"
             }`}
           >
             {toast.variant === "error" ? (
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" aria-hidden="true" />
             ) : (
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <CheckCircle className="w-5 h-5 text-success flex-shrink-0 mt-0.5" aria-hidden="true" />
             )}
-            <p className="flex-1 text-sm text-gray-900">{toast.message}</p>
+            <p className="flex-1 text-sm text-foreground">{toast.message}</p>
             <button
               type="button"
               onClick={() => dismiss(toast.id)}
               aria-label={t("close")}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-muted-foreground/70 hover:text-foreground"
             >
               <X className="w-4 h-4" aria-hidden="true" />
             </button>

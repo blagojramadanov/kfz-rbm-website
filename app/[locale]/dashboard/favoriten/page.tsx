@@ -13,6 +13,7 @@ import { formatMileage, formatPrice } from "@/lib/format-vehicle";
 import { getFuelTypeLabel, getTransmissionLabel } from "@/lib/vehicle-labels";
 import { Button } from "@/components/ui/button";
 import type { FavoriteEntry } from "@/app/actions/favorites";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -68,48 +69,42 @@ export default function FavoritesPage() {
 
   if (loading || !isAuthenticated || favorites === undefined) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div>
-            <Link href="/dashboard" className="text-kfz-blue hover:underline mb-2 inline-block">
-              {tNav("dashboard")}
-            </Link>
-            <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
-            <p className="text-gray-600 mt-1">{t("description")}</p>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-muted">
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        backHref="/dashboard"
+        backLabel={<>← {tNav("dashboard")}</>}
+      />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="page-container">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 mb-6 flex gap-3">
+            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <p className="text-sm text-destructive-subtle-foreground">{error}</p>
           </div>
         )}
 
         {favorites.length === 0 && !error ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="card p-8 sm:p-12 text-center">
             <div className="flex justify-center mb-4">
-              <div className="bg-gray-100 rounded-lg p-6">
-                <Heart className="w-12 h-12 text-gray-400" aria-hidden="true" />
+              <div className="bg-secondary rounded-lg p-6">
+                <Heart className="w-12 h-12 text-muted-foreground/70" aria-hidden="true" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("empty")}</h2>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">{t("emptyDescription")}</p>
-            <Button asChild className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
+            <h2 className="section-title mb-2">{t("empty")}</h2>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">{t("emptyDescription")}</p>
+            <Button asChild >
               <Link href="/fahrzeuge">
                 {t("browse")}
                 <Search className="ml-2 w-4 h-4" aria-hidden="true" />
@@ -118,7 +113,7 @@ export default function FavoritesPage() {
           </div>
         ) : (
           <>
-            <p className="text-gray-600 mb-6" aria-live="polite">
+            <p className="text-muted-foreground mb-6" aria-live="polite">
               {t("count", { count: favorites.length })}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -127,10 +122,10 @@ export default function FavoritesPage() {
                 const removeButton = (
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="outline-destructive"
                     onClick={() => handleRemove(vehicleId)}
                     disabled={pending}
-                    className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    className="w-full"
                   >
                     <Trash2 className="w-4 h-4 mr-2" aria-hidden="true" />
                     {tFavorites("removeShort")}
@@ -143,15 +138,15 @@ export default function FavoritesPage() {
                   return (
                     <div
                       key={vehicleId}
-                      className="bg-gray-100 rounded-lg border border-dashed border-gray-300 overflow-hidden flex flex-col"
+                      className="bg-secondary rounded-lg border border-dashed border-input overflow-hidden flex flex-col"
                     >
-                      <div className="h-48 flex items-center justify-center text-gray-400">
+                      <div className="h-48 flex items-center justify-center text-muted-foreground/70">
                         <Car className="w-12 h-12" aria-hidden="true" />
                       </div>
                       <div className="p-5 flex flex-col gap-4 flex-grow">
                         <div>
-                          <p className="font-semibold text-gray-700">{t("unavailableTitle")}</p>
-                          <p className="text-sm text-gray-500 mt-1">{t("unavailableHint")}</p>
+                          <p className="font-semibold text-foreground">{t("unavailableTitle")}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{t("unavailableHint")}</p>
                         </div>
                         <div className="mt-auto">{removeButton}</div>
                       </div>
@@ -160,9 +155,9 @@ export default function FavoritesPage() {
                 }
 
                 return (
-                  <div key={vehicleId} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
+                  <div key={vehicleId} className="card overflow-hidden flex flex-col">
                     <Link href={`/fahrzeuge/${vehicle.slug}`} className="group block">
-                      <div className="relative h-48 bg-gray-200 overflow-hidden">
+                      <div className="relative h-48 bg-border overflow-hidden">
                         {vehicle.image ? (
                           <Image
                             src={vehicle.image}
@@ -172,19 +167,19 @@ export default function FavoritesPage() {
                             className="object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
-                          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                          <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/70">
                             <Car className="w-12 h-12" aria-hidden="true" />
                           </div>
                         )}
-                        <div className="absolute bottom-3 left-3 bg-kfz-blue text-white px-3 py-1 rounded-lg font-bold">
+                        <div className="absolute bottom-3 left-3 bg-primary text-primary-foreground px-3 py-1 rounded-lg font-bold">
                           {formatPrice(format, vehicle.price)}
                         </div>
                       </div>
                       <div className="px-5 pt-4">
-                        <h2 className="text-lg font-bold text-gray-900 group-hover:text-kfz-blue transition">
+                        <h2 className="text-lg font-bold text-foreground group-hover:text-primary transition">
                           {vehicle.brand} {vehicle.model}
                         </h2>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           {[
                             String(vehicle.year),
                             formatMileage(format, vehicle.mileage),

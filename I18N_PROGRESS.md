@@ -1024,3 +1024,35 @@ Earlier notes:
 - ~~Dead **`?edit=` branch** in the offer wizard~~ — removed.
 - Mercedes-Benz C 300 (`ae0119a8-…`) has no photos at all — upload them in the admin.
 - "fffffffff…" test submission — delete when no longer needed for testing.
+
+## UI/UX polish
+
+### Part 1 of 5: design system (done, 2026-09-28)
+Visual consistency pass only: no changes to functionality, data, routes or translation texts.
+
+**Tokens** (`app/globals.css`, mapped in `tailwind.config.ts`; single source of truth for colors)
+- shadcn variables: `background`, `foreground`, `card`, `popover`, `primary` (RBM navy #1a3a6b) + `primary-hover`, `secondary`, `muted` (page background), `muted-foreground` (meta text, #4b5563), `accent` (hover surface), `border`, `input`, `ring`.
+- Brand: `kfz-blue`/`kfz-blue-dark`/`kfz-blue-light` (gradients) and `kfz-accent` now point to the same variables. The accent was darkened to #2471a3 so white text on accent CTAs passes WCAG AA (was 3.15:1, now 5.3:1).
+- Semantic tones, each with `DEFAULT`, `foreground`, `hover`, `subtle`, `subtle-foreground`, `border`: `destructive`, `success`, `warning`, `info`, `highlight`. Plus `inverse` (navy footer + admin sidebar) and `featured` (featured star).
+- No hardcoded hex or palette colors remain in `app/` and `components/` (only translucent white/black overlays such as `bg-white/10` on the navy hero and `bg-black/50` scrims).
+
+**Type scale** (component classes in `globals.css`)
+- `display` hero headings (landing, vehicle listing), `display-section` landing-page sections
+- `page-title` (h1 on every other page, 2xl → 3xl), `section-title` (h2, xl → 2xl), `card-title` (h3, lg semibold)
+- body `text-base`, meta `text-sm text-muted-foreground`
+
+**Spacing**: `page-container` / `page-container-narrow` (max-w-7xl / 4xl, px-4 sm:px-6 lg:px-8, py-8 sm:py-12), section gap `space-y-6`, card padding `p-6` (`p-6 sm:p-8` for form/content cards), `card` = card background + rounded-lg + shadow-md. Inputs use `field` (light) and `field-inverse` (navy auth pages).
+
+**Components**
+- `Button` variants: default (primary), `accent`, `success`, `destructive`, `outline` (neutral), `outline-primary`, `outline-destructive`, `outline-inverse`, `secondary`, `ghost`, `link`, `inverse`. All ad-hoc `bg-kfz-blue hover:bg-kfz-blue-dark text-white` etc. overrides replaced by variants.
+- `Badge` variants per tone; `StatusBadge` + `lib/status-styles.ts`: one status → tone map shared by customer and admin views (submissions: eingereicht info, in_bearbeitung warning, angebot_gesendet highlight, akzeptiert success, abgelehnt destructive; vehicles: draft neutral, available success, reserved info, sold destructive; trade-ins and inquiries likewise). Stat counters use the same map.
+- `PageHeader`: navy header band for public and customer pages (title, description, back link, actions); admin pages use the same `page-title` scale inside the shell.
+- Font: Inter now loads the `cyrillic` and `latin-ext` subsets via `next/font` (`--font-sans`); before, only `latin` was loaded, so Macedonian fell back to a system font.
+
+**Contrast fixes**: accent CTAs, green buttons/step dots (green-500/600 → green-700), `text-gray-400` text (→ muted-foreground), yellow-600 counters (→ warning #b45309), placeholders on the navy auth pages, admin sidebar email.
+
+### Left for later parts
+- Part 2 (mobile): wizard step bar and admin tables at 375px, `whitespace-nowrap` buttons with long MK labels in narrow grids, hero heading size on small screens.
+- Raw `<button>` elements in the admin pages are token-colored but not yet on `Button`/`buttonVariants` (sizes/paddings still vary slightly).
+- Error/success alert boxes are repeated inline in ~25 places; extract an `Alert` component.
+- The wizard scroll-to-top and upload-progress notes above.

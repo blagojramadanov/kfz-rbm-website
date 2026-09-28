@@ -104,13 +104,13 @@ export default async function VehicleDetailPage({
   const priceLabel = formatPrice(format, vehicle.price);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted">
       {/* Header with Back Button */}
-      <div className="bg-white border-b">
+      <div className="bg-card border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link
             href="/fahrzeuge"
-            className="inline-flex items-center gap-2 text-kfz-blue hover:text-kfz-blue-dark transition"
+            className="inline-flex items-center gap-2 text-primary hover:text-primary-hover transition"
           >
             <ArrowLeft className="w-5 h-5" aria-hidden="true" />
             {t("backToOverview")}
@@ -137,14 +137,14 @@ export default async function VehicleDetailPage({
 
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                  <h1 className="page-title text-foreground mb-2">
                     {vehicle.brand} {vehicle.model}
                   </h1>
-                  <p className="text-gray-600 text-lg">{vehicle.year}</p>
+                  <p className="text-muted-foreground text-lg">{vehicle.year}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-4xl font-bold text-kfz-blue mb-2">{priceLabel}</div>
-                  <p className="text-gray-600">
+                  <div className="text-4xl font-bold text-primary mb-2">{priceLabel}</div>
+                  <p className="text-muted-foreground">
                     {isExport ? t("price.export") : t("price.sale")}
                   </p>
                 </div>
@@ -153,30 +153,30 @@ export default async function VehicleDetailPage({
               {/* Quick Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12 pb-12 border-b">
                 <div>
-                  <p className="text-gray-600 text-sm mb-1">{tVehicles("mileage")}</p>
-                  <p className="text-xl font-bold text-gray-900">
+                  <p className="text-muted-foreground text-sm mb-1">{tVehicles("mileage")}</p>
+                  <p className="text-xl font-bold text-foreground">
                     {formatMileage(format, vehicle.mileage)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm mb-1">{tVehicles("power")}</p>
-                  <p className="text-xl font-bold text-gray-900">
+                  <p className="text-muted-foreground text-sm mb-1">{tVehicles("power")}</p>
+                  <p className="text-xl font-bold text-foreground">
                     {vehicle.powerHp != null
                       ? tVehicles("powerValue", { value: format.number(vehicle.powerHp) })
                       : "—"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm mb-1">{tVehicles("transmission")}</p>
-                  <p className="text-xl font-bold text-gray-900">
+                  <p className="text-muted-foreground text-sm mb-1">{tVehicles("transmission")}</p>
+                  <p className="text-xl font-bold text-foreground">
                     {vehicle.transmission
                       ? getTransmissionLabel(tCommon, vehicle.transmission)
                       : "—"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm mb-1">{tVehicles("fuelType")}</p>
-                  <p className="text-xl font-bold text-gray-900">
+                  <p className="text-muted-foreground text-sm mb-1">{tVehicles("fuelType")}</p>
+                  <p className="text-xl font-bold text-foreground">
                     {vehicle.fuelType ? getFuelTypeLabel(tCommon, vehicle.fuelType) : "—"}
                   </p>
                 </div>
@@ -184,36 +184,36 @@ export default async function VehicleDetailPage({
 
               {/* Export-Specific Fields */}
               {isExport && (
-                <div className="mb-12 p-6 bg-blue-50 rounded-lg border border-blue-200">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <div className="mb-12 p-6 bg-info-subtle/50 rounded-lg border border-info-border">
+                  <h2 className="section-title mb-4">
                     <span aria-hidden="true">🌍</span> {t("exportInfo.title")}
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     {vehicle.zustand && (
                       <div>
-                        <p className="text-gray-600 text-sm mb-1">{tVehicles("condition")}</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-muted-foreground text-sm mb-1">{tVehicles("condition")}</p>
+                        <p className="text-lg font-semibold text-foreground">
                           {getVehicleConditionLabel(tCommon, vehicle.zustand)}
                         </p>
                       </div>
                     )}
                     {vehicle.zielland && (
                       <div>
-                        <p className="text-gray-600 text-sm mb-1">{t("exportInfo.destination")}</p>
-                        <p className="text-lg font-semibold text-gray-900">{vehicle.zielland}</p>
+                        <p className="text-muted-foreground text-sm mb-1">{t("exportInfo.destination")}</p>
+                        <p className="text-lg font-semibold text-foreground">{vehicle.zielland}</p>
                       </div>
                     )}
                     <div>
-                      <p className="text-gray-600 text-sm mb-1">{t("exportInfo.priceType")}</p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-muted-foreground text-sm mb-1">{t("exportInfo.priceType")}</p>
+                      <p className="text-lg font-semibold text-foreground">
                         {t("exportInfo.priceTypeValue")}
                       </p>
                     </div>
                   </div>
                   {vehicle.exportNotes && (
-                    <div className="mt-6 pt-6 border-t border-blue-200">
-                      <p className="text-gray-600 text-sm mb-2">{t("exportInfo.notes")}</p>
-                      <p className="text-gray-700">{vehicle.exportNotes}</p>
+                    <div className="mt-6 pt-6 border-t border-info-border">
+                      <p className="text-muted-foreground text-sm mb-2">{t("exportInfo.notes")}</p>
+                      <p className="text-foreground">{vehicle.exportNotes}</p>
                     </div>
                   )}
                 </div>
@@ -221,35 +221,35 @@ export default async function VehicleDetailPage({
 
               {/* Description */}
               <div className="mb-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t("description.title")}</h2>
-                <p className="text-gray-700 text-lg leading-relaxed">
+                <h2 className="section-title mb-4">{t("description.title")}</h2>
+                <p className="text-foreground text-lg leading-relaxed">
                   {vehicle.description || t("description.empty")}
                 </p>
               </div>
 
               {/* Detailed Specs */}
               <div className="mb-12 pb-12 border-b">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">{tVehicles("details")}</h3>
+                <h3 className="card-title mb-4">{tVehicles("details")}</h3>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                   <div>
-                    <dt className="text-gray-600 text-sm">{tVehicles("bodyType")}</dt>
-                    <dd className="text-gray-900 font-semibold">
+                    <dt className="text-muted-foreground text-sm">{tVehicles("bodyType")}</dt>
+                    <dd className="text-foreground font-semibold">
                       {vehicle.bodyType ? getBodyTypeLabel(tCommon, vehicle.bodyType) : "—"}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-gray-600 text-sm">{tVehicles("colorExterior")}</dt>
-                    <dd className="text-gray-900 font-semibold">
+                    <dt className="text-muted-foreground text-sm">{tVehicles("colorExterior")}</dt>
+                    <dd className="text-foreground font-semibold">
                       {vehicle.color ? getColorLabel(tCommon, vehicle.color) : "—"}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-gray-600 text-sm">{tVehicles("firstRegistration")}</dt>
-                    <dd className="text-gray-900 font-semibold">{vehicle.year}</dd>
+                    <dt className="text-muted-foreground text-sm">{tVehicles("firstRegistration")}</dt>
+                    <dd className="text-foreground font-semibold">{vehicle.year}</dd>
                   </div>
                   <div>
-                    <dt className="text-gray-600 text-sm">{tVehicles("engineSize")}</dt>
-                    <dd className="text-gray-900 font-semibold">
+                    <dt className="text-muted-foreground text-sm">{tVehicles("engineSize")}</dt>
+                    <dd className="text-foreground font-semibold">
                       {vehicle.engineCc
                         ? tVehicles("engineValue", { value: format.number(vehicle.engineCc) })
                         : tVehicles("onRequest")}
@@ -257,8 +257,8 @@ export default async function VehicleDetailPage({
                   </div>
                   {getSubmissionDetails(tWizard, vehicle.details).map((detail) => (
                     <div key={detail.key}>
-                      <dt className="text-gray-600 text-sm">{detail.label}</dt>
-                      <dd className="text-gray-900 font-semibold break-words">{detail.value}</dd>
+                      <dt className="text-muted-foreground text-sm">{detail.label}</dt>
+                      <dd className="text-foreground font-semibold break-words">{detail.value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -269,17 +269,17 @@ export default async function VehicleDetailPage({
           {/* Right Column - Contact & CTA */}
           <div className="lg:col-span-1">
             {/* CTA Card */}
-            <div className="sticky top-24 bg-white rounded-lg shadow-lg p-8 space-y-6">
+            <div className="sticky top-24 card p-6 sm:p-8 space-y-6">
               {/* Price Summary */}
               <div className="border-b pb-6">
-                <p className="text-gray-600 text-sm mb-2">{t("price.summary")}</p>
-                <p className="text-3xl font-bold text-kfz-blue">{priceLabel}</p>
+                <p className="text-muted-foreground text-sm mb-2">{t("price.summary")}</p>
+                <p className="text-3xl font-bold text-primary">{priceLabel}</p>
               </div>
 
               {/* Quick Contact */}
               <div className="space-y-3">
-                <h3 className="font-bold text-gray-900">{t("cta.title")}</h3>
-                <p className="text-sm text-gray-600">{t("cta.text")}</p>
+                <h3 className="font-bold text-foreground">{t("cta.title")}</h3>
+                <p className="text-sm text-muted-foreground">{t("cta.text")}</p>
 
                 <VehicleInquiry vehicleId={vehicle.id} vehicleLabel={vehicleLabel} />
               </div>
@@ -287,26 +287,26 @@ export default async function VehicleDetailPage({
               {/* Contact Info */}
               <div className="border-t pt-6 space-y-4 text-sm">
                 <div>
-                  <p className="text-gray-600 mb-1">{tContact("phone")}</p>
+                  <p className="text-muted-foreground mb-1">{tContact("phone")}</p>
                   <a
                     href={`tel:${COMPANY.phone.replace(/\s/g, "")}`}
-                    className="text-kfz-blue hover:text-kfz-blue-dark font-semibold"
+                    className="text-primary hover:text-primary-hover font-semibold"
                   >
                     {COMPANY.phone}
                   </a>
                 </div>
                 <div>
-                  <p className="text-gray-600 mb-1">{tContact("email")}</p>
+                  <p className="text-muted-foreground mb-1">{tContact("email")}</p>
                   <a
                     href={`mailto:${COMPANY.email}`}
-                    className="text-kfz-blue hover:text-kfz-blue-dark font-semibold break-all"
+                    className="text-primary hover:text-primary-hover font-semibold break-all"
                   >
                     {COMPANY.email}
                   </a>
                 </div>
                 <div>
-                  <p className="text-gray-600 mb-1">{tContact("hours")}</p>
-                  <BusinessHours className="text-gray-900" />
+                  <p className="text-muted-foreground mb-1">{tContact("hours")}</p>
+                  <BusinessHours className="text-foreground" />
                 </div>
               </div>
 
@@ -324,9 +324,9 @@ export default async function VehicleDetailPage({
 
       {/* Related Vehicles */}
       {relatedVehicles.length > 0 && (
-        <div className="bg-white py-16 px-4 sm:px-6 lg:px-8 border-t">
+        <div className="bg-card py-16 px-4 sm:px-6 lg:px-8 border-t">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">{t("related")}</h2>
+            <h2 className="section-title mb-8">{t("related")}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedVehicles.map((relatedVehicle) => (
                 <Link
@@ -334,8 +334,8 @@ export default async function VehicleDetailPage({
                   href={`/fahrzeuge/${relatedVehicle.slug}`}
                   className="group"
                 >
-                  <div className="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition">
-                    <div className="relative h-40 bg-gray-200">
+                  <div className="bg-muted rounded-lg overflow-hidden hover:shadow-lg transition">
+                    <div className="relative h-40 bg-border">
                       {relatedVehicle.image ? (
                         <Image
                           src={relatedVehicle.image}
@@ -345,19 +345,19 @@ export default async function VehicleDetailPage({
                           className="object-cover group-hover:scale-105 transition"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                        <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/70">
                           <Car className="w-10 h-10" aria-hidden="true" />
                         </div>
                       )}
                     </div>
                     <div className="p-4">
-                      <h4 className="font-bold text-gray-900 group-hover:text-kfz-blue">
+                      <h4 className="font-bold text-foreground group-hover:text-primary">
                         {relatedVehicle.brand} {relatedVehicle.model}
                       </h4>
-                      <p className="text-kfz-blue font-bold mt-2">
+                      <p className="text-primary font-bold mt-2">
                         {formatPrice(format, relatedVehicle.price)}
                       </p>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {relatedVehicle.year} • {formatMileage(format, relatedVehicle.mileage)}
                       </p>
                     </div>

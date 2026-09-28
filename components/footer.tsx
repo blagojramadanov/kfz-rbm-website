@@ -13,16 +13,16 @@ export function Footer() {
   const tCompany = useTranslations("company");
 
   return (
-    <footer className="bg-kfz-blue-dark text-white">
+    <footer className="bg-inverse text-inverse-foreground">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* About */}
           <div>
             <h3 className="text-lg font-bold mb-4">{COMPANY.name}</h3>
-            <p className="text-blue-100 text-sm">
+            <p className="text-primary-foreground/80 text-sm">
               {t("footer.description")}
             </p>
-            <p className="text-blue-200 text-xs mt-3 italic">
+            <p className="text-primary-foreground/70 text-xs mt-3 italic">
               {t("footer.demoDisclaimer")}
             </p>
           </div>
@@ -30,24 +30,24 @@ export function Footer() {
           {/* Quick Links */}
           <div>
             <h4 className="text-lg font-semibold mb-4">{t("footer.quickLinks")}</h4>
-            <ul className="space-y-2 text-blue-100">
+            <ul className="space-y-2 text-primary-foreground/80">
               <li>
-                <Link href={`/fahrzeuge`} className="hover:text-white transition-colors">
+                <Link href={`/fahrzeuge`} className="hover:text-primary-foreground transition-colors">
                   {t("navigation.vehicles")}
                 </Link>
               </li>
               <li>
-                <Link href={`/about`} className="hover:text-white transition-colors">
+                <Link href={`/about`} className="hover:text-primary-foreground transition-colors">
                   {t("navigation.about")}
                 </Link>
               </li>
               <li>
-                <Link href={`/services`} className="hover:text-white transition-colors">
+                <Link href={`/services`} className="hover:text-primary-foreground transition-colors">
                   {t("navigation.services")}
                 </Link>
               </li>
               <li>
-                <Link href={`/contact`} className="hover:text-white transition-colors">
+                <Link href={`/contact`} className="hover:text-primary-foreground transition-colors">
                   {t("navigation.contact")}
                 </Link>
               </li>
@@ -57,7 +57,7 @@ export function Footer() {
           {/* Contact */}
           <div>
             <h4 className="text-lg font-semibold mb-4">{t("footer.contactInfo")}</h4>
-            <ul className="space-y-2 text-blue-100 text-sm">
+            <ul className="space-y-2 text-primary-foreground/80 text-sm">
               <li>{t("contact.phone")}: {COMPANY.phone}</li>
               <li>{t("contact.email")}: {COMPANY.email}</li>
               <li>{t("contact.address")}: {getFormattedAddress(tCompany)}</li>
@@ -76,7 +76,7 @@ export function Footer() {
                 href={COMPANY.social.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-100 hover:text-white transition-colors"
+                className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
               >
                 <Facebook className="w-6 h-6" />
               </a>
@@ -84,7 +84,7 @@ export function Footer() {
                 href={COMPANY.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-100 hover:text-white transition-colors"
+                className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
               >
                 <Instagram className="w-6 h-6" />
               </a>
@@ -92,7 +92,7 @@ export function Footer() {
                 href={COMPANY.social.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-100 hover:text-white transition-colors"
+                className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
               >
                 <Linkedin className="w-6 h-6" />
               </a>
@@ -100,7 +100,7 @@ export function Footer() {
                 href={COMPANY.social.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-100 hover:text-white transition-colors"
+                className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
               >
                 <Twitter className="w-6 h-6" />
               </a>
@@ -109,21 +109,21 @@ export function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-blue-700 pt-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-blue-100">
-            <Link href={`/privacy`} className="hover:text-white transition-colors">
+        <div className="border-t border-white/15 pt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-primary-foreground/80">
+            <Link href={`/privacy`} className="hover:text-primary-foreground transition-colors">
               {t("footer.privacyPolicy")}
             </Link>
-            <Link href={`/terms`} className="hover:text-white transition-colors">
+            <Link href={`/terms`} className="hover:text-primary-foreground transition-colors">
               {t("footer.termsConditions")}
             </Link>
-            <Link href={`/impressum`} className="hover:text-white transition-colors">
+            <Link href={`/impressum`} className="hover:text-primary-foreground transition-colors">
               {t("footer.impressum")}
             </Link>
           </div>
 
           {/* Copyright */}
-          <div className="text-center text-blue-100 text-sm">
+          <div className="text-center text-primary-foreground/80 text-sm">
             <p>
               © {currentYear} {COMPANY.name}. {t("footer.allRightsReserved")} | {t("footer.premiumCars")}
             </p>

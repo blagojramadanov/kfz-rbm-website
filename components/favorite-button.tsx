@@ -31,8 +31,8 @@ export function FavoriteButton({ vehicleId, variant = "icon", size = "sm", class
       aria-hidden="true"
       className={cn(
         variant === "icon" && size === "md" ? "w-6 h-6" : "w-5 h-5",
-        "text-red-500 transition-colors",
-        saved && "fill-red-500",
+        "text-destructive transition-colors",
+        saved && "fill-destructive",
       )}
     />
   );
@@ -45,10 +45,10 @@ export function FavoriteButton({ vehicleId, variant = "icon", size = "sm", class
         aria-pressed={saved}
         disabled={pending}
         className={cn(
-          "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md border h-10 px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60",
+          "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg border h-10 px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-60",
           saved
-            ? "border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
-            : "border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900",
+            ? "border-destructive-border bg-destructive-subtle/50 text-destructive hover:bg-destructive-subtle"
+            : "border-input bg-card text-foreground hover:bg-secondary",
           className,
         )}
       >
@@ -67,7 +67,7 @@ export function FavoriteButton({ vehicleId, variant = "icon", size = "sm", class
       title={saved ? t("remove") : t("add")}
       disabled={pending}
       className={cn(
-        "bg-white rounded-full p-2 shadow hover:bg-gray-100 transition-colors disabled:opacity-60",
+        "bg-card rounded-full p-2 shadow hover:bg-secondary transition-colors disabled:opacity-60",
         className,
       )}
     >

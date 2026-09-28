@@ -21,7 +21,7 @@ function toDateInputValue(date: Date): string {
 }
 
 const inputClass =
-  "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-accent focus:border-transparent outline-none";
+  "field";
 
 /**
  * "Send inquiry" / "Book a test drive" buttons of the vehicle detail page and the
@@ -130,15 +130,15 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
       <Button
         type="button"
         onClick={() => open("general")}
-        className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white py-3 text-lg font-semibold"
+        className="w-full py-3 text-lg"
       >
         {tCta("inquiry")}
       </Button>
       <Button
         type="button"
-        variant="outline"
+        variant="outline-primary"
         onClick={() => open("test_drive")}
-        className="w-full border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white py-3 text-lg font-semibold"
+        className="w-full py-3 text-lg font-semibold"
       >
         {tCta("testDrive")}
       </Button>
@@ -151,33 +151,33 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl"
+            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-lg bg-card p-6 shadow-xl"
           >
             <div className="flex items-start justify-between gap-4 mb-1">
-              <h2 id={titleId} className="text-xl font-bold text-gray-900">
+              <h2 id={titleId} className="text-xl font-bold text-foreground">
                 {type === "test_drive" ? t("titleTestDrive") : t("titleGeneral")}
               </h2>
               <button
                 type="button"
                 onClick={close}
                 disabled={sending}
-                className="text-gray-500 hover:text-gray-900"
+                className="text-muted-foreground hover:text-foreground"
                 aria-label={t("close")}
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
-            <p className="text-sm text-gray-600 mb-6">{vehicleLabel}</p>
+            <p className="text-sm text-muted-foreground mb-6">{vehicleLabel}</p>
 
             {sent ? (
               <div className="text-center py-6" role="status">
-                <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" aria-hidden="true" />
-                <p className="text-lg font-semibold text-gray-900 mb-2">{t("successTitle")}</p>
-                <p className="text-gray-600">{t("successText")}</p>
+                <CheckCircle className="w-12 h-12 text-success mx-auto mb-4" aria-hidden="true" />
+                <p className="text-lg font-semibold text-foreground mb-2">{t("successTitle")}</p>
+                <p className="text-muted-foreground">{t("successText")}</p>
                 {isAuthenticated && (
-                  <p className="text-gray-600 mt-2">
+                  <p className="text-muted-foreground mt-2">
                     {t("successDashboard")}{" "}
-                    <Link href="/dashboard/anfragen" className="text-kfz-blue hover:underline font-medium">
+                    <Link href="/dashboard/anfragen" className="text-primary hover:underline font-medium">
                       {t("toMyInquiries")}
                     </Link>
                   </p>
@@ -191,7 +191,7 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
                 <HoneypotField label={t("honeypot")} value={form.website} onChange={set("website")} />
 
                 <div>
-                  <label htmlFor={`${titleId}-type`} className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label htmlFor={`${titleId}-type`} className="block text-sm font-semibold text-foreground mb-1">
                     {t("type")}
                   </label>
                   <select
@@ -208,7 +208,7 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
 
                 {type === "test_drive" && (
                   <div>
-                    <label htmlFor={`${titleId}-date`} className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label htmlFor={`${titleId}-date`} className="block text-sm font-semibold text-foreground mb-1">
                       {t("preferredDate")}
                     </label>
                     <input
@@ -221,12 +221,12 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
                       onChange={(e) => set("preferredDate")(e.target.value)}
                       className={inputClass}
                     />
-                    <p className="text-xs text-gray-500 mt-1">{t("preferredDateHint")}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t("preferredDateHint")}</p>
                   </div>
                 )}
 
                 <div>
-                  <label htmlFor={`${titleId}-name`} className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label htmlFor={`${titleId}-name`} className="block text-sm font-semibold text-foreground mb-1">
                     {tForms("fullName")}
                   </label>
                   <input
@@ -243,7 +243,7 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
                 </div>
 
                 <div>
-                  <label htmlFor={`${titleId}-email`} className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label htmlFor={`${titleId}-email`} className="block text-sm font-semibold text-foreground mb-1">
                     {tForms("email")}
                   </label>
                   <input
@@ -259,7 +259,7 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
                 </div>
 
                 <div>
-                  <label htmlFor={`${titleId}-phone`} className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label htmlFor={`${titleId}-phone`} className="block text-sm font-semibold text-foreground mb-1">
                     {t("phoneOptional")}
                   </label>
                   <input
@@ -274,7 +274,7 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
                 </div>
 
                 <div>
-                  <label htmlFor={`${titleId}-message`} className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label htmlFor={`${titleId}-message`} className="block text-sm font-semibold text-foreground mb-1">
                     {type === "test_drive" ? t("messageOptional") : tForms("message")}
                   </label>
                   <textarea
@@ -290,18 +290,18 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
                 </div>
 
                 {error && (
-                  <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3" role="alert">
+                  <p className="text-sm text-destructive bg-destructive-subtle/50 border border-destructive-border rounded-lg p-3" role="alert">
                     {error}
                   </p>
                 )}
 
-                <p className="text-xs text-gray-500">{t("privacy")}</p>
+                <p className="text-xs text-muted-foreground">{t("privacy")}</p>
 
                 <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-2">
                   <Button type="button" variant="outline" onClick={close} disabled={sending}>
                     {t("cancel")}
                   </Button>
-                  <Button type="submit" disabled={sending} className="bg-kfz-blue hover:bg-kfz-blue-dark text-white">
+                  <Button type="submit" disabled={sending} >
                     {sending ? t("sending") : t("submit")}
                   </Button>
                 </div>

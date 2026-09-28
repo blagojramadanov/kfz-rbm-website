@@ -97,7 +97,7 @@ function DebouncedNumberInput({
       onKeyDown={(e) => {
         if (e.key === "Enter") commit(draft);
       }}
-      className="w-1/2 px-3 py-2 border border-gray-300 rounded text-sm"
+      className="field w-1/2 text-sm"
     />
   );
 }
@@ -140,9 +140,9 @@ export function VehicleFilters({ filters, onChange, onReset, filterOptions }: Ve
       onClick={() => toggleSection(id)}
       aria-expanded={expandedSections.has(id)}
       aria-controls={`${idPrefix}-${id}`}
-      className="w-full flex items-center justify-between py-2 hover:text-kfz-blue transition"
+      className="w-full flex items-center justify-between py-2 hover:text-primary transition"
     >
-      <span className="font-semibold text-gray-900">{title}</span>
+      <span className="font-semibold text-foreground">{title}</span>
       <ChevronDown
         aria-hidden="true"
         className={`w-5 h-5 transition ${expandedSections.has(id) ? "rotate-180" : ""}`}
@@ -173,7 +173,7 @@ export function VehicleFilters({ filters, onChange, onReset, filterOptions }: Ve
                   }
                   className="rounded"
                 />
-                <span className="text-gray-700">{option.label}</span>
+                <span className="text-foreground">{option.label}</span>
               </label>
             ))}
           </div>
@@ -207,18 +207,18 @@ export function VehicleFilters({ filters, onChange, onReset, filterOptions }: Ve
   );
 
   const selectClass =
-    "w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white disabled:bg-gray-50 disabled:text-gray-400";
+    "field text-sm disabled:bg-muted";
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6" role="region" aria-label={t("filter")}>
+    <div className="card p-6" role="region" aria-label={t("filter")}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-900">{t("filters.title")}</h3>
+        <h3 className="card-title">{t("filters.title")}</h3>
         {activeFilterCount > 0 && (
           <button
             type="button"
             onClick={onReset}
-            className="text-sm text-kfz-accent hover:text-kfz-blue flex items-center gap-1"
+            className="text-sm text-kfz-accent hover:text-primary flex items-center gap-1"
           >
             <X className="w-4 h-4" aria-hidden="true" />
             {t("filters.clearAll", { count: activeFilterCount })}

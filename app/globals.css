@@ -2,13 +2,148 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-white text-slate-900;
+/*
+ * Design tokens: the single source of truth for colors.
+ * Values are HSL channels, used through the Tailwind colors in tailwind.config.ts
+ * (e.g. bg-primary, text-muted-foreground, bg-success-subtle).
+ */
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* #ffffff */
+    --foreground: 221 39.3% 11%; /* #111827 */
+    --card: 0 0% 100%;
+    --card-foreground: 221 39.3% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 39.3% 11%;
+
+    /* Brand: RBM navy + accent blue */
+    --primary: 216 60.9% 26.1%; /* #1a3a6b */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 213 65.1% 16.9%; /* #0f2847 */
+    --brand-light: 216 58.4% 39.6%; /* #2a5aa0, gradients only */
+    --brand-accent: 204 63.8% 39%; /* #2471a3, 5.3:1 with white */
+    --brand-accent-hover: 204 67.7% 32.7%; /* #1b5e8c */
+
+    /* Neutrals */
+    --secondary: 220 14.3% 95.9%; /* #f3f4f6 */
+    --secondary-foreground: 221 39.3% 11%;
+    --muted: 210 20% 98%; /* #f9fafb, page background */
+    --muted-foreground: 215 13.8% 34.1%; /* #4b5563, meta text */
+    --accent: 220 14.3% 95.9%; /* hover surface */
+    --accent-foreground: 221 39.3% 11%;
+    --border: 220 13% 91%; /* #e5e7eb */
+    --input: 216 12.2% 83.9%; /* #d1d5db */
+    --ring: 216 60.9% 26.1%;
+
+    /* Dark brand surfaces (footer, admin sidebar) */
+    --inverse: 213 65.1% 16.9%; /* #0f2847 */
+    --inverse-foreground: 0 0% 100%;
+
+    /* Semantic tones: solid (buttons, icons, text on white), subtle (badge and
+       alert backgrounds), subtle-foreground (text on subtle), border */
+    --destructive: 0 72.2% 50.6%; /* #dc2626 */
+    --destructive-foreground: 0 0% 100%;
+    --destructive-hover: 0 73.7% 41.8%;
+    --destructive-subtle: 0 93.3% 94.1%;
+    --destructive-subtle-foreground: 0 70% 35.3%;
+    --destructive-border: 0 96.3% 89.4%;
+
+    --success: 142 71.8% 29.2%; /* #15803d */
+    --success-foreground: 0 0% 100%;
+    --success-hover: 143 64.2% 24.1%;
+    --success-subtle: 141 84.2% 92.5%;
+    --success-subtle-foreground: 143 64.2% 24.1%;
+    --success-border: 141 78.9% 85.1%;
+
+    --warning: 26 90.5% 37.1%; /* #b45309 */
+    --warning-foreground: 0 0% 100%;
+    --warning-hover: 23 82.5% 31.4%;
+    --warning-subtle: 48 96.5% 88.8%;
+    --warning-subtle-foreground: 23 82.5% 31.4%;
+    --warning-border: 48 96.6% 76.7%;
+
+    --info: 224 76.3% 48%; /* #1d4ed8 */
+    --info-foreground: 0 0% 100%;
+    --info-hover: 226 70.7% 40.2%;
+    --info-subtle: 214 94.6% 92.7%;
+    --info-subtle-foreground: 226 70.7% 40.2%;
+    --info-border: 213 96.9% 87.3%;
+
+    --highlight: 272 71.7% 47.1%; /* #7e22ce */
+    --highlight-foreground: 0 0% 100%;
+    --highlight-hover: 273 67.2% 39.4%;
+    --highlight-subtle: 269 100% 95.5%;
+    --highlight-subtle-foreground: 273 67.2% 39.4%;
+    --highlight-border: 269 100% 91.8%;
+
+    /* Featured-vehicle star */
+    --featured: 45 93.4% 47.5%; /* #eab308 */
+
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
 }
 
-/* Smooth transitions */
-html {
-  scroll-behavior: smooth;
+/*
+ * Type scale and layout rhythm. Use these instead of ad-hoc sizes.
+ *   display          hero headings on public landing/listing pages
+ *   display-section  section headings on the public landing page
+ *   page-title       h1 of every other page (public, dashboard, admin)
+ *   section-title    h2 inside a page
+ *   card-title       h3 of a card
+ *   body             text-base (default), meta: text-sm text-muted-foreground
+ * Spacing: page-container (page padding + width), section gap space-y-6,
+ * card padding p-6.
+ */
+@layer components {
+  .display {
+    @apply text-4xl sm:text-5xl font-bold tracking-tight;
+  }
+  .display-section {
+    @apply text-3xl sm:text-4xl font-bold tracking-tight;
+  }
+  .page-title {
+    @apply text-2xl sm:text-3xl font-bold tracking-tight;
+  }
+  .section-title {
+    @apply text-xl sm:text-2xl font-bold;
+  }
+  .card-title {
+    @apply text-lg font-semibold;
+  }
+  .meta {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12;
+  }
+  .page-container-narrow {
+    @apply max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12;
+  }
+
+  .card {
+    @apply bg-card text-card-foreground rounded-lg shadow-md;
+  }
+
+  .field {
+    @apply w-full px-3 py-2 rounded-lg border border-input bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  /* Inputs on the navy auth/hero background */
+  .field-inverse {
+    @apply w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary-foreground/70 focus:border-transparent;
+  }
 }
 
 /* Custom scrollbar */
@@ -17,14 +152,14 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: hsl(var(--secondary));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1a3a6b;
+  background: hsl(var(--primary));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0f2847;
+  background: hsl(var(--primary-hover));
 }

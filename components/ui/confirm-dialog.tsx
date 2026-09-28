@@ -59,13 +59,13 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
-        className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+        className="relative w-full max-w-md rounded-lg bg-card p-6 shadow-xl"
       >
-        <h2 id={titleId} className="text-lg font-bold text-gray-900">
+        <h2 id={titleId} className="text-lg font-bold text-foreground">
           {title}
         </h2>
         {description && (
-          <div id={descriptionId} className="mt-2 text-sm text-gray-600">
+          <div id={descriptionId} className="mt-2 text-sm text-muted-foreground">
             {description}
           </div>
         )}
@@ -76,7 +76,7 @@ export function ConfirmDialog({
           <Button
             onClick={onConfirm}
             disabled={busy}
-            className={tone === "destructive" ? "bg-red-600 hover:bg-red-700 text-white" : "bg-green-600 hover:bg-green-700 text-white"}
+            className={tone === "destructive" ? "bg-destructive hover:bg-destructive-hover text-primary-foreground" : "bg-success hover:bg-success-hover text-primary-foreground"}
           >
             {confirmLabel}
           </Button>

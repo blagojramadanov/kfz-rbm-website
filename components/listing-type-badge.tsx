@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Badge } from "@/components/ui/badge";
 
 /** Sale/export badge. Works in server and client components. */
 export function ListingTypeBadge({ type = "verkauf" }: { type?: "verkauf" | "export" }) {
@@ -6,17 +7,17 @@ export function ListingTypeBadge({ type = "verkauf" }: { type?: "verkauf" | "exp
 
   if (type === "export") {
     return (
-      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+      <Badge variant="info" className="text-sm">
         <span aria-hidden="true">🌍</span>
         {t("export")}
-      </span>
+      </Badge>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+    <Badge variant="success" className="text-sm">
       <span aria-hidden="true">🏪</span>
       {t("verkauf")}
-    </span>
+    </Badge>
   );
 }

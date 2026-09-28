@@ -20,35 +20,35 @@ const SERVICES: Service[] = [
     href: "/fahrzeuge",
     icon: <Car className="w-8 h-8" />,
     image: "https://picsum.photos/seed/kfzrbm-10/500/400",
-    color: "from-blue-50 to-blue-100",
+    color: "from-info-subtle/50 to-info-subtle",
   },
   {
     id: "sell",
     href: "/dashboard/fahrzeug-anbieten",
     icon: <TrendingUp className="w-8 h-8" />,
     image: "https://picsum.photos/seed/kfzrbm-11/500/400",
-    color: "from-green-50 to-green-100",
+    color: "from-success-subtle/50 to-success-subtle",
   },
   {
     id: "consignment",
     href: "/dashboard/fahrzeug-anbieten",
     icon: <Handshake className="w-8 h-8" />,
     image: "https://picsum.photos/seed/kfzrbm-12/500/400",
-    color: "from-orange-50 to-orange-100",
+    color: "from-warning-subtle/50 to-warning-subtle",
   },
   {
     id: "trade-in",
     href: "/dashboard/inzahlungnahme",
     icon: <Truck className="w-8 h-8" />,
     image: "https://picsum.photos/seed/kfzrbm-13/500/400",
-    color: "from-purple-50 to-purple-100",
+    color: "from-highlight-subtle/50 to-highlight-subtle",
   },
   {
     id: "export",
     href: "/fahrzeuge/export",
     icon: <Globe className="w-8 h-8" />,
     image: "https://picsum.photos/seed/kfzrbm-14/500/400",
-    color: "from-yellow-50 to-yellow-100",
+    color: "from-muted to-secondary",
   },
 ];
 
@@ -59,11 +59,11 @@ export function ServicesGrid() {
       {SERVICES.map((service) => (
         <div
           key={service.id}
-          className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all overflow-hidden"
+          className="group card hover:shadow-xl transition-all overflow-hidden"
         >
           <div className="grid grid-cols-1 sm:grid-cols-5 h-full">
             {/* Image - Hidden on mobile, shown on larger screens */}
-            <div className="hidden sm:block sm:col-span-2 relative overflow-hidden bg-gray-200">
+            <div className="hidden sm:block sm:col-span-2 relative overflow-hidden bg-border">
               <Image
                 src={service.image}
                 alt={t(`services.${service.id}.title`)}
@@ -77,19 +77,19 @@ export function ServicesGrid() {
             <div className={`sm:col-span-3 bg-gradient-to-br ${service.color} p-8 flex flex-col justify-between`}>
               {/* Icon & Title */}
               <div>
-                <div className="inline-block p-3 bg-kfz-blue text-white rounded-lg mb-4 group-hover:scale-110 transition-transform">
+                <div className="inline-block p-3 bg-primary text-primary-foreground rounded-lg mb-4 group-hover:scale-110 transition-transform">
                   {service.icon}
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                <h3 className="section-title mb-3">
                   {t(`services.${service.id}.title`)}
                 </h3>
-                <p className="text-gray-700 mb-6">
+                <p className="text-foreground mb-6">
                   {t(`services.${service.id}.description`)}
                 </p>
               </div>
 
               {/* CTA */}
-              <Button asChild className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold">
+              <Button asChild className="w-full">
                 <Link href={service.href}>
                   {t(`services.${service.id}.cta`)}
                   <ArrowRight className="ml-2 w-4 h-4" />

@@ -71,23 +71,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-primary-foreground flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         {/* Card */}
         <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl p-8 border border-white/20">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">{t("auth.welcomeBack")}</h1>
-            <p className="text-blue-100">
+            <h1 className="page-title mb-2">{t("auth.welcomeBack")}</h1>
+            <p className="text-primary-foreground/80">
               {t("auth.signInMessage")}
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-500/20 border border-red-400/50 rounded-lg p-4 mb-6 flex gap-3">
-              <AlertCircle className="w-5 h-5 text-red-300 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-200">{error}</p>
+            <div className="bg-destructive/20 border border-destructive-border/50 rounded-lg p-4 mb-6 flex gap-3">
+              <AlertCircle className="w-5 h-5 text-destructive-border flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-destructive-subtle">{error}</p>
             </div>
           )}
 
@@ -99,14 +99,14 @@ export default function LoginPage() {
                 {t("forms.email")}
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
+                <Mail className="absolute left-3 top-3 w-5 h-5 text-primary-foreground/70" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="user@example.com"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
+                  className="field-inverse"
                 />
               </div>
             </div>
@@ -117,14 +117,14 @@ export default function LoginPage() {
                 {t("auth.password")}
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-blue-200" />
+                <Lock className="absolute left-3 top-3 w-5 h-5 text-primary-foreground/70" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-kfz-accent focus:border-transparent"
+                  className="field-inverse"
                 />
               </div>
             </div>
@@ -133,17 +133,17 @@ export default function LoginPage() {
             <div className="text-right">
               <Link
                 href={`/forgot-password`}
-                className="text-sm text-blue-100 hover:text-white transition-colors"
+                className="text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors"
               >
                 {t("auth.forgotPassword")}
               </Link>
             </div>
 
             {/* Submit Button */}
-            <Button
+            <Button variant="accent"
               type="submit"
               disabled={loading}
-              className="w-full bg-kfz-accent hover:bg-kfz-accent-light text-white font-semibold py-2 rounded-lg transition-all disabled:opacity-50"
+              className="w-full"
             >
               {loading ? t("common.loading") : t("auth.signIn")}
               <ArrowRight className="ml-2 w-4 h-4" />
@@ -153,14 +153,14 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="flex-1 h-px bg-white/20"></div>
-            <span className="text-sm text-blue-100">{t("common.orElse")}</span>
+            <span className="text-sm text-primary-foreground/80">{t("common.orElse")}</span>
             <div className="flex-1 h-px bg-white/20"></div>
           </div>
 
           {/* Sign Up Link */}
-          <p className="text-center text-blue-100">
+          <p className="text-center text-primary-foreground/80">
             {t("auth.dontHaveAccount")}{" "}
-            <Link href={`/register`} className="text-white font-semibold hover:underline">
+            <Link href={`/register`} className="text-primary-foreground font-semibold hover:underline">
               {t("auth.signUp")}
             </Link>
           </p>

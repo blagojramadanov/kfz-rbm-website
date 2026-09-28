@@ -203,8 +203,8 @@ export default function SubmittedVehicleDetailPage() {
     return (
       <div className="flex justify-center items-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -214,15 +214,15 @@ export default function SubmittedVehicleDetailPage() {
     return (
       <div className="space-y-6">
         <Link href="/admin/fahrzeuge/eingereicht">
-          <button className="flex items-center gap-2 text-kfz-blue hover:underline">
+          <button className="flex items-center gap-2 text-primary hover:underline">
             <ArrowLeft className="w-4 h-4" />
             {tButtons("back")}
           </button>
         </Link>
         <div className="flex justify-center py-12">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-            <p className="text-gray-600">{t("loading")}</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">{t("loading")}</p>
           </div>
         </div>
       </div>
@@ -233,14 +233,14 @@ export default function SubmittedVehicleDetailPage() {
     return (
       <div className="space-y-6">
         <Link href="/admin/fahrzeuge/eingereicht">
-          <button className="flex items-center gap-2 text-kfz-blue hover:underline">
+          <button className="flex items-center gap-2 text-primary hover:underline">
             <ArrowLeft className="w-4 h-4" />
             {tButtons("back")}
           </button>
         </Link>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-          <p className="text-red-800">{t("notFound")}</p>
+        <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-6 text-center">
+          <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
+          <p className="text-destructive-subtle-foreground">{t("notFound")}</p>
         </div>
       </div>
     );
@@ -254,7 +254,7 @@ export default function SubmittedVehicleDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <Link href="/admin/fahrzeuge/eingereicht">
-        <button className="flex items-center gap-2 text-kfz-blue hover:underline">
+        <button className="flex items-center gap-2 text-primary hover:underline">
           <ArrowLeft className="w-4 h-4" />
           {t("backToList")}
         </button>
@@ -262,9 +262,9 @@ export default function SubmittedVehicleDetailPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 flex gap-3">
+          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-destructive-subtle-foreground">{error}</p>
         </div>
       )}
 
@@ -272,8 +272,8 @@ export default function SubmittedVehicleDetailPage() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Images */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="relative w-full aspect-video bg-gray-200">
+          <div className="card overflow-hidden">
+            <div className="relative w-full aspect-video bg-border">
               {vehicle && vehicle.images && vehicle.images.length > 0 ? (
                 (() => {
                   const currentPath = vehicle.images[currentImageIndex];
@@ -289,15 +289,15 @@ export default function SubmittedVehicleDetailPage() {
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <div className="text-center">
-                        <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">{t("imageLoading")}</p>
+                        <Upload className="w-12 h-12 text-muted-foreground/70 mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">{t("imageLoading")}</p>
                       </div>
                     </div>
                   );
                 })()
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Upload className="w-12 h-12 text-gray-400" />
+                  <Upload className="w-12 h-12 text-muted-foreground/70" />
                 </div>
               )}
             </div>
@@ -305,7 +305,7 @@ export default function SubmittedVehicleDetailPage() {
             {vehicle.images && vehicle.images.length > 1 && (
               <div className="p-4 space-y-3">
                 <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     {t("imageCounter", { current: currentImageIndex + 1, total: vehicle.images.length })}
                   </p>
                   <div className="flex gap-2">
@@ -316,7 +316,7 @@ export default function SubmittedVehicleDetailPage() {
                         )
                       }
                       aria-label={t("previousImage")}
-                      className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
+                      className="px-3 py-1 bg-border rounded hover:bg-input text-sm"
                     >
                       ←
                     </button>
@@ -327,7 +327,7 @@ export default function SubmittedVehicleDetailPage() {
                         )
                       }
                       aria-label={t("nextImage")}
-                      className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
+                      className="px-3 py-1 bg-border rounded hover:bg-input text-sm"
                     >
                       →
                     </button>
@@ -339,51 +339,51 @@ export default function SubmittedVehicleDetailPage() {
 
           {/* Vehicle Info */}
           {vehicle ? (
-            <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+            <div className="card p-6 space-y-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="page-title text-foreground">
                   {vehicle.brand} {vehicle.model}
                 </h1>
-                <p className="text-gray-600 mt-1">
+                <p className="text-muted-foreground mt-1">
                   {vehicle.year} • {tAdmin("units.mileage", { value: format.number(vehicle.mileage) })}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                 <div>
-                  <p className="text-sm text-gray-600">{t("fuel")}</p>
-                  <p className="font-semibold text-gray-900">{getFuelTypeLabel(tCommon, vehicle.fuel_type)}</p>
+                  <p className="text-sm text-muted-foreground">{t("fuel")}</p>
+                  <p className="font-semibold text-foreground">{getFuelTypeLabel(tCommon, vehicle.fuel_type)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">{t("transmission")}</p>
-                  <p className="font-semibold text-gray-900">{getTransmissionLabel(tCommon, vehicle.transmission)}</p>
+                  <p className="text-sm text-muted-foreground">{t("transmission")}</p>
+                  <p className="font-semibold text-foreground">{getTransmissionLabel(tCommon, vehicle.transmission)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">{t("color")}</p>
-                  <p className="font-semibold text-gray-900">{getColorLabel(tCommon, vehicle.color)}</p>
+                  <p className="text-sm text-muted-foreground">{t("color")}</p>
+                  <p className="font-semibold text-foreground">{getColorLabel(tCommon, vehicle.color)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">{t("power")}</p>
-                  <p className="font-semibold text-gray-900">{tAdmin("units.power", { value: format.number(vehicle.power_hp) })}</p>
+                  <p className="text-sm text-muted-foreground">{t("power")}</p>
+                  <p className="font-semibold text-foreground">{tAdmin("units.power", { value: format.number(vehicle.power_hp) })}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">{t("bodyType")}</p>
-                  <p className="font-semibold text-gray-900">{getBodyTypeLabel(tCommon, vehicle.body_type)}</p>
+                  <p className="text-sm text-muted-foreground">{t("bodyType")}</p>
+                  <p className="font-semibold text-foreground">{getBodyTypeLabel(tCommon, vehicle.body_type)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">{t("status")}</p>
-                  <p className="font-semibold text-gray-900">{getSubmissionStatusLabel(tCommon, vehicle.status)}</p>
+                  <p className="text-sm text-muted-foreground">{t("status")}</p>
+                  <p className="font-semibold text-foreground">{getSubmissionStatusLabel(tCommon, vehicle.status)}</p>
                 </div>
               </div>
 
             {submissionDetails.length > 0 && (
               <div className="pt-4 border-t">
-                <p className="text-sm text-gray-600 mb-3">{t("vehicleDetails")}</p>
+                <p className="text-sm text-muted-foreground mb-3">{t("vehicleDetails")}</p>
                 <div className="grid grid-cols-2 gap-4">
                   {submissionDetails.map((detail) => (
                     <div key={detail.key}>
-                      <p className="text-sm text-gray-600">{detail.label}</p>
-                      <p className="font-semibold text-gray-900 break-words">{detail.value}</p>
+                      <p className="text-sm text-muted-foreground">{detail.label}</p>
+                      <p className="font-semibold text-foreground break-words">{detail.value}</p>
                     </div>
                   ))}
                 </div>
@@ -392,8 +392,8 @@ export default function SubmittedVehicleDetailPage() {
 
             {vehicle.sales_type && (
               <div className="pt-4 border-t">
-                <p className="text-sm text-gray-600 mb-1">{t("salesType")}</p>
-                <p className="font-semibold text-gray-900">
+                <p className="text-sm text-muted-foreground mb-1">{t("salesType")}</p>
+                <p className="font-semibold text-foreground">
                   {SALES_TYPE_ICONS[vehicle.sales_type] ? `${SALES_TYPE_ICONS[vehicle.sales_type]} ` : ""}
                   {getSalesTypeLabel(tCommon, vehicle.sales_type)}
                 </p>
@@ -402,19 +402,19 @@ export default function SubmittedVehicleDetailPage() {
 
             {vehicle.description && (
               <div className="pt-4 border-t">
-                <p className="text-sm text-gray-600 mb-2">{t("description")}</p>
-                <p className="text-gray-900">{vehicle.description}</p>
+                <p className="text-sm text-muted-foreground mb-2">{t("description")}</p>
+                <p className="text-foreground">{vehicle.description}</p>
               </div>
             )}
 
             {vehicle.features && vehicle.features.length > 0 && (
               <div className="pt-4 border-t">
-                <p className="text-sm text-gray-600 mb-3">{t("features")}</p>
+                <p className="text-sm text-muted-foreground mb-3">{t("features")}</p>
                 <div className="grid grid-cols-2 gap-2">
                   {vehicle.features.map((feature, idx) => (
                     <div key={idx} className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{feature}</span>
+                      <CheckCircle className="w-4 h-4 text-success flex-shrink-0" />
+                      <span className="text-sm text-foreground">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -422,8 +422,8 @@ export default function SubmittedVehicleDetailPage() {
             )}
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-gray-600">{t("loading")}</p>
+            <div className="card p-6">
+              <p className="text-muted-foreground">{t("loading")}</p>
             </div>
           )}
         </div>
@@ -432,13 +432,13 @@ export default function SubmittedVehicleDetailPage() {
         <div className="space-y-4">
           {/* Price Card */}
           {vehicle && (
-            <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+            <div className="card p-6 space-y-4">
               <div>
-                <p className="text-sm text-gray-600 mb-1">{t("requestedPrice")}</p>
-                <p className="text-2xl font-bold text-kfz-blue">
+                <p className="text-sm text-muted-foreground mb-1">{t("requestedPrice")}</p>
+                <p className="text-2xl font-bold text-primary">
                   {formatPrice(format, vehicle.price)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   {t("submittedOn", {
                     date: format.dateTime(new Date(vehicle.created_at), { day: "2-digit", month: "2-digit", year: "numeric" }),
                   })}
@@ -449,66 +449,66 @@ export default function SubmittedVehicleDetailPage() {
 
           {/* Customer */}
           {vehicle.user && (
-            <div className="bg-white rounded-lg shadow-md p-6 text-sm text-gray-600">
-              <h3 className="font-bold text-gray-900 mb-2">{t("customer")}</h3>
+            <div className="card p-6 text-sm text-muted-foreground">
+              <h3 className="font-bold text-foreground mb-2">{t("customer")}</h3>
               <SubmissionCustomer user={vehicle.user} />
             </div>
           )}
 
           {/* Offer: current / declined / accepted offer, rejection reason, admin actions */}
-          <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-            <h3 className="font-bold text-gray-900">{t("offerTitle")}</h3>
+          <div className="card p-6 space-y-4">
+            <h3 className="font-bold text-foreground">{t("offerTitle")}</h3>
             <DeclinedOfferBadge vehicle={vehicle} />
             {(vehicle.status === "angebot_gesendet" || vehicle.status === "akzeptiert") && (
               <div className="text-sm">
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   {vehicle.status === "akzeptiert" ? tSubmissions("acceptedOffer") : tSubmissions("currentOffer")}
                 </p>
-                <p className={`text-xl font-bold ${vehicle.status === "akzeptiert" ? "text-emerald-700" : "text-green-700"}`}>
+                <p className={`text-xl font-bold ${vehicle.status === "akzeptiert" ? "text-success" : "text-success"}`}>
                   {vehicle.offered_price != null ? formatPrice(format, vehicle.offered_price) : tSubmissions("noOfferPrice")}
                 </p>
-                {vehicle.offer_terms && <p className="text-gray-600 mt-1 whitespace-pre-line break-words">{vehicle.offer_terms}</p>}
+                {vehicle.offer_terms && <p className="text-muted-foreground mt-1 whitespace-pre-line break-words">{vehicle.offer_terms}</p>}
               </div>
             )}
             {vehicle.status === "abgelehnt" && (vehicle.rejection_reason || vehicle.status_reason) && (
               <div className="text-sm">
-                <p className="text-gray-600">{tSubmissions("rejectionReason")}:</p>
-                <p className="text-gray-900 mt-1 whitespace-pre-line break-words">{vehicle.rejection_reason || vehicle.status_reason}</p>
+                <p className="text-muted-foreground">{tSubmissions("rejectionReason")}:</p>
+                <p className="text-foreground mt-1 whitespace-pre-line break-words">{vehicle.rejection_reason || vehicle.status_reason}</p>
               </div>
             )}
             <SubmissionActions vehicle={vehicle} onChange={applyPatch} />
           </div>
 
           {/* Publish Form: only for an accepted offer, once (enforced in publishSubmittedVehicle) */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-4">
-            <h3 className="font-bold text-gray-900">{t("publishTitle")}</h3>
+          <div className="bg-info-subtle/50 border border-info-border rounded-lg p-6 space-y-4">
+            <h3 className="font-bold text-foreground">{t("publishTitle")}</h3>
 
             {vehicle.vehicle_id ? (
               <div className="space-y-2 text-sm">
-                <p className="text-gray-700">{tSubmissions("alreadyPublished")}</p>
-                <Link href={`/admin/fahrzeuge/${vehicle.vehicle_id}`} className="text-kfz-blue font-medium hover:underline">
+                <p className="text-foreground">{tSubmissions("alreadyPublished")}</p>
+                <Link href={`/admin/fahrzeuge/${vehicle.vehicle_id}`} className="text-primary font-medium hover:underline">
                   {t("openVehicle")}
                 </Link>
               </div>
             ) : !canPublishSubmission(vehicle) ? (
-              <p className="text-sm text-gray-700">{t("publishOnlyAccepted")}</p>
+              <p className="text-sm text-foreground">{t("publishOnlyAccepted")}</p>
             ) : !showPublishForm ? (
               <button
                 onClick={() => setShowPublishForm(true)}
-                className="w-full px-4 py-2 bg-kfz-blue text-white rounded-lg hover:bg-kfz-blue-dark font-medium transition-colors"
+                className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors"
               >
                 {t("publish")}
               </button>
             ) : (
               <div className="space-y-4">
                 {publishSourceType && (
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-foreground">
                     {t("publishSource", { source: tSource(publishSourceType) })}
                   </p>
                 )}
 
                 <div>
-                  <label htmlFor="publish-price" className="block text-sm font-medium text-gray-900 mb-1">
+                  <label htmlFor="publish-price" className="block text-sm font-medium text-foreground mb-1">
                     {t("salePrice")}
                   </label>
                   <input
@@ -518,16 +518,16 @@ export default function SubmittedVehicleDetailPage() {
                     required
                     value={publishPrice ?? ""}
                     onChange={(e) => setPublishPrice(e.target.value ? parseFloat(e.target.value) : null)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                    className="field"
                   />
                   <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <dt className="text-gray-600">{t("requestedPrice")}</dt>
-                      <dd className="font-semibold text-gray-900">{formatPrice(format, vehicle.price)}</dd>
+                      <dt className="text-muted-foreground">{t("requestedPrice")}</dt>
+                      <dd className="font-semibold text-foreground">{formatPrice(format, vehicle.price)}</dd>
                     </div>
                     <div>
-                      <dt className="text-gray-600">{t("agreedPrice")}</dt>
-                      <dd className="font-semibold text-gray-900">
+                      <dt className="text-muted-foreground">{t("agreedPrice")}</dt>
+                      <dd className="font-semibold text-foreground">
                         {vehicle.offered_price != null ? formatPrice(format, vehicle.offered_price) : "—"}
                       </dd>
                     </div>
@@ -535,7 +535,7 @@ export default function SubmittedVehicleDetailPage() {
                 </div>
 
                 <fieldset className="space-y-2">
-                  <legend className="block text-sm font-medium text-gray-900 mb-1">{t("publishStatusLabel")}</legend>
+                  <legend className="block text-sm font-medium text-foreground mb-1">{t("publishStatusLabel")}</legend>
                   {(["draft", "available"] as const).map((option) => (
                     <label key={option} className="flex items-start gap-2">
                       <input
@@ -546,7 +546,7 @@ export default function SubmittedVehicleDetailPage() {
                         onChange={() => setPublishStatus(option)}
                         className="w-4 h-4 mt-0.5"
                       />
-                      <span className="text-sm text-gray-700">
+                      <span className="text-sm text-foreground">
                         {option === "draft" ? t("publishAsDraft") : t("publishAsAvailable")}
                       </span>
                     </label>
@@ -554,14 +554,14 @@ export default function SubmittedVehicleDetailPage() {
                 </fieldset>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     {t("descriptionOptional")}
                   </label>
                   <textarea
                     value={publishDescription}
                     onChange={(e) => setPublishDescription(e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                    className="field"
                   />
                 </div>
 
@@ -572,14 +572,14 @@ export default function SubmittedVehicleDetailPage() {
                     onChange={(e) => setPublishFeatured(e.target.checked)}
                     className="w-4 h-4 rounded"
                   />
-                  <span className="text-sm text-gray-700">{t("markFeatured")}</span>
+                  <span className="text-sm text-foreground">{t("markFeatured")}</span>
                 </label>
 
                 <div className="space-y-2 pt-2 border-t">
                   <button
                     onClick={handlePublish}
                     disabled={publishing}
-                    className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 font-medium transition-colors"
+                    className="w-full px-4 py-2 bg-success text-primary-foreground rounded-lg hover:bg-success-hover disabled:bg-muted-foreground/50 font-medium transition-colors"
                   >
                     {publishing
                       ? t("publishing")
@@ -587,7 +587,7 @@ export default function SubmittedVehicleDetailPage() {
                   </button>
                   <button
                     onClick={() => setShowPublishForm(false)}
-                    className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                    className="w-full px-4 py-2 border border-input text-foreground rounded-lg hover:bg-muted font-medium transition-colors"
                   >
                     {tButtons("cancel")}
                   </button>

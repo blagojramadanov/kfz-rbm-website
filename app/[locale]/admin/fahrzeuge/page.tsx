@@ -12,16 +12,11 @@ import { VehicleSourceBadge } from "@/components/vehicle-source-badge";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
+import { StatusBadge } from "@/components/status-badge";
 import { getVehicleStatusLabel } from "@/lib/vehicle-labels";
 
 const VEHICLE_STATUSES = ["draft", "available", "reserved", "sold"] as const;
 
-const STATUS_COLORS: Record<string, string> = {
-  draft: "bg-gray-100 text-gray-800",
-  available: "bg-green-100 text-green-800",
-  reserved: "bg-blue-100 text-blue-800",
-  sold: "bg-red-100 text-red-800",
-};
 
 interface Vehicle {
   id: string;
@@ -110,8 +105,8 @@ export default function AdminVehiclesPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -122,11 +117,11 @@ export default function AdminVehiclesPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
-          <p className="text-gray-600 mt-1">{t("subtitle")}</p>
+          <h1 className="page-title text-foreground">{t("title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("subtitle")}</p>
         </div>
         <Link href="/admin/fahrzeuge/neu">
-          <button className="flex items-center gap-2 px-4 py-2 bg-kfz-blue text-white rounded-lg hover:bg-kfz-blue-dark transition-colors font-medium">
+          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors font-medium">
             <Plus className="w-5 h-5" />
             {t("newVehicle")}
           </button>
@@ -135,24 +130,24 @@ export default function AdminVehiclesPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 flex gap-3">
+          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-destructive-subtle-foreground">{error}</p>
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-md p-4 space-y-4">
+      <div className="card p-4 space-y-4">
         <div className="grid md:grid-cols-2 gap-4">
           <div className="relative">
-            <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground/70" />
             <input
               type="text"
               placeholder={t("searchPlaceholder")}
               aria-label={t("searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+              className="field pl-10 pr-4"
             />
           </div>
 
@@ -160,7 +155,7 @@ export default function AdminVehiclesPage() {
             <select
               value={statusFilter || ""}
               onChange={(e) => setStatusFilter(e.target.value || null)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+              className="field"
             >
               <option value="">{t("allStatuses")}</option>
               {VEHICLE_STATUSES.map((status) => (
@@ -174,72 +169,66 @@ export default function AdminVehiclesPage() {
       </div>
 
       {/* Vehicles Table */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="card overflow-hidden">
         {vehiclesLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           </div>
         ) : vehicles.length === 0 ? (
-          <div className="text-center py-12 text-gray-600">
+          <div className="text-center py-12 text-muted-foreground">
             {t("empty")}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.vehicle")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.year")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.mileage")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.price")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.source")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.status")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.favorites")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("columns.actions")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("columns.vehicle")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("columns.year")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("columns.mileage")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("columns.price")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("columns.source")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("columns.status")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("columns.favorites")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("columns.actions")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-border">
                 {vehicles.map((vehicle) => (
                   <tr
                     key={vehicle.id}
-                    className="hover:bg-blue-50 cursor-pointer transition-colors"
+                    className="hover:bg-info-subtle/50 cursor-pointer transition-colors"
                     onClick={() => router.push(`/admin/fahrzeuge/${vehicle.id}`)}
                   >
                     <td className="px-6 py-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium text-foreground">
                             {vehicle.brand} {vehicle.model}
                           </p>
                           {vehicle.featured && (
-                            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" aria-label={t("featured")} />
+                            <Star className="w-4 h-4 text-featured fill-featured" aria-label={t("featured")} />
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">{vehicle.year}</td>
-                    <td className="px-6 py-4 text-gray-600">
+                    <td className="px-6 py-4 text-muted-foreground">{vehicle.year}</td>
+                    <td className="px-6 py-4 text-muted-foreground">
                       {vehicle.mileage != null ? tAdmin("units.mileage", { value: format.number(vehicle.mileage) }) : "–"}
                     </td>
-                    <td className="px-6 py-4 font-semibold text-kfz-blue">
+                    <td className="px-6 py-4 font-semibold text-primary">
                       {vehicle.price != null ? formatPrice(format, vehicle.price) : "–"}
                     </td>
                     <td className="px-6 py-4">
                       <VehicleSourceBadge sourceType={vehicle.source_type || "rbm"} />
                     </td>
                     <td className="px-6 py-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          STATUS_COLORS[vehicle.status] || "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {getVehicleStatusLabel(tCommon, vehicle.status)}
-                      </span>
+                      <StatusBadge kind="vehicle" status={vehicle.status}>{getVehicleStatusLabel(tCommon, vehicle.status)}</StatusBadge>
                     </td>
-                    <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                    <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
                       <span className="inline-flex items-center gap-1">
                         <Heart
-                          className={`w-4 h-4 ${vehicle.favoriteCount > 0 ? "text-red-500 fill-red-500" : "text-gray-300"}`}
+                          className={`w-4 h-4 ${vehicle.favoriteCount > 0 ? "text-destructive fill-destructive" : "text-muted-foreground/50"}`}
                           aria-hidden="true"
                         />
                         {t("favoriteCount", { value: format.number(vehicle.favoriteCount) })}
@@ -251,7 +240,7 @@ export default function AdminVehiclesPage() {
                           <button
                             title={t("actions.view")}
                             aria-label={t("actions.view")}
-                            className="p-2 text-gray-600 hover:text-kfz-blue hover:bg-gray-100 rounded transition-colors"
+                            className="p-2 text-muted-foreground hover:text-primary hover:bg-secondary rounded transition-colors"
                           >
                             <Eye className="w-4 h-4" aria-hidden="true" />
                           </button>
@@ -260,7 +249,7 @@ export default function AdminVehiclesPage() {
                           <button
                             title={t("actions.edit")}
                             aria-label={t("actions.edit")}
-                            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded transition-colors"
+                            className="p-2 text-muted-foreground hover:text-primary hover:bg-secondary rounded transition-colors"
                           >
                             <Edit2 className="w-4 h-4" aria-hidden="true" />
                           </button>
@@ -270,7 +259,7 @@ export default function AdminVehiclesPage() {
                           disabled={deleting === vehicle.id}
                           title={t("actions.delete")}
                           aria-label={t("actions.delete")}
-                          className="p-2 text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded transition-colors disabled:opacity-50"
+                          className="p-2 text-muted-foreground hover:text-destructive hover:bg-secondary rounded transition-colors disabled:opacity-50"
                         >
                           <Trash2 className="w-4 h-4" aria-hidden="true" />
                         </button>

@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { User, Lock, AlertCircle, CheckCircle } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { PageHeader } from "@/components/page-header";
 
 export default function ProfilePage() {
   const params = useParams();
@@ -55,10 +56,10 @@ export default function ProfilePage() {
 
   if (loading || !isAuthenticated || !profile) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -133,33 +134,26 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Link href="/dashboard" className="text-kfz-blue hover:underline mb-2 inline-block">
-            {tNav("dashboard")}
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {t("title")}
-          </h1>
-          <p className="text-gray-600 mt-1">
-            {t("description")}
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-muted">
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        backHref="/dashboard"
+        backLabel={<>← {tNav("dashboard")}</>}
+        width="narrow"
+      />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="page-container-narrow">
         {/* Tabs */}
-        <div className="bg-white rounded-lg shadow-md mb-8">
-          <div className="border-b border-gray-200 px-8">
+        <div className="card mb-8">
+          <div className="border-b border-border px-8">
             <div className="flex gap-8">
               <button
                 onClick={() => setActiveTab("profile")}
                 className={`py-4 px-2 font-medium border-b-2 transition-colors ${
                   activeTab === "profile"
-                    ? "text-kfz-blue border-kfz-blue"
-                    : "text-gray-600 border-transparent hover:text-gray-900"
+                    ? "text-primary border-primary"
+                    : "text-muted-foreground border-transparent hover:text-foreground"
                 }`}
               >
                 <User className="w-4 h-4 inline mr-2" />
@@ -169,8 +163,8 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab("password")}
                 className={`py-4 px-2 font-medium border-b-2 transition-colors ${
                   activeTab === "password"
-                    ? "text-kfz-blue border-kfz-blue"
-                    : "text-gray-600 border-transparent hover:text-gray-900"
+                    ? "text-primary border-primary"
+                    : "text-muted-foreground border-transparent hover:text-foreground"
                 }`}
               >
                 <Lock className="w-4 h-4 inline mr-2" />
@@ -183,15 +177,15 @@ export default function ProfilePage() {
           {message && (
             <div className={`mx-8 mt-6 p-4 rounded-lg flex gap-3 ${
               message.type === "success"
-                ? "bg-green-50 border border-green-200"
-                : "bg-red-50 border border-red-200"
+                ? "bg-success-subtle/50 border border-success-border"
+                : "bg-destructive-subtle/50 border border-destructive-border"
             }`}>
               {message.type === "success" ? (
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
               ) : (
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
               )}
-              <p className={`text-sm ${message.type === "success" ? "text-green-800" : "text-red-800"}`}>
+              <p className={`text-sm ${message.type === "success" ? "text-success-subtle-foreground" : "text-destructive-subtle-foreground"}`}>
                 {message.text}
               </p>
             </div>
@@ -203,20 +197,20 @@ export default function ProfilePage() {
               <form onSubmit={handleProfileSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       {t("form.email")}
                     </label>
                     <input
                       type="email"
                       value={profile.email}
                       disabled
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                      className="field bg-muted text-muted-foreground cursor-not-allowed"
                     />
-                    <p className="text-xs text-gray-500 mt-1">{t("form.emailDisabled")}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t("form.emailDisabled")}</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       {t("form.fullName")}
                     </label>
                     <input
@@ -225,12 +219,12 @@ export default function ProfilePage() {
                       value={profileForm.full_name}
                       onChange={handleProfileChange}
                       placeholder={t("form.placeholder.fullName")}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                      className="field"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       {t("form.phone")}
                     </label>
                     <input
@@ -239,12 +233,12 @@ export default function ProfilePage() {
                       value={profileForm.phone}
                       onChange={handleProfileChange}
                       placeholder={t("form.placeholder.phone")}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                      className="field"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       {t("form.company")}
                     </label>
                     <input
@@ -253,21 +247,21 @@ export default function ProfilePage() {
                       value={profileForm.company_name}
                       onChange={handleProfileChange}
                       placeholder={t("form.placeholder.company")}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                      className="field"
                     />
                   </div>
                 </div>
 
                 <div className="flex gap-4 justify-end pt-4">
                   <Link href="/dashboard">
-                    <Button variant="outline" className="border-gray-300">
+                    <Button variant="outline" >
                       {t("buttons.cancel")}
                     </Button>
                   </Link>
                   <Button
                     type="submit"
                     disabled={saving}
-                    className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold"
+
                   >
                     {saving ? t("buttons.saving") : t("buttons.save")}
                   </Button>
@@ -281,7 +275,7 @@ export default function ProfilePage() {
             <div className="p-8">
               <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-md">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     {t("password.current")}
                   </label>
                   <input
@@ -290,12 +284,12 @@ export default function ProfilePage() {
                     value={passwordForm.current_password}
                     onChange={handlePasswordChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                    className="field"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     {t("password.new")}
                   </label>
                   <input
@@ -305,12 +299,12 @@ export default function ProfilePage() {
                     onChange={handlePasswordChange}
                     required
                     placeholder={t("password.newPlaceholder")}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                    className="field"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     {t("password.confirm")}
                   </label>
                   <input
@@ -319,20 +313,20 @@ export default function ProfilePage() {
                     value={passwordForm.confirm_password}
                     onChange={handlePasswordChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+                    className="field"
                   />
                 </div>
 
                 <div className="flex gap-4 justify-end pt-4">
                   <Link href="/dashboard">
-                    <Button variant="outline" className="border-gray-300">
+                    <Button variant="outline" >
                       {t("buttons.cancel")}
                     </Button>
                   </Link>
                   <Button
                     type="submit"
                     disabled={saving}
-                    className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold"
+
                   >
                     {saving ? t("buttons.changingPassword") : t("buttons.changePassword")}
                   </Button>

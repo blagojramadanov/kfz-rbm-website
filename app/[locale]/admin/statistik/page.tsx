@@ -1,5 +1,6 @@
 "use client";
 import { useTranslations } from "next-intl";
+import { getStatusTone, TONE_TEXT } from "@/lib/status-styles";
 
 export const dynamic = "force-dynamic";
 
@@ -17,32 +18,32 @@ import {
   getVehicleStatusLabel,
 } from "@/lib/vehicle-labels";
 
-// [DB status, stats field, colour] per breakdown card.
+// [DB status, stats field] per breakdown card; colors come from lib/status-styles.
 const VEHICLE_ROWS = [
-  ["draft", "vehicles_draft", "text-gray-900"],
-  ["available", "vehicles_available", "text-green-600"],
-  ["reserved", "vehicles_reserved", "text-blue-600"],
-  ["sold", "vehicles_sold", "text-red-600"],
+  ["draft", "vehicles_draft"],
+  ["available", "vehicles_available"],
+  ["reserved", "vehicles_reserved"],
+  ["sold", "vehicles_sold"],
 ] as const;
 const SUBMISSION_ROWS = [
-  ["eingereicht", "submitted_vehicles_eingereicht", "text-gray-900"],
-  ["in_bearbeitung", "submitted_vehicles_in_bearbeitung", "text-yellow-600"],
-  ["angebot_gesendet", "submitted_vehicles_angebot_gesendet", "text-green-600"],
-  ["akzeptiert", "submitted_vehicles_akzeptiert", "text-emerald-700"],
-  ["abgelehnt", "submitted_vehicles_abgelehnt", "text-red-600"],
+  ["eingereicht", "submitted_vehicles_eingereicht"],
+  ["in_bearbeitung", "submitted_vehicles_in_bearbeitung"],
+  ["angebot_gesendet", "submitted_vehicles_angebot_gesendet"],
+  ["akzeptiert", "submitted_vehicles_akzeptiert"],
+  ["abgelehnt", "submitted_vehicles_abgelehnt"],
 ] as const;
 const TRADE_IN_ROWS = [
-  ["new", "trade_in_requests_new", "text-blue-600"],
-  ["reviewing", "trade_in_requests_reviewing", "text-yellow-600"],
-  ["contact_made", "trade_in_requests_contact_made", "text-purple-600"],
-  ["completed", "trade_in_requests_completed", "text-green-600"],
-  ["cancelled", "trade_in_requests_cancelled", "text-red-600"],
+  ["new", "trade_in_requests_new"],
+  ["reviewing", "trade_in_requests_reviewing"],
+  ["contact_made", "trade_in_requests_contact_made"],
+  ["completed", "trade_in_requests_completed"],
+  ["cancelled", "trade_in_requests_cancelled"],
 ] as const;
 const INQUIRY_ROWS = [
-  ["new", "inquiries_new", "text-blue-600"],
-  ["read", "inquiries_read", "text-yellow-600"],
-  ["responded", "inquiries_responded", "text-green-600"],
-  ["closed", "inquiries_closed", "text-gray-600"],
+  ["new", "inquiries_new"],
+  ["read", "inquiries_read"],
+  ["responded", "inquiries_responded"],
+  ["closed", "inquiries_closed"],
 ] as const;
 
 export default function AdminStatisticsPage() {
@@ -91,8 +92,8 @@ export default function AdminStatisticsPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -101,112 +102,112 @@ export default function AdminStatisticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">{tAdmin("sidebar.statistics")}</h1>
-        <p className="text-gray-600 mt-1">{t("description")}</p>
+        <h1 className="page-title text-foreground">{tAdmin("sidebar.statistics")}</h1>
+        <p className="text-muted-foreground mt-1">{t("description")}</p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 flex gap-3">
+          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-destructive-subtle-foreground">{error}</p>
         </div>
       )}
 
       {statsLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
         </div>
       ) : stats ? (
         <div className="space-y-6">
           <div className="grid md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">{tAdmin("vehicles")}</p>
-              <p className="text-3xl font-bold text-kfz-blue">{n(stats.total_vehicles)}</p>
+            <div className="card p-6">
+              <p className="text-sm text-muted-foreground mb-2">{tAdmin("vehicles")}</p>
+              <p className="text-3xl font-bold text-primary">{n(stats.total_vehicles)}</p>
             </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">{t("availableVehicles")}</p>
-              <p className="text-3xl font-bold text-green-600">{n(stats.vehicles_available)}</p>
+            <div className="card p-6">
+              <p className="text-sm text-muted-foreground mb-2">{t("availableVehicles")}</p>
+              <p className="text-3xl font-bold text-success">{n(stats.vehicles_available)}</p>
             </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">{tAdmin("sidebar.submittedVehicles")}</p>
-              <p className="text-3xl font-bold text-yellow-600">{n(stats.total_submitted_vehicles)}</p>
+            <div className="card p-6">
+              <p className="text-sm text-muted-foreground mb-2">{tAdmin("sidebar.submittedVehicles")}</p>
+              <p className="text-3xl font-bold text-warning">{n(stats.total_submitted_vehicles)}</p>
             </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">{t("totalCustomers")}</p>
-              <p className="text-3xl font-bold text-purple-600">{n(stats.total_customers)}</p>
+            <div className="card p-6">
+              <p className="text-sm text-muted-foreground mb-2">{t("totalCustomers")}</p>
+              <p className="text-3xl font-bold text-highlight">{n(stats.total_customers)}</p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">{t("newInquiries")}</p>
-              <p className="text-3xl font-bold text-blue-600">{n(stats.inquiries_new)}</p>
+            <div className="card p-6">
+              <p className="text-sm text-muted-foreground mb-2">{t("newInquiries")}</p>
+              <p className="text-3xl font-bold text-info">{n(stats.inquiries_new)}</p>
             </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">{t("newTradeIns")}</p>
-              <p className="text-3xl font-bold text-purple-600">{n(stats.trade_in_requests_new)}</p>
+            <div className="card p-6">
+              <p className="text-sm text-muted-foreground mb-2">{t("newTradeIns")}</p>
+              <p className="text-3xl font-bold text-highlight">{n(stats.trade_in_requests_new)}</p>
             </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-sm text-gray-600 mb-2">{t("avgPrice")}</p>
-              <p className="text-3xl font-bold text-green-600">
+            <div className="card p-6">
+              <p className="text-sm text-muted-foreground mb-2">{t("avgPrice")}</p>
+              <p className="text-3xl font-bold text-success">
                 {formatPrice(format, stats.avg_vehicle_price || 0)}
               </p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("vehicleStatus")}</h3>
+            <div className="card p-6">
+              <h3 className="card-title mb-4">{t("vehicleStatus")}</h3>
               <div className="space-y-3">
-                {VEHICLE_ROWS.map(([status, key, color]) => (
+                {VEHICLE_ROWS.map(([status, key]) => (
                   <div key={status} className="flex justify-between">
-                    <span className="text-sm text-gray-600">{getVehicleStatusLabel(tCommon, status)}</span>
-                    <span className={`font-medium ${color}`}>{n(stats[key])}</span>
+                    <span className="text-sm text-muted-foreground">{getVehicleStatusLabel(tCommon, status)}</span>
+                    <span className={`font-medium ${TONE_TEXT[getStatusTone("vehicle", status)]}`}>{n(stats[key])}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{tAdmin("sidebar.submittedVehicles")}</h3>
+            <div className="card p-6">
+              <h3 className="card-title mb-4">{tAdmin("sidebar.submittedVehicles")}</h3>
               <div className="space-y-3">
-                {SUBMISSION_ROWS.map(([status, key, color]) => (
+                {SUBMISSION_ROWS.map(([status, key]) => (
                   <div key={status} className="flex justify-between">
-                    <span className="text-sm text-gray-600">{getSubmissionStatusLabel(tCommon, status)}</span>
-                    <span className={`font-medium ${color}`}>{n(stats[key])}</span>
+                    <span className="text-sm text-muted-foreground">{getSubmissionStatusLabel(tCommon, status)}</span>
+                    <span className={`font-medium ${TONE_TEXT[getStatusTone("submission", status)]}`}>{n(stats[key])}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("tradeInStatus")}</h3>
+          <div className="card p-6">
+            <h3 className="card-title mb-4">{t("tradeInStatus")}</h3>
             <div className="grid md:grid-cols-5 gap-4">
-              {TRADE_IN_ROWS.map(([status, key, color]) => (
+              {TRADE_IN_ROWS.map(([status, key]) => (
                 <div key={status} className="text-center">
-                  <p className="text-sm text-gray-600 mb-2">{getTradeInStatusLabel(tCommon, status)}</p>
-                  <p className={`text-2xl font-bold ${color}`}>{n(stats[key])}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{getTradeInStatusLabel(tCommon, status)}</p>
+                  <p className={`text-2xl font-bold ${TONE_TEXT[getStatusTone("tradeIn", status)]}`}>{n(stats[key])}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("inquiryStatus")}</h3>
+          <div className="card p-6">
+            <h3 className="card-title mb-4">{t("inquiryStatus")}</h3>
             <div className="grid md:grid-cols-4 gap-4">
-              {INQUIRY_ROWS.map(([status, key, color]) => (
+              {INQUIRY_ROWS.map(([status, key]) => (
                 <div key={status} className="text-center">
-                  <p className="text-sm text-gray-600 mb-2">{getInquiryStatusLabel(tCommon, status)}</p>
-                  <p className={`text-2xl font-bold ${color}`}>{n(stats[key])}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{getInquiryStatusLabel(tCommon, status)}</p>
+                  <p className={`text-2xl font-bold ${TONE_TEXT[getStatusTone("inquiry", status)]}`}>{n(stats[key])}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <p className="text-gray-600">{t("noData")}</p>
+        <div className="card p-6 sm:p-8 text-center">
+          <p className="text-muted-foreground">{t("noData")}</p>
         </div>
       )}
     </div>

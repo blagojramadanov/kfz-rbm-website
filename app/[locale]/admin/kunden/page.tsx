@@ -56,8 +56,8 @@ export default function AdminCustomersPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -77,86 +77,86 @@ export default function AdminCustomersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
-        <p className="text-gray-600 mt-1">{t("description")}</p>
+        <h1 className="page-title text-foreground">{t("title")}</h1>
+        <p className="text-muted-foreground mt-1">{t("description")}</p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 flex gap-3">
+          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-destructive-subtle-foreground">{error}</p>
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-md p-4">
+      <div className="card p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground/70" />
           <input
             type="text"
             placeholder={t("searchPlaceholder")}
             aria-label={t("searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-blue focus:border-transparent"
+            className="field pl-10 pr-4"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="card overflow-hidden">
         {customersLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           </div>
         ) : visibleCustomers.length === 0 ? (
-          <div className="text-center py-12 text-gray-600">{t("empty")}</div>
+          <div className="text-center py-12 text-muted-foreground">{t("empty")}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("name")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("email")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("phone")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("joined")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("vehicles")}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("name")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("email")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("phone")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("joined")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("vehicles")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                     {tAdmin("sidebar.inquiries")}
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                     {tAdmin("sidebar.tradeIns")}
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">{t("actions")}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">{t("actions")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-border">
                 {visibleCustomers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-gray-50">
+                  <tr key={customer.id} className="hover:bg-muted">
                     <td className="px-6 py-4">
-                      <p className="font-medium text-gray-900">{customer.full_name}</p>
+                      <p className="font-medium text-foreground">{customer.full_name}</p>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{customer.email}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{customer.phone || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-muted-foreground">{customer.email}</td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">{customer.phone || "—"}</td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
                       {formatDate(customer.created_at)}
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                      <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-info-subtle text-info-subtle-foreground">
                         {format.number(customer.submitted_vehicles_count || 0)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                      <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-warning-subtle text-warning-subtle-foreground">
                         {format.number(customer.inquiries_count || 0)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                      <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-highlight-subtle text-highlight-subtle-foreground">
                         {format.number(customer.trade_in_requests_count || 0)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <Link href={`/admin/kunden/${customer.id}`} title={t("viewProfile")} aria-label={t("viewProfile")}>
-                        <span className="inline-flex p-2 text-gray-600 hover:text-kfz-blue hover:bg-gray-100 rounded transition-colors">
+                        <span className="inline-flex p-2 text-muted-foreground hover:text-primary hover:bg-secondary rounded transition-colors">
                           <Eye className="w-4 h-4" />
                         </span>
                       </Link>

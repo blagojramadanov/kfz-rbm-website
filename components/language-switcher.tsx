@@ -22,8 +22,8 @@ export function LanguageSwitcher() {
           onClick={() => handleLanguageChange(loc)}
           className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
             locale === loc
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-border text-foreground hover:bg-input'
           }`}
         >
           {localeNames[loc]}

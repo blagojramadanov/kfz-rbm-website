@@ -5,16 +5,16 @@ export default function NotFoundPage() {
   const t = useTranslations("pages.notFound");
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-muted flex items-center justify-center px-4">
       <div className="text-center">
-        <h1 className="text-6xl font-bold text-kfz-blue mb-4">404</h1>
-        <p className="text-2xl font-semibold text-gray-900 mb-2">
+        <h1 className="text-6xl font-bold text-primary mb-4">404</h1>
+        <p className="text-2xl font-semibold text-foreground mb-2">
           {t("title")}
         </p>
-        <p className="text-gray-600 mb-8">
+        <p className="text-muted-foreground mb-8">
           {t("description")}
         </p>
-        <Link href="/" className="inline-block bg-kfz-blue text-white px-6 py-3 rounded-lg hover:bg-kfz-blue-dark transition">
+        <Link href="/" className="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary-hover transition">
           {t("backHome")}
         </Link>
       </div>

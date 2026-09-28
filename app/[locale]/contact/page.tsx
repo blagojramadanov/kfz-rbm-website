@@ -9,6 +9,7 @@ import { BusinessHours } from "@/components/business-hours";
 import { HoneypotField } from "@/components/honeypot-field";
 import { useAuth } from "@/lib/auth-context";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { PageHeader } from "@/components/page-header";
 
 const EMPTY_FORM = { name: "", email: "", phone: "", message: "", website: "" };
 
@@ -54,48 +55,45 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">{t("contact.title")}</h1>
-        <p className="text-lg text-gray-600 mb-12">
-          {t("contact.getInTouch")}
-        </p>
+    <div className="min-h-screen bg-muted">
+      <PageHeader title={t("contact.title")} description={t("contact.getInTouch")} />
+      <div className="page-container">
 
         <div className="grid md:grid-cols-2 gap-12">
           {/* Contact Info */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <h2 className="section-title mb-6">
               {t("footer.contactInfo")}
             </h2>
 
             <div className="space-y-6">
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
-                  <Phone className="w-6 h-6 text-kfz-blue" />
+                  <Phone className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{t("contact.phone")}</h3>
-                  <p className="text-gray-600">{COMPANY.phone}</p>
+                  <h3 className="font-semibold text-foreground">{t("contact.phone")}</h3>
+                  <p className="text-muted-foreground">{COMPANY.phone}</p>
                 </div>
               </div>
 
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
-                  <Mail className="w-6 h-6 text-kfz-blue" />
+                  <Mail className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{t("contact.email")}</h3>
-                  <p className="text-gray-600">{COMPANY.email}</p>
+                  <h3 className="font-semibold text-foreground">{t("contact.email")}</h3>
+                  <p className="text-muted-foreground">{COMPANY.email}</p>
                 </div>
               </div>
 
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
-                  <MapPin className="w-6 h-6 text-kfz-blue" />
+                  <MapPin className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{t("contact.address")}</h3>
-                  <p className="text-gray-600">
+                  <h3 className="font-semibold text-foreground">{t("contact.address")}</h3>
+                  <p className="text-muted-foreground">
                     {getFormattedAddress(tCompany)}
                   </p>
                 </div>
@@ -103,27 +101,27 @@ export default function ContactPage() {
 
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
-                  <Clock className="w-6 h-6 text-kfz-blue" />
+                  <Clock className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{t("contact.hours")}</h3>
-                  <BusinessHours className="text-gray-600" />
+                  <h3 className="font-semibold text-foreground">{t("contact.hours")}</h3>
+                  <BusinessHours className="text-muted-foreground" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white p-8 rounded-lg shadow">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <div className="bg-card p-8 rounded-lg shadow">
+            <h2 className="section-title mb-6">
               {t("contact.sendMessage")}
             </h2>
 
             {sent ? (
               <div className="text-center py-8" role="status">
-                <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" aria-hidden="true" />
-                <p className="text-lg font-semibold text-gray-900 mb-2">{t("contact.messageSent")}</p>
-                <p className="text-gray-600">{t("contact.messageSentText")}</p>
+                <CheckCircle className="w-12 h-12 text-success mx-auto mb-4" aria-hidden="true" />
+                <p className="text-lg font-semibold text-foreground mb-2">{t("contact.messageSent")}</p>
+                <p className="text-muted-foreground">{t("contact.messageSentText")}</p>
               </div>
             ) : (
             <form onSubmit={handleSubmit} className="relative space-y-6">
@@ -134,7 +132,7 @@ export default function ContactPage() {
               />
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-foreground mb-2">
                   {t("forms.fullName")}
                 </label>
                 <input
@@ -147,13 +145,13 @@ export default function ContactPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-accent focus:border-transparent outline-none"
+                  className="field"
                   placeholder={t("forms.fullName")}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-foreground mb-2">
                   {t("forms.email")}
                 </label>
                 <input
@@ -165,13 +163,13 @@ export default function ContactPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-accent focus:border-transparent outline-none"
+                  className="field"
                   placeholder={t("forms.email")}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-foreground mb-2">
                   {t("inquiryForm.phoneOptional")}
                 </label>
                 <input
@@ -182,13 +180,13 @@ export default function ContactPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-accent focus:border-transparent outline-none"
+                  className="field"
                   placeholder={t("forms.phone")}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-foreground mb-2">
                   {t("forms.message")}
                 </label>
                 <textarea
@@ -199,23 +197,23 @@ export default function ContactPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kfz-accent focus:border-transparent outline-none resize-none"
+                  className="field resize-none"
                   placeholder={t("forms.message")}
                 />
               </div>
 
               {error && (
-                <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3" role="alert">
+                <p className="text-sm text-destructive bg-destructive-subtle/50 border border-destructive-border rounded-lg p-3" role="alert">
                   {error}
                 </p>
               )}
 
-              <p className="text-xs text-gray-500">{t("inquiryForm.privacy")}</p>
+              <p className="text-xs text-muted-foreground">{t("inquiryForm.privacy")}</p>
 
               <Button
                 type="submit"
                 disabled={sending}
-                className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white py-2 font-semibold"
+                className="w-full py-2"
               >
                 {sending ? t("contact.sending") : t("contact.sendMessage")}
               </Button>

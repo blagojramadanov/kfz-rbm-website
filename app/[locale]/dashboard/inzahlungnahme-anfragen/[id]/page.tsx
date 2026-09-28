@@ -1,22 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getStatusTone, TONE_PANEL } from "@/lib/status-styles";
 import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useTranslations } from "next-intl";
-import { AlertCircle, ArrowLeft } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import type { TradeInRequest } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { PageHeader } from "@/components/page-header";
 
-const STATUS_COLORS: Record<string, string> = {
-  new: "bg-blue-100 text-blue-800 border-blue-300",
-  reviewing: "bg-yellow-100 text-yellow-800 border-yellow-300",
-  contact_made: "bg-purple-100 text-purple-800 border-purple-300",
-  completed: "bg-green-100 text-green-800 border-green-300",
-  cancelled: "bg-red-100 text-red-800 border-red-300",
-};
 
 export default function TradeInRequestDetailPage() {
   const t = useTranslations("dashboard.tradeInRequestDetail");
@@ -78,57 +73,50 @@ export default function TradeInRequestDetailPage() {
 
   if (loading || !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Link
-            href="/dashboard/inzahlungnahme-anfragen"
-            className="text-blue-100 hover:text-white mb-2 inline-flex items-center gap-1 text-sm"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {t("backToList")}
-          </Link>
-          <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
-          <p className="text-blue-100">{t("requestId")} {requestId}</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-muted">
+      <PageHeader
+        title={t("title")}
+        description={<>{t("requestId")} {requestId}</>}
+        backHref="/dashboard/inzahlungnahme-anfragen"
+        backLabel={<>← {t("backToList")}</>}
+        width="narrow"
+      />
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="page-container-narrow">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="bg-destructive-subtle/50 border border-destructive-border rounded-lg p-4 mb-6 flex gap-3">
+            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-destructive-subtle-foreground">{error}</p>
           </div>
         )}
 
         {requestLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto"></div>
-            <p className="text-gray-600 mt-4">{t("loading")}</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground mt-4">{t("loading")}</p>
           </div>
         ) : !request ? (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <p className="text-gray-600 mb-6">{t("notFound")}</p>
-            <Link href="/dashboard/inzahlungnahme-anfragen" className="text-kfz-blue hover:underline">
+          <div className="card p-6 sm:p-8 text-center">
+            <p className="text-muted-foreground mb-6">{t("notFound")}</p>
+            <Link href="/dashboard/inzahlungnahme-anfragen" className="text-primary hover:underline">
               {t("backToOverview")}
             </Link>
           </div>
         ) : (
           <div className="space-y-6">
             {/* Status Card */}
-            <div className={`border-l-4 rounded-lg p-6 ${STATUS_COLORS[request.status]}`}>
+            <div className={`border border-l-4 rounded-lg p-6 ${TONE_PANEL[getStatusTone("tradeIn", request.status)]}`}>
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl font-bold">{getStatusLabel(request.status)}</h2>
                 <span className="text-sm font-medium">
@@ -141,28 +129,28 @@ export default function TradeInRequestDetailPage() {
             {/* Request Details */}
             <div className="grid md:grid-cols-2 gap-6">
               {/* Current Vehicle */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">{t("currentVehicle")}</h3>
+              <div className="card p-6">
+                <h3 className="card-title mb-4">{t("currentVehicle")}</h3>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-gray-600">{t("brandModel")}</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-sm text-muted-foreground">{t("brandModel")}</p>
+                    <p className="font-semibold text-foreground">
                       {request.current_vehicle_brand} {request.current_vehicle_model}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">{t("firstRegistration")}</p>
-                    <p className="font-semibold text-gray-900">{request.current_vehicle_year}</p>
+                    <p className="text-sm text-muted-foreground">{t("firstRegistration")}</p>
+                    <p className="font-semibold text-foreground">{request.current_vehicle_year}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">{t("mileage")}</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-sm text-muted-foreground">{t("mileage")}</p>
+                    <p className="font-semibold text-foreground">
                       {tUnits("mileage", { value: formatter.number(request.current_vehicle_mileage || 0) })}
                     </p>
                   </div>
                   <div className="pt-3 border-t">
-                    <p className="text-sm text-gray-600">{t("estimatedValue")}</p>
-                    <p className="text-2xl font-bold text-kfz-blue">
+                    <p className="text-sm text-muted-foreground">{t("estimatedValue")}</p>
+                    <p className="text-2xl font-bold text-primary">
                       {formatCurrency(request.current_vehicle_value_estimate || 0)}
                     </p>
                   </div>
@@ -171,28 +159,28 @@ export default function TradeInRequestDetailPage() {
 
               {/* Desired Vehicle */}
               {request.desired_vehicle && (
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">{t("desiredVehicle")}</h3>
+                <div className="card p-6">
+                  <h3 className="card-title mb-4">{t("desiredVehicle")}</h3>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-gray-600">{t("brandModel")}</p>
-                      <p className="font-semibold text-gray-900">
+                      <p className="text-sm text-muted-foreground">{t("brandModel")}</p>
+                      <p className="font-semibold text-foreground">
                         {request.desired_vehicle.brand} {request.desired_vehicle.model}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">{t("year")}</p>
-                      <p className="font-semibold text-gray-900">{request.desired_vehicle.year}</p>
+                      <p className="text-sm text-muted-foreground">{t("year")}</p>
+                      <p className="font-semibold text-foreground">{request.desired_vehicle.year}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">{t("mileage")}</p>
-                      <p className="font-semibold text-gray-900">
+                      <p className="text-sm text-muted-foreground">{t("mileage")}</p>
+                      <p className="font-semibold text-foreground">
                         {tUnits("mileage", { value: formatter.number(request.desired_vehicle.mileage || 0) })}
                       </p>
                     </div>
                     <div className="pt-3 border-t">
-                      <p className="text-sm text-gray-600">{t("price")}</p>
-                      <p className="text-2xl font-bold text-kfz-blue">
+                      <p className="text-sm text-muted-foreground">{t("price")}</p>
+                      <p className="text-2xl font-bold text-primary">
                         {formatCurrency(request.desired_vehicle.price || 0)}
                       </p>
                     </div>
@@ -203,32 +191,32 @@ export default function TradeInRequestDetailPage() {
 
             {/* Pricing Breakdown */}
             {request.desired_vehicle && (
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-6">{t("pricingBreakdown")}</h3>
+              <div className="bg-info-subtle/50 border-2 border-info-border rounded-lg p-6">
+                <h3 className="card-title mb-6">{t("pricingBreakdown")}</h3>
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center py-2 border-b">
-                    <span className="text-gray-700">{t("yourVehicleEstimate")}</span>
+                    <span className="text-foreground">{t("yourVehicleEstimate")}</span>
                     <span className="font-semibold">
                       {formatCurrency(request.current_vehicle_value_estimate || 0)}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center py-2 border-b">
-                    <span className="text-gray-700">{t("desiredVehiclePrice")}</span>
+                    <span className="text-foreground">{t("desiredVehiclePrice")}</span>
                     <span className="font-semibold">
                       {formatCurrency(request.desired_vehicle.price || 0)}
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center py-4 bg-white rounded p-3">
-                    <span className="font-bold text-gray-900">{t("difference")}</span>
+                  <div className="flex justify-between items-center py-4 bg-card rounded p-3">
+                    <span className="font-bold text-foreground">{t("difference")}</span>
                     <span
                       className={`text-2xl font-bold ${
                         (request.current_vehicle_value_estimate ?? 0) >
                         (request.desired_vehicle.price ?? 0)
-                          ? "text-green-600"
-                          : "text-red-600"
+                          ? "text-success"
+                          : "text-destructive"
                       }`}
                     >
                       {((request.current_vehicle_value_estimate ?? 0) -
@@ -246,8 +234,8 @@ export default function TradeInRequestDetailPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 p-4 bg-white border border-blue-300 rounded">
-                  <p className="text-sm text-gray-700">
+                <div className="mt-6 p-4 bg-card border border-info-border rounded">
+                  <p className="text-sm text-foreground">
                     <strong>{t("importantNote")}</strong> {t("importantNoteText")}
                   </p>
                 </div>
@@ -256,22 +244,22 @@ export default function TradeInRequestDetailPage() {
 
             {/* Admin Notes */}
             {request.admin_notes && (
-              <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{t("adminNotes")}</h3>
-                <p className="text-gray-700">{request.admin_notes}</p>
+              <div className="bg-highlight-subtle/50 border-2 border-highlight-border rounded-lg p-6">
+                <h3 className="card-title mb-2">{t("adminNotes")}</h3>
+                <p className="text-foreground">{request.admin_notes}</p>
               </div>
             )}
 
             {/* Important Notice */}
-            <div className="bg-amber-50 border-l-4 border-amber-400 rounded-lg p-6">
-              <h3 className="font-bold text-amber-900 mb-2">{t("importantNote")}</h3>
-              <p className="text-sm text-amber-900 mb-3">{t("importantNoteText")}</p>
+            <div className="bg-warning-subtle/50 border-l-4 border-warning rounded-lg p-6">
+              <h3 className="font-bold text-warning-subtle-foreground mb-2">{t("importantNote")}</h3>
+              <p className="text-sm text-warning-subtle-foreground mb-3">{t("importantNoteText")}</p>
             </div>
 
             {/* Action Buttons */}
             <div className="flex justify-between gap-4">
               <Link href="/dashboard/inzahlungnahme-anfragen">
-                <button className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                <button className="px-6 py-2 border border-input rounded-lg text-foreground hover:bg-muted transition-colors">
                   ← {t("backToList")}
                 </button>
               </Link>

@@ -16,7 +16,7 @@ export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }
 
   if (vehicles.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-10 text-center text-gray-600">
+      <div className="card p-8 sm:p-10 text-center text-muted-foreground">
         {t("latest.empty")}
       </div>
     );
@@ -27,10 +27,10 @@ export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }
       {vehicles.map((vehicle) => (
         <div
           key={vehicle.id}
-          className="bg-white rounded-lg shadow hover:shadow-xl transition-shadow overflow-hidden group"
+          className="card hover:shadow-xl transition-shadow overflow-hidden group"
         >
           {/* Image Container */}
-          <div className="relative h-48 bg-gray-200 overflow-hidden">
+          <div className="relative h-48 bg-border overflow-hidden">
             {vehicle.image ? (
               <Image
                 src={vehicle.image}
@@ -40,7 +40,7 @@ export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+              <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/70">
                 <Car className="w-12 h-12" aria-hidden="true" />
               </div>
             )}
@@ -54,17 +54,17 @@ export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }
 
           {/* Content */}
           <div className="p-4">
-            <h3 className="text-lg font-bold text-gray-900">
+            <h3 className="card-title">
               {vehicle.brand} {vehicle.model}
             </h3>
 
             {/* Price */}
-            <p className="text-2xl font-bold text-kfz-blue mt-2 mb-2">
+            <p className="text-2xl font-bold text-primary mt-2 mb-2">
               {formatPrice(format, vehicle.price)}
             </p>
 
             {/* Specs */}
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
+            <div className="space-y-2 text-sm text-muted-foreground mb-4">
               <div className="flex items-center gap-2">
                 <span className="font-semibold">{vehicle.year}</span>
                 <span>•</span>
@@ -84,7 +84,7 @@ export async function LatestVehicles({ vehicles }: { vehicles: PublicVehicle[] }
             {/* CTA */}
             <Button
               asChild
-              className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white text-sm"
+              className="w-full text-sm"
             >
               <Link href={`/fahrzeuge/${vehicle.slug}`}>{tCommon("viewDetails")}</Link>
             </Button>

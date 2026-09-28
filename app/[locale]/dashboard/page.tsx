@@ -9,6 +9,7 @@ import { useFavorites } from "@/lib/favorites-context";
 import { Button } from "@/components/ui/button";
 import { Car, MessageSquare, Heart, Plus, FileText, LogOut, ArrowRight, Repeat2 } from "lucide-react";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -53,10 +54,10 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kfz-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{tCommon("loading")}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">{tCommon("loading")}</p>
         </div>
       </div>
     );
@@ -72,67 +73,60 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-4xl font-bold mb-2">
-            {tCommon("welcome")}, {profile.full_name}!
-          </h1>
-          <p className="text-blue-100 text-lg">
-            {t("welcome")}
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-muted">
+      <PageHeader
+        title={<>{tCommon("welcome")}, {profile.full_name}!</>}
+        description={t("welcome")}
+      />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="page-container">
         {/* Quick Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-12">
           <Link href={`/dashboard/fahrzeuge`}>
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
+            <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">{t("myVehicles")}</p>
-                  <p className="text-3xl font-bold text-gray-900">{vehicleCount === undefined ? "…" : vehicleCount === null ? "—" : formatter.number(vehicleCount)}</p>
+                  <p className="text-sm text-muted-foreground">{t("myVehicles")}</p>
+                  <p className="text-3xl font-bold text-foreground">{vehicleCount === undefined ? "…" : vehicleCount === null ? "—" : formatter.number(vehicleCount)}</p>
                 </div>
-                <Car className="w-10 h-10 text-kfz-blue" />
+                <Car className="w-10 h-10 text-primary" />
               </div>
             </div>
           </Link>
 
           <Link href="/dashboard/anfragen">
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
+            <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">{t("overview.inquiries")}</p>
-                  <p className="text-3xl font-bold text-gray-900">{inquiryCount === undefined ? "…" : inquiryCount === null ? "—" : formatter.number(inquiryCount)}</p>
+                  <p className="text-sm text-muted-foreground">{t("overview.inquiries")}</p>
+                  <p className="text-3xl font-bold text-foreground">{inquiryCount === undefined ? "…" : inquiryCount === null ? "—" : formatter.number(inquiryCount)}</p>
                 </div>
-                <MessageSquare className="w-10 h-10 text-green-600" />
+                <MessageSquare className="w-10 h-10 text-success" />
               </div>
             </div>
           </Link>
 
           <Link href="/dashboard/favoriten">
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
+            <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">{t("overview.favorites")}</p>
-                  <p className="text-3xl font-bold text-gray-900">{favorites.ready ? formatter.number(favorites.count) : "…"}</p>
+                  <p className="text-sm text-muted-foreground">{t("overview.favorites")}</p>
+                  <p className="text-3xl font-bold text-foreground">{favorites.ready ? formatter.number(favorites.count) : "…"}</p>
                 </div>
-                <Heart className="w-10 h-10 text-red-600" />
+                <Heart className="w-10 h-10 text-destructive" />
               </div>
             </div>
           </Link>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">{t("memberSince")}</p>
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm text-muted-foreground">{t("memberSince")}</p>
+                <p className="text-sm font-semibold text-foreground">
                   {formatter.dateTime(new Date(profile.created_at), { year: "numeric", month: "2-digit", day: "2-digit" })}
                 </p>
               </div>
-              <FileText className="w-10 h-10 text-orange-600" />
+              <FileText className="w-10 h-10 text-warning" />
             </div>
           </div>
         </div>
@@ -141,19 +135,19 @@ export default function DashboardPage() {
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           {/* Submit Vehicle */}
           <Link href="/dashboard/fahrzeug-anbieten">
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow cursor-pointer h-full">
+            <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer h-full">
               <div className="flex items-center gap-4 mb-4">
-                <div className="bg-blue-100 rounded-lg p-3">
-                  <Plus className="w-6 h-6 text-kfz-blue" />
+                <div className="bg-info-subtle rounded-lg p-3">
+                  <Plus className="w-6 h-6 text-primary" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="section-title">
                   {t("overview.submitVehicle")}
                 </h2>
               </div>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 {t("overview.submitDescription")}
               </p>
-              <Button className="bg-kfz-blue hover:bg-kfz-blue-dark text-white font-semibold w-full">
+              <Button className="w-full">
                 <Plus className="mr-2 w-4 h-4" />
                 {t("overview.addVehicle")}
               </Button>
@@ -162,19 +156,19 @@ export default function DashboardPage() {
 
           {/* My Vehicles */}
           <Link href="/dashboard/fahrzeuge">
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow cursor-pointer h-full">
+            <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer h-full">
               <div className="flex items-center gap-4 mb-4">
-                <div className="bg-blue-100 rounded-lg p-3">
-                  <Car className="w-6 h-6 text-kfz-blue" />
+                <div className="bg-info-subtle rounded-lg p-3">
+                  <Car className="w-6 h-6 text-primary" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="section-title">
                   {t("overview.manageVehicles")}
                 </h2>
               </div>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 {t("overview.manageVehiclesDescription")}
               </p>
-              <Button variant="outline" className="border-kfz-blue text-kfz-blue hover:bg-kfz-blue hover:text-white w-full">
+              <Button variant="outline-primary" className="w-full">
                 {t("overview.viewVehicles")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -183,19 +177,19 @@ export default function DashboardPage() {
 
           {/* Inquiries */}
           <Link href="/dashboard/anfragen">
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow cursor-pointer h-full">
+            <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer h-full">
               <div className="flex items-center gap-4 mb-4">
-                <div className="bg-green-100 rounded-lg p-3">
-                  <MessageSquare className="w-6 h-6 text-green-600" />
+                <div className="bg-success-subtle rounded-lg p-3">
+                  <MessageSquare className="w-6 h-6 text-success" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="section-title">
                   {t("overview.inquiries")}
                 </h2>
               </div>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 {t("overview.inquiriesDescription")}
               </p>
-              <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white w-full">
+              <Button variant="outline-primary" className="w-full">
                 {t("overview.viewInquiries")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -204,19 +198,19 @@ export default function DashboardPage() {
 
           {/* Favorites */}
           <Link href="/dashboard/favoriten">
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow cursor-pointer h-full">
+            <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer h-full">
               <div className="flex items-center gap-4 mb-4">
-                <div className="bg-red-100 rounded-lg p-3">
-                  <Heart className="w-6 h-6 text-red-600" />
+                <div className="bg-destructive-subtle rounded-lg p-3">
+                  <Heart className="w-6 h-6 text-destructive" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="section-title">
                   {t("overview.favorites")}
                 </h2>
               </div>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 {t("overview.favoritesDescription")}
               </p>
-              <Button variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white w-full">
+              <Button variant="outline-primary" className="w-full">
                 {t("overview.viewFavorites")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -225,19 +219,19 @@ export default function DashboardPage() {
 
           {/* Trade-In */}
           <Link href="/dashboard/inzahlungnahme">
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow cursor-pointer h-full">
+            <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer h-full">
               <div className="flex items-center gap-4 mb-4">
-                <div className="bg-purple-100 rounded-lg p-3">
-                  <Repeat2 className="w-6 h-6 text-purple-600" />
+                <div className="bg-highlight-subtle rounded-lg p-3">
+                  <Repeat2 className="w-6 h-6 text-highlight" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="section-title">
                   {t("overview.tradeIn")}
                 </h2>
               </div>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 {t("overview.tradeInDescription")}
               </p>
-              <Button variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white w-full">
+              <Button variant="outline-primary" className="w-full">
                 {t("overview.newRequest")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -246,19 +240,19 @@ export default function DashboardPage() {
 
           {/* Trade-In Requests */}
           <Link href="/dashboard/inzahlungnahme-anfragen">
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow cursor-pointer h-full">
+            <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer h-full">
               <div className="flex items-center gap-4 mb-4">
-                <div className="bg-indigo-100 rounded-lg p-3">
-                  <FileText className="w-6 h-6 text-indigo-600" />
+                <div className="bg-info-subtle rounded-lg p-3">
+                  <FileText className="w-6 h-6 text-info" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="section-title">
                   {t("overview.myTradeInRequests")}
                 </h2>
               </div>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 {t("overview.myTradeInRequestsDescription")}
               </p>
-              <Button variant="outline" className="border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white w-full">
+              <Button variant="outline-primary" className="w-full">
                 {t("overview.viewRequests")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -269,26 +263,26 @@ export default function DashboardPage() {
         {/* Profile & Logout */}
         <div className="grid md:grid-cols-2 gap-6">
           <Link href="/dashboard/profil">
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">{t("overview.manageProfile")}</h3>
-              <p className="text-gray-600 mb-4">
+            <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer">
+              <h3 className="card-title mb-4">{t("overview.manageProfile")}</h3>
+              <p className="text-muted-foreground mb-4">
                 {t("overview.manageProfileDescription")}
               </p>
-              <Button className="w-full bg-kfz-blue hover:bg-kfz-blue-dark text-white">
+              <Button className="w-full">
                 {t("overview.toProfile")}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
           </Link>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">{t("overview.accountActions")}</h3>
-            <p className="text-gray-600 mb-4">
+          <div className="card p-6">
+            <h3 className="card-title mb-4">{t("overview.accountActions")}</h3>
+            <p className="text-muted-foreground mb-4">
               {t("overview.accountActionsDescription")}
             </p>
-            <Button
+            <Button variant="destructive"
               onClick={handleLogout}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold"
+              className="w-full"
             >
               <LogOut className="mr-2 w-4 h-4" />
               {t("overview.logout")}

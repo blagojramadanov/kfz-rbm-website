@@ -16,7 +16,7 @@ export function VehicleGallery({ images, title }: VehicleGalleryProps) {
 
   if (images.length === 0) {
     return (
-      <div className="relative h-96 sm:h-[500px] bg-gray-100 rounded-lg flex flex-col items-center justify-center gap-3 text-gray-400">
+      <div className="relative h-96 sm:h-[500px] bg-secondary rounded-lg flex flex-col items-center justify-center gap-3 text-muted-foreground/70">
         <Car className="w-16 h-16" aria-hidden="true" />
         <p>{t("noImages")}</p>
       </div>
@@ -38,7 +38,7 @@ export function VehicleGallery({ images, title }: VehicleGalleryProps) {
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative h-96 sm:h-[500px] bg-gray-100 rounded-lg overflow-hidden group">
+      <div className="relative h-96 sm:h-[500px] bg-secondary rounded-lg overflow-hidden group">
         <Image
           src={images[selectedIndex]}
           alt={t("imageAlt", { title, index: selectedIndex + 1, total: images.length })}
@@ -53,21 +53,21 @@ export function VehicleGallery({ images, title }: VehicleGalleryProps) {
           <>
             <button
               onClick={handlePrevious}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-900 rounded-full p-2 transition-all z-10"
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-card bg-opacity-90 hover:bg-opacity-100 text-foreground rounded-full p-2 transition-all z-10"
               aria-label={t("previous")}
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button
               onClick={handleNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-900 rounded-full p-2 transition-all z-10"
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-card bg-opacity-90 hover:bg-opacity-100 text-foreground rounded-full p-2 transition-all z-10"
               aria-label={t("next")}
             >
               <ChevronRight className="w-6 h-6" />
             </button>
 
             {/* Image Counter */}
-            <div className="absolute bottom-4 right-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded text-sm font-semibold">
+            <div className="absolute bottom-4 right-4 bg-black bg-opacity-60 text-primary-foreground px-3 py-1 rounded text-sm font-semibold">
               {t("counter", { current: selectedIndex + 1, total: images.length })}
             </div>
           </>
@@ -85,8 +85,8 @@ export function VehicleGallery({ images, title }: VehicleGalleryProps) {
               aria-current={index === selectedIndex}
               className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
                 index === selectedIndex
-                  ? "border-kfz-blue"
-                  : "border-gray-200 hover:border-kfz-blue"
+                  ? "border-primary"
+                  : "border-border hover:border-primary"
               }`}
             >
               <Image
