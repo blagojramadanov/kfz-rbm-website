@@ -94,7 +94,7 @@ export function ServicesGrid() {
               </div>
 
               {/* CTA */}
-              <Button asChild className="w-full h-auto min-h-10 whitespace-normal text-center">
+              <Button asChild className="w-full h-auto sm:h-auto min-h-11 sm:min-h-10 whitespace-normal text-center">
                 <Link href={service.href}>
                   {t(`services.${service.id}.cta`)}
                   <ArrowRight className="ml-2 w-4 h-4" />

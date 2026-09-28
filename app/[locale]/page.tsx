@@ -29,7 +29,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
   return (
     <div className="w-full">
       {/* Hero Section with Background Image */}
-      <section className="relative min-h-[calc(100svh-5rem)] py-12 sm:py-20 bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-primary-foreground overflow-hidden flex items-center">
+      <section className="relative sm:min-h-[calc(100svh-5rem)] py-10 sm:py-20 bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-primary-foreground overflow-hidden flex items-center">
         {/* Background photo under a navy overlay (text stays above AA contrast) */}
         <Image
           src={SITE_IMAGES.hero}
@@ -54,8 +54,9 @@ export default async function Home({ params: { locale } }: { params: { locale: s
         <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
             {/* Logo */}
-            <div className="mb-8 sm:mb-12 flex items-center gap-4">
-              <div className="relative w-16 h-16 bg-card rounded-lg p-2">
+            {/* Brand block: the navbar already shows the logo on phones, so it is visual from sm (heading stays for screen readers) */}
+            <div className="sm:mb-12 flex items-center gap-4">
+              <div className="relative hidden sm:block w-16 h-16 bg-card rounded-lg p-2">
                 <Image
                   src="/assets/logo.png"
                   alt={t("hero.logoAlt", { name: COMPANY.name })}
@@ -65,7 +66,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                   priority
                 />
               </div>
-              <div>
+              <div className="sr-only sm:not-sr-only">
                 <h1 className="text-4xl font-bold">{COMPANY.name}</h1>
                 <p className="text-primary-foreground/80">{t("hero.tagline")}</p>
               </div>
@@ -73,22 +74,22 @@ export default async function Home({ params: { locale } }: { params: { locale: s
 
             {/* Main Headline */}
             <div className="mb-8">
-              <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+              <h2 className="text-[2rem] sm:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
                 {t("hero.headline1")}<br />
                 {t("hero.headline2")}<br />
                 {t("hero.headline3")}
               </h2>
-              <p className="text-lg sm:text-2xl text-primary-foreground/80 max-w-3xl">
+              <p className="text-base sm:text-2xl text-primary-foreground/80 max-w-3xl">
                 {t("hero.subheadline")}
               </p>
             </div>
 
             {/* Primary CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:mb-12">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:mb-12">
               <Button variant="accent"
                 asChild
                 size="lg"
-                className="h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg shadow-lg hover:shadow-xl"
+                className="h-auto sm:h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-3 sm:py-6 text-base sm:text-lg shadow-lg hover:shadow-xl"
               >
                 <Link href="/fahrzeuge">
                   {t("hero.discoverVehicles")}
@@ -99,7 +100,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                 asChild
                 size="lg"
                 variant="outline-inverse"
-                className="h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg"
+                className="h-auto sm:h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-3 sm:py-6 text-base sm:text-lg"
               >
                 <Link href="/dashboard/fahrzeug-anbieten">
                   {t("hero.offerVehicle")}
@@ -119,7 +120,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
       </section>
 
       {/* Search Section */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-secondary relative -mt-20 z-20">
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-secondary relative sm:-mt-20 z-20">
         <div className="max-w-6xl mx-auto">
           <SearchBar filterOptions={searchOptions} />
         </div>
@@ -171,7 +172,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
               asChild
               variant="outline-primary"
               size="lg"
-              className="h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg"
+              className="h-auto sm:h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-3 sm:py-6 text-base sm:text-lg"
             >
               <Link href="/fahrzeuge">
                 {t("featured.viewAll")}
@@ -300,14 +301,16 @@ export default async function Home({ params: { locale } }: { params: { locale: s
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left: Image */}
-            <div className="relative h-96 rounded-lg overflow-hidden shadow-lg">
+            {/* Whole photo at its own proportions (no cropping) */}
+            <div className="rounded-lg overflow-hidden shadow-lg">
               <Image
                 src={SITE_IMAGES.about}
                 alt={tImg("about")}
-                fill
                 sizes="(max-width: 768px) 100vw, 50vw"
+                // Served as the original file (no re-compression); the source is only 763px wide
+              unoptimized
                 placeholder="blur"
-                className="object-cover"
+                className="w-full h-auto"
               />
             </div>
 
@@ -350,7 +353,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
               <Button
                 asChild
                 size="lg"
-                className="h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg"
+                className="h-auto sm:h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-3 sm:py-6 text-base sm:text-lg"
               >
                 <Link href="/about">
                   {t("aboutSection.learnMore")}
@@ -375,7 +378,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
             <Button variant="accent"
               asChild
               size="lg"
-              className="h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg"
+              className="h-auto sm:h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-3 sm:py-6 text-base sm:text-lg"
             >
               <Link href="/contact">
                 {t("contact.contactCta")}
@@ -386,7 +389,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
               asChild
               size="lg"
               variant="outline-inverse"
-              className="h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg"
+              className="h-auto sm:h-auto min-h-12 whitespace-normal text-center px-6 sm:px-8 py-3 sm:py-6 text-base sm:text-lg"
             >
               <a href={PHONE_HREF}>
                 {t("contact.callCta", { phone: COMPANY.phone })}

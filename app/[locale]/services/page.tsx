@@ -52,7 +52,7 @@ export default function ServicesPage({ params: { locale } }: { params: { locale:
               </div>
               <h2 className="card-title mb-2">{t(`items.${id}.title`)}</h2>
               <p className="text-muted-foreground mb-6 flex-1">{t(`items.${id}.text`)}</p>
-              <Button asChild variant="outline-primary" className="self-start whitespace-normal text-left h-auto min-h-10">
+              <Button asChild variant="outline-primary" className="self-start whitespace-normal text-left h-auto sm:h-auto min-h-11 sm:min-h-10">
                 <Link href={href}>
                   {t(`items.${id}.cta`)}
                   <ArrowRight className="ml-2 w-4 h-4 shrink-0" aria-hidden="true" />

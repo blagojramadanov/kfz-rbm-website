@@ -72,14 +72,16 @@ export default function AboutPage({ params: { locale } }: { params: { locale: st
               {t("intro.location", values)}
             </p>
           </div>
-          <div className="relative min-h-64 lg:min-h-full">
+          {/* Whole photo at its own proportions (no cropping); never wider than the 763px source */}
+          <div className="flex items-center justify-center bg-inverse">
             <Image
               src={SITE_IMAGES.about}
               alt={tImg("about")}
-              fill
               sizes="(max-width: 1024px) 100vw, 50vw"
+              // Served as the original file (no re-compression); the source is only 763px wide
+              unoptimized
               placeholder="blur"
-              className="object-cover"
+              className="w-full max-w-[763px] h-auto"
             />
           </div>
         </section>

@@ -45,7 +45,7 @@ export function PageHeader({
           <Link
             href={backHref}
             className={cn(
-              "mb-2 inline-flex items-center gap-1.5 text-sm font-medium",
+              "mb-1 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium",
               brand
                 ? "text-primary-foreground/80 hover:text-primary-foreground"
                 : "text-primary hover:underline",

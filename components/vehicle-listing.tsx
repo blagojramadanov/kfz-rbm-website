@@ -238,7 +238,7 @@ export function VehicleListing({
             <Button
               onClick={() => setShowFilters(true)}
               variant="outline"
-              className="lg:hidden h-auto min-h-11 shrink-0"
+              className="lg:hidden h-auto sm:h-auto min-h-11 shrink-0"
               aria-expanded={showFilters}
               aria-controls="vehicle-filter-drawer"
             >

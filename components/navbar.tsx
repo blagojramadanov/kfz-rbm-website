@@ -81,8 +81,8 @@ export function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Menu (lg+: five links, the language switcher and the account area need the width) */}
-          <div className="hidden lg:flex items-center gap-6 xl:gap-8">
+          {/* Desktop Menu (xl+: five links, the language switcher and the account area with the user name need the width) */}
+          <div className="hidden xl:flex items-center gap-8">
             {NAV_LINKS.map(({ href, key, ...rest }) => {
               const Icon = "icon" in rest ? rest.icon : null;
               return (
@@ -99,7 +99,7 @@ export function Navbar() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden xl:flex items-center gap-4">
             <LanguageSwitcher />
             {!loading && (
               <>
@@ -164,7 +164,7 @@ export function Navbar() {
           {/* Mobile menu button (44px touch target) */}
           <button
             type="button"
-            className="lg:hidden -mr-2 inline-flex h-11 w-11 items-center justify-center rounded-lg hover:bg-secondary transition-colors"
+            className="xl:hidden -mr-2 inline-flex h-11 w-11 items-center justify-center rounded-lg hover:bg-secondary transition-colors"
             onClick={() => setIsOpen((open) => !open)}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
@@ -183,7 +183,7 @@ export function Navbar() {
       <div
         id="mobile-menu"
         className={cn(
-          "lg:hidden fixed inset-x-0 top-20 bottom-0 z-40 bg-foreground/40 transition-[opacity,visibility] duration-200",
+          "xl:hidden fixed inset-x-0 top-20 bottom-0 z-40 bg-foreground/40 transition-[opacity,visibility] duration-200",
           isOpen ? "visible opacity-100" : "invisible opacity-0",
         )}
         onClick={closeMenu}

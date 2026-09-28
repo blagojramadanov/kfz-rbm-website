@@ -77,6 +77,10 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      screens: {
+        // Devices with a real hover (mouse); use for hover-only UI with a touch fallback.
+        "can-hover": { raw: "(hover: hover)" },
+      },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },

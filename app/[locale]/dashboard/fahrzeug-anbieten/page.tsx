@@ -752,7 +752,7 @@ export default function SubmitVehicleWizardPage() {
                       </div>
 
                       {/* Hover Actions (mouse); touch screens get the button below instead */}
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity hidden [@media(hover:hover)]:flex flex-col items-center justify-center gap-2">
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity hidden can-hover:flex flex-col items-center justify-center gap-2">
                         {!image.isMain && (
                           <button
                             onClick={() => setMainImage(image.id)}
@@ -768,7 +768,7 @@ export default function SubmitVehicleWizardPage() {
                         <button
                           type="button"
                           onClick={() => setMainImage(image.id)}
-                          className="[@media(hover:hover)]:hidden absolute inset-x-1 bottom-1 min-h-11 rounded bg-card/95 px-2 text-xs font-semibold text-foreground shadow"
+                          className="can-hover:hidden absolute inset-x-1 bottom-1 min-h-11 rounded bg-card/95 px-2 text-xs font-semibold text-foreground shadow"
                         >
                           {t("images.setMain")}
                         </button>
@@ -786,7 +786,7 @@ export default function SubmitVehicleWizardPage() {
                       </button>
 
                       {/* Drag Handle */}
-                      <div className="absolute bottom-2 right-2 bg-foreground/60 text-primary-foreground p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity hidden [@media(hover:hover)]:block">
+                      <div className="absolute bottom-2 right-2 bg-foreground/60 text-primary-foreground p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity hidden can-hover:block">
                         <GripVertical className="w-4 h-4" />
                       </div>
                     </div>
