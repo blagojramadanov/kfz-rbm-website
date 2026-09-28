@@ -151,7 +151,7 @@ export default function AdminEditVehiclePage() {
     return (
       <div className="space-y-6">
         <Link href="/admin/fahrzeuge">
-          <button className="flex items-center gap-2 text-primary hover:text-primary-hover font-medium">
+          <button className="flex min-h-11 items-center gap-2 text-primary hover:text-primary-hover font-medium">
             <ArrowLeft className="w-4 h-4" />
             {tForm("backToList")}
           </button>
@@ -167,7 +167,7 @@ export default function AdminEditVehiclePage() {
   return (
     <div className="space-y-6">
       <Link href={`/admin/fahrzeuge/${vehicleId}`}>
-        <button className="flex items-center gap-2 text-primary hover:text-primary-hover font-medium">
+        <button className="flex min-h-11 items-center gap-2 text-primary hover:text-primary-hover font-medium">
           <ArrowLeft className="w-4 h-4" />
           {tForm("backToVehicle")}
         </button>

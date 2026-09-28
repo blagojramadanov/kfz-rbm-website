@@ -208,7 +208,7 @@ export default function SubmittedVehicleDetailPage() {
     return (
       <div className="space-y-6">
         <Link href="/admin/fahrzeuge/eingereicht">
-          <button className="flex items-center gap-2 text-primary hover:underline">
+          <button className="flex min-h-11 items-center gap-2 text-primary hover:underline">
             <ArrowLeft className="w-4 h-4" />
             {tButtons("back")}
           </button>
@@ -227,7 +227,7 @@ export default function SubmittedVehicleDetailPage() {
     return (
       <div className="space-y-6">
         <Link href="/admin/fahrzeuge/eingereicht">
-          <button className="flex items-center gap-2 text-primary hover:underline">
+          <button className="flex min-h-11 items-center gap-2 text-primary hover:underline">
             <ArrowLeft className="w-4 h-4" />
             {tButtons("back")}
           </button>
@@ -248,7 +248,7 @@ export default function SubmittedVehicleDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <Link href="/admin/fahrzeuge/eingereicht">
-        <button className="flex items-center gap-2 text-primary hover:underline">
+        <button className="flex min-h-11 items-center gap-2 text-primary hover:underline">
           <ArrowLeft className="w-4 h-4" />
           {t("backToList")}
         </button>
@@ -310,7 +310,7 @@ export default function SubmittedVehicleDetailPage() {
                         )
                       }
                       aria-label={t("previousImage")}
-                      className="p-1.5 bg-border rounded hover:bg-input"
+                      className="inline-flex h-11 w-11 items-center justify-center bg-border rounded hover:bg-input"
                     >
                       <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                     </button>
@@ -321,7 +321,7 @@ export default function SubmittedVehicleDetailPage() {
                         )
                       }
                       aria-label={t("nextImage")}
-                      className="p-1.5 bg-border rounded hover:bg-input"
+                      className="inline-flex h-11 w-11 items-center justify-center bg-border rounded hover:bg-input"
                     >
                       <ChevronRight className="w-4 h-4" aria-hidden="true" />
                     </button>

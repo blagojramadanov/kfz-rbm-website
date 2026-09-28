@@ -259,13 +259,13 @@ export function SubmissionCustomer({
     <div className="space-y-0.5">
       {user.full_name && <p className="font-medium text-foreground">{user.full_name}</p>}
       {user.email && (
-        <a href={`mailto:${user.email}`} className="flex items-center gap-1.5 hover:text-primary break-all">
+        <a href={`mailto:${user.email}`} className="flex min-h-11 sm:min-h-0 items-center gap-1.5 hover:text-primary break-all">
           <Mail className="w-3.5 h-3.5 flex-shrink-0" />
           {user.email}
         </a>
       )}
       {user.phone && (
-        <a href={`tel:${user.phone.replace(/[^\d+]/g, "")}`} className="flex items-center gap-1.5 hover:text-primary">
+        <a href={`tel:${user.phone.replace(/[^\d+]/g, "")}`} className="flex min-h-11 sm:min-h-0 items-center gap-1.5 hover:text-primary">
           <Phone className="w-3.5 h-3.5 flex-shrink-0" />
           {user.phone}
         </a>

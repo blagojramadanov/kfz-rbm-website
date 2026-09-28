@@ -203,7 +203,7 @@ export default function AdminInquiriesPage() {
               <div className="flex gap-2 mb-4 flex-wrap items-center">
                 <StatusBadge kind="inquiryType" status={inquiry.inquiry_type}>{getInquiryTypeLabel(tCommon, inquiry.inquiry_type)}</StatusBadge>
                 {inquiry.vehicle ? (
-                  <Link href={`/admin/fahrzeuge/${inquiry.vehicle_id}`}>
+                  <Link href={`/admin/fahrzeuge/${inquiry.vehicle_id}`} className="inline-flex min-h-11 items-center">
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-info-subtle text-info-subtle-foreground cursor-pointer hover:bg-info-border">
                       {inquiry.vehicle.brand} {inquiry.vehicle.model} ({inquiry.vehicle.year})
                     </span>

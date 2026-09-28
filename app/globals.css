@@ -108,8 +108,8 @@
    */
   @media (max-width: 639px) {
     input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
-    select,
-    textarea {
+    select:not([multiple]),
+    textarea:not([hidden]) {
       font-size: max(16px, 1em);
     }
   }

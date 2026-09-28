@@ -1112,7 +1112,10 @@ Layout and styling only; the only new texts are the aria-labels `navigation.open
 - **Checked** (production build, automated overflow/clipped-text/input-size checks): all public and auth pages at 360 and 375 px in de/en/mk (84 page loads, logged out), 390/414/768/1280 px in de/mk, customer dashboard and both wizards at 360/375 in de/mk; menu, filter drawer, gallery swipe and dialog tested interactively.
 
 **Left for later parts**
-- Admin pages could not be opened in the browser (no admin session); checked from code only.
 - Raw `<button>` elements in admin/dashboard still aren't on `Button` (part 1 note).
 - Drag-to-reorder photos has no touch equivalent (only "Als Hauptbild festlegen").
 - Desktop filter sidebar fields are 14px (fine on desktop; phones use the drawer at 16px).
+
+### Part 2 follow-up: admin checked as admin (2026-09-28)
+- All admin pages (overview, vehicles list/detail/new/edit, submission queue, an accepted and a rejected submission, customers list/detail, inquiries, trade-ins, statistics) checked at 360/375 px in de/mk and 768/1280 px in de, logged in as admin: no page overflow, no clipped text; the drawer menu tested interactively (all entries and sub-pages 44px, active state, closes on navigation and Escape, scroll lock).
+- Fixed from that check: the 16px phone rule did not apply to `select`/`textarea` with `text-sm` (specificity; now `select:not([multiple])`, `textarea:not([hidden])`), "Zurück zu …" links and the photo arrows on the submission detail are 44px, customer email/phone links and the vehicle chips in Anfragen have 44px tap areas on phones, admin overview stat cards use 1/2/3/5 columns (were 5 columns at 768 px next to the sidebar).

@@ -76,7 +76,7 @@ export default function AdminCustomerDetailPage() {
   }
 
   const backLink = (
-    <Link href="/admin/kunden" className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-medium">
+    <Link href="/admin/kunden" className="inline-flex min-h-11 items-center gap-2 text-primary hover:text-primary-hover font-medium">
       <ArrowLeft className="w-4 h-4" />
       {t("backToList")}
     </Link>

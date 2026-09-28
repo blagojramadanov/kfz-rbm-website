@@ -120,7 +120,7 @@ export default function AdminDashboardPage() {
       ) : stats ? (
         <>
           {/* Quick Stats */}
-          <div className="grid md:grid-cols-5 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {/* Total Vehicles */}
             <Link href={`/admin/fahrzeuge`}>
               <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer">
@@ -226,7 +226,7 @@ export default function AdminDashboardPage() {
           {/* Quick Actions */}
           <div className="card p-6">
             <h3 className="card-title mb-4">{t("admin.dashboard.quickActions")}</h3>
-            <div className="grid md:grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
               <Link href="/admin/fahrzeuge/neu">
                 <button className="min-h-11 w-full px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors font-medium">
                   + {t("admin.dashboard.createVehicle")}
