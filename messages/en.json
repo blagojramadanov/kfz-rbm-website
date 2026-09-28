@@ -1015,8 +1015,9 @@
         },
         "notFound": {
             "title": "Page not found",
-            "description": "The requested page could not be found.",
-            "backHome": "Back to home"
+            "description": "The page you requested does not exist or has been moved. Check the address or take a look at our vehicles.",
+            "backHome": "Go to the home page",
+            "vehicles": "View vehicles"
         }
     },
     "common": {
@@ -1214,6 +1215,11 @@
                     "p3": "Vercel processes the data on our behalf (Art. 28 GDPR). This may involve a transfer to the USA, which takes place on the basis of the EU-US Data Privacy Framework or the European Commission's standard contractual clauses.",
                     "policy": "Vercel privacy policy"
                 },
+                "tls": {
+                    "title": "SSL/TLS encryption",
+                    "p1": "For security reasons and to protect the data transmitted, such as your form entries and login details, this website uses SSL/TLS encryption. You can recognise an encrypted connection by “https://” in your browser’s address bar and by the padlock icon.",
+                    "p2": "With encryption enabled, the data you send to us cannot be read by third parties."
+                },
                 "database": {
                     "title": "Database, sign-in and file storage (Supabase)",
                     "p1": "For customer accounts, sign-in and the storage of inquiries, vehicle offers, favourites and uploaded photos we use Supabase (Supabase Inc.). Supabase provides the database, authentication and file storage and processes the data on our behalf (Art. 28 GDPR).",
@@ -1247,7 +1253,9 @@
                     "item5": "for test drives, your preferred date",
                     "p2": "If you are signed in, we link the inquiry to your customer account so that you can view it there.",
                     "p3": "We use the information solely to handle your inquiry. The legal basis is Art. 6(1)(b) GDPR where your inquiry aims at a contract, otherwise Art. 6(1)(f) GDPR (legitimate interest in answering). The same applies when you contact us by email or phone.",
-                    "p4": "To protect against spam, the forms contain a field that is invisible to people. No additional data is collected for this."
+                    "p4": "Our public email address is hosted by Google (Gmail, Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland). When you contact us by email, your message is therefore processed by Google. This may involve a transfer to the USA, which takes place on the basis of the EU-US Data Privacy Framework.",
+                    "googlePolicy": "Google privacy policy",
+                    "p5": "To protect against spam, the forms contain a field that is invisible to people. No additional data is collected for this."
                 },
                 "submissions": {
                     "title": "Offering a vehicle and trade-in",

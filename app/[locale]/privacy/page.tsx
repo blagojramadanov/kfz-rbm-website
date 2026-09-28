@@ -29,10 +29,11 @@ const SECTIONS: { id: string; parts: Part[] }[] = [
   { id: "controller", parts: ["p"] }, // + contact block, added below
   { id: "overview", parts: ["p", { list: 3 }, "p"] },
   { id: "hosting", parts: ["p", { list: 5 }, "p", "p", { link: "policy", href: "https://vercel.com/legal/privacy-policy" }] },
+  { id: "tls", parts: ["p", "p"] },
   { id: "database", parts: ["p", "p", "p", { link: "policy", href: "https://supabase.com/privacy" }] },
   { id: "email", parts: ["p", "p", { link: "policy", href: "https://resend.com/legal/privacy-policy" }] },
   { id: "account", parts: ["p", { list: 4 }, "p", "p"] },
-  { id: "inquiries", parts: ["p", { list: 5 }, "p", "p", "p"] },
+  { id: "inquiries", parts: ["p", { list: 5 }, "p", "p", "p", { link: "googlePolicy", href: "https://policies.google.com/privacy" }, "p"] },
   { id: "submissions", parts: ["p", { list: 4 }, "p", "p", "p"] },
   { id: "favorites", parts: ["p"] },
   { id: "cookies", parts: ["p", { list: 3 }, "p", "p"] },

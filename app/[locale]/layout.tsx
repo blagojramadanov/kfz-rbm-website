@@ -1,23 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { notFound } from "next/navigation";
-import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
-import "../globals.css";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
-import { ToastProvider } from "@/components/ui/toast";
-import { AuthProvider } from "@/lib/auth-context";
-import { FavoritesProvider } from "@/lib/favorites-context";
+import { SiteShell } from "@/components/site-shell";
 import { COMPANY } from "@/lib/company";
 import { locales } from "@/lib/locales";
-
-// Cyrillic subset for Macedonian; otherwise mk text falls back to a system font.
-const inter = Inter({
-  subsets: ["latin", "latin-ext", "cyrillic"],
-  variable: "--font-sans",
-  display: "swap",
-});
 
 export async function generateMetadata({
   params: { locale },
@@ -49,7 +35,7 @@ export default async function LocaleLayout({
   // Opts the tree into static rendering (no headers() lookup for the locale).
   setRequestLocale(locale);
 
-  let messages = {};
+  let messages: Awaited<ReturnType<typeof getMessages>> = {};
   try {
     messages = await getMessages();
   } catch (error) {
@@ -58,20 +44,8 @@ export default async function LocaleLayout({
   }
 
   return (
-    <html lang={locale} className={inter.variable} suppressHydrationWarning>
-      <body className="font-sans">
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          <ToastProvider>
-            <AuthProvider>
-              <FavoritesProvider>
-                <Navbar />
-                <main className="min-h-screen">{children}</main>
-                <Footer />
-              </FavoritesProvider>
-            </AuthProvider>
-          </ToastProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <SiteShell locale={locale} messages={messages}>
+      {children}
+    </SiteShell>
   );
 }
