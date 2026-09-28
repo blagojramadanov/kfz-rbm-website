@@ -225,13 +225,14 @@ export default function InzahlungnahmePage() {
               style={{ width: `${stepProgress}%` }}
             ></div>
           </div>
-          <div className="flex justify-between items-center mt-4 overflow-x-auto">
+          {/* Steps share the width (flexible connectors), so all fit at 360px */}
+          <ol className="flex items-center mt-4">
             {STEPS.map((step, index) => (
-              <div key={step.id} className="flex items-center flex-shrink-0">
+              <li key={step.id} className="flex items-center flex-1 last:flex-none">
                 <button
                   onClick={() => setCurrentStep(step.id)}
                   disabled={index > currentIndex}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
+                  className={`relative w-8 h-8 shrink-0 rounded-full flex items-center justify-center font-bold text-sm transition-colors after:absolute after:-inset-1.5 after:content-[""] ${
                     index < currentIndex
                       ? "bg-success text-primary-foreground"
                       : index === currentIndex
@@ -243,14 +244,14 @@ export default function InzahlungnahmePage() {
                 </button>
                 {index < STEPS.length - 1 && (
                   <div
-                    className={`w-12 h-0.5 mx-1 transition-colors ${
+                    className={`flex-1 min-w-2 h-0.5 mx-1 transition-colors ${
                       index < currentIndex ? "bg-success" : "bg-input"
                     }`}
                   ></div>
                 )}
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </div>
 
@@ -294,6 +295,7 @@ export default function InzahlungnahmePage() {
                 <label className="block text-sm font-medium text-foreground mb-2">{t("currentVehicle.year")} *</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   name="current_vehicle_year"
                   value={formData.current_vehicle_year}
                   onChange={handleInputChange}
@@ -306,6 +308,7 @@ export default function InzahlungnahmePage() {
                 <label className="block text-sm font-medium text-foreground mb-2">{t("currentVehicle.mileage")}</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   name="current_vehicle_mileage"
                   value={formData.current_vehicle_mileage}
                   onChange={handleInputChange}
@@ -328,6 +331,7 @@ export default function InzahlungnahmePage() {
               <label className="block text-sm font-medium text-foreground mb-2">{t("vehicleValue.label")} *</label>
               <input
                 type="number"
+                inputMode="numeric"
                 name="current_vehicle_value_estimate"
                 value={formData.current_vehicle_value_estimate}
                 onChange={handleInputChange}

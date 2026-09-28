@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -49,17 +50,19 @@ export function ConfirmDialog({
     };
   }, [open]);
 
+  useBodyScrollLock(open);
+
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={() => !busy && onCancel()} aria-hidden="true" />
       <div
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
-        className="relative w-full max-w-md rounded-lg bg-card p-6 shadow-xl"
+        className="relative w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-lg bg-card p-6 shadow-xl"
       >
         <h2 id={titleId} className="text-lg font-bold text-foreground">
           {title}

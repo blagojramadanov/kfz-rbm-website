@@ -488,7 +488,7 @@ export default function SubmittedVehicleDetailPage() {
             ) : !showPublishForm ? (
               <button
                 onClick={() => setShowPublishForm(true)}
-                className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors"
+                className="min-h-11 w-full px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors"
               >
                 {t("publish")}
               </button>
@@ -507,6 +507,7 @@ export default function SubmittedVehicleDetailPage() {
                   <input
                     id="publish-price"
                     type="number"
+                    inputMode="numeric"
                     min={1}
                     required
                     value={publishPrice ?? ""}
@@ -572,7 +573,7 @@ export default function SubmittedVehicleDetailPage() {
                   <button
                     onClick={handlePublish}
                     disabled={publishing}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-success text-success-foreground rounded-lg hover:bg-success-hover disabled:bg-muted-foreground/50 font-medium transition-colors"
+                    className="min-h-11 w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-success text-success-foreground rounded-lg hover:bg-success-hover disabled:bg-muted-foreground/50 font-medium transition-colors"
                   >
                     {publishing ? (
                       t("publishing")
@@ -585,7 +586,7 @@ export default function SubmittedVehicleDetailPage() {
                   </button>
                   <button
                     onClick={() => setShowPublishForm(false)}
-                    className="w-full px-4 py-2 border border-input text-foreground rounded-lg hover:bg-muted font-medium transition-colors"
+                    className="min-h-11 w-full px-4 py-2 border border-input text-foreground rounded-lg hover:bg-muted font-medium transition-colors"
                   >
                     {tButtons("cancel")}
                   </button>

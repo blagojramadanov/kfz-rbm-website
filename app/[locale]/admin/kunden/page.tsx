@@ -110,7 +110,35 @@ export default function AdminCustomersPage() {
         ) : visibleCustomers.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">{t("empty")}</div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Phones: one card per customer, the whole card links to the profile */}
+          <ul className="md:hidden divide-y divide-border">
+            {visibleCustomers.map((customer) => (
+              <li key={customer.id}>
+                <Link href={`/admin/kunden/${customer.id}`} className="block p-4 space-y-2 hover:bg-muted">
+                  <p className="font-semibold text-foreground break-words">{customer.full_name}</p>
+                  <p className="text-sm text-muted-foreground break-all">{customer.email}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {customer.phone || "—"} · {formatDate(customer.created_at)}
+                  </p>
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-medium bg-info-subtle text-info-subtle-foreground">
+                      {t("vehicles")}: {format.number(customer.submitted_vehicles_count || 0)}
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-medium bg-warning-subtle text-warning-subtle-foreground">
+                      {tAdmin("sidebar.inquiries")}: {format.number(customer.inquiries_count || 0)}
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-medium bg-highlight-subtle text-highlight-subtle-foreground">
+                      {tAdmin("sidebar.tradeIns")}: {format.number(customer.trade_in_requests_count || 0)}
+                    </span>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* md+: table (scrolls horizontally inside the card if needed) */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-muted border-b border-border">
                 <tr>
@@ -166,6 +194,7 @@ export default function AdminCustomersPage() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
     </div>

@@ -142,7 +142,7 @@ export default function AdminInquiriesPage() {
             <button
               key={category || "all"}
               onClick={() => setCategoryFilter(category)}
-              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+              className={`min-h-11 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                 categoryFilter === category ? "bg-inverse text-primary-foreground" : "bg-card border border-input text-foreground hover:bg-secondary"
               }`}
             >

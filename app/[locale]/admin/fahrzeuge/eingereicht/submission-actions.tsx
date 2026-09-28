@@ -129,7 +129,7 @@ export function SubmissionActions({
           <button
             onClick={toggleOffer}
             disabled={busy}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-success hover:bg-success-hover text-primary-foreground rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-success hover:bg-success-hover text-primary-foreground rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Check className="w-4 h-4" />
             {vehicle.status === "angebot_gesendet" ? t("updateOffer") : t("sendOffer")}
@@ -139,7 +139,7 @@ export function SubmissionActions({
           <button
             onClick={toggleReject}
             disabled={busy}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-destructive-border text-destructive hover:bg-destructive-subtle/50 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-destructive-border text-destructive hover:bg-destructive-subtle/50 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <X className="w-4 h-4" />
             {t("reject")}
@@ -178,13 +178,13 @@ export function SubmissionActions({
             <button
               onClick={handleSendOffer}
               disabled={busy || !offerPrice.trim()}
-              className="flex-1 px-3 py-2 bg-success hover:bg-success-hover text-primary-foreground rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-11 flex-1 px-3 py-2 bg-success hover:bg-success-hover text-primary-foreground rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {busy ? "..." : t("confirmOffer")}
             </button>
             <button
               onClick={() => setMode(null)}
-              className="flex-1 px-3 py-2 border border-input text-foreground hover:bg-muted rounded-lg font-medium text-sm transition-colors"
+              className="min-h-11 flex-1 px-3 py-2 border border-input text-foreground hover:bg-muted rounded-lg font-medium text-sm transition-colors"
             >
               {tButtons("cancel")}
             </button>
@@ -206,7 +206,7 @@ export function SubmissionActions({
             <button
               onClick={handleReject}
               disabled={busy || !rejectReason.trim()}
-              className="flex-1 px-3 py-2 bg-destructive hover:bg-destructive-hover text-primary-foreground rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-11 flex-1 px-3 py-2 bg-destructive hover:bg-destructive-hover text-primary-foreground rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {tCommon("confirm")}
             </button>
@@ -215,7 +215,7 @@ export function SubmissionActions({
                 setMode(null);
                 setRejectReason("");
               }}
-              className="flex-1 px-3 py-2 border border-input text-foreground hover:bg-muted rounded-lg font-medium text-sm transition-colors"
+              className="min-h-11 flex-1 px-3 py-2 border border-input text-foreground hover:bg-muted rounded-lg font-medium text-sm transition-colors"
             >
               {tButtons("cancel")}
             </button>

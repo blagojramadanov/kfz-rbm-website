@@ -64,7 +64,7 @@ export default function ContactPage() {
       />
       <div className="page-container">
 
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
           {/* Contact Info */}
           <div>
             <h2 className="section-title mb-6">
@@ -108,7 +108,7 @@ export default function ContactPage() {
           </div>
 
           {/* Contact Form */}
-          <div className="bg-card p-8 rounded-lg shadow">
+          <div className="card p-6 sm:p-8">
             <h2 className="section-title mb-6">
               {t("contact.sendMessage")}
             </h2>

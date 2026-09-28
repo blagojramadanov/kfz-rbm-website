@@ -59,7 +59,7 @@ export function ServicesGrid() {
   const t = useTranslations("pages.home");
   const tImg = useTranslations("siteImages");
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
       {SERVICES.map((service) => (
         <div
           key={service.id}
@@ -79,7 +79,7 @@ export function ServicesGrid() {
             </div>
 
             {/* Content */}
-            <div className={`sm:col-span-3 bg-gradient-to-br ${service.color} p-8 flex flex-col justify-between`}>
+            <div className={`sm:col-span-3 bg-gradient-to-br ${service.color} p-6 sm:p-8 flex flex-col justify-between`}>
               {/* Icon & Title */}
               <div>
                 <div className="inline-block p-3 bg-primary text-primary-foreground rounded-lg mb-4 group-hover:scale-110 transition-transform">
@@ -94,7 +94,7 @@ export function ServicesGrid() {
               </div>
 
               {/* CTA */}
-              <Button asChild className="w-full">
+              <Button asChild className="w-full h-auto min-h-10 whitespace-normal text-center">
                 <Link href={service.href}>
                   {t(`services.${service.id}.cta`)}
                   <ArrowRight className="ml-2 w-4 h-4" />

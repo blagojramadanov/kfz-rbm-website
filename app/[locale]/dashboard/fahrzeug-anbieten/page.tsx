@@ -455,12 +455,13 @@ export default function SubmitVehicleWizardPage() {
               style={{ width: `${stepProgress}%` }}
             ></div>
           </div>
-          <div className="flex justify-between items-center mt-4 overflow-x-auto">
+          {/* Steps share the width (flexible connectors), so all fit at 360px */}
+          <ol className="flex items-center mt-4">
             {STEP_IDS.map((stepId, index) => (
-              <div key={stepId} className="flex items-center flex-shrink-0">
+              <li key={stepId} className="flex items-center flex-1 last:flex-none">
                 <button
                   onClick={() => setCurrentStep(stepId)}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
+                  className={`relative w-8 h-8 shrink-0 rounded-full flex items-center justify-center font-bold text-sm transition-colors after:absolute after:-inset-1.5 after:content-[""] ${
                     index < currentIndex
                       ? "bg-success text-primary-foreground"
                       : index === currentIndex
@@ -472,14 +473,14 @@ export default function SubmitVehicleWizardPage() {
                 </button>
                 {index < STEP_IDS.length - 1 && (
                   <div
-                    className={`w-12 h-0.5 mx-1 transition-colors ${
+                    className={`flex-1 min-w-2 h-0.5 mx-1 transition-colors ${
                       index < currentIndex ? "bg-success" : "bg-input"
                     }`}
                   ></div>
                 )}
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </div>
 
@@ -534,6 +535,7 @@ export default function SubmitVehicleWizardPage() {
                 <label className="block text-sm font-medium text-foreground mb-2">{t("fields.firstRegistrationRequired")}</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   name="erstzulassung"
                   value={formData.erstzulassung}
                   onChange={handleInputChange}
@@ -547,6 +549,7 @@ export default function SubmitVehicleWizardPage() {
                 <label className="block text-sm font-medium text-foreground mb-2">{t("fields.mileage")}</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   name="kilometerstand"
                   value={formData.kilometerstand}
                   onChange={handleInputChange}
@@ -558,6 +561,7 @@ export default function SubmitVehicleWizardPage() {
                 <label className="block text-sm font-medium text-foreground mb-2">{t("fields.powerHp")}</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   name="leistung"
                   value={formData.leistung}
                   onChange={handleInputChange}
@@ -684,6 +688,7 @@ export default function SubmitVehicleWizardPage() {
               <label className="block text-sm font-medium text-foreground mb-2">{t("fields.priceLabel")}</label>
               <input
                 type="number"
+                inputMode="numeric"
                 name="preisvorstellung"
                 value={formData.preisvorstellung}
                 onChange={handleInputChange}
@@ -746,17 +751,28 @@ export default function SubmitVehicleWizardPage() {
                         )}
                       </div>
 
-                      {/* Hover Actions */}
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                      {/* Hover Actions (mouse); touch screens get the button below instead */}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity hidden [@media(hover:hover)]:flex flex-col items-center justify-center gap-2">
                         {!image.isMain && (
                           <button
                             onClick={() => setMainImage(image.id)}
-                            className="bg-card text-foreground px-3 py-1 rounded text-sm font-medium hover:bg-secondary"
+                            className="min-h-11 bg-card text-foreground px-3 py-1 rounded text-sm font-medium hover:bg-secondary"
                           >
                             {t("images.setMain")}
                           </button>
                         )}
                       </div>
+
+                      {/* Set as main image on touch screens (no hover) */}
+                      {!image.isMain && (
+                        <button
+                          type="button"
+                          onClick={() => setMainImage(image.id)}
+                          className="[@media(hover:hover)]:hidden absolute inset-x-1 bottom-1 min-h-11 rounded bg-card/95 px-2 text-xs font-semibold text-foreground shadow"
+                        >
+                          {t("images.setMain")}
+                        </button>
+                      )}
 
                       {/* Remove (always visible: hover does not exist on touch screens) */}
                       <button
@@ -764,13 +780,13 @@ export default function SubmitVehicleWizardPage() {
                         onClick={() => removeImage(image.id)}
                         aria-label={t("images.remove", { index: index + 1 })}
                         title={t("images.remove", { index: index + 1 })}
-                        className="absolute top-2 right-2 z-10 bg-white/90 hover:bg-destructive hover:text-primary-foreground text-destructive p-1.5 rounded-full shadow"
+                        className="absolute top-1 right-1 z-10 inline-flex h-11 w-11 items-center justify-center bg-white/90 hover:bg-destructive hover:text-primary-foreground text-destructive rounded-full shadow"
                       >
                         <X className="w-4 h-4" />
                       </button>
 
                       {/* Drag Handle */}
-                      <div className="absolute bottom-2 right-2 bg-foreground/60 text-primary-foreground p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="absolute bottom-2 right-2 bg-foreground/60 text-primary-foreground p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity hidden [@media(hover:hover)]:block">
                         <GripVertical className="w-4 h-4" />
                       </div>
                     </div>

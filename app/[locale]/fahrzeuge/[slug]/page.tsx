@@ -119,7 +119,7 @@ export default async function VehicleDetailPage({
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Left Column - Gallery and Main Info */}
           <div className="lg:col-span-2">
             {/* Gallery */}
@@ -269,7 +269,7 @@ export default async function VehicleDetailPage({
           {/* Right Column - Contact & CTA */}
           <div className="lg:col-span-1">
             {/* CTA Card */}
-            <div className="sticky top-24 card p-6 sm:p-8 space-y-6">
+            <div className="lg:sticky lg:top-24 card p-6 sm:p-8 space-y-6">
               {/* Price Summary */}
               <div className="border-b pb-6">
                 <p className="text-muted-foreground text-sm mb-2">{t("price.summary")}</p>

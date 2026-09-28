@@ -247,6 +247,7 @@ export default function AdminCreateVehiclePage() {
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 name="year"
                 value={formData.year}
                 onChange={handleInputChange}
@@ -265,6 +266,7 @@ export default function AdminCreateVehiclePage() {
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 name="mileage"
                 value={formData.mileage}
                 onChange={handleInputChange}
@@ -278,6 +280,7 @@ export default function AdminCreateVehiclePage() {
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 name="price"
                 value={formData.price}
                 onChange={handleInputChange}
@@ -370,6 +373,7 @@ export default function AdminCreateVehiclePage() {
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 name="power_hp"
                 value={formData.power_hp}
                 onChange={handleInputChange}
@@ -385,6 +389,7 @@ export default function AdminCreateVehiclePage() {
             </label>
             <input
               type="number"
+              inputMode="numeric"
               name="engine_cc"
               value={formData.engine_cc}
               onChange={handleInputChange}
@@ -530,7 +535,7 @@ export default function AdminCreateVehiclePage() {
             <button
               type="submit"
               disabled={formLoading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-11 flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="w-4 h-4" />
               {formLoading ? tForm("creating") : tForm("create")}
@@ -538,7 +543,7 @@ export default function AdminCreateVehiclePage() {
             <Link href="/admin/fahrzeuge" className="flex-1">
               <button
                 type="button"
-                className="w-full px-4 py-3 border border-input text-foreground rounded-lg hover:bg-muted font-medium transition-colors"
+                className="min-h-11 w-full px-4 py-3 border border-input text-foreground rounded-lg hover:bg-muted font-medium transition-colors"
               >
                 {tButtons("cancel")}
               </button>

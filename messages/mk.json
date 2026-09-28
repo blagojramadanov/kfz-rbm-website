@@ -13,7 +13,9 @@
         "export": "Извоз",
         "settings": "Поставки",
         "favorites": "Омилени",
-        "favoritesCount": "{count, plural, one {# омилено} other {# омилени}}"
+        "favoritesCount": "{count, plural, one {# омилено} other {# омилени}}",
+        "openMenu": "Отворете го менито",
+        "closeMenu": "Затворете го менито"
     },
     "buttons": {
         "save": "Зачувајте",

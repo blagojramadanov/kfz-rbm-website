@@ -1097,3 +1097,22 @@ Visual consistency pass only: no changes to functionality, data, routes or trans
 - Styled 404 for every unknown URL: `app/[locale]/[...rest]/page.tsx` calls `notFound()`, `app/[locale]/not-found.tsx` and the new root `app/not-found.tsx` (paths the middleware skips, e.g. `/foo.php`; shown in German) render `components/not-found-content.tsx` (title, text, buttons to the home page and /fahrzeuge; de/en/mk). Header, footer and language switcher come from the new `components/site-shell.tsx`, now shared by the [locale] layout and the root not-found.
 - Checked with a production build: /de|en|mk/xyz, /de/a/b/c, /terms (redirects to /{locale}/terms), /foo.php and unknown vehicle slugs return 404 with `<meta name="robots" content="noindex">`; styled page in all three languages at 1280px and 375px; language switcher works on the 404. Valid pages 200, / and unprefixed paths redirect as before, dashboard/admin redirect logged-out users to /login, reset-password with `code` or `token_hash` loads.
 - Known Next.js 14 behavior (also before this change, e.g. unknown vehicle slugs): for 404s the server sends a minimal HTML shell (`<html id="__next_error__">`) and the styled page is rendered in the browser from the included payload. Status 404 and noindex are sent by the server.
+
+### Part 2 of 5: mobile layout (done, 2026-09-28)
+Layout and styling only; the only new texts are the aria-labels `navigation.openMenu` / `navigation.closeMenu` (de/en/mk).
+
+- **Navigation**: full menu from `lg` (tablet uses the mobile menu). Mobile menu is an animated panel below the bar: all links, language switcher (44px buttons), account/login area incl. Einstellungen; closes on link click, route change, Escape and backdrop tap; page scroll locked while open (`lib/use-body-scroll-lock.ts`); hamburger 44px with translated label.
+- **/fahrzeuge + export**: filters open as a slide-in drawer below `lg` (one "Filter (n)" button, close button, "n Fahrzeuge gefunden" footer, scroll lock); search bar only sticky from `sm` and now below the navbar (was `top-0`, hidden behind it); 44px filter section headers and checkbox rows.
+- **Vehicle detail**: gallery swipe, 4:3 image on phones, 44px arrows; contact box sticky only on `lg`; inquiry/test-drive dialog is a full-height scrollable sheet on phones (`dvh`), 44px close, scroll lock; confirm dialog height-limited and scrollable.
+- **Home**: hero grows with content instead of `h-screen` (was clipped on short phones), smaller hero type on phones, CTA buttons may wrap, scroll hint hidden on phones, section padding `py-12 sm:py-20`; service card CTAs may wrap (MK at 768px).
+- **Forms**: every text field is ≥16px on phones (CSS rule in `globals.css`, no iOS zoom); `inputMode="numeric"` on all number fields; `autoComplete` on login, register, forgot password, profile; long emails/URLs wrap.
+- **Wizards**: step indicators use flexible connectors (7 steps fit at 360px) with 44px tap areas; photo grid: "Als Hauptbild" button visible on touch screens (was hover-only), 44px remove button.
+- **Dashboard**: stat cards 1/2/4 columns; Profil card and tabs with phone paddings; offer accept/reject buttons 44px.
+- **Admin**: sidebar becomes a drawer on phones (all entries incl. Eingereichte Fahrzeuge / Neues Fahrzeug, active state, logout, close, scroll lock, above the site navbar); one page scroll instead of the nested `h-screen` scroll area; vehicle and customer tables become stacked cards below `md` (tables unchanged from `md`, horizontal scroll inside the card); submission queue quick specs stack on phones; status tabs scroll horizontally; admin form buttons ≥44px.
+- **Checked** (production build, automated overflow/clipped-text/input-size checks): all public and auth pages at 360 and 375 px in de/en/mk (84 page loads, logged out), 390/414/768/1280 px in de/mk, customer dashboard and both wizards at 360/375 in de/mk; menu, filter drawer, gallery swipe and dialog tested interactively.
+
+**Left for later parts**
+- Admin pages could not be opened in the browser (no admin session); checked from code only.
+- Raw `<button>` elements in admin/dashboard still aren't on `Button` (part 1 note).
+- Drag-to-reorder photos has no touch equivalent (only "Als Hauptbild festlegen").
+- Desktop filter sidebar fields are 14px (fine on desktop; phones use the drawer at 16px).

@@ -228,12 +228,12 @@ export default function AdminDashboardPage() {
             <h3 className="card-title mb-4">{t("admin.dashboard.quickActions")}</h3>
             <div className="grid md:grid-cols-4 gap-4">
               <Link href="/admin/fahrzeuge/neu">
-                <button className="w-full px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors font-medium">
+                <button className="min-h-11 w-full px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors font-medium">
                   + {t("admin.dashboard.createVehicle")}
                 </button>
               </Link>
               <Link href="/admin/fahrzeuge/eingereicht">
-                <button className="w-full px-4 py-3 border border-input text-foreground rounded-lg hover:bg-muted transition-colors font-medium">
+                <button className="min-h-11 w-full px-4 py-3 border border-input text-foreground rounded-lg hover:bg-muted transition-colors font-medium">
                   {t("admin.dashboard.withCount", {
                     label: t("admin.sidebar.submittedVehicles"),
                     count: n(stats.submitted_vehicles_eingereicht),
@@ -241,12 +241,12 @@ export default function AdminDashboardPage() {
                 </button>
               </Link>
               <Link href="/admin/anfragen">
-                <button className="w-full px-4 py-3 border border-input text-foreground rounded-lg hover:bg-muted transition-colors font-medium">
+                <button className="min-h-11 w-full px-4 py-3 border border-input text-foreground rounded-lg hover:bg-muted transition-colors font-medium">
                   {t("admin.dashboard.withCount", { label: t("admin.sidebar.inquiries"), count: n(stats.inquiries_new) })}
                 </button>
               </Link>
               <Link href="/admin/inzahlungnahmen">
-                <button className="w-full px-4 py-3 border border-input text-foreground rounded-lg hover:bg-muted transition-colors font-medium">
+                <button className="min-h-11 w-full px-4 py-3 border border-input text-foreground rounded-lg hover:bg-muted transition-colors font-medium">
                   {t("admin.dashboard.withCount", {
                     label: t("admin.sidebar.tradeIns"),
                     count: n(stats.trade_in_requests_new),

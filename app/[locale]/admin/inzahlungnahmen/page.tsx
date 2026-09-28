@@ -124,7 +124,7 @@ export default function AdminTradeInRequestsPage() {
           <button
             key={status}
             onClick={() => setStatusFilter(status)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`min-h-11 px-4 py-2 rounded-lg font-medium transition-colors ${
               statusFilter === status
                 ? "bg-primary text-primary-foreground"
                 : "bg-border text-foreground hover:bg-input"
@@ -254,7 +254,7 @@ export default function AdminTradeInRequestsPage() {
                         setEditingNotes("");
                       }}
                       aria-label={tButtons("cancel")}
-                      className="px-4 py-2 border border-input rounded-lg hover:bg-secondary font-medium transition-colors"
+                      className="min-h-11 px-4 py-2 border border-input rounded-lg hover:bg-secondary font-medium transition-colors"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -274,7 +274,7 @@ export default function AdminTradeInRequestsPage() {
                       setEditingId(request.id);
                       setEditingNotes(request.admin_notes || "");
                     }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors"
+                    className="min-h-11 w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors"
                   >
                     <Edit2 className="w-4 h-4" />
                     {t("editStatusNotes")}

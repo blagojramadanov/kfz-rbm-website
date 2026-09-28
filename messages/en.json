@@ -13,7 +13,9 @@
         "export": "Export",
         "settings": "Settings",
         "favorites": "Favorites",
-        "favoritesCount": "{count, plural, one {# favorite} other {# favorites}}"
+        "favoritesCount": "{count, plural, one {# favorite} other {# favorites}}",
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu"
     },
     "buttons": {
         "save": "Save",

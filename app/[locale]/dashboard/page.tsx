@@ -81,7 +81,7 @@ export default function DashboardPage() {
 
       <main className="page-container">
         {/* Quick Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
           <Link href={`/dashboard/fahrzeuge`}>
             <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
@@ -132,7 +132,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Actions */}
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
+        <div className="grid md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
           {/* Submit Vehicle */}
           <Link href="/dashboard/fahrzeug-anbieten">
             <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer h-full">

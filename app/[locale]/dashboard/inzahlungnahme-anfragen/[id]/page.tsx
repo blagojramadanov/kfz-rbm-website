@@ -259,7 +259,7 @@ export default function TradeInRequestDetailPage() {
             {/* Action Buttons */}
             <div className="flex justify-between gap-4">
               <Link href="/dashboard/inzahlungnahme-anfragen">
-                <button className="inline-flex items-center gap-2 px-6 py-2 border border-input rounded-lg text-foreground hover:bg-muted transition-colors">
+                <button className="min-h-11 inline-flex items-center gap-2 px-6 py-2 border border-input rounded-lg text-foreground hover:bg-muted transition-colors">
                   <ArrowLeft className="w-4 h-4" aria-hidden="true" />
                   {t("backToList")}
                 </button>

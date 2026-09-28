@@ -1,5 +1,6 @@
 "use client";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -115,17 +116,17 @@ export default function AdminVehiclesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <h1 className="page-title text-foreground">{t("title")}</h1>
           <p className="text-muted-foreground mt-1">{t("subtitle")}</p>
         </div>
-        <Link href="/admin/fahrzeuge/neu">
-          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors font-medium">
-            <Plus className="w-5 h-5" />
+        <Button asChild className="self-start sm:self-auto">
+          <Link href="/admin/fahrzeuge/neu">
+            <Plus className="mr-2 w-5 h-5" aria-hidden="true" />
             {t("newVehicle")}
-          </button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       {/* Error Alert */}
@@ -179,7 +180,68 @@ export default function AdminVehiclesPage() {
             {t("empty")}
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Phones: one card per vehicle */}
+          <ul className="md:hidden divide-y divide-border">
+            {vehicles.map((vehicle) => (
+              <li key={vehicle.id} className="p-4 space-y-3">
+                <Link href={`/admin/fahrzeuge/${vehicle.id}`} className="block">
+                  <p className="font-semibold text-foreground flex items-center gap-2">
+                    <span className="min-w-0 break-words">{vehicle.brand} {vehicle.model}</span>
+                    {vehicle.featured && (
+                      <Star className="w-4 h-4 shrink-0 text-featured fill-featured" aria-label={t("featured")} />
+                    )}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {vehicle.year}
+                    {vehicle.mileage != null && <> · {tAdmin("units.mileage", { value: format.number(vehicle.mileage) })}</>}
+                  </p>
+                  <p className="font-semibold text-primary mt-1">
+                    {vehicle.price != null ? formatPrice(format, vehicle.price) : "–"}
+                  </p>
+                </Link>
+                <div className="flex flex-wrap items-center gap-2">
+                  <VehicleSourceBadge sourceType={vehicle.source_type || "rbm"} />
+                  <StatusBadge kind="vehicle" status={vehicle.status}>{getVehicleStatusLabel(tCommon, vehicle.status)}</StatusBadge>
+                  <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                    <Heart
+                      className={`w-4 h-4 ${vehicle.favoriteCount > 0 ? "text-destructive fill-destructive" : "text-muted-foreground/50"}`}
+                      aria-hidden="true"
+                    />
+                    {t("favoriteCount", { value: format.number(vehicle.favoriteCount) })}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <Link
+                    href={`/admin/fahrzeuge/${vehicle.id}`}
+                    aria-label={t("actions.view")}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-input text-muted-foreground hover:text-primary hover:bg-secondary"
+                  >
+                    <Eye className="w-5 h-5" aria-hidden="true" />
+                  </Link>
+                  <Link
+                    href={`/admin/fahrzeuge/${vehicle.id}/edit`}
+                    aria-label={t("actions.edit")}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-input text-muted-foreground hover:text-primary hover:bg-secondary"
+                  >
+                    <Edit2 className="w-5 h-5" aria-hidden="true" />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(vehicle.id)}
+                    disabled={deleting === vehicle.id}
+                    aria-label={t("actions.delete")}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-input text-muted-foreground hover:text-destructive hover:bg-secondary disabled:opacity-50"
+                  >
+                    <Trash2 className="w-5 h-5" aria-hidden="true" />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {/* md+: table (scrolls horizontally inside the card if needed) */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-muted border-b border-border">
                 <tr>
@@ -270,6 +332,7 @@ export default function AdminVehiclesPage() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
     </div>

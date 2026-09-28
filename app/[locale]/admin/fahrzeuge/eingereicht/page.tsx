@@ -167,7 +167,7 @@ export default function AdminSubmittedVehiclesPage() {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`flex flex-shrink-0 items-center gap-2 px-5 py-4 font-medium text-sm transition-all border-b-2 ${
+              className={`flex flex-shrink-0 items-center gap-2 px-4 sm:px-5 py-4 font-medium text-sm whitespace-nowrap transition-all border-b-2 ${
                 statusFilter === status
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -284,8 +284,8 @@ export default function AdminSubmittedVehiclesPage() {
                   </div>
 
                   {/* Quick Specs */}
-                  <div className="grid grid-cols-3 gap-3 mb-5">
-                    <div className="flex items-center gap-2 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                    <div className="flex min-w-0 items-center gap-2 text-sm">
                       <Gauge className="w-4 h-4 text-muted-foreground/70" />
                       <div>
                         <p className="text-xs text-muted-foreground">{t("mileage")}</p>
@@ -294,14 +294,14 @@ export default function AdminSubmittedVehiclesPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
+                    <div className="flex min-w-0 items-center gap-2 text-sm">
                       <Calendar className="w-4 h-4 text-muted-foreground/70" />
                       <div>
                         <p className="text-xs text-muted-foreground">{t("transmission")}</p>
                         <p className="font-semibold text-foreground">{getTransmissionLabel(tCommon, vehicle.transmission)}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
+                    <div className="flex min-w-0 items-center gap-2 text-sm">
                       <MapPin className="w-4 h-4 text-muted-foreground/70" />
                       <div>
                         <p className="text-xs text-muted-foreground">{t("fuel")}</p>

@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 import { TEST_DRIVE_HASH } from "@/lib/inquiries";
 import { Link } from "@/lib/navigation";
 import { useErrorMessage } from "@/lib/use-error-message";
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
 
 type InquiryType = "general" | "test_drive";
 
@@ -51,6 +52,8 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
     setError("");
     setOpenType(initialType);
   };
+
+  useBodyScrollLock(openType !== null);
 
   // Prefill from the profile (it loads after the page) without overwriting what was typed.
   useEffect(() => {
@@ -145,13 +148,13 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
 
       {openType &&
         createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center sm:p-4">
           <div className="absolute inset-0 bg-black/50" onClick={close} aria-hidden="true" />
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-lg bg-card p-6 shadow-xl"
+            className="relative w-full max-w-lg max-h-[100dvh] sm:max-h-[90vh] overflow-y-auto overscroll-contain rounded-t-lg sm:rounded-lg bg-card p-4 sm:p-6 shadow-xl"
           >
             <div className="flex items-start justify-between gap-4 mb-1">
               <h2 id={titleId} className="text-xl font-bold text-foreground">
@@ -161,7 +164,7 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
                 type="button"
                 onClick={close}
                 disabled={sending}
-                className="text-muted-foreground hover:text-foreground"
+                className="-mr-2 -mt-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary"
                 aria-label={t("close")}
               >
                 <X className="w-5 h-5" aria-hidden="true" />

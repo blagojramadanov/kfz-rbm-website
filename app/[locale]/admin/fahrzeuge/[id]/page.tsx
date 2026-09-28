@@ -260,7 +260,7 @@ export default function AdminVehicleDetailPage() {
 
         <div className="flex gap-3">
           <Link href={`/admin/fahrzeuge/${vehicleId}/edit`} className="flex-1">
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors">
+            <button className="min-h-11 w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover font-medium transition-colors">
               <Edit2 className="w-4 h-4" />
               {tButtons("edit")}
             </button>
@@ -268,7 +268,7 @@ export default function AdminVehicleDetailPage() {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-destructive-border text-destructive rounded-lg hover:bg-destructive-subtle/50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-h-11 flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-destructive-border text-destructive rounded-lg hover:bg-destructive-subtle/50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Trash2 className="w-4 h-4" />
             {deleting ? t("deleting") : tButtons("delete")}

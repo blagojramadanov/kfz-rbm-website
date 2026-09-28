@@ -13,7 +13,9 @@
         "export": "Export",
         "settings": "Einstellungen",
         "favorites": "Favoriten",
-        "favoritesCount": "{count, plural, one {# Favorit} other {# Favoriten}}"
+        "favoritesCount": "{count, plural, one {# Favorit} other {# Favoriten}}",
+        "openMenu": "Menü öffnen",
+        "closeMenu": "Menü schließen"
     },
     "buttons": {
         "save": "Speichern",

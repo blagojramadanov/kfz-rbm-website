@@ -92,6 +92,26 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    /* Long words (German compounds, VINs) wrap instead of widening the page */
+    overflow-wrap: break-word;
+  }
+
+  /* Emails and URLs have no break points; let them break anywhere. */
+  a[href^="mailto:"],
+  a[href^="http"] {
+    overflow-wrap: anywhere;
+  }
+
+  /*
+   * iOS zooms into form fields with a font size below 16px. On phones every text
+   * field is at least 16px; the selector outranks utilities such as .text-sm.
+   */
+  @media (max-width: 639px) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+    select,
+    textarea {
+      font-size: max(16px, 1em);
+    }
   }
 }
 

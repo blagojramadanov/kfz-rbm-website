@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Car, ChevronLeft, ChevronRight } from "lucide-react";
@@ -13,10 +13,11 @@ interface VehicleGalleryProps {
 export function VehicleGallery({ images, title }: VehicleGalleryProps) {
   const t = useTranslations("vehicles.gallery");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
 
   if (images.length === 0) {
     return (
-      <div className="relative h-96 sm:h-[500px] bg-secondary rounded-lg flex flex-col items-center justify-center gap-3 text-muted-foreground/70">
+      <div className="relative aspect-[4/3] sm:aspect-auto sm:h-[500px] bg-secondary rounded-lg flex flex-col items-center justify-center gap-3 text-muted-foreground/70">
         <Car className="w-16 h-16" aria-hidden="true" />
         <p>{t("noImages")}</p>
       </div>
@@ -35,10 +36,26 @@ export function VehicleGallery({ images, title }: VehicleGalleryProps) {
     setSelectedIndex(index);
   };
 
+  // Swipe on touch screens: a horizontal move of 40px or more changes the image.
+  const handleTouchStart = (event: React.TouchEvent) => {
+    touchStartX.current = event.touches[0].clientX;
+  };
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    if (touchStartX.current === null || images.length < 2) return;
+    const deltaX = event.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(deltaX) < 40) return;
+    if (deltaX < 0) handleNext();
+    else handlePrevious();
+  };
+
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative h-96 sm:h-[500px] bg-secondary rounded-lg overflow-hidden group">
+      <div className="relative aspect-[4/3] sm:aspect-auto sm:h-[500px] bg-secondary rounded-lg overflow-hidden group touch-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <Image
           src={images[selectedIndex]}
           alt={t("imageAlt", { title, index: selectedIndex + 1, total: images.length })}
@@ -53,21 +70,21 @@ export function VehicleGallery({ images, title }: VehicleGalleryProps) {
           <>
             <button
               onClick={handlePrevious}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-card bg-opacity-90 hover:bg-opacity-100 text-foreground rounded-full p-2 transition-all z-10"
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center bg-card/90 hover:bg-card text-foreground rounded-full shadow transition-all z-10"
               aria-label={t("previous")}
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-6 h-6" aria-hidden="true" />
             </button>
             <button
               onClick={handleNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-card bg-opacity-90 hover:bg-opacity-100 text-foreground rounded-full p-2 transition-all z-10"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center bg-card/90 hover:bg-card text-foreground rounded-full shadow transition-all z-10"
               aria-label={t("next")}
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-6 h-6" aria-hidden="true" />
             </button>
 
             {/* Image Counter */}
-            <div className="absolute bottom-4 right-4 bg-black bg-opacity-60 text-primary-foreground px-3 py-1 rounded text-sm font-semibold">
+            <div className="absolute bottom-4 right-4 bg-black/60 text-primary-foreground px-3 py-1 rounded text-sm font-semibold">
               {t("counter", { current: selectedIndex + 1, total: images.length })}
             </div>
           </>

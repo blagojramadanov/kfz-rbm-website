@@ -247,14 +247,14 @@ export default function MyVehiclesPage() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => setPendingAnswer({ vehicleId: vehicle.id, decision: "accept", price: vehicle.offered_price! })}
-                            className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-success text-success-foreground text-sm rounded-lg hover:bg-success-hover font-semibold"
+                            className="min-h-11 flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-success text-success-foreground text-sm rounded-lg hover:bg-success-hover font-semibold"
                           >
                             <Check className="w-4 h-4" aria-hidden="true" />
                             {t("acceptOffer")}
                           </button>
                           <button
                             onClick={() => setPendingAnswer({ vehicleId: vehicle.id, decision: "reject", price: vehicle.offered_price! })}
-                            className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 border border-destructive-border bg-card text-destructive text-sm rounded-lg hover:bg-destructive-subtle/50 font-semibold"
+                            className="min-h-11 flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 border border-destructive-border bg-card text-destructive text-sm rounded-lg hover:bg-destructive-subtle/50 font-semibold"
                           >
                             <X className="w-4 h-4" aria-hidden="true" />
                             {t("rejectOffer")}

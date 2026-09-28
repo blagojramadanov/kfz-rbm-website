@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { SITE_IMAGES } from "@/lib/site-images";
 import { Globe, Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useBodyScrollLock, useEscapeKey } from "@/lib/use-body-scroll-lock";
 import { VehicleCard } from "@/components/vehicle-card";
 import { INPUT_DEBOUNCE_MS, VehicleFilters } from "@/components/vehicle-filters";
 import type { PublicVehicle, VehicleFilterOptions } from "@/lib/public-vehicles";
@@ -72,6 +73,7 @@ export function VehicleListing({
 }: VehicleListingProps) {
   const t = useTranslations("vehicles");
   const tImg = useTranslations("siteImages");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -154,10 +156,14 @@ export function VehicleListing({
     />
   );
 
+  const closeFilters = useCallback(() => setShowFilters(false), []);
+  useBodyScrollLock(showFilters);
+  useEscapeKey(showFilters, closeFilters);
+
   return (
     <div className="min-h-screen bg-muted">
       {/* Hero Section */}
-      <div className="relative isolate overflow-hidden bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-primary-foreground py-12 px-4 sm:px-6 lg:px-8">
+      <div className="relative isolate overflow-hidden bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-primary-foreground py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
         {variant === "export" && (
           <>
             <Image
@@ -177,21 +183,21 @@ export function VehicleListing({
         )}
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-4">
-            {variant === "export" && <Globe className="w-8 h-8" aria-hidden="true" />}
+            {variant === "export" && <Globe className="w-8 h-8 shrink-0" aria-hidden="true" />}
             <h1 className="display">{heading}</h1>
           </div>
-          <p className="text-xl text-primary-foreground/80 max-w-2xl">{subheading}</p>
+          <p className="text-lg sm:text-xl text-primary-foreground/80 max-w-2xl">{subheading}</p>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="bg-card border-b py-6 px-4 sm:px-6 lg:px-8 sticky top-0 z-40 shadow-sm">
+      <div className="bg-card border-b py-4 sm:py-6 px-4 sm:px-6 lg:px-8 sm:sticky sm:top-20 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4">
             {/* Search Input */}
             <form
               role="search"
-              className="flex-1 relative"
+              className="relative w-full sm:w-auto sm:flex-1"
               onSubmit={(e) => {
                 e.preventDefault();
                 commitQuery(query);
@@ -219,7 +225,7 @@ export function VehicleListing({
               value={sort}
               aria-label={t("listing.sortLabel")}
               onChange={(e) => handleSortChange(e.target.value as SortOption)}
-              className="field w-auto"
+              className="field w-auto flex-1 sm:flex-none min-w-0"
             >
               {SORT_OPTIONS.map((option) => (
                 <option key={option} value={option}>
@@ -228,12 +234,13 @@ export function VehicleListing({
               ))}
             </select>
 
-            {/* Mobile Filter Button */}
+            {/* Filter drawer button (below lg; the sidebar is shown from lg) */}
             <Button
-              onClick={() => setShowFilters(!showFilters)}
+              onClick={() => setShowFilters(true)}
               variant="outline"
-              className="sm:hidden"
+              className="lg:hidden h-auto min-h-11 shrink-0"
               aria-expanded={showFilters}
+              aria-controls="vehicle-filter-drawer"
             >
               <SlidersHorizontal className="w-5 h-5 mr-2" aria-hidden="true" />
               {t("filters.title")}
@@ -244,13 +251,34 @@ export function VehicleListing({
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar - Desktop */}
           <div className="hidden lg:block">{filterPanel}</div>
 
-          {/* Mobile Filters - Collapsible */}
-          {showFilters && <div className="lg:hidden mb-8">{filterPanel}</div>}
+          {/* Filter drawer - below lg */}
+          {showFilters && (
+            <div className="lg:hidden fixed inset-0 z-[60] flex justify-end" role="dialog" aria-modal="true" aria-label={t("filters.title")} id="vehicle-filter-drawer">
+              <div className="absolute inset-0 bg-foreground/50 animate-in fade-in" onClick={closeFilters} aria-hidden="true" />
+              <div className="relative flex h-full w-full max-w-sm flex-col bg-card shadow-xl animate-in slide-in-from-right duration-200">
+                <div className="flex-1 overflow-y-auto overscroll-contain">
+                  <VehicleFilters
+                    filterOptions={filterOptions}
+                    filters={filters}
+                    onChange={updateFilters}
+                    onReset={resetAll}
+                    onClose={closeFilters}
+                    closeLabel={tCommon("close")}
+                  />
+                </div>
+                <div className="border-t p-4">
+                  <Button size="lg" className="w-full" onClick={closeFilters}>
+                    {t("listing.resultsCount", { count: sortedVehicles.length })}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Vehicle Grid */}
           <div className="lg:col-span-3">
@@ -266,22 +294,11 @@ export function VehicleListing({
                   <h2 className="section-title" aria-live="polite">
                     {t("listing.resultsCount", { count: sortedVehicles.length })}
                   </h2>
-                  <div className="flex items-center gap-2">
-                    {activeFilterCount > 0 && (
-                      <Button variant="outline" onClick={resetAll}>
-                        {t("listing.resetFilters")}
-                      </Button>
-                    )}
-                    <Button
-                      onClick={() => setShowFilters(!showFilters)}
-                      variant="ghost"
-                      className="lg:hidden"
-                      aria-label={t("listing.toggleFilters")}
-                      aria-expanded={showFilters}
-                    >
-                      <SlidersHorizontal className="w-5 h-5" aria-hidden="true" />
+                  {activeFilterCount > 0 && (
+                    <Button variant="outline" onClick={resetAll}>
+                      {t("listing.resetFilters")}
                     </Button>
-                  </div>
+                  )}
                 </div>
 
                 <div

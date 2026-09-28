@@ -146,11 +146,11 @@ export default function ProfilePage() {
       <main className="page-container-narrow">
         {/* Tabs */}
         <div className="card mb-8">
-          <div className="border-b border-border px-8">
-            <div className="flex gap-8">
+          <div className="border-b border-border px-4 sm:px-8">
+            <div className="flex gap-4 sm:gap-8 overflow-x-auto">
               <button
                 onClick={() => setActiveTab("profile")}
-                className={`py-4 px-2 font-medium border-b-2 transition-colors ${
+                className={`py-4 px-2 whitespace-nowrap font-medium border-b-2 transition-colors ${
                   activeTab === "profile"
                     ? "text-primary border-primary"
                     : "text-muted-foreground border-transparent hover:text-foreground"
@@ -161,7 +161,7 @@ export default function ProfilePage() {
               </button>
               <button
                 onClick={() => setActiveTab("password")}
-                className={`py-4 px-2 font-medium border-b-2 transition-colors ${
+                className={`py-4 px-2 whitespace-nowrap font-medium border-b-2 transition-colors ${
                   activeTab === "password"
                     ? "text-primary border-primary"
                     : "text-muted-foreground border-transparent hover:text-foreground"
@@ -175,7 +175,7 @@ export default function ProfilePage() {
 
           {/* Message Alert */}
           {message && (
-            <div className={`mx-8 mt-6 p-4 rounded-lg flex gap-3 ${
+            <div className={`mx-4 sm:mx-8 mt-6 p-4 rounded-lg flex gap-3 ${
               message.type === "success"
                 ? "bg-success-subtle/50 border border-success-border"
                 : "bg-destructive-subtle/50 border border-destructive-border"
@@ -193,7 +193,7 @@ export default function ProfilePage() {
 
           {/* Profile Tab */}
           {activeTab === "profile" && (
-            <div className="p-8">
+            <div className="p-4 sm:p-8">
               <form onSubmit={handleProfileSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -215,6 +215,7 @@ export default function ProfilePage() {
                     </label>
                     <input
                       type="text"
+                      autoComplete="name"
                       name="full_name"
                       value={profileForm.full_name}
                       onChange={handleProfileChange}
@@ -229,6 +230,7 @@ export default function ProfilePage() {
                     </label>
                     <input
                       type="tel"
+                      autoComplete="tel"
                       name="phone"
                       value={profileForm.phone}
                       onChange={handleProfileChange}
@@ -243,6 +245,7 @@ export default function ProfilePage() {
                     </label>
                     <input
                       type="text"
+                      autoComplete="organization"
                       name="company_name"
                       value={profileForm.company_name}
                       onChange={handleProfileChange}
@@ -272,7 +275,7 @@ export default function ProfilePage() {
 
           {/* Password Tab */}
           {activeTab === "password" && (
-            <div className="p-8">
+            <div className="p-4 sm:p-8">
               <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-md">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
@@ -280,6 +283,7 @@ export default function ProfilePage() {
                   </label>
                   <input
                     type="password"
+                    autoComplete="current-password"
                     name="current_password"
                     value={passwordForm.current_password}
                     onChange={handlePasswordChange}
@@ -294,6 +298,7 @@ export default function ProfilePage() {
                   </label>
                   <input
                     type="password"
+                    autoComplete="new-password"
                     name="new_password"
                     value={passwordForm.new_password}
                     onChange={handlePasswordChange}
@@ -309,6 +314,7 @@ export default function ProfilePage() {
                   </label>
                   <input
                     type="password"
+                    autoComplete="new-password"
                     name="confirm_password"
                     value={passwordForm.confirm_password}
                     onChange={handlePasswordChange}

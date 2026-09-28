@@ -31,6 +31,9 @@ interface VehicleFiltersProps {
   onChange: (patch: Partial<VehicleSearchFilters>) => void;
   onReset: () => void;
   filterOptions: VehicleFilterOptions;
+  /** Drawer mode (mobile): shows a close button and drops the card frame. */
+  onClose?: () => void;
+  closeLabel?: string;
 }
 
 /** Ids of the sections that contain an active filter. */
@@ -102,7 +105,7 @@ function DebouncedNumberInput({
   );
 }
 
-export function VehicleFilters({ filters, onChange, onReset, filterOptions }: VehicleFiltersProps) {
+export function VehicleFilters({ filters, onChange, onReset, filterOptions, onClose, closeLabel }: VehicleFiltersProps) {
   const t = useTranslations("vehicles");
   const tCommon = useTranslations("common");
   const idPrefix = useId();
@@ -140,7 +143,7 @@ export function VehicleFilters({ filters, onChange, onReset, filterOptions }: Ve
       onClick={() => toggleSection(id)}
       aria-expanded={expandedSections.has(id)}
       aria-controls={`${idPrefix}-${id}`}
-      className="w-full flex items-center justify-between py-2 hover:text-primary transition"
+      className="w-full min-h-11 flex items-center justify-between py-2 hover:text-primary transition"
     >
       <span className="font-semibold text-foreground">{title}</span>
       <ChevronDown
@@ -164,14 +167,14 @@ export function VehicleFilters({ filters, onChange, onReset, filterOptions }: Ve
         {expandedSections.has(id) && (
           <div id={`${idPrefix}-${id}`} role="group" aria-label={title} className="mt-3 space-y-2">
             {options.map((option) => (
-              <label key={option.value} className="flex items-center gap-3 cursor-pointer">
+              <label key={option.value} className="flex min-h-11 items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={filters[key] === option.value}
                   onChange={(e) =>
                     onChange({ [key]: e.target.checked ? option.value : undefined } as Partial<VehicleSearchFilters>)
                   }
-                  className="rounded"
+                  className="w-5 h-5 rounded shrink-0"
                 />
                 <span className="text-foreground">{option.label}</span>
               </label>
@@ -210,20 +213,32 @@ export function VehicleFilters({ filters, onChange, onReset, filterOptions }: Ve
     "field text-sm disabled:bg-muted";
 
   return (
-    <div className="card p-6" role="region" aria-label={t("filter")}>
+    <div className={onClose ? "p-4 sm:p-6" : "card p-6"} role="region" aria-label={t("filter")}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between gap-3 mb-6">
         <h3 className="card-title">{t("filters.title")}</h3>
-        {activeFilterCount > 0 && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="text-sm text-kfz-accent hover:text-primary flex items-center gap-1"
-          >
-            <X className="w-4 h-4" aria-hidden="true" />
-            {t("filters.clearAll", { count: activeFilterCount })}
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          {activeFilterCount > 0 && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="min-h-11 px-2 text-sm text-kfz-accent hover:text-primary flex items-center gap-1"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+              {t("filters.clearAll", { count: activeFilterCount })}
+            </button>
+          )}
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={closeLabel}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-lg hover:bg-secondary"
+            >
+              <X className="w-5 h-5" aria-hidden="true" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-4">
