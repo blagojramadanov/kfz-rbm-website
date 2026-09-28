@@ -4,6 +4,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { SiteShell } from "@/components/site-shell";
 import { COMPANY } from "@/lib/company";
 import { locales } from "@/lib/locales";
+import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
 
 export async function generateMetadata({
   params: { locale },
@@ -11,9 +12,13 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "meta" });
+  // Defaults for pages without their own metadata; public pages use pageMetadata()
+  // (lib/seo.ts) for canonical, hreflang and Open Graph.
   return {
+    metadataBase: new URL(SITE_URL),
     title: t("title", { name: COMPANY.name }),
     description: t("description", { name: COMPANY.name }),
+    openGraph: { siteName: COMPANY.fullName, images: [DEFAULT_OG_IMAGE] },
   };
 }
 

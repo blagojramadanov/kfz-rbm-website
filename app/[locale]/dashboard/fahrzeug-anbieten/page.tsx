@@ -17,6 +17,7 @@ import { getSubmissionDetails } from "@/lib/submission-details";
 import { PageHeader } from "@/components/page-header";
 import { SITE_IMAGES } from "@/lib/site-images";
 import { SalesTypeLabel } from "@/components/sales-type-label";
+import { PrivacyNotice } from "@/components/privacy-notice";
 import { CONCEPT_ICONS } from "@/lib/concept-icons";
 
 type Step = "fahrzeugdaten" | "preis" | "bilder" | "beschreibung" | "verkaufsart" | "kontrolle" | "absenden";
@@ -989,6 +990,8 @@ export default function SubmitVehicleWizardPage() {
             </div>
           </div>
         ) : (
+        <>
+        {currentStep === "absenden" && <PrivacyNotice variant="submission" className="mt-8" />}
         <div className="flex gap-4 justify-between mt-8">
           <Button
             variant="outline"
@@ -1019,6 +1022,7 @@ export default function SubmitVehicleWizardPage() {
             </Button>
           )}
         </div>
+        </>
         )}
       </main>
     </div>

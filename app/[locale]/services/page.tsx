@@ -9,6 +9,7 @@ import { Link } from "@/lib/navigation";
 import { COMPANY } from "@/lib/company";
 import { SERVICES } from "@/lib/services";
 import { SITE_IMAGES } from "@/lib/site-images";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params: { locale },
@@ -16,10 +17,12 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "pages.services" });
-  return {
+  return pageMetadata({
+    locale,
+    path: "/services",
     title: `${t("title")} – ${COMPANY.name}`,
     description: t("subtitle"),
-  };
+  });
 }
 
 export default function ServicesPage({ params: { locale } }: { params: { locale: string } }) {

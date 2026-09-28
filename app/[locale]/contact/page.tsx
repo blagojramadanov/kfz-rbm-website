@@ -9,6 +9,7 @@ import { HoneypotField } from "@/components/honeypot-field";
 import { useAuth } from "@/lib/auth-context";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { PageHeader } from "@/components/page-header";
+import { PrivacyNotice } from "@/components/privacy-notice";
 import { SITE_IMAGES } from "@/lib/site-images";
 
 const EMPTY_FORM = { name: "", email: "", phone: "", message: "", website: "" };
@@ -204,7 +205,7 @@ export default function ContactPage() {
                 </p>
               )}
 
-              <p className="text-xs text-muted-foreground">{t("inquiryForm.privacy")}</p>
+              <PrivacyNotice variant="inquiry" />
 
               <Button
                 type="submit"

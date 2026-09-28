@@ -1020,6 +1020,12 @@
             "description": "The page you requested does not exist or has been moved. Check the address or take a look at our vehicles.",
             "backHome": "Go to the home page",
             "vehicles": "View vehicles"
+        },
+        "error": {
+            "title": "Something went wrong",
+            "description": "An unexpected error occurred while loading this page. Please try again. If the problem persists, please contact us.",
+            "retry": "Try again",
+            "backHome": "Go to the home page"
         }
     },
     "common": {
@@ -1160,7 +1166,29 @@
     "meta": {
         "title": "{name} – Premium Used Cars",
         "description": "Find your perfect car at {name} – your used-car dealership for inspected premium vehicles.",
-        "adminTitle": "Admin Dashboard – {name}"
+        "adminTitle": "Admin Dashboard – {name}",
+        "pages": {
+            "contact": {
+                "title": "Contact",
+                "description": "Contact {name}: phone, email, address and contact form for questions about vehicles, selling your car and trade-ins."
+            },
+            "login": {
+                "title": "Sign in",
+                "description": "Sign in to your {name} customer account."
+            },
+            "register": {
+                "title": "Register",
+                "description": "Create your {name} customer account to save vehicles, track your inquiries and offer your car."
+            },
+            "forgotPassword": {
+                "title": "Forgot password",
+                "description": "Reset the password for your {name} customer account."
+            },
+            "resetPassword": {
+                "title": "Set a new password",
+                "description": "Set a new password for your {name} customer account."
+            }
+        }
     },
     "legalPages": {
         "privacy": {
@@ -1646,7 +1674,6 @@
         "messageOptional": "Message (optional)",
         "messagePlaceholder": "Your question about this vehicle",
         "honeypot": "Please leave this field empty",
-        "privacy": "We only use your details to handle your inquiry.",
         "submit": "Send inquiry",
         "sending": "Sending …",
         "cancel": "Cancel",
@@ -1676,5 +1703,11 @@
         "sellCar": "BMW car key with an RBM key tag",
         "contact": "Rear of a black BMW with an RBM number plate holder",
         "export": "Cars at a port in front of a car carrier ship for export"
+    },
+    "privacyNotice": {
+        "inquiry": "We only use your details to handle your inquiry. Learn more in our <link>privacy policy</link>.",
+        "register": "We process your details to manage your customer account. Learn more in our <link>privacy policy</link>.",
+        "submission": "We only use your details and photos to assess your vehicle and make you an offer. Learn more in our <link>privacy policy</link>.",
+        "tradeIn": "We only use your details to handle your trade-in request. Learn more in our <link>privacy policy</link>."
     }
 }

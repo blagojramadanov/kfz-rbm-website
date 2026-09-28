@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LegalPage } from "@/components/legal-page";
 import { COMPANY, EMAIL_HREF, PHONE_HREF, getAddress } from "@/lib/company";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params: { locale },
@@ -9,10 +10,12 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "legalPages.impressum" });
-  return {
+  return pageMetadata({
+    locale,
+    path: "/impressum",
     title: `${t("title")} – ${COMPANY.name}`,
     description: t("metaDescription", { name: COMPANY.legalName }),
-  };
+  });
 }
 
 // Impressum per § 5 DDG and § 18 Abs. 2 MStV. USt-IdNr. and Handelsregister are

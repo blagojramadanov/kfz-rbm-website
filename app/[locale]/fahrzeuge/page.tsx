@@ -4,6 +4,7 @@ import { VehicleListing } from "@/components/vehicle-listing";
 import { COMPANY } from "@/lib/company";
 import { getPublicFilterOptions, searchPublicVehicles } from "@/lib/public-vehicles";
 import { parseVehicleSearch } from "@/lib/vehicle-search";
+import { pageMetadata } from "@/lib/seo";
 
 // The filters come from the URL (searchParams), so the page renders per request.
 // The vehicle queries still go through the cookie-less anon client, whose fetches
@@ -15,10 +16,12 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "pages.fahrzeuge" });
-  return {
+  return pageMetadata({
+    locale,
+    path: "/fahrzeuge",
     title: t("metaTitle", { name: COMPANY.name }),
     description: t("metaDescription", { name: COMPANY.name }),
-  };
+  });
 }
 
 export default async function FahrzeugeListingPage({

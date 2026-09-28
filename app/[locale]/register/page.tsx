@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { Button } from "@/components/ui/button";
+import { PrivacyNotice } from "@/components/privacy-notice";
 import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function RegisterPage() {
@@ -195,6 +196,8 @@ export default function RegisterPage() {
                 />
               </div>
             </div>
+
+            <PrivacyNotice variant="register" className="text-primary-foreground/80 pt-2" />
 
             {/* Submit Button */}
             <Button variant="accent"

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LegalPage, type LegalBlock, type LegalSection } from "@/components/legal-page";
 import { COMPANY, EMAIL_HREF, PHONE_HREF, getAddress } from "@/lib/company";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params: { locale },
@@ -9,10 +10,12 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "legalPages.privacy" });
-  return {
+  return pageMetadata({
+    locale,
+    path: "/privacy",
     title: `${t("title")} – ${COMPANY.name}`,
     description: t("metaDescription", { name: COMPANY.legalName }),
-  };
+  });
 }
 
 /**

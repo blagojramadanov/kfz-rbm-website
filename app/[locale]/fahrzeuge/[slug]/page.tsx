@@ -16,6 +16,7 @@ import {
   getRelatedVehicles,
   getVehicleBySlug,
 } from "@/lib/public-vehicles";
+import { pageMetadata } from "@/lib/seo";
 import { getSubmissionDetails } from "@/lib/submission-details";
 import { decodeSlugParam } from "@/lib/vehicle-slug";
 import {
@@ -52,8 +53,11 @@ export async function generateMetadata({
   if (!vehicle) return { title: t("notFound.title") };
 
   const format = await getFormatter({ locale });
-  const image = vehicle.images[0];
-  return {
+  // The vehicle's main photo for sharing; the default image if it has none.
+  return pageMetadata({
+    locale,
+    path: `/fahrzeuge/${vehicle.slug}`,
+    image: vehicle.images[0],
     title: t("metaTitle", {
       brand: vehicle.brand,
       model: vehicle.model,
@@ -68,8 +72,7 @@ export async function generateMetadata({
       price: formatPrice(format, vehicle.price),
       name: COMPANY.name,
     }),
-    openGraph: image ? { images: [image] } : undefined,
-  };
+  });
 }
 
 export default async function VehicleDetailPage({

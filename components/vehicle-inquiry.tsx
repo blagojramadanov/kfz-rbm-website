@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { CheckCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HoneypotField } from "@/components/honeypot-field";
+import { PrivacyNotice } from "@/components/privacy-notice";
 import { useAuth } from "@/lib/auth-context";
 import { TEST_DRIVE_HASH } from "@/lib/inquiries";
 import { Link } from "@/lib/navigation";
@@ -298,7 +299,7 @@ export function VehicleInquiry({ vehicleId, vehicleLabel }: { vehicleId: string;
                   </p>
                 )}
 
-                <p className="text-xs text-muted-foreground">{t("privacy")}</p>
+                <PrivacyNotice variant="inquiry" />
 
                 <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-2">
                   <Button type="button" variant="outline" onClick={close} disabled={sending}>

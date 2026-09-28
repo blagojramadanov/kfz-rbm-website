@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
@@ -10,11 +11,22 @@ import { ArrowRight, CheckCircle, Users, Award, Shield, Zap } from "lucide-react
 import { COMPANY, PHONE_HREF } from "@/lib/company";
 import { Link } from "@/lib/navigation";
 import { getFeaturedVehicles, getLatestVehicles, getPublicFilterOptions } from "@/lib/public-vehicles";
+import { pageMetadata } from "@/lib/seo";
 
 // ISR: the latest/featured lists are read with the cookie-less anon client
 // (lib/public-vehicles.ts) and the page is regenerated at most once a minute.
 // Must be a literal for Next to read it; keep in sync with REVALIDATE_SECONDS in that file.
 export const revalidate = 60;
+
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: "meta" });
+  return pageMetadata({
+    locale,
+    path: "",
+    title: t("title", { name: COMPANY.name }),
+    description: t("description", { name: COMPANY.name }),
+  });
+}
 
 export default async function Home({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);

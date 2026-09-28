@@ -1020,6 +1020,12 @@
             "description": "Die aufgerufene Seite existiert nicht oder wurde verschoben. Prüfen Sie die Adresse oder sehen Sie sich unsere Fahrzeuge an.",
             "backHome": "Zur Startseite",
             "vehicles": "Fahrzeuge ansehen"
+        },
+        "error": {
+            "title": "Etwas ist schiefgelaufen",
+            "description": "Beim Laden dieser Seite ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es erneut. Wenn das Problem bestehen bleibt, kontaktieren Sie uns.",
+            "retry": "Erneut versuchen",
+            "backHome": "Zur Startseite"
         }
     },
     "common": {
@@ -1160,7 +1166,29 @@
     "meta": {
         "title": "{name} – Premium-Gebrauchtwagen",
         "description": "Finden Sie Ihr Traumauto bei {name} – Ihr Gebrauchtwagenhändler für geprüfte Premium-Fahrzeuge.",
-        "adminTitle": "Admin-Dashboard – {name}"
+        "adminTitle": "Admin-Dashboard – {name}",
+        "pages": {
+            "contact": {
+                "title": "Kontakt",
+                "description": "Kontaktieren Sie {name}: Telefon, E-Mail, Adresse und Kontaktformular für Fragen zu Fahrzeugen, Ankauf und Inzahlungnahme."
+            },
+            "login": {
+                "title": "Anmelden",
+                "description": "Melden Sie sich in Ihrem Kundenkonto bei {name} an."
+            },
+            "register": {
+                "title": "Registrieren",
+                "description": "Erstellen Sie Ihr Kundenkonto bei {name}, um Fahrzeuge zu merken, Anfragen zu verfolgen und Ihr Auto anzubieten."
+            },
+            "forgotPassword": {
+                "title": "Passwort vergessen",
+                "description": "Setzen Sie das Passwort für Ihr Kundenkonto bei {name} zurück."
+            },
+            "resetPassword": {
+                "title": "Neues Passwort festlegen",
+                "description": "Legen Sie ein neues Passwort für Ihr Kundenkonto bei {name} fest."
+            }
+        }
     },
     "legalPages": {
         "privacy": {
@@ -1646,7 +1674,6 @@
         "messageOptional": "Nachricht (optional)",
         "messagePlaceholder": "Ihre Frage zu diesem Fahrzeug",
         "honeypot": "Bitte lassen Sie dieses Feld leer",
-        "privacy": "Wir verwenden Ihre Angaben nur, um Ihre Anfrage zu bearbeiten.",
         "submit": "Anfrage senden",
         "sending": "Wird gesendet …",
         "cancel": "Abbrechen",
@@ -1676,5 +1703,11 @@
         "sellCar": "BMW-Autoschlüssel mit RBM-Schlüsselanhänger",
         "contact": "Heck eines schwarzen BMW mit RBM-Kennzeichenhalter",
         "export": "Fahrzeuge im Hafen vor einem Autotransportschiff für den Export"
+    },
+    "privacyNotice": {
+        "inquiry": "Wir verwenden Ihre Angaben nur, um Ihre Anfrage zu bearbeiten. Mehr dazu in unserer <link>Datenschutzerklärung</link>.",
+        "register": "Wir verarbeiten Ihre Angaben, um Ihr Kundenkonto zu führen. Mehr dazu in unserer <link>Datenschutzerklärung</link>.",
+        "submission": "Wir verwenden Ihre Angaben und Fotos nur, um Ihr Fahrzeug zu prüfen und Ihnen ein Angebot zu machen. Mehr dazu in unserer <link>Datenschutzerklärung</link>.",
+        "tradeIn": "Wir verwenden Ihre Angaben nur, um Ihre Inzahlungnahme-Anfrage zu bearbeiten. Mehr dazu in unserer <link>Datenschutzerklärung</link>."
     }
 }

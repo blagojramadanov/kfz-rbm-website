@@ -13,6 +13,7 @@ import type { Vehicle } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { PageHeader } from "@/components/page-header";
+import { PrivacyNotice } from "@/components/privacy-notice";
 
 type Step = "current_vehicle" | "vehicle_value" | "select_desired" | "review" | "success";
 
@@ -529,6 +530,7 @@ export default function InzahlungnahmePage() {
         )}
 
         {/* Navigation */}
+        {currentStep === "review" && <PrivacyNotice variant="tradeIn" className="mt-8" />}
         {currentStep !== "success" && (
           <div className="flex gap-4 justify-between mt-8">
             <Button

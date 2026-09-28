@@ -10,6 +10,7 @@ import { Link } from "@/lib/navigation";
 import { COMPANY } from "@/lib/company";
 import { SERVICES } from "@/lib/services";
 import { SITE_IMAGES } from "@/lib/site-images";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params: { locale },
@@ -17,10 +18,12 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "pages.about" });
-  return {
+  return pageMetadata({
+    locale,
+    path: "/about",
     title: `${t("title", { name: COMPANY.name })} – ${COMPANY.name}`,
     description: t("subtitle", { name: COMPANY.name, owner: COMPANY.owner, city: COMPANY.address.city }),
-  };
+  });
 }
 
 // Only facts from lib/company.ts and the services the site really offers:
