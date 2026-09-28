@@ -1,3 +1,5 @@
+import { CheckCircle2, Hourglass, Inbox, Send, XCircle, type LucideIcon } from "lucide-react";
+
 /**
  * One status-to-color mapping for customer and admin views. Every DB status maps
  * to a tone; the tone picks the Badge variant and the text color of counters.
@@ -68,3 +70,17 @@ export const TONE_PANEL: Record<StatusTone, string> = {
   destructive: "bg-destructive-subtle/50 border-destructive-border text-destructive-subtle-foreground",
   highlight: "bg-highlight-subtle/50 border-highlight-border text-highlight-subtle-foreground",
 };
+
+/** Icons for submission statuses (customer list, admin queue tabs and cards). */
+const SUBMISSION_STATUS_ICONS: Record<string, LucideIcon> = {
+  eingereicht: Inbox,
+  in_bearbeitung: Hourglass,
+  angebot_gesendet: Send,
+  akzeptiert: CheckCircle2,
+  abgelehnt: XCircle,
+};
+
+export function getStatusIcon(kind: StatusKind, status: string | null | undefined): LucideIcon | null {
+  if (kind !== "submission" || !status) return null;
+  return SUBMISSION_STATUS_ICONS[status] ?? null;
+}

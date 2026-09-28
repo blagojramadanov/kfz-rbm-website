@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 import { useEffect, useState } from "react";
 import { useRouter } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { AlertCircle, Edit2, X } from "lucide-react";
+import { AlertCircle, Edit2, X, Lock } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { formatPrice } from "@/lib/format-vehicle";
@@ -212,8 +212,9 @@ export default function AdminTradeInRequestsPage() {
 
               {request.commission && (
                 <div className="mb-4 p-3 bg-highlight-subtle/50 border border-highlight-border rounded-lg">
-                  <p className="text-sm">
-                    <span className="font-medium text-foreground">🔐 {t("commission")}:</span>
+                  <p className="text-sm flex items-center flex-wrap">
+                    <Lock className="w-4 h-4 mr-1.5 text-highlight" aria-hidden="true" />
+                    <span className="font-medium text-foreground">{t("commission")}:</span>
                     <span className="text-muted-foreground ml-2">
                       {format.number(request.commission / 100, { style: "percent", maximumFractionDigits: 2 })}
                     </span>

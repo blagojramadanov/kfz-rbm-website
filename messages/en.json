@@ -265,12 +265,12 @@
                 "akzeptiert": "Offer Accepted",
                 "abgelehnt": "Rejected"
             },
-            "offeredPrice": "💰 Offered Price:",
-            "acceptOffer": "✓ Accept",
-            "rejectOffer": "✗ Reject",
+            "offeredPrice": "Offered Price:",
+            "acceptOffer": "Accept",
+            "rejectOffer": "Reject",
             "acceptConfirm": "Do you want to accept this offer?",
             "rejectConfirm": "Do you want to reject this offer?",
-            "offerAccepted": "✓ Offer accepted!",
+            "offerAccepted": "Offer accepted!",
             "contactUs": "Contact us for next steps.",
             "rejectionReason": "Reason for rejection",
             "acceptedPrice": "Agreed price",
@@ -751,7 +751,6 @@
                 "subheadline": "Premium used cars with transparent pricing and personal service",
                 "discoverVehicles": "Discover Vehicles",
                 "offerVehicle": "Offer My Car",
-                "backgroundAlt": "Luxury automotive background",
                 "logoAlt": "{name} logo"
             },
             "latest": {
@@ -803,8 +802,7 @@
                 "fairPricesDesc": "Market-appropriate prices for buying and selling",
                 "completeSolution": "Complete Solution",
                 "completeSolutionDesc": "Everything from one source - buying, selling, trade-in",
-                "learnMore": "Learn More",
-                "imageAlt": "Premium showroom"
+                "learnMore": "Learn More"
             },
             "contact": {
                 "title": "Ready for Your Dream Car?",
@@ -1282,7 +1280,7 @@
     },
     "wizard": {
         "title": "Offer my vehicle",
-        "dashboardLink": "← Dashboard",
+        "dashboardLink": "Dashboard",
         "stepIndicator": "Step {current} of {total}",
         "loading": "Loading...",
         "steps": {
@@ -1519,5 +1517,13 @@
         "toggleFailed": "Your favorites could not be saved. Please try again.",
         "removeFailed": "The favorite could not be removed. Please try again.",
         "notAvailableToast": "This vehicle is no longer available."
+    },
+    "siteImages": {
+        "hero": "Black premium cars in front of the RBM dealership at sunset",
+        "about": "Black Audi in front of the illuminated RBM showroom",
+        "services": "Bonnet of a black car with the RBM logo on the dealership lot",
+        "sellCar": "BMW car key with an RBM key tag",
+        "contact": "Rear of a black BMW with an RBM number plate holder",
+        "export": "Cars at a port in front of a car carrier ship for export"
     }
 }

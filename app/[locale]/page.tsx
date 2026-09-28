@@ -5,6 +5,7 @@ import { FeaturedVehicles } from "@/components/featured-vehicles";
 import { SearchBar } from "@/components/search-bar";
 import { LatestVehicles } from "@/components/latest-vehicles";
 import { ServicesGrid } from "@/components/services-grid";
+import { SITE_IMAGES } from "@/lib/site-images";
 import { ArrowRight, CheckCircle, Users, Award, Shield, Zap } from "lucide-react";
 import { COMPANY } from "@/lib/company";
 import { Link } from "@/lib/navigation";
@@ -18,6 +19,7 @@ export const revalidate = 60;
 export default async function Home({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
   const t = await getTranslations("pages.home");
+  const tImg = await getTranslations("siteImages");
   const [latestVehicles, featuredVehicles, searchOptions] = await Promise.all([
     getLatestVehicles(4),
     getFeaturedVehicles(6),
@@ -28,22 +30,25 @@ export default async function Home({ params: { locale } }: { params: { locale: s
     <div className="w-full">
       {/* Hero Section with Background Image */}
       <section className="relative h-screen bg-gradient-to-br from-kfz-blue via-kfz-blue-light to-kfz-blue-dark text-primary-foreground overflow-hidden flex items-center">
+        {/* Background photo under a navy overlay (text stays above AA contrast) */}
+        <Image
+          src={SITE_IMAGES.hero}
+          alt={tImg("hero")}
+          fill
+          sizes="100vw"
+          placeholder="blur"
+          className="object-cover"
+          priority
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-kfz-blue-dark/90 via-kfz-blue-dark/80 via-60% to-kfz-blue-dark/50"
+          aria-hidden="true"
+        />
+
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-10 right-10 w-96 h-96 rounded-full border-2 border-primary-foreground"></div>
           <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full border-2 border-primary-foreground"></div>
-        </div>
-
-        {/* Background automotive image overlay */}
-        <div className="absolute inset-0 opacity-20">
-          <Image
-            src="https://picsum.photos/seed/kfzrbm-hero/1920/1080"
-            alt={t("hero.backgroundAlt")}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority
-          />
         </div>
 
         <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
@@ -297,10 +302,11 @@ export default async function Home({ params: { locale } }: { params: { locale: s
             {/* Left: Image */}
             <div className="relative h-96 rounded-lg overflow-hidden shadow-lg">
               <Image
-                src="https://picsum.photos/seed/kfzrbm-about/600/400"
-                alt={t("aboutSection.imageAlt")}
+                src={SITE_IMAGES.about}
+                alt={tImg("about")}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
+                placeholder="blur"
                 className="object-cover"
               />
             </div>

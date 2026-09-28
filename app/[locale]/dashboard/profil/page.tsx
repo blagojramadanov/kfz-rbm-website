@@ -139,7 +139,7 @@ export default function ProfilePage() {
         title={t("title")}
         description={t("description")}
         backHref="/dashboard"
-        backLabel={<>← {tNav("dashboard")}</>}
+        backLabel={tNav("dashboard")}
         width="narrow"
       />
 

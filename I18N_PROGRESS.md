@@ -1056,3 +1056,17 @@ Visual consistency pass only: no changes to functionality, data, routes or trans
 - Raw `<button>` elements in the admin pages are token-colored but not yet on `Button`/`buttonVariants` (sizes/paddings still vary slightly).
 - Error/success alert boxes are repeated inline in ~25 places; extract an `Alert` component.
 - The wizard scroll-to-top and upload-progress notes above.
+
+### Emojis → Lucide icons (done, 2026-09-28)
+- No emojis or text symbols used as icons remain in `app/`, `components/`, `lib/` or `messages/` (kept: `©` in the footer, `•` separators inside sentences, `••••••••` password placeholders).
+- One icon per concept in `lib/concept-icons.ts`: Direktverkauf `Handshake`, Verkauf im Kundenauftrag `ClipboardList`, Inzahlungnahme `ArrowLeftRight` (was 🔄 / `Repeat2` / `Truck`), Export `Globe`, Verkauf `Store`, Angebotspreis `Wallet`, admin-only info `Lock`. `SalesTypeLabel` shows the sale type with its icon (admin queue, admin detail, wizard review); the wizard sale-type cards and the home service cards use the same icons.
+- Submission status icons in `lib/status-styles.ts` (eingereicht `Inbox`, in_bearbeitung `Hourglass`, angebot_gesendet `Send`, akzeptiert `CheckCircle2`, abgelehnt `XCircle`), shown via `StatusBadge withIcon` for customer and admin.
+- Messages (de/en/mk): symbol removed, text unchanged: `dashboard.vehicles.offeredPrice` (💰), `acceptOffer` (✓), `rejectOffer` (✗), `offerAccepted` (✓), `wizard.dashboardLink` (←). Back links get an `ArrowLeft` icon from `PageHeader`.
+- Sizes: 16px (`w-4 h-4`) inline, 20px in headings/cards; decorative icons `aria-hidden`.
+
+### Site images (done, 2026-09-28)
+- All decorative images were random `picsum.photos` placeholders (home hero, home "about" block, 5 home service cards); all replaced. Photos live in `public/images/site/`, are imported in `lib/site-images.ts` (static imports → next/image with blur placeholder), alt texts in the `siteImages` namespace (de/en/mk). Removed keys `pages.home.hero.backgroundAlt`, `pages.home.aboutSection.imageAlt`.
+- Placement: hero → home hero (only `priority` image); about → home about block + Über uns header; services → Dienstleistungen header + "buy" service card; sell-car → "Mein Auto anbieten" header + "sell" card; contact → Kontakt header + consignment card; export → export listing hero + export card; hero also on the trade-in card.
+- Overlay: `kfz-blue-dark` gradient 90% → 80% (at 60%) → 50%; header descriptions capped at `max-w-2xl`. Measured on every pixel of each photo: description (white/80) ≥ 5.76:1, title ≥ 4.31:1.
+- Files: `export.png` (2.5 MB) converted to `export.webp` (218 KB) and the PNG deleted; 4–11 px white edges trimmed from the JPGs.
+- No image files are missing. Open for the owner: the JPGs are only 768 px wide (soft on large screens; ≥1920 px versions would be better), and `export.webp` has German text ("EXPORT AUSLAND") baked in (cropped out of the banner, but visible if used full-frame).

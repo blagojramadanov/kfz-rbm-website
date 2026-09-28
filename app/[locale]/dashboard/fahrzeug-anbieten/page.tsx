@@ -15,6 +15,9 @@ import { getFuelTypeLabel, getTransmissionLabel, getBodyTypeLabel } from "@/lib/
 import { SubmissionWorkflowInfo } from "@/components/submission-workflow-info";
 import { getSubmissionDetails } from "@/lib/submission-details";
 import { PageHeader } from "@/components/page-header";
+import { SITE_IMAGES } from "@/lib/site-images";
+import { SalesTypeLabel } from "@/components/sales-type-label";
+import { CONCEPT_ICONS } from "@/lib/concept-icons";
 
 type Step = "fahrzeugdaten" | "preis" | "bilder" | "beschreibung" | "verkaufsart" | "kontrolle" | "absenden";
 
@@ -63,6 +66,7 @@ export default function SubmitVehicleWizardPage() {
   const locale = params.locale as string || 'de';
   const t = useTranslations("wizard");
   const tCommon = useTranslations("common");
+  const tImg = useTranslations("siteImages");
   const format = useLocaleFormatter();
   const router = useRouter();
   const { loading, isAuthenticated, user } = useAuth();
@@ -438,6 +442,8 @@ export default function SubmitVehicleWizardPage() {
         backHref="/dashboard"
         backLabel={t("dashboardLink")}
         width="narrow"
+        image={SITE_IMAGES.sellCar}
+        imageAlt={tImg("sellCar")}
       />
 
       {/* Progress Bar */}
@@ -813,7 +819,10 @@ export default function SubmitVehicleWizardPage() {
                   className="w-4 h-4 text-primary mt-1 flex-shrink-0"
                 />
                 <div className="ml-4 flex-1">
-                  <p className="font-semibold text-foreground">{t("salesType.direct")}</p>
+                  <p className="font-semibold text-foreground flex items-center gap-2">
+                    <CONCEPT_ICONS.directSale className="w-5 h-5 text-primary shrink-0" aria-hidden="true" />
+                    {t("salesType.direct")}
+                  </p>
                   <p className="text-sm text-muted-foreground mt-1">
                     {t("salesType.directDesc")}
                   </p>
@@ -835,7 +844,10 @@ export default function SubmitVehicleWizardPage() {
                   className="w-4 h-4 text-primary mt-1 flex-shrink-0"
                 />
                 <div className="ml-4 flex-1">
-                  <p className="font-semibold text-foreground">{t("salesType.tradeIn")}</p>
+                  <p className="font-semibold text-foreground flex items-center gap-2">
+                    <CONCEPT_ICONS.tradeIn className="w-5 h-5 text-primary shrink-0" aria-hidden="true" />
+                    {t("salesType.tradeIn")}
+                  </p>
                   <p className="text-sm text-muted-foreground mt-1">
                     {t("salesType.tradeInDesc")}
                   </p>
@@ -857,7 +869,10 @@ export default function SubmitVehicleWizardPage() {
                   className="w-4 h-4 text-primary mt-1 flex-shrink-0"
                 />
                 <div className="ml-4 flex-1">
-                  <p className="font-semibold text-foreground">{t("salesType.consignment")}</p>
+                  <p className="font-semibold text-foreground flex items-center gap-2">
+                    <CONCEPT_ICONS.consignment className="w-5 h-5 text-primary shrink-0" aria-hidden="true" />
+                    {t("salesType.consignment")}
+                  </p>
                   <p className="text-sm text-muted-foreground mt-1">
                     {t("salesType.consignmentDesc")}
                   </p>
@@ -908,7 +923,7 @@ export default function SubmitVehicleWizardPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-foreground mb-2">{t("review.salesTypeSection")}</h3>
-                <p className="text-muted-foreground">{getSalesTypeLabel(formData.verkaufsart)}</p>
+                <SalesTypeLabel salesType={formData.verkaufsart} className="text-muted-foreground">{getSalesTypeLabel(formData.verkaufsart)}</SalesTypeLabel>
               </div>
             </div>
           </div>

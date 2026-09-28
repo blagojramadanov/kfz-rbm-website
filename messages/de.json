@@ -265,12 +265,12 @@
                 "akzeptiert": "Angebot angenommen",
                 "abgelehnt": "Abgelehnt"
             },
-            "offeredPrice": "💰 Angebotspreis:",
-            "acceptOffer": "✓ Annehmen",
-            "rejectOffer": "✗ Ablehnen",
+            "offeredPrice": "Angebotspreis:",
+            "acceptOffer": "Annehmen",
+            "rejectOffer": "Ablehnen",
             "acceptConfirm": "Möchten Sie dieses Angebot annehmen?",
             "rejectConfirm": "Möchten Sie dieses Angebot ablehnen?",
-            "offerAccepted": "✓ Angebot angenommen!",
+            "offerAccepted": "Angebot angenommen!",
             "contactUs": "Kontaktieren Sie uns für die nächsten Schritte.",
             "rejectionReason": "Grund der Ablehnung",
             "acceptedPrice": "Vereinbarter Preis",
@@ -751,7 +751,6 @@
                 "subheadline": "Premium-Gebrauchtwagen mit transparenten Preisen und persönlicher Beratung",
                 "discoverVehicles": "Fahrzeuge entdecken",
                 "offerVehicle": "Mein Auto anbieten",
-                "backgroundAlt": "Luxuriöser Fahrzeughintergrund",
                 "logoAlt": "{name}-Logo"
             },
             "latest": {
@@ -803,8 +802,7 @@
                 "fairPricesDesc": "Marktgerechte Preise für Kauf und Verkauf",
                 "completeSolution": "Gesamtlösung",
                 "completeSolutionDesc": "Alles aus einer Hand - Kauf, Verkauf, Inzahlungnahme",
-                "learnMore": "Mehr erfahren",
-                "imageAlt": "Premium-Ausstellungsraum"
+                "learnMore": "Mehr erfahren"
             },
             "contact": {
                 "title": "Bereit für Ihr Traumauto?",
@@ -1282,7 +1280,7 @@
     },
     "wizard": {
         "title": "Mein Auto anbieten",
-        "dashboardLink": "← Dashboard",
+        "dashboardLink": "Dashboard",
         "stepIndicator": "Schritt {current} von {total}",
         "loading": "Wird geladen...",
         "steps": {
@@ -1519,5 +1517,13 @@
         "toggleFailed": "Ihre Favoriten konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
         "removeFailed": "Der Favorit konnte nicht entfernt werden. Bitte versuchen Sie es erneut.",
         "notAvailableToast": "Dieses Fahrzeug ist nicht mehr verfügbar."
+    },
+    "siteImages": {
+        "hero": "Schwarze Premium-Fahrzeuge vor dem RBM-Autohaus bei Sonnenuntergang",
+        "about": "Schwarzer Audi vor dem beleuchteten RBM-Ausstellungsraum",
+        "services": "Motorhaube eines schwarzen Fahrzeugs mit RBM-Logo auf dem Firmengelände",
+        "sellCar": "BMW-Autoschlüssel mit RBM-Schlüsselanhänger",
+        "contact": "Heck eines schwarzen BMW mit RBM-Kennzeichenhalter",
+        "export": "Fahrzeuge im Hafen vor einem Autotransportschiff für den Export"
     }
 }

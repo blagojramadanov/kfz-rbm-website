@@ -1,6 +1,8 @@
 "use client";
 import { useTranslations } from "next-intl";
 import { StatusBadge } from "@/components/status-badge";
+import { SalesTypeLabel } from "@/components/sales-type-label";
+import { getStatusIcon } from "@/lib/status-styles";
 import { useParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -137,21 +139,7 @@ export default function AdminSubmittedVehiclesPage() {
     );
   }
 
-  const statuses = [
-    { value: "eingereicht", icon: "📥" },
-    { value: "in_bearbeitung", icon: "⏳" },
-    { value: "angebot_gesendet", icon: "📤" },
-    { value: "akzeptiert", icon: "✅" },
-    { value: "abgelehnt", icon: "❌" },
-  ];
-
-  const salesTypeIcons: Record<string, string> = {
-    direct: "🤝",
-    Direktverkauf: "🤝",
-    tradeIn: "🔄",
-    Inzahlungnahme: "🔄",
-    consignment: "📋",
-  };
+  const statuses = ["eingereicht", "in_bearbeitung", "angebot_gesendet", "akzeptiert", "abgelehnt"];
 
 
   return (
@@ -173,20 +161,23 @@ export default function AdminSubmittedVehiclesPage() {
       {/* Filter Tabs */}
       <div className="mb-8 border-b border-border bg-card rounded-t-lg">
         <div className="flex gap-2 px-4 overflow-x-auto">
-          {statuses.map((status) => (
+          {statuses.map((status) => {
+            const StatusIcon = getStatusIcon("submission", status);
+            return (
             <button
-              key={status.value}
-              onClick={() => setStatusFilter(status.value)}
+              key={status}
+              onClick={() => setStatusFilter(status)}
               className={`flex flex-shrink-0 items-center gap-2 px-5 py-4 font-medium text-sm transition-all border-b-2 ${
-                statusFilter === status.value
+                statusFilter === status
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
-              <span>{status.icon}</span>
-              {getSubmissionStatusLabel(tCommon, status.value)}
+              {StatusIcon && <StatusIcon className="w-4 h-4" aria-hidden="true" />}
+              {getSubmissionStatusLabel(tCommon, status)}
             </button>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -268,7 +259,7 @@ export default function AdminSubmittedVehiclesPage() {
 
                   {/* Status Badge */}
                   <div className="pointer-events-none absolute top-3 left-3">
-                    <StatusBadge kind="submission" status={vehicle.status} className="shadow-sm">
+                    <StatusBadge kind="submission" status={vehicle.status} className="shadow-sm" withIcon>
                       {getSubmissionStatusLabel(tCommon, vehicle.status)}
                     </StatusBadge>
                   </div>
@@ -329,10 +320,9 @@ export default function AdminSubmittedVehiclesPage() {
                     {vehicle.sales_type && (
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground">{t("salesType")}:</span>
-                        <span className="font-semibold text-foreground">
-                          {salesTypeIcons[vehicle.sales_type] ? `${salesTypeIcons[vehicle.sales_type]} ` : ""}
+                        <SalesTypeLabel salesType={vehicle.sales_type} className="font-semibold text-foreground">
                           {getSalesTypeLabel(tCommon, vehicle.sales_type)}
-                        </span>
+                        </SalesTypeLabel>
                       </div>
                     )}
                     {vehicle.commission && (

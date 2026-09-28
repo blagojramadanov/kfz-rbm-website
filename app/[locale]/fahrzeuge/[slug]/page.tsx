@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft, Car } from "lucide-react";
+import { ArrowLeft, Car, Globe } from "lucide-react";
 import { BusinessHours } from "@/components/business-hours";
 import { FavoriteButton } from "@/components/favorite-button";
 import { ListingTypeBadge } from "@/components/listing-type-badge";
@@ -185,8 +185,9 @@ export default async function VehicleDetailPage({
               {/* Export-Specific Fields */}
               {isExport && (
                 <div className="mb-12 p-6 bg-info-subtle/50 rounded-lg border border-info-border">
-                  <h2 className="section-title mb-4">
-                    <span aria-hidden="true">🌍</span> {t("exportInfo.title")}
+                  <h2 className="section-title mb-4 flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-primary" aria-hidden="true" />
+                    {t("exportInfo.title")}
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     {vehicle.zustand && (

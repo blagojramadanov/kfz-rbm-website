@@ -212,7 +212,7 @@ export default function InzahlungnahmePage() {
         title={t("title")}
         description={t("stepProgress", { current: currentIndex + 1, total: STEPS.length })}
         backHref="/dashboard"
-        backLabel={<>← {tNav("dashboard")}</>}
+        backLabel={tNav("dashboard")}
         width="narrow"
       />
 

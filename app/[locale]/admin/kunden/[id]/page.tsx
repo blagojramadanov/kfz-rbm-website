@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
-import { AlertCircle, ArrowLeft } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, Lock } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { StatusBadge } from "@/components/status-badge";
@@ -179,7 +179,7 @@ export default function AdminCustomerDetailPage() {
                     </p>
                   )}
                 </div>
-                <StatusBadge kind="submission" status={vehicle.status}>{getSubmissionStatusLabel(tCommon, vehicle.status)}</StatusBadge>
+                <StatusBadge kind="submission" status={vehicle.status} withIcon>{getSubmissionStatusLabel(tCommon, vehicle.status)}</StatusBadge>
               </div>
             ))}
           </div>
@@ -227,21 +227,20 @@ export default function AdminCustomerDetailPage() {
                     {request.current_vehicle_model}
                     {request.desired_vehicle && (
                       <>
-                        <span className="text-muted-foreground mx-2">→</span>
+                        <ArrowRight className="inline w-4 h-4 mx-2 text-muted-foreground align-[-2px]" role="img" aria-label={tAdmin("tradeIns.desiredVehicle")} />
                         {request.desired_vehicle.brand} {request.desired_vehicle.model}
                       </>
                     )}
                   </p>
                   {request.commission && (
-                    <p className="text-sm text-highlight mt-1">
-                      🔐 {tAdmin("tradeIns.commission")}:{" "}
+                    <p className="text-sm text-highlight mt-1 flex items-center gap-1.5">
+                      <Lock className="w-4 h-4" aria-hidden="true" />
+                      {tAdmin("tradeIns.commission")}:{" "}
                       {format.number(request.commission / 100, { style: "percent", maximumFractionDigits: 2 })}
                     </p>
                   )}
                 </div>
-                <span className="px-3 py-1 rounded-full text-sm font-medium bg-highlight-subtle text-highlight-subtle-foreground">
-                  {getTradeInStatusLabel(tCommon, request.status)}
-                </span>
+                <StatusBadge kind="tradeIn" status={request.status}>{getTradeInStatusLabel(tCommon, request.status)}</StatusBadge>
               </div>
             ))}
           </div>

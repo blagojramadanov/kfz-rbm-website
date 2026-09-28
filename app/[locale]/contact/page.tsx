@@ -10,6 +10,7 @@ import { HoneypotField } from "@/components/honeypot-field";
 import { useAuth } from "@/lib/auth-context";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { PageHeader } from "@/components/page-header";
+import { SITE_IMAGES } from "@/lib/site-images";
 
 const EMPTY_FORM = { name: "", email: "", phone: "", message: "", website: "" };
 
@@ -56,7 +57,12 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-muted">
-      <PageHeader title={t("contact.title")} description={t("contact.getInTouch")} />
+      <PageHeader
+        title={t("contact.title")}
+        description={t("contact.getInTouch")}
+        image={SITE_IMAGES.contact}
+        imageAlt={t("siteImages.contact")}
+      />
       <div className="page-container">
 
         <div className="grid md:grid-cols-2 gap-12">

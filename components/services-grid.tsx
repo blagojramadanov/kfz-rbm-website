@@ -4,12 +4,15 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/navigation";
-import { ArrowRight, Car, TrendingUp, Truck, Globe, Handshake } from "lucide-react";
+import { ArrowRight, Car } from "lucide-react";
+import { CONCEPT_ICONS } from "@/lib/concept-icons";
+import { SITE_IMAGES, type SiteImageKey } from "@/lib/site-images";
 
 interface Service {
   id: string;
   icon: React.ReactNode;
-  image: string;
+  /** Site photo (lib/site-images); its alt text is siteImages.<key>. */
+  image: SiteImageKey;
   color: string;
   href: string;
 }
@@ -18,42 +21,43 @@ const SERVICES: Service[] = [
   {
     id: "buy",
     href: "/fahrzeuge",
-    icon: <Car className="w-8 h-8" />,
-    image: "https://picsum.photos/seed/kfzrbm-10/500/400",
+    icon: <Car className="w-8 h-8" aria-hidden="true" />,
+    image: "services",
     color: "from-info-subtle/50 to-info-subtle",
   },
   {
     id: "sell",
     href: "/dashboard/fahrzeug-anbieten",
-    icon: <TrendingUp className="w-8 h-8" />,
-    image: "https://picsum.photos/seed/kfzrbm-11/500/400",
+    icon: <CONCEPT_ICONS.directSale className="w-8 h-8" aria-hidden="true" />,
+    image: "sellCar",
     color: "from-success-subtle/50 to-success-subtle",
   },
   {
     id: "consignment",
     href: "/dashboard/fahrzeug-anbieten",
-    icon: <Handshake className="w-8 h-8" />,
-    image: "https://picsum.photos/seed/kfzrbm-12/500/400",
+    icon: <CONCEPT_ICONS.consignment className="w-8 h-8" aria-hidden="true" />,
+    image: "contact",
     color: "from-warning-subtle/50 to-warning-subtle",
   },
   {
     id: "trade-in",
     href: "/dashboard/inzahlungnahme",
-    icon: <Truck className="w-8 h-8" />,
-    image: "https://picsum.photos/seed/kfzrbm-13/500/400",
+    icon: <CONCEPT_ICONS.tradeIn className="w-8 h-8" aria-hidden="true" />,
+    image: "hero",
     color: "from-highlight-subtle/50 to-highlight-subtle",
   },
   {
     id: "export",
     href: "/fahrzeuge/export",
-    icon: <Globe className="w-8 h-8" />,
-    image: "https://picsum.photos/seed/kfzrbm-14/500/400",
+    icon: <CONCEPT_ICONS.export className="w-8 h-8" aria-hidden="true" />,
+    image: "export",
     color: "from-muted to-secondary",
   },
 ];
 
 export function ServicesGrid() {
   const t = useTranslations("pages.home");
+  const tImg = useTranslations("siteImages");
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {SERVICES.map((service) => (
@@ -65,10 +69,11 @@ export function ServicesGrid() {
             {/* Image - Hidden on mobile, shown on larger screens */}
             <div className="hidden sm:block sm:col-span-2 relative overflow-hidden bg-border">
               <Image
-                src={service.image}
-                alt={t(`services.${service.id}.title`)}
+                src={SITE_IMAGES[service.image]}
+                alt={tImg(service.image)}
                 fill
-                sizes="(max-width: 768px) 100%, 40vw"
+                sizes="(max-width: 768px) 40vw, 20vw"
+                placeholder="blur"
                 className="object-cover group-hover:scale-110 transition-transform duration-300"
               />
             </div>

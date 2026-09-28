@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useTranslations } from "next-intl";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft } from "lucide-react";
 import type { TradeInRequest } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
@@ -88,7 +88,7 @@ export default function TradeInRequestDetailPage() {
         title={t("title")}
         description={<>{t("requestId")} {requestId}</>}
         backHref="/dashboard/inzahlungnahme-anfragen"
-        backLabel={<>← {t("backToList")}</>}
+        backLabel={t("backToList")}
         width="narrow"
       />
 
@@ -259,8 +259,9 @@ export default function TradeInRequestDetailPage() {
             {/* Action Buttons */}
             <div className="flex justify-between gap-4">
               <Link href="/dashboard/inzahlungnahme-anfragen">
-                <button className="px-6 py-2 border border-input rounded-lg text-foreground hover:bg-muted transition-colors">
-                  ← {t("backToList")}
+                <button className="inline-flex items-center gap-2 px-6 py-2 border border-input rounded-lg text-foreground hover:bg-muted transition-colors">
+                  <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                  {t("backToList")}
                 </button>
               </Link>
             </div>

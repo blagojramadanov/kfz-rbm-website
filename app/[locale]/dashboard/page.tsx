@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { useFavorites } from "@/lib/favorites-context";
 import { Button } from "@/components/ui/button";
-import { Car, MessageSquare, Heart, Plus, FileText, LogOut, ArrowRight, Repeat2 } from "lucide-react";
+import { Car, MessageSquare, Heart, Plus, FileText, LogOut, ArrowRight, ArrowLeftRight } from "lucide-react";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { PageHeader } from "@/components/page-header";
 
@@ -222,7 +222,7 @@ export default function DashboardPage() {
             <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer h-full">
               <div className="flex items-center gap-4 mb-4">
                 <div className="bg-highlight-subtle rounded-lg p-3">
-                  <Repeat2 className="w-6 h-6 text-highlight" />
+                  <ArrowLeftRight className="w-6 h-6 text-highlight" />
                 </div>
                 <h2 className="section-title">
                   {t("overview.tradeIn")}

@@ -7,7 +7,8 @@ import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Plus, Car, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { Plus, Car, Check, CheckCircle2, X } from "lucide-react";
+import { CONCEPT_ICONS } from "@/lib/concept-icons";
 import Image from "next/image";
 import type { SubmittedVehicle } from "@/lib/supabase";
 import { useErrorMessage } from "@/lib/use-error-message";
@@ -45,20 +46,9 @@ export default function MyVehiclesPage() {
     });
   };
 
-  const getStatusConfig = (status: DashboardVehicleStatus): { label: string; icon: React.ReactNode } => {
-    const statusLabel = t(`status.${status}`);
-    const icons: Record<DashboardVehicleStatus, React.ReactNode> = {
-      eingereicht: <Clock className="w-4 h-4" />,
-      in_bearbeitung: <Clock className="w-4 h-4" />,
-      angebot_gesendet: <CheckCircle className="w-4 h-4" />,
-      akzeptiert: <CheckCircle className="w-4 h-4" />,
-      abgelehnt: <AlertCircle className="w-4 h-4" />,
-    };
-    return {
-      label: statusLabel,
-      icon: icons[status],
-    };
-  };
+  const getStatusConfig = (status: DashboardVehicleStatus): { label: string } => ({
+    label: t(`status.${status}`),
+  });
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -144,7 +134,7 @@ export default function MyVehiclesPage() {
         title={t("title")}
         description={t("description")}
         backHref="/dashboard"
-        backLabel={<>← {tNav("dashboard")}</>}
+        backLabel={tNav("dashboard")}
         actions={
           <Link href="/dashboard/fahrzeug-anbieten">
             <Button variant="inverse">
@@ -214,8 +204,7 @@ export default function MyVehiclesPage() {
                   {/* Content */}
                   <div className="p-4">
                     {/* Status Badge */}
-                    <StatusBadge kind="submission" status={status} className="mb-3">
-                      {config.icon}
+                    <StatusBadge kind="submission" status={status} className="mb-3" withIcon>
                       {config.label}
                     </StatusBadge>
 
@@ -246,7 +235,10 @@ export default function MyVehiclesPage() {
                     {status === "angebot_gesendet" && vehicle.offered_price && (
                       <div className="border-t pt-3 mt-3">
                         <div className="bg-success-subtle/50 p-3 rounded mb-3">
-                          <p className="text-sm text-muted-foreground mb-1">{t("offeredPrice")}</p>
+                          <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1.5">
+                            <CONCEPT_ICONS.offerPrice className="w-4 h-4" aria-hidden="true" />
+                            {t("offeredPrice")}
+                          </p>
                           <p className="text-2xl font-bold text-success">{formatCurrency(vehicle.offered_price)}</p>
                           {vehicle.offer_terms && (
                             <p className="text-xs text-muted-foreground mt-2">{vehicle.offer_terms}</p>
@@ -255,14 +247,16 @@ export default function MyVehiclesPage() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => setPendingAnswer({ vehicleId: vehicle.id, decision: "accept", price: vehicle.offered_price! })}
-                            className="flex-1 px-3 py-2 bg-success text-primary-foreground text-sm rounded hover:bg-success-hover font-medium"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-success text-success-foreground text-sm rounded-lg hover:bg-success-hover font-semibold"
                           >
+                            <Check className="w-4 h-4" aria-hidden="true" />
                             {t("acceptOffer")}
                           </button>
                           <button
                             onClick={() => setPendingAnswer({ vehicleId: vehicle.id, decision: "reject", price: vehicle.offered_price! })}
-                            className="flex-1 px-3 py-2 border border-destructive-border text-destructive text-sm rounded hover:bg-destructive-subtle/50 font-medium"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 border border-destructive-border bg-card text-destructive text-sm rounded-lg hover:bg-destructive-subtle/50 font-semibold"
                           >
+                            <X className="w-4 h-4" aria-hidden="true" />
                             {t("rejectOffer")}
                           </button>
                         </div>
@@ -299,7 +293,10 @@ export default function MyVehiclesPage() {
                     {/* Accepted/Rejected Status */}
                     {status === "akzeptiert" && (
                       <div className="border-t pt-3 mt-3 bg-success-subtle/50 p-3 rounded">
-                        <p className="text-sm text-success"><span className="font-semibold">{t("offerAccepted")}</span></p>
+                        <p className="text-sm text-success font-semibold flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+                          {t("offerAccepted")}
+                        </p>
                         {Number(vehicle.offered_price) > 0 && (
                           <>
                             <p className="text-sm text-muted-foreground mt-2">{t("acceptedPrice")}</p>

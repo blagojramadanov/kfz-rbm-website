@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { SITE_IMAGES } from "@/lib/site-images";
 import { Globe, Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VehicleCard } from "@/components/vehicle-card";
@@ -69,6 +71,7 @@ export function VehicleListing({
   emptyHint,
 }: VehicleListingProps) {
   const t = useTranslations("vehicles");
+  const tImg = useTranslations("siteImages");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -154,13 +157,30 @@ export function VehicleListing({
   return (
     <div className="min-h-screen bg-muted">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-primary-foreground py-12 px-4 sm:px-6 lg:px-8">
+      <div className="relative isolate overflow-hidden bg-gradient-to-r from-kfz-blue to-kfz-blue-dark text-primary-foreground py-12 px-4 sm:px-6 lg:px-8">
+        {variant === "export" && (
+          <>
+            <Image
+              src={SITE_IMAGES.export}
+              alt={tImg("export")}
+              fill
+              sizes="100vw"
+              placeholder="blur"
+              // Focus on the ship and cars; keeps the text baked into the photo out of the band
+              className="-z-20 object-cover object-[50%_65%]"
+            />
+            <div
+              className="absolute inset-0 -z-10 bg-gradient-to-r from-kfz-blue-dark/90 via-kfz-blue-dark/80 via-60% to-kfz-blue-dark/50"
+              aria-hidden="true"
+            />
+          </>
+        )}
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-4">
             {variant === "export" && <Globe className="w-8 h-8" aria-hidden="true" />}
             <h1 className="display">{heading}</h1>
           </div>
-          <p className="text-xl text-primary-foreground/80">{subheading}</p>
+          <p className="text-xl text-primary-foreground/80 max-w-2xl">{subheading}</p>
         </div>
       </div>
 

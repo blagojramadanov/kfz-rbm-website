@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useRouter, Link } from "@/lib/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { ArrowLeft, AlertCircle, CheckCircle, Upload } from "lucide-react";
+import { ArrowLeft, AlertCircle, Check, CheckCircle, ChevronLeft, ChevronRight, Upload } from "lucide-react";
+import { SalesTypeLabel } from "@/components/sales-type-label";
+import { StatusBadge } from "@/components/status-badge";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useErrorMessage } from "@/lib/use-error-message";
@@ -21,14 +23,6 @@ import {
   getSubmissionStatusLabel,
   getSalesTypeLabel,
 } from "@/lib/vehicle-labels";
-
-const SALES_TYPE_ICONS: Record<string, string> = {
-  direct: "🤝",
-  Direktverkauf: "🤝",
-  tradeIn: "🔄",
-  Inzahlungnahme: "🔄",
-  consignment: "📋",
-};
 
 interface SubmittedVehicle {
   id: string;
@@ -316,9 +310,9 @@ export default function SubmittedVehicleDetailPage() {
                         )
                       }
                       aria-label={t("previousImage")}
-                      className="px-3 py-1 bg-border rounded hover:bg-input text-sm"
+                      className="p-1.5 bg-border rounded hover:bg-input"
                     >
-                      ←
+                      <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                     </button>
                     <button
                       onClick={() =>
@@ -327,9 +321,9 @@ export default function SubmittedVehicleDetailPage() {
                         )
                       }
                       aria-label={t("nextImage")}
-                      className="px-3 py-1 bg-border rounded hover:bg-input text-sm"
+                      className="p-1.5 bg-border rounded hover:bg-input"
                     >
-                      →
+                      <ChevronRight className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -372,7 +366,7 @@ export default function SubmittedVehicleDetailPage() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">{t("status")}</p>
-                  <p className="font-semibold text-foreground">{getSubmissionStatusLabel(tCommon, vehicle.status)}</p>
+                  <StatusBadge kind="submission" status={vehicle.status} withIcon className="mt-1">{getSubmissionStatusLabel(tCommon, vehicle.status)}</StatusBadge>
                 </div>
               </div>
 
@@ -393,10 +387,9 @@ export default function SubmittedVehicleDetailPage() {
             {vehicle.sales_type && (
               <div className="pt-4 border-t">
                 <p className="text-sm text-muted-foreground mb-1">{t("salesType")}</p>
-                <p className="font-semibold text-foreground">
-                  {SALES_TYPE_ICONS[vehicle.sales_type] ? `${SALES_TYPE_ICONS[vehicle.sales_type]} ` : ""}
+                <SalesTypeLabel salesType={vehicle.sales_type} className="font-semibold text-foreground">
                   {getSalesTypeLabel(tCommon, vehicle.sales_type)}
-                </p>
+                </SalesTypeLabel>
               </div>
             )}
 
@@ -579,11 +572,16 @@ export default function SubmittedVehicleDetailPage() {
                   <button
                     onClick={handlePublish}
                     disabled={publishing}
-                    className="w-full px-4 py-2 bg-success text-primary-foreground rounded-lg hover:bg-success-hover disabled:bg-muted-foreground/50 font-medium transition-colors"
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-success text-success-foreground rounded-lg hover:bg-success-hover disabled:bg-muted-foreground/50 font-medium transition-colors"
                   >
-                    {publishing
-                      ? t("publishing")
-                      : `✓ ${publishStatus === "available" ? t("confirmPublishAvailable") : t("confirmPublishDraft")}`}
+                    {publishing ? (
+                      t("publishing")
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4" aria-hidden="true" />
+                        {publishStatus === "available" ? t("confirmPublishAvailable") : t("confirmPublishDraft")}
+                      </>
+                    )}
                   </button>
                   <button
                     onClick={() => setShowPublishForm(false)}

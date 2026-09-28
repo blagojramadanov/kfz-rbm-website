@@ -84,7 +84,7 @@ export default function FavoritesPage() {
         title={t("title")}
         description={t("description")}
         backHref="/dashboard"
-        backLabel={<>← {tNav("dashboard")}</>}
+        backLabel={tNav("dashboard")}
       />
 
       <main className="page-container">

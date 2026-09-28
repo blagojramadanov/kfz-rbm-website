@@ -3,7 +3,7 @@
 import { Link, useRouter } from "@/lib/navigation";
 import Image from "next/image";
 import { useState } from "react";
-import { Menu, X, LogOut, Settings, User, Heart } from "lucide-react";
+import { Menu, X, LogOut, Settings, User, Heart, Globe } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
@@ -74,9 +74,9 @@ export function Navbar() {
             </Link>
             <Link
               href={`/fahrzeuge/export`}
-              className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-1"
+              className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-1.5"
             >
-              <span>🌍</span>
+              <Globe className="w-4 h-4" aria-hidden="true" />
               <span>{t("navigation.export")}</span>
             </Link>
             <Link
@@ -188,9 +188,10 @@ export function Navbar() {
             </Link>
             <Link
               href={`/fahrzeuge/export`}
-              className="block px-4 py-2 text-foreground hover:bg-secondary"
+              className="flex items-center gap-2 px-4 py-2 text-foreground hover:bg-secondary"
             >
-              🌍 {t("navigation.export")}
+              <Globe className="w-4 h-4" aria-hidden="true" />
+              {t("navigation.export")}
             </Link>
             <Link
               href={`/about`}

@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function SubmissionWorkflowInfo() {
@@ -71,7 +71,7 @@ export function SubmissionWorkflowInfo() {
         <div className="flex gap-4">
           <div className="flex flex-col items-center">
             <div className="w-10 h-10 rounded-full bg-success text-primary-foreground flex items-center justify-center font-bold flex-shrink-0">
-              ✓
+              <Check className="w-5 h-5" aria-hidden="true" />
             </div>
           </div>
           <div>

@@ -90,7 +90,7 @@ export default function TradeInRequestsPage() {
         title={t("title")}
         description={t("description")}
         backHref="/dashboard"
-        backLabel={<>← {tNav("dashboard")}</>}
+        backLabel={tNav("dashboard")}
       />
 
       {/* Content */}

@@ -5,7 +5,7 @@ import { getStatusTone, TONE_TEXT } from "@/lib/status-styles";
 import { useRouter, Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth-context";
-import { Car, Users, MessageSquare, Repeat2, TrendingUp, AlertCircle } from "lucide-react";
+import { Car, Users, MessageSquare, ArrowLeftRight, TrendingUp, AlertCircle, ArrowRight } from "lucide-react";
 import { useErrorMessage } from "@/lib/use-error-message";
 import { useLocaleFormatter } from "@/lib/use-locale-formatter";
 import { getSubmissionStatusLabel, getVehicleStatusLabel } from "@/lib/vehicle-labels";
@@ -165,7 +165,7 @@ export default function AdminDashboardPage() {
             <Link href="/admin/inzahlungnahmen">
               <div className="card p-6 hover:shadow-lg transition-shadow cursor-pointer">
                 <div className="flex items-center justify-between mb-2">
-                  <Repeat2 className="w-10 h-10 text-highlight" />
+                  <ArrowLeftRight className="w-10 h-10 text-highlight" />
                   <span className="text-sm font-medium text-muted-foreground">{t("admin.sidebar.tradeIns")}</span>
                 </div>
                 <p className="text-3xl font-bold text-foreground">{n(stats.trade_in_requests_new)}</p>
@@ -199,8 +199,9 @@ export default function AdminDashboardPage() {
                   </div>
                 ))}
               </div>
-              <Link href="/admin/fahrzeuge" className="mt-4 inline-block text-primary hover:underline text-sm font-medium">
-                {t("adminDashboard.manageVehicles")} →
+              <Link href="/admin/fahrzeuge" className="mt-4 inline-flex items-center gap-1.5 text-primary hover:underline text-sm font-medium">
+                {t("adminDashboard.manageVehicles")}
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Link>
             </div>
 
@@ -215,8 +216,9 @@ export default function AdminDashboardPage() {
                   </div>
                 ))}
               </div>
-              <Link href="/admin/fahrzeuge/eingereicht" className="mt-4 inline-block text-primary hover:underline text-sm font-medium">
-                {t("admin.dashboard.manageSubmissions")} →
+              <Link href="/admin/fahrzeuge/eingereicht" className="mt-4 inline-flex items-center gap-1.5 text-primary hover:underline text-sm font-medium">
+                {t("admin.dashboard.manageSubmissions")}
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Link>
             </div>
           </div>

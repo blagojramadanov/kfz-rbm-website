@@ -10,7 +10,7 @@ import {
   Users,
   MessageSquare,
   BarChart3,
-  Repeat2,
+  ArrowLeftRight,
   LogOut,
   ChevronDown,
   Menu
@@ -42,7 +42,7 @@ const getAdminNavigation = (t: ReturnType<typeof useTranslations>, locale: strin
   {
     label: t("admin.sidebar.tradeIns"),
     href: `/admin/inzahlungnahmen`,
-    icon: Repeat2,
+    icon: ArrowLeftRight,
   },
   {
     label: t("admin.sidebar.customers"),
