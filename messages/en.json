@@ -680,7 +680,6 @@
         "contactInfo": "Contact Info",
         "followUs": "Follow Us",
         "privacyPolicy": "Privacy Policy",
-        "termsConditions": "Terms & Conditions",
         "impressum": "Impressum",
         "description": "Your used-car dealership for inspected premium vehicles, with expert advice and transparent pricing.",
         "social": {
@@ -690,7 +689,6 @@
     },
     "legal": {
         "privacyPolicy": "Privacy Policy",
-        "termsConditions": "Terms & Conditions",
         "impressum": "Impressum",
         "cookiePolicy": "Cookie Policy",
         "dataProtection": "Data Protection"
@@ -1162,10 +1160,6 @@
         "adminTitle": "Admin Dashboard – {name}"
     },
     "legalPages": {
-        "demoNotice": {
-            "title": "Demo content",
-            "text": "This page contains placeholder text and fictional example data only. It is neither a legally binding statement nor legal advice."
-        },
         "privacy": {
             "metaDescription": "Privacy policy of {name}: what data we process, why, and what rights you have.",
             "title": "Privacy policy",
@@ -1222,9 +1216,9 @@
                 },
                 "database": {
                     "title": "Database, sign-in and file storage (Supabase)",
-                    "p1": "For customer accounts, sign-in and the storage of inquiries, vehicle offers, favourites and uploaded photos we use Supabase (Supabase Inc., USA). Supabase provides the database, authentication and file storage and processes the data on our behalf (Art. 28 GDPR).",
+                    "p1": "For customer accounts, sign-in and the storage of inquiries, vehicle offers, favourites and uploaded photos we use Supabase (Supabase Inc.). Supabase provides the database, authentication and file storage and processes the data on our behalf (Art. 28 GDPR).",
                     "p2": "Passwords are stored in encrypted (hashed) form only; we have no access to your password. Photos of vehicle offers are kept in non-public storage and can only be accessed by you and by us.",
-                    "p3": "Where data is transferred to the USA in this context, this takes place on the basis of the European Commission's standard contractual clauses. The legal basis is Art. 6(1)(b) GDPR, otherwise Art. 6(1)(f) GDPR.",
+                    "p3": "The database, sign-in data and file storage of our Supabase project are stored in Frankfurt am Main (Germany, EU). The legal basis is Art. 6(1)(b) GDPR, otherwise Art. 6(1)(f) GDPR.",
                     "policy": "Supabase privacy policy"
                 },
                 "email": {
@@ -1306,33 +1300,6 @@
                 }
             },
             "updated": "Last updated: September 2026"
-        },
-        "terms": {
-            "metaDescription": "Sample terms and conditions of the {name} demo website.",
-            "title": "Terms & Conditions",
-            "intro": "These sample terms and conditions show how such a page would be laid out on this demo website.",
-            "sections": {
-                "scope": {
-                    "title": "Scope",
-                    "body": "These terms apply to all offers and services provided by {company} through this website."
-                },
-                "offers": {
-                    "title": "Offers and prices",
-                    "body": "The vehicles shown are non-binding and subject to prior sale. All prices are in euros. Errors and changes are reserved."
-                },
-                "contract": {
-                    "title": "Formation of contract",
-                    "body": "A purchase contract is only concluded once {company} has confirmed it in writing. Enquiries submitted through the website are not binding orders."
-                },
-                "warranty": {
-                    "title": "Warranty",
-                    "body": "Statutory warranty rights apply unless otherwise agreed in writing in an individual case."
-                },
-                "law": {
-                    "title": "Governing law",
-                    "body": "The law of the Federal Republic of Germany applies."
-                }
-            }
         },
         "impressum": {
             "metaDescription": "Legal notice (Impressum) of {name} pursuant to § 5 DDG.",

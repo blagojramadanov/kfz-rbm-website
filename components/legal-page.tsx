@@ -21,8 +21,6 @@ interface LegalPageProps {
   sections: LegalSection[];
   /** "Stand: ..." line below the content. */
   updated?: string;
-  /** Show the demo-content notice (only for pages that still hold placeholder text). */
-  demoNotice?: boolean;
   /** Show a table of contents (long pages such as the privacy policy). */
   toc?: boolean;
 }
@@ -69,8 +67,8 @@ function Block({ block }: { block: LegalBlock }) {
   );
 }
 
-/** Shared layout for the Impressum, privacy policy and terms pages. */
-export async function LegalPage({ title, intro, sections, updated, demoNotice = false, toc = false }: LegalPageProps) {
+/** Shared layout for the Impressum and privacy policy pages. */
+export async function LegalPage({ title, intro, sections, updated, toc = false }: LegalPageProps) {
   const t = await getTranslations("legalPages");
   const locale = await getLocale();
 
@@ -79,19 +77,6 @@ export async function LegalPage({ title, intro, sections, updated, demoNotice = 
       <PageHeader title={title} width="narrow" />
       <div className="page-container-narrow">
         <div className="card p-6 sm:p-10">
-          {demoNotice && (
-            <div
-              role="note"
-              className="flex gap-3 rounded-lg border border-warning-border bg-warning-subtle/50 p-4 mb-8 text-warning-subtle-foreground"
-            >
-              <Info className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
-              <div>
-                <p className="font-semibold">{t("demoNotice.title")}</p>
-                <p className="text-sm">{t("demoNotice.text")}</p>
-              </div>
-            </div>
-          )}
-
           {/* Only the German version is legally binding */}
           {locale !== "de" && (
             <div

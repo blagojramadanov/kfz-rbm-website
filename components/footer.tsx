@@ -106,12 +106,9 @@ export function Footer() {
 
         {/* Divider */}
         <div className="border-t border-white/15 pt-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-primary-foreground/80">
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 mb-4 text-sm text-primary-foreground/80">
             <Link href={`/privacy`} className="hover:text-primary-foreground transition-colors">
               {t("footer.privacyPolicy")}
-            </Link>
-            <Link href={`/terms`} className="hover:text-primary-foreground transition-colors">
-              {t("footer.termsConditions")}
             </Link>
             <Link href={`/impressum`} className="hover:text-primary-foreground transition-colors">
               {t("footer.impressum")}

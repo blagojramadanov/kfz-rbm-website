@@ -1082,7 +1082,12 @@ Visual consistency pass only: no changes to functionality, data, routes or trans
 **Not provided (left out everywhere, add when available):** USt-IdNr., Handelsregister, opening hours.
 
 **Open:**
-- AGB page (`/terms`) still holds demo terms (demo notice kept on that page only); needs real terms or removal.
-- Privacy policy assumes Resend as SMTP for Supabase Auth emails and does not name the Supabase region; neither is visible in the repo. Confirm both in the Supabase dashboard and adjust the "E-Mail-Versand" / "Datenbank" sections.
+- ~~AGB page with demo terms~~ removed, see below.
+- Privacy policy assumes Resend as SMTP for Supabase Auth emails (not visible in the repo); confirm in the Supabase dashboard.
 - Make sure data processing agreements (Art. 28 DSGVO) exist with Vercel, Supabase and Resend.
 - Impressum and Datenschutz are templates and need legal review before official use.
+
+### Follow-up: Supabase region, AGB removed (done, 2026-09-28, de/en/mk)
+- Datenschutz, section "Datenbank, Anmeldung und Dateispeicher": Supabase data (database, authentication, file storage) is stored in Frankfurt am Main (Germany, EU), region eu-central-1. The US-transfer wording is removed there; transfer notes remain only for Vercel (hosting; EU-US Data Privacy Framework / standard contractual clauses) and Resend (email; standard contractual clauses).
+- Demo AGB page removed: `app/[locale]/terms` deleted, footer link removed, `LegalPage` demo-notice option removed, keys `footer.termsConditions`, `legal.termsConditions`, `legalPages.terms`, `legalPages.demoNotice` deleted. The registration form never required accepting the AGB (no checkbox), so nothing changed there. `/{de,en,mk}/terms` return 404 like any unknown URL.
+- Open (pre-existing): unknown URLs show the plain Next.js 404, not the localized `app/[locale]/not-found.tsx` (needs a catch-all route that calls `notFound()`).
