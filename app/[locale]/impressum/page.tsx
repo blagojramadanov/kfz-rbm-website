@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LegalPage } from "@/components/legal-page";
-import { COMPANY, getAddress, getLegalInfo } from "@/lib/company";
+import { COMPANY, EMAIL_HREF, PHONE_HREF, getAddress } from "@/lib/company";
 
 export async function generateMetadata({
   params: { locale },
@@ -11,12 +11,12 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "legalPages.impressum" });
   return {
     title: `${t("title")} – ${COMPANY.name}`,
-    description: t("metaDescription", { name: COMPANY.name }),
+    description: t("metaDescription", { name: COMPANY.legalName }),
   };
 }
 
-// Deliberately lists no natural person (no owner / managing director): the
-// demo data in lib/company.ts is fictional.
+// Impressum per § 5 DDG and § 18 Abs. 2 MStV. USt-IdNr. and Handelsregister are
+// omitted on purpose: the owner has not provided them (see lib/company.ts).
 export default async function ImpressumPage({
   params: { locale },
 }: {
@@ -26,43 +26,48 @@ export default async function ImpressumPage({
   const t = await getTranslations("legalPages.impressum");
   const tCompany = await getTranslations("company");
   const address = getAddress(tCompany);
-  const legal = getLegalInfo(tCompany);
+
+  const addressLines = [
+    address.street,
+    `${address.zip} ${address.city} (${address.district})`,
+    address.country,
+  ];
 
   return (
     <LegalPage
       title={t("title")}
-      intro={t("intro")}
       sections={[
         {
           id: "provider",
           title: t("sections.provider.title"),
-          body: [
-            COMPANY.fullName,
-            address.street,
-            `${address.zip} ${address.city}`,
-            address.country,
+          blocks: [
+            {
+              type: "lines",
+              lines: [
+                <strong key="name" className="font-semibold text-foreground">{COMPANY.legalName}</strong>,
+                t("sections.provider.owner", { owner: COMPANY.owner }),
+                ...addressLines,
+              ],
+            },
           ],
         },
         {
           id: "contact",
           title: t("sections.contact.title"),
-          body: [
-            t("sections.contact.phone", { phone: COMPANY.phone }),
-            t("sections.contact.email", { email: COMPANY.email }),
-          ],
-        },
-        {
-          id: "register",
-          title: t("sections.register.title"),
-          body: [
-            t("sections.register.registerNumber", { number: legal.registerNumber }),
-            t("sections.register.vatId", { vatId: legal.ustIdNr }),
+          blocks: [
+            { type: "link", label: t("sections.contact.phone"), href: PHONE_HREF, text: COMPANY.phone },
+            { type: "link", label: t("sections.contact.email"), href: EMAIL_HREF, text: COMPANY.email },
           ],
         },
         {
           id: "responsible",
           title: t("sections.responsible.title"),
-          body: [t("sections.responsible.body", { company: COMPANY.fullName })],
+          blocks: [{ type: "lines", lines: [COMPANY.owner, ...addressLines] }],
+        },
+        {
+          id: "dispute",
+          title: t("sections.dispute.title"),
+          blocks: [t("sections.dispute.body")],
         },
       ]}
     />

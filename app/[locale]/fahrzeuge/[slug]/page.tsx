@@ -3,13 +3,12 @@ import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeft, Car, Globe } from "lucide-react";
-import { BusinessHours } from "@/components/business-hours";
 import { FavoriteButton } from "@/components/favorite-button";
 import { ListingTypeBadge } from "@/components/listing-type-badge";
 import { VehicleGallery } from "@/components/vehicle-gallery";
 import { VehicleInquiry } from "@/components/vehicle-inquiry";
 import { Button } from "@/components/ui/button";
-import { COMPANY } from "@/lib/company";
+import { COMPANY, EMAIL_HREF, PHONE_HREF } from "@/lib/company";
 import { formatMileage, formatPrice } from "@/lib/format-vehicle";
 import { Link } from "@/lib/navigation";
 import {
@@ -290,7 +289,7 @@ export default async function VehicleDetailPage({
                 <div>
                   <p className="text-muted-foreground mb-1">{tContact("phone")}</p>
                   <a
-                    href={`tel:${COMPANY.phone.replace(/\s/g, "")}`}
+                    href={PHONE_HREF}
                     className="text-primary hover:text-primary-hover font-semibold"
                   >
                     {COMPANY.phone}
@@ -299,15 +298,11 @@ export default async function VehicleDetailPage({
                 <div>
                   <p className="text-muted-foreground mb-1">{tContact("email")}</p>
                   <a
-                    href={`mailto:${COMPANY.email}`}
+                    href={EMAIL_HREF}
                     className="text-primary hover:text-primary-hover font-semibold break-all"
                   >
                     {COMPANY.email}
                   </a>
-                </div>
-                <div>
-                  <p className="text-muted-foreground mb-1">{tContact("hours")}</p>
-                  <BusinessHours className="text-foreground" />
                 </div>
               </div>
 

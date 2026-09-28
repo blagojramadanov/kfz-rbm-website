@@ -2,10 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, MapPin, Clock, CheckCircle } from "lucide-react";
+import { Phone, Mail, MapPin, CheckCircle } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
-import { COMPANY, getFormattedAddress } from "@/lib/company";
-import { BusinessHours } from "@/components/business-hours";
+import { COMPANY, EMAIL_HREF, PHONE_HREF, getFormattedAddress } from "@/lib/company";
 import { HoneypotField } from "@/components/honeypot-field";
 import { useAuth } from "@/lib/auth-context";
 import { useErrorMessage } from "@/lib/use-error-message";
@@ -79,7 +78,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">{t("contact.phone")}</h3>
-                  <p className="text-muted-foreground">{COMPANY.phone}</p>
+                  <a href={PHONE_HREF} className="text-primary hover:text-primary-hover font-medium">{COMPANY.phone}</a>
                 </div>
               </div>
 
@@ -89,7 +88,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">{t("contact.email")}</h3>
-                  <p className="text-muted-foreground">{COMPANY.email}</p>
+                  <a href={EMAIL_HREF} className="text-primary hover:text-primary-hover font-medium break-all">{COMPANY.email}</a>
                 </div>
               </div>
 
@@ -105,15 +104,6 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="flex gap-4">
-                <div className="flex-shrink-0">
-                  <Clock className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">{t("contact.hours")}</h3>
-                  <BusinessHours className="text-muted-foreground" />
-                </div>
-              </div>
             </div>
           </div>
 

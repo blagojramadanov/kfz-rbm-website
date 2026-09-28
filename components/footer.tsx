@@ -2,9 +2,8 @@
 
 import { Link } from "@/lib/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
-import { COMPANY, getFormattedAddress } from "@/lib/company";
-import { BusinessHours } from "@/components/business-hours";
+import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
+import { COMPANY, EMAIL_HREF, PHONE_HREF, getFormattedAddress } from "@/lib/company";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -21,9 +20,6 @@ export function Footer() {
             <h3 className="text-lg font-bold mb-4">{COMPANY.name}</h3>
             <p className="text-primary-foreground/80 text-sm">
               {t("footer.description")}
-            </p>
-            <p className="text-primary-foreground/70 text-xs mt-3 italic">
-              {t("footer.demoDisclaimer")}
             </p>
           </div>
 
@@ -57,13 +53,27 @@ export function Footer() {
           {/* Contact */}
           <div>
             <h4 className="text-lg font-semibold mb-4">{t("footer.contactInfo")}</h4>
-            <ul className="space-y-2 text-primary-foreground/80 text-sm">
-              <li>{t("contact.phone")}: {COMPANY.phone}</li>
-              <li>{t("contact.email")}: {COMPANY.email}</li>
-              <li>{t("contact.address")}: {getFormattedAddress(tCompany)}</li>
-              <li>
-                {t("contact.hours")}:
-                <BusinessHours className="mt-1 space-y-0.5" />
+            <ul className="space-y-3 text-primary-foreground/80 text-sm">
+              <li className="flex gap-2">
+                <Phone className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+                <a href={PHONE_HREF} className="hover:text-primary-foreground transition-colors">
+                  <span className="sr-only">{t("contact.phone")}: </span>
+                  {COMPANY.phone}
+                </a>
+              </li>
+              <li className="flex gap-2">
+                <Mail className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+                <a href={EMAIL_HREF} className="hover:text-primary-foreground transition-colors break-all">
+                  <span className="sr-only">{t("contact.email")}: </span>
+                  {COMPANY.email}
+                </a>
+              </li>
+              <li className="flex gap-2">
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+                <span>
+                  <span className="sr-only">{t("contact.address")}: </span>
+                  {getFormattedAddress(tCompany)}
+                </span>
               </li>
             </ul>
           </div>
@@ -76,33 +86,19 @@ export function Footer() {
                 href={COMPANY.social.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={t("footer.social.facebook")}
                 className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
               >
-                <Facebook className="w-6 h-6" />
+                <Facebook className="w-6 h-6" aria-hidden="true" />
               </a>
               <a
                 href={COMPANY.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={t("footer.social.instagram")}
                 className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
               >
-                <Instagram className="w-6 h-6" />
-              </a>
-              <a
-                href={COMPANY.social.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-              >
-                <Linkedin className="w-6 h-6" />
-              </a>
-              <a
-                href={COMPANY.social.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-              >
-                <Twitter className="w-6 h-6" />
+                <Instagram className="w-6 h-6" aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -125,7 +121,7 @@ export function Footer() {
           {/* Copyright */}
           <div className="text-center text-primary-foreground/80 text-sm">
             <p>
-              © {currentYear} {COMPANY.name}. {t("footer.allRightsReserved")} | {t("footer.premiumCars")}
+              © {currentYear} {COMPANY.legalName}. {t("footer.allRightsReserved")}
             </p>
           </div>
         </div>

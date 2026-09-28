@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/navigation";
-import { ArrowRight, Car } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { CONCEPT_ICONS } from "@/lib/concept-icons";
 import { SITE_IMAGES, type SiteImageKey } from "@/lib/site-images";
 
@@ -21,7 +21,7 @@ const SERVICES: Service[] = [
   {
     id: "buy",
     href: "/fahrzeuge",
-    icon: <Car className="w-8 h-8" aria-hidden="true" />,
+    icon: <CONCEPT_ICONS.purchase className="w-8 h-8" aria-hidden="true" />,
     image: "services",
     color: "from-info-subtle/50 to-info-subtle",
   },

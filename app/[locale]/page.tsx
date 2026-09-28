@@ -7,7 +7,7 @@ import { LatestVehicles } from "@/components/latest-vehicles";
 import { ServicesGrid } from "@/components/services-grid";
 import { SITE_IMAGES } from "@/lib/site-images";
 import { ArrowRight, CheckCircle, Users, Award, Shield, Zap } from "lucide-react";
-import { COMPANY } from "@/lib/company";
+import { COMPANY, PHONE_HREF } from "@/lib/company";
 import { Link } from "@/lib/navigation";
 import { getFeaturedVehicles, getLatestVehicles, getPublicFilterOptions } from "@/lib/public-vehicles";
 
@@ -388,7 +388,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
               variant="outline-inverse"
               className="px-8 py-6 text-lg"
             >
-              <a href={`tel:${COMPANY.phone.replace(/\s/g, "")}`}>
+              <a href={PHONE_HREF}>
                 {t("contact.callCta", { phone: COMPANY.phone })}
               </a>
             </Button>

@@ -1,69 +1,61 @@
 /**
- * Central Company Configuration
- * All company name, contact info, and branding comes from this file
- * This is a DEMO/EXAMPLE website with fictional data only
+ * Central company data. Real data only: fields the owner has not provided
+ * (USt-IdNr., Handelsregister, opening hours) are deliberately absent and must
+ * not be shown anywhere until they are.
  *
- * Placeholder wording that reads differently per language ("Beispielstraße",
- * "(Beispiel)", ...) lives in messages/*.json under `company.*`; use
- * getFormattedAddress() / getLegalInfo() with a `company` translator.
+ * Naming: `legalName` ("KFZ RBM") is used in the Impressum, the privacy policy
+ * (controller) and the footer copyright line. Everywhere else the brand `name`
+ * ("RBM") / `fullName` is used. Neither is translated.
  */
 
 // `t` must come from `useTranslations("company")` / `getTranslations({ locale, namespace: "company" })`.
-type CompanyTranslator = (key: any) => string;
+type CompanyTranslator = (key: any, values?: Record<string, string>) => string;
 
 export const COMPANY = {
-  // Display name (used in UI)
+  // Brand (used in the UI)
   name: "RBM",
   fullName: "RBM Premium Used Cars",
 
-  // Contact Information (all fictional example data)
-  email: "info@example.com",
-  phone: "+49 000 0000000",
+  // Legal entity
+  legalName: "KFZ RBM",
+  owner: "Vlado Ramadanov",
 
-  // Address (fictional; street, city and country are localized, see `company.address.*`)
+  // Contact
+  email: "kfzrbm@gmail.com",
+  phone: "+49 176 11848557",
+  /** E.164 form for tel: links */
+  phoneE164: "+4917611848557",
+
+  // Address (proper names, not translated; the country and the district label are, see `company.address.*`)
   address: {
-    zip: "12345",
+    street: "Am Neuhäusl 24",
+    zip: "93142",
+    city: "Maxhütte-Haidhof",
+    district: "Pirkensee",
   },
 
-  // Business hours (fictional). 24h strings; null means closed.
-  // Single source of truth for the contact page and the footer (see components/business-hours.tsx).
-  hours: {
-    weekdays: { open: "09:00", close: "18:00" },
-    saturday: { open: "10:00", close: "16:00" },
-    sunday: null,
-  },
-
-  // Social Media
   social: {
-    facebook: "#", // Placeholder - no real profile
-    instagram: "#", // Placeholder - no real profile
-    linkedin: "#", // Placeholder - no real profile
-    twitter: "#", // Placeholder - no real profile
+    facebook: "https://www.facebook.com/profile.php?id=61573370368219",
+    instagram: "https://www.instagram.com/kfzrbm/",
   },
 } as const;
+
+export const PHONE_HREF = `tel:${COMPANY.phoneE164}`;
+export const EMAIL_HREF = `mailto:${COMPANY.email}`;
 
 /** Address parts in the active language (`t` = `company` namespace translator). */
 export function getAddress(t: CompanyTranslator) {
   return {
-    street: t("address.street"),
+    street: COMPANY.address.street,
     zip: COMPANY.address.zip,
-    city: t("address.city"),
+    city: COMPANY.address.city,
+    district: t("address.district", { name: COMPANY.address.district }),
     country: t("address.country"),
   };
 }
 
-/** Legal/business identifiers in the active language (`t` = `company` namespace translator). */
-export function getLegalInfo(t: CompanyTranslator) {
-  return {
-    ustIdNr: t("legal.ustIdNr"),
-    registerNumber: t("legal.registerNumber"),
-  };
-}
-
-/**
- * Get formatted address
- */
+/** One-line address, e.g. "Am Neuhäusl 24, 93142 Maxhütte-Haidhof (Ortsteil Pirkensee), Deutschland". */
 export function getFormattedAddress(t: CompanyTranslator) {
-  const { street, zip, city, country } = getAddress(t);
-  return `${street}, ${zip} ${city}, ${country}`;
+  const { street, zip, city, district, country } = getAddress(t);
+  return `${street}, ${zip} ${city} (${district}), ${country}`;
 }

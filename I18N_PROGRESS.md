@@ -1070,3 +1070,19 @@ Visual consistency pass only: no changes to functionality, data, routes or trans
 - Overlay: `kfz-blue-dark` gradient 90% → 80% (at 60%) → 50%; header descriptions capped at `max-w-2xl`. Measured on every pixel of each photo: description (white/80) ≥ 5.76:1, title ≥ 4.31:1.
 - Files: `export.png` (2.5 MB) converted to `export.webp` (218 KB) and the PNG deleted; 4–11 px white edges trimmed from the JPGs.
 - No image files are missing. Open for the owner: the JPGs are only 768 px wide (soft on large screens; ≥1920 px versions would be better), and `export.webp` has German text ("EXPORT AUSLAND") baked in (cropped out of the banner, but visible if used full-frame).
+
+### Real company data, Über uns, Dienstleistungen, Impressum, Datenschutz (done, 2026-09-28, de/en/mk)
+- `lib/company.ts` holds only real data: legal name KFZ RBM, owner Vlado Ramadanov, Am Neuhäusl 24, 93142 Maxhütte-Haidhof (Ortsteil Pirkensee), +49 176 11848557, kfzrbm@gmail.com, Facebook and Instagram. `PHONE_HREF` / `EMAIL_HREF` for tel:/mailto: links. "KFZ RBM" appears in the Impressum, the privacy policy (controller) and the footer copyright; everywhere else the brand "RBM" stays.
+- Demo data removed everywhere (footer, Kontakt, vehicle detail sidebar, Impressum, privacy policy); demo note removed from the footer; fictional opening hours removed (`components/business-hours.tsx` deleted, `hours.*`, `contact.hours`, `common.closed` removed). LinkedIn/Twitter removed; Facebook/Instagram open in a new tab with `rel="noopener noreferrer"` and translated aria-labels.
+- Über uns: header (photo, title, subtitle, CTA "Kontakt aufnehmen"), "Wer wir sind", services overview, four values (ShieldCheck, Handshake, Globe, BadgeCheck), contact CTA. Only facts from `lib/company.ts` and the real services; no numbers, years, reviews or team members.
+- Dienstleistungen: header with CTA "Fahrzeuge ansehen"; one card per service from `lib/services.ts` (Ankauf/Direktverkauf, Verkauf im Kundenauftrag, Inzahlungnahme, Export, Fahrzeugkauf) with the concept icons and a CTA to the matching page; contact CTA.
+- Impressum (§ 5 DDG, § 18 Abs. 2 MStV, Verbraucherstreitbeilegung) and Datenschutzerklärung (controller, legal bases, Vercel, Supabase, Resend, account, forms, submissions/photos, favorites, cookies NEXT_LOCALE and sb-…, self-hosted font, social links, recipients, retention, rights, BayLDA, "Stand: September 2026") rebuilt on the new `LegalPage` (structured blocks, table of contents, "German version is binding" note on en/mk).
+- Checked with a production build: about, services, contact, impressum, privacy in de/en/mk at 1280×800 and 375×667 (title and CTA above the fold, no overflow, no raw keys, no demo data or opening hours, footer links); only same-origin requests (no Google Fonts).
+
+**Not provided (left out everywhere, add when available):** USt-IdNr., Handelsregister, opening hours.
+
+**Open:**
+- AGB page (`/terms`) still holds demo terms (demo notice kept on that page only); needs real terms or removal.
+- Privacy policy assumes Resend as SMTP for Supabase Auth emails and does not name the Supabase region; neither is visible in the repo. Confirm both in the Supabase dashboard and adjust the "E-Mail-Versand" / "Datenbank" sections.
+- Make sure data processing agreements (Art. 28 DSGVO) exist with Vercel, Supabase and Resend.
+- Impressum and Datenschutz are templates and need legal review before official use.

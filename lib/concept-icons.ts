@@ -1,5 +1,6 @@
 import {
   ArrowLeftRight,
+  Car,
   ClipboardList,
   Globe,
   Handshake,
@@ -14,6 +15,8 @@ import {
  * Sizes: w-4 h-4 inline with text, w-5 h-5 in headings and cards.
  */
 export const CONCEPT_ICONS = {
+  /** Fahrzeugkauf (buying from our stock) */
+  purchase: Car,
   /** Direktverkauf an RBM */
   directSale: Handshake,
   /** Verkauf im Kundenauftrag */

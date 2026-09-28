@@ -663,7 +663,6 @@
         "phone": "Telefon",
         "email": "E-Mail",
         "address": "Adresse",
-        "hours": "Öffnungszeiten",
         "sendMessage": "Nachricht senden",
         "messageSent": "Nachricht erfolgreich gesendet",
         "messageError": "Fehler beim Senden der Nachricht",
@@ -683,9 +682,11 @@
         "privacyPolicy": "Datenschutzrichtlinie",
         "termsConditions": "Geschäftsbedingungen",
         "impressum": "Impressum",
-        "premiumCars": "Premium Cars",
         "description": "Ihr Gebrauchtwagenhändler für geprüfte Premium-Fahrzeuge – mit fachkundiger Beratung und transparenten Preisen.",
-        "demoDisclaimer": "Demo-Website – alle Informationen sind fiktive Beispieldaten."
+        "social": {
+            "facebook": "RBM auf Facebook (öffnet in neuem Tab)",
+            "instagram": "RBM auf Instagram (öffnet in neuem Tab)"
+        }
     },
     "legal": {
         "privacyPolicy": "Datenschutzrichtlinie",
@@ -858,10 +859,42 @@
             }
         },
         "about": {
-            "title": "Über uns",
-            "subtitle": "Premium-Gebrauchtwagen-Händler",
-            "comingSoon": "Die Seite kommt bald...",
-            "description": "Ihr Gebrauchtwagenhändler für hochwertige Fahrzeuge und fachkundigen Service."
+            "title": "Über {name}",
+            "subtitle": "{name} ist Ihr Autohändler in {city} für Kauf, Verkauf, Inzahlungnahme und Export von Gebrauchtwagen – geführt von Inhaber {owner}.",
+            "headerCta": "Kontakt aufnehmen",
+            "intro": {
+                "title": "Wer wir sind",
+                "p1": "{name} ist ein inhabergeführter Autohandel in {city}. Bei uns kaufen Sie Gebrauchtwagen aus unserem Bestand, verkaufen uns Ihr Fahrzeug oder geben es in Zahlung – und für Käufer im Ausland bieten wir Fahrzeuge für den Export an.",
+                "p2": "Hinter {name} steht Inhaber {owner}. Bei Fragen zu einem Fahrzeug, zu Ihrem Angebot oder zu einer Inzahlungnahme erreichen Sie ihn direkt per Telefon oder E-Mail.",
+                "location": "Sie finden uns in {city}, Ortsteil {district}."
+            },
+            "offer": {
+                "title": "Unser Angebot",
+                "text": "Rund um den Gebrauchtwagen bietet {name} Ihnen alles aus einer Hand:"
+            },
+            "values": {
+                "title": "Warum {name}",
+                "transparent": {
+                    "title": "Transparente Angebote",
+                    "text": "Preise und Fahrzeugdaten sehen Sie online. Unser Angebot für Ihr Fahrzeug erhalten Sie schriftlich in Ihrem Kundenkonto."
+                },
+                "personal": {
+                    "title": "Persönlicher Kontakt",
+                    "text": "Sie sprechen direkt mit dem Inhaber {owner} – telefonisch, per E-Mail oder vor Ort in {city}."
+                },
+                "international": {
+                    "title": "Deutschland und Ausland",
+                    "text": "Neben dem Verkauf in Deutschland bieten wir ausgewählte Fahrzeuge für den Export an."
+                },
+                "simple": {
+                    "title": "Einfacher Ablauf",
+                    "text": "Fahrzeug online anbieten, Angebot erhalten und im Kundenkonto annehmen oder ablehnen – ohne Umwege."
+                }
+            },
+            "contactCta": {
+                "title": "Sprechen Sie uns an",
+                "text": "Sie haben Fragen zu einem Fahrzeug oder möchten Ihr Auto verkaufen? Wir freuen uns auf Ihre Nachricht oder Ihren Anruf."
+            }
         },
         "contact": {
             "title": "Kontaktieren Sie uns",
@@ -892,8 +925,46 @@
         },
         "services": {
             "title": "Unsere Dienstleistungen",
-            "subtitle": "Umfassende Lösungen für den Kauf und Verkauf von Gebrauchtwagen",
-            "comingSoon": "Die Seite kommt bald..."
+            "subtitle": "Ankauf, Verkauf im Kundenauftrag, Inzahlungnahme, Export und Fahrzeugkauf – alles rund um Ihren Gebrauchtwagen bei RBM.",
+            "headerCta": "Fahrzeuge ansehen",
+            "items": {
+                "directSale": {
+                    "title": "Ankauf / Direktverkauf",
+                    "text": "Sie möchten Ihr Auto verkaufen? Bieten Sie es uns online mit Fotos und Fahrzeugdaten an. Wir prüfen Ihre Angaben und senden Ihnen ein Angebot, das Sie in Ihrem Kundenkonto annehmen oder ablehnen können.",
+                    "short": "Sie verkaufen Ihr Fahrzeug direkt an uns und erhalten ein konkretes Angebot.",
+                    "cta": "Mein Auto anbieten"
+                },
+                "consignment": {
+                    "title": "Verkauf im Kundenauftrag",
+                    "text": "Wir verkaufen Ihr Fahrzeug in Ihrem Auftrag und präsentieren es auf unserer Website. Bis zum Verkauf bleibt das Fahrzeug Ihr Eigentum; die Konditionen stimmen wir vorab mit Ihnen ab.",
+                    "short": "Wir verkaufen Ihr Fahrzeug in Ihrem Auftrag über unsere Website.",
+                    "cta": "Mein Auto anbieten"
+                },
+                "tradeIn": {
+                    "title": "Inzahlungnahme",
+                    "text": "Sie möchten ein Fahrzeug aus unserem Bestand kaufen und Ihr bisheriges Auto abgeben? Geben Sie Ihr aktuelles Fahrzeug an, und wir rechnen seinen Wert beim Kauf an.",
+                    "short": "Ihr bisheriges Fahrzeug wird beim Kauf eines unserer Fahrzeuge angerechnet.",
+                    "cta": "Inzahlungnahme anfragen"
+                },
+                "export": {
+                    "title": "Export",
+                    "text": "Für Käufer im Ausland bieten wir ausgewählte Fahrzeuge für den Export an. Alle Exportfahrzeuge finden Sie in einer eigenen Übersicht.",
+                    "short": "Ausgewählte Fahrzeuge für Käufer im Ausland.",
+                    "cta": "Exportfahrzeuge ansehen"
+                },
+                "purchase": {
+                    "title": "Fahrzeugkauf",
+                    "text": "In unserem Bestand finden Sie Gebrauchtwagen mit allen wichtigen Daten, Fotos und Preis. Über jede Fahrzeugseite können Sie eine Anfrage stellen oder eine Probefahrt vereinbaren.",
+                    "short": "Gebrauchtwagen aus unserem Bestand – online ansehen und direkt anfragen.",
+                    "cta": "Fahrzeuge ansehen"
+                }
+            },
+            "contactCta": {
+                "title": "Fragen zu unseren Leistungen?",
+                "text": "Rufen Sie uns an oder schreiben Sie uns – wir beraten Sie gerne.",
+                "button": "Kontakt aufnehmen",
+                "call": "RBM anrufen: {phone}"
+            }
         },
         "fahrzeuge": {
             "metaTitle": "Fahrzeuginventar – {name}",
@@ -960,7 +1031,6 @@
         "german": "Deutsch",
         "english": "English",
         "macedonian": "Македонски",
-        "closed": "Geschlossen",
         "orElse": "oder",
         "and": "und",
         "yes": "Ja",
@@ -1086,11 +1156,6 @@
         },
         "close": "Schließen"
     },
-    "hours": {
-        "monFri": "Montag – Freitag",
-        "saturday": "Samstag",
-        "sunday": "Sonntag"
-    },
     "meta": {
         "title": "{name} – Premium-Gebrauchtwagen",
         "description": "Finden Sie Ihr Traumauto bei {name} – Ihr Gebrauchtwagenhändler für geprüfte Premium-Fahrzeuge.",
@@ -1102,31 +1167,145 @@
             "text": "Diese Seite enthält Platzhaltertext und ausschließlich fiktive Beispieldaten. Sie stellt weder eine rechtsverbindliche Angabe noch eine Rechtsberatung dar."
         },
         "privacy": {
-            "metaDescription": "Beispiel-Datenschutzerklärung der Demo-Website von {name}.",
+            "metaDescription": "Datenschutzerklärung von {name}: welche Daten wir verarbeiten, wofür und welche Rechte Sie haben.",
             "title": "Datenschutzerklärung",
-            "intro": "Der Schutz Ihrer personenbezogenen Daten ist uns wichtig. Diese Beispiel-Datenschutzerklärung zeigt, wie eine solche Seite auf dieser Demo-Website aufgebaut wäre.",
+            "intro": "Mit dieser Datenschutzerklärung informieren wir Sie, welche personenbezogenen Daten wir bei der Nutzung dieser Website verarbeiten, zu welchen Zwecken und auf welcher Rechtsgrundlage dies geschieht und welche Rechte Sie haben.",
             "sections": {
                 "controller": {
                     "title": "Verantwortlicher",
-                    "body": "Verantwortlich für die Datenverarbeitung auf dieser Website ist {company}, {address}. Sie erreichen uns per E-Mail unter {email}."
-                },
-                "data": {
-                    "title": "Welche Daten wir verarbeiten",
-                    "body": "Beim Besuch der Website werden technisch notwendige Daten verarbeitet, zum Beispiel die IP-Adresse sowie Datum und Uhrzeit des Zugriffs. Wenn Sie ein Kundenkonto anlegen, uns über das Kontaktformular schreiben oder ein Fahrzeug anbieten, verarbeiten wir die von Ihnen eingegebenen Angaben, etwa Name, E-Mail-Adresse, Telefonnummer und Fahrzeugdaten."
-                },
-                "purposes": {
-                    "title": "Zwecke der Verarbeitung",
-                    "body": "Wir verarbeiten Ihre Daten, um die Website bereitzustellen, Ihre Anfragen zu beantworten, Ihr Kundenkonto zu verwalten sowie Fahrzeugangebote und Inzahlungnahmen zu bearbeiten."
+                    "p1": "Verantwortlich für die Datenverarbeitung auf dieser Website im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:",
+                    "owner": "Inhaber: {owner}",
+                    "phone": "Telefon",
+                    "email": "E-Mail"
                 },
                 "cookies": {
-                    "title": "Cookies und Sitzungen",
-                    "body": "Diese Demo-Website verwendet nur technisch notwendige Cookies, zum Beispiel für die Anmeldung und die Speicherung Ihrer Spracheinstellung. Eine Auswertung Ihres Nutzungsverhaltens findet nicht statt."
+                    "title": "Cookies",
+                    "p1": "Wir verwenden ausschließlich technisch notwendige Cookies:",
+                    "item1": "NEXT_LOCALE – speichert die von Ihnen gewählte Sprache; Speicherdauer ein Jahr.",
+                    "item2": "sb-…-auth-token – hält Sie nach der Anmeldung angemeldet; wird beim Abmelden gelöscht, spätestens nach 400 Tagen.",
+                    "item3": "sb-…-code-verifier – kurzzeitiges Sicherheits-Cookie während der Anmeldung und beim Zurücksetzen des Passworts.",
+                    "p2": "Diese Cookies sind für die von Ihnen genutzten Funktionen unbedingt erforderlich und daher ohne Einwilligung zulässig (§ 25 Abs. 2 Nr. 2 TDDDG). Rechtsgrundlage der Verarbeitung ist Art. 6 Abs. 1 lit. b bzw. lit. f DSGVO.",
+                    "p3": "Cookies zu Analyse-, Tracking- oder Werbezwecken setzen wir nicht ein."
                 },
                 "rights": {
                     "title": "Ihre Rechte",
-                    "body": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Außerdem können Sie sich bei einer Datenschutz-Aufsichtsbehörde beschweren. Wenden Sie sich dazu bitte an {email}."
+                    "p1": "Sie haben im Rahmen der gesetzlichen Vorgaben folgende Rechte:",
+                    "item1": "Auskunft über Ihre gespeicherten Daten (Art. 15 DSGVO)",
+                    "item2": "Berichtigung unrichtiger Daten (Art. 16 DSGVO)",
+                    "item3": "Löschung (Art. 17 DSGVO)",
+                    "item4": "Einschränkung der Verarbeitung (Art. 18 DSGVO)",
+                    "item5": "Datenübertragbarkeit (Art. 20 DSGVO)",
+                    "item6": "Widerspruch gegen die Verarbeitung (Art. 21 DSGVO)",
+                    "item7": "Widerruf einer erteilten Einwilligung mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)",
+                    "p2": "Widerspruchsrecht: Soweit wir Daten auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO verarbeiten, können Sie aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit widersprechen.",
+                    "p3": "Zur Ausübung Ihrer Rechte genügt eine E-Mail an {email}."
+                },
+                "overview": {
+                    "title": "Allgemeine Hinweise und Rechtsgrundlagen",
+                    "p1": "Wir verarbeiten personenbezogene Daten nur, soweit dies zur Bereitstellung dieser Website und unserer Leistungen erforderlich ist. Rechtsgrundlagen sind insbesondere:",
+                    "item1": "Art. 6 Abs. 1 lit. b DSGVO – zur Erfüllung eines Vertrags oder zur Durchführung vorvertraglicher Maßnahmen, etwa bei Kundenkonto, Anfragen, Fahrzeugangeboten und Inzahlungnahmen;",
+                    "item2": "Art. 6 Abs. 1 lit. c DSGVO – zur Erfüllung rechtlicher Pflichten, insbesondere handels- und steuerrechtlicher Aufbewahrungspflichten;",
+                    "item3": "Art. 6 Abs. 1 lit. f DSGVO – auf Grundlage unserer berechtigten Interessen, etwa am sicheren und stabilen Betrieb der Website und an der Beantwortung von Anfragen.",
+                    "p2": "Wir setzen keine Analyse-, Tracking- oder Werbedienste ein und erstellen keine Nutzungsprofile."
+                },
+                "hosting": {
+                    "title": "Hosting und Server-Logfiles",
+                    "p1": "Diese Website wird bei Vercel Inc. (USA) gehostet. Beim Aufruf der Website werden automatisch technische Daten verarbeitet, die Ihr Browser übermittelt (Server-Logfiles), insbesondere:",
+                    "item1": "IP-Adresse",
+                    "item2": "Datum und Uhrzeit des Zugriffs",
+                    "item3": "aufgerufene Seite bzw. Datei",
+                    "item4": "Referrer-URL (die zuvor besuchte Seite)",
+                    "item5": "Browsertyp und Betriebssystem",
+                    "p2": "Diese Daten sind erforderlich, um die Website auszuliefern und ihre Sicherheit und Stabilität zu gewährleisten, etwa zur Abwehr von Angriffen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Eine Zusammenführung mit anderen Daten findet nicht statt.",
+                    "p3": "Vercel verarbeitet die Daten in unserem Auftrag (Art. 28 DSGVO). Dabei kann eine Übermittlung in die USA stattfinden; sie erfolgt auf Grundlage des EU-US Data Privacy Framework bzw. der Standardvertragsklauseln der EU-Kommission.",
+                    "policy": "Datenschutzerklärung von Vercel"
+                },
+                "database": {
+                    "title": "Datenbank, Anmeldung und Dateispeicher (Supabase)",
+                    "p1": "Für Kundenkonten, die Anmeldung sowie die Speicherung von Anfragen, Fahrzeugangeboten, Favoriten und hochgeladenen Fotos nutzen wir Supabase (Supabase Inc., USA). Supabase stellt Datenbank, Authentifizierung und Dateispeicher bereit und verarbeitet die Daten in unserem Auftrag (Art. 28 DSGVO).",
+                    "p2": "Passwörter werden ausschließlich verschlüsselt (gehasht) gespeichert; wir haben keinen Zugriff auf Ihr Passwort. Fotos zu Fahrzeugangeboten liegen in einem nicht öffentlichen Speicher und sind nur für Sie und für uns abrufbar.",
+                    "p3": "Soweit Daten dabei in die USA übermittelt werden, erfolgt dies auf Grundlage der Standardvertragsklauseln der EU-Kommission. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, im Übrigen Art. 6 Abs. 1 lit. f DSGVO.",
+                    "policy": "Datenschutzerklärung von Supabase"
+                },
+                "email": {
+                    "title": "E-Mail-Versand",
+                    "p1": "System-E-Mails, etwa zur Bestätigung Ihrer Registrierung oder zum Zurücksetzen Ihres Passworts, versenden wir über den E-Mail-Dienst Resend (Resend, Inc., USA). Dabei werden Ihre E-Mail-Adresse und der Inhalt der Nachricht verarbeitet.",
+                    "p2": "Resend handelt in unserem Auftrag (Art. 28 DSGVO). Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Eine Übermittlung in die USA erfolgt auf Grundlage der Standardvertragsklauseln der EU-Kommission.",
+                    "policy": "Datenschutzerklärung von Resend"
+                },
+                "account": {
+                    "title": "Kundenkonto",
+                    "p1": "Sie können ein Kundenkonto anlegen, um Fahrzeuge anzubieten, Inzahlungnahmen anzufragen, Ihre Anfragen einzusehen und Favoriten zu speichern. Dabei verarbeiten wir:",
+                    "item1": "Name",
+                    "item2": "E-Mail-Adresse",
+                    "item3": "Passwort (nur verschlüsselt gespeichert)",
+                    "item4": "Telefonnummer, wenn Sie sie in Ihrem Profil angeben",
+                    "p2": "Die Verarbeitung erfolgt zur Bereitstellung des Kundenkontos und zur Durchführung der darüber angefragten Leistungen (Art. 6 Abs. 1 lit. b DSGVO).",
+                    "p3": "Sie können die Löschung Ihres Kontos jederzeit per E-Mail an {email} verlangen. Daten, die wir aus rechtlichen Gründen aufbewahren müssen, sperren wir bis zum Ablauf der Fristen."
+                },
+                "inquiries": {
+                    "title": "Kontaktformular, Fahrzeuganfragen und Probefahrten",
+                    "p1": "Wenn Sie uns über das Kontaktformular, eine Fahrzeuganfrage oder eine Probefahrt-Anfrage schreiben, verarbeiten wir:",
+                    "item1": "Name und E-Mail-Adresse",
+                    "item2": "Telefonnummer (freiwillig)",
+                    "item3": "Ihre Nachricht",
+                    "item4": "bei Fahrzeuganfragen das betreffende Fahrzeug",
+                    "item5": "bei Probefahrten Ihren Wunschtermin",
+                    "p2": "Sind Sie dabei angemeldet, ordnen wir die Anfrage Ihrem Kundenkonto zu, damit Sie sie dort einsehen können.",
+                    "p3": "Wir nutzen die Angaben ausschließlich zur Bearbeitung Ihrer Anfrage. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, soweit Ihre Anfrage auf einen Vertrag abzielt, andernfalls Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Beantwortung). Dasselbe gilt, wenn Sie uns per E-Mail oder Telefon kontaktieren.",
+                    "p4": "Zum Schutz vor Spam enthalten die Formulare ein für Menschen unsichtbares Feld. Dafür werden keine zusätzlichen Daten erhoben."
+                },
+                "submissions": {
+                    "title": "Fahrzeug anbieten und Inzahlungnahme",
+                    "p1": "Wenn Sie uns über Ihr Kundenkonto ein Fahrzeug anbieten oder eine Inzahlungnahme anfragen, verarbeiten wir:",
+                    "item1": "Fahrzeugdaten wie Marke, Modell, Baujahr, Kilometerstand, Ausstattung und Zustand",
+                    "item2": "Ihre Preisvorstellung bzw. Wertschätzung",
+                    "item3": "die gewünschte Verkaufsart und bei einer Inzahlungnahme das gewünschte Fahrzeug",
+                    "item4": "die von Ihnen hochgeladenen Fotos",
+                    "p2": "Wir nutzen die Daten, um Ihr Fahrzeug zu prüfen, Ihnen ein Angebot zu unterbreiten und den Ankauf, die Inzahlungnahme oder den Verkauf im Kundenauftrag abzuwickeln (Art. 6 Abs. 1 lit. b DSGVO).",
+                    "p3": "Übernehmen wir Ihr Fahrzeug in unseren Bestand oder verkaufen wir es in Ihrem Auftrag, können die Fahrzeugdaten und Fotos in der öffentlichen Fahrzeuganzeige auf dieser Website erscheinen. Ihr Name und Ihre Kontaktdaten werden dabei nicht veröffentlicht.",
+                    "p4": "Bitte achten Sie darauf, dass auf den Fotos keine Personen oder fremden Kennzeichen zu erkennen sind."
+                },
+                "favorites": {
+                    "title": "Favoriten",
+                    "p1": "Wenn Sie angemeldet sind, können Sie Fahrzeuge als Favoriten speichern. Die Favoriten werden Ihrem Kundenkonto zugeordnet gespeichert, bis Sie sie entfernen oder Ihr Konto gelöscht wird (Art. 6 Abs. 1 lit. b DSGVO)."
+                },
+                "fonts": {
+                    "title": "Schriftarten",
+                    "p1": "Die auf dieser Website verwendete Schriftart wird zusammen mit der Website von unserem Hosting-Anbieter ausgeliefert. Beim Aufruf der Seiten wird keine Verbindung zu Servern von Google oder anderen Schriftanbietern hergestellt."
+                },
+                "social": {
+                    "title": "Links zu sozialen Netzwerken",
+                    "p1": "Wir verlinken auf unsere Seiten bei Facebook und Instagram (Meta Platforms Ireland Ltd.). Es handelt sich um einfache Links, nicht um eingebundene Plugins: Beim Aufruf unserer Website werden keine Daten an diese Netzwerke übertragen.",
+                    "p2": "Erst wenn Sie einen Link anklicken, gelangen Sie auf die Seite des jeweiligen Netzwerks; dort gelten dessen Datenschutzbestimmungen."
+                },
+                "recipients": {
+                    "title": "Empfänger",
+                    "p1": "Ihre Daten erhalten nur die in dieser Erklärung genannten Dienstleister, die für uns als Auftragsverarbeiter tätig sind. Darüber hinaus geben wir Daten nur weiter, wenn dies zur Vertragsabwicklung erforderlich ist oder wir gesetzlich dazu verpflichtet sind.",
+                    "p2": "Wir verkaufen keine personenbezogenen Daten und geben sie nicht zu Werbezwecken weiter."
+                },
+                "retention": {
+                    "title": "Speicherdauer",
+                    "p1": "Wir speichern personenbezogene Daten nur so lange, wie es für den jeweiligen Zweck erforderlich ist:",
+                    "item1": "Kundenkonto und Favoriten: bis zur Löschung des Kontos;",
+                    "item2": "Anfragen: bis zur abschließenden Bearbeitung; danach löschen wir sie, sofern sie nicht für einen Vertrag benötigt werden;",
+                    "item3": "Fahrzeugangebote und Inzahlungnahmen: bis zum Abschluss des Vorgangs bzw. bis Sie die Löschung verlangen;",
+                    "item4": "Server-Logfiles: nur kurzzeitig nach den Vorgaben unseres Hosting-Anbieters;",
+                    "item5": "Daten, die gesetzlichen Aufbewahrungspflichten unterliegen (z. B. Geschäftsbriefe und Buchungsbelege nach § 257 HGB und § 147 AO): für die Dauer dieser Fristen von sechs bzw. zehn Jahren."
+                },
+                "complaint": {
+                    "title": "Beschwerderecht bei der Aufsichtsbehörde",
+                    "p1": "Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Für uns zuständig ist:",
+                    "authority": "Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)",
+                    "website": "Website"
+                },
+                "obligation": {
+                    "title": "Pflicht zur Bereitstellung und automatisierte Entscheidungen",
+                    "p1": "Sie sind nicht verpflichtet, uns personenbezogene Daten bereitzustellen. Ohne die als Pflichtfelder gekennzeichneten Angaben können wir jedoch kein Kundenkonto einrichten und Ihre Anfrage oder Ihr Angebot nicht bearbeiten.",
+                    "p2": "Eine automatisierte Entscheidungsfindung einschließlich Profiling (Art. 22 DSGVO) findet nicht statt."
                 }
-            }
+            },
+            "updated": "Stand: September 2026"
         },
         "terms": {
             "metaDescription": "Beispiel-Geschäftsbedingungen der Demo-Website von {name}.",
@@ -1156,39 +1335,34 @@
             }
         },
         "impressum": {
-            "metaDescription": "Beispiel-Impressum der Demo-Website von {name}.",
+            "metaDescription": "Impressum von {name}: Anbieterkennzeichnung gemäß § 5 DDG.",
             "title": "Impressum",
-            "intro": "Beispielangaben für diese Demo-Website.",
             "sections": {
                 "provider": {
-                    "title": "Anbieter"
+                    "title": "Angaben gemäß § 5 DDG",
+                    "owner": "Inhaber: {owner}"
                 },
                 "contact": {
                     "title": "Kontakt",
-                    "phone": "Telefon: {phone}",
-                    "email": "E-Mail: {email}"
-                },
-                "register": {
-                    "title": "Register und Steuer",
-                    "registerNumber": "Handelsregisternummer: {number}",
-                    "vatId": "USt-IdNr.: {vatId}"
+                    "phone": "Telefon",
+                    "email": "E-Mail"
                 },
                 "responsible": {
-                    "title": "Inhaltlich verantwortlich",
-                    "body": "Für die Inhalte dieser Website ist {company} verantwortlich (Anschrift siehe oben)."
+                    "title": "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV"
+                },
+                "dispute": {
+                    "title": "Verbraucherstreitbeilegung",
+                    "body": "Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
                 }
             }
-        }
+        },
+        "bindingNote": "Übersetzung zur besseren Verständlichkeit. Rechtlich verbindlich ist ausschließlich die deutsche Fassung.",
+        "contents": "Inhalt"
     },
     "company": {
         "address": {
-            "street": "Beispielstraße 1",
-            "city": "Beispielstadt",
-            "country": "Deutschland"
-        },
-        "legal": {
-            "ustIdNr": "DE000000000 (Beispiel)",
-            "registerNumber": "HRB 000000 (Beispiel)"
+            "country": "Deutschland",
+            "district": "Ortsteil {name}"
         }
     },
     "adminVehicleForm": {

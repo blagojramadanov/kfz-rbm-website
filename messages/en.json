@@ -663,7 +663,6 @@
         "phone": "Phone",
         "email": "Email",
         "address": "Address",
-        "hours": "Opening hours",
         "sendMessage": "Send Message",
         "messageSent": "Message sent successfully",
         "messageError": "Error sending message",
@@ -683,9 +682,11 @@
         "privacyPolicy": "Privacy Policy",
         "termsConditions": "Terms & Conditions",
         "impressum": "Impressum",
-        "premiumCars": "Premium Cars",
         "description": "Your used-car dealership for inspected premium vehicles, with expert advice and transparent pricing.",
-        "demoDisclaimer": "Demo website – all information is fictional example data."
+        "social": {
+            "facebook": "RBM on Facebook (opens in a new tab)",
+            "instagram": "RBM on Instagram (opens in a new tab)"
+        }
     },
     "legal": {
         "privacyPolicy": "Privacy Policy",
@@ -858,10 +859,42 @@
             }
         },
         "about": {
-            "title": "About Us",
-            "subtitle": "Premium Used Car Dealership",
-            "comingSoon": "Page coming soon...",
-            "description": "Premium used-car dealership offering quality vehicles and expert service"
+            "title": "About {name}",
+            "subtitle": "{name} is your car dealer in {city} for buying, selling, trading in and exporting used cars – run by owner {owner}.",
+            "headerCta": "Get in touch",
+            "intro": {
+                "title": "Who we are",
+                "p1": "{name} is an owner-run car dealership in {city}. With us you can buy a used car from our stock, sell us your vehicle or trade it in – and for buyers abroad we offer vehicles for export.",
+                "p2": "Behind {name} is owner {owner}. If you have questions about a vehicle, your offer or a trade-in, you can reach him directly by phone or email.",
+                "location": "You can find us in {city}, {district} district."
+            },
+            "offer": {
+                "title": "What we offer",
+                "text": "{name} covers everything around the used car in one place:"
+            },
+            "values": {
+                "title": "Why {name}",
+                "transparent": {
+                    "title": "Transparent offers",
+                    "text": "You see prices and vehicle details online. Our offer for your vehicle arrives in writing in your customer account."
+                },
+                "personal": {
+                    "title": "Personal contact",
+                    "text": "You talk directly to the owner, {owner} – by phone, by email or in person in {city}."
+                },
+                "international": {
+                    "title": "Germany and abroad",
+                    "text": "Besides selling in Germany, we offer selected vehicles for export."
+                },
+                "simple": {
+                    "title": "Simple process",
+                    "text": "Offer your vehicle online, receive an offer and accept or decline it in your customer account – no detours."
+                }
+            },
+            "contactCta": {
+                "title": "Talk to us",
+                "text": "Do you have questions about a vehicle or want to sell your car? We look forward to your message or call."
+            }
         },
         "contact": {
             "title": "Contact Us",
@@ -891,9 +924,47 @@
             "title": "Forgot Password"
         },
         "services": {
-            "title": "Our Services",
-            "subtitle": "Comprehensive solutions for buying and selling used cars",
-            "comingSoon": "Page coming soon..."
+            "title": "Our services",
+            "subtitle": "Buying your car, selling on your behalf, trade-in, export and vehicle purchase – everything around your used car at RBM.",
+            "headerCta": "View vehicles",
+            "items": {
+                "directSale": {
+                    "title": "We buy your car",
+                    "text": "Want to sell your car? Offer it to us online with photos and vehicle details. We review your information and send you an offer that you can accept or decline in your customer account.",
+                    "short": "Sell your vehicle directly to us and receive a concrete offer.",
+                    "cta": "Offer my car"
+                },
+                "consignment": {
+                    "title": "Sale on your behalf",
+                    "text": "We sell your vehicle on your behalf and present it on our website. The vehicle remains your property until it is sold; we agree on the terms with you in advance.",
+                    "short": "We sell your vehicle on your behalf through our website.",
+                    "cta": "Offer my car"
+                },
+                "tradeIn": {
+                    "title": "Trade-in",
+                    "text": "Want to buy a vehicle from our stock and hand over your current car? Tell us about your current vehicle and we will credit its value against the purchase.",
+                    "short": "Your current vehicle is credited when you buy one of our vehicles.",
+                    "cta": "Request a trade-in"
+                },
+                "export": {
+                    "title": "Export",
+                    "text": "For buyers abroad we offer selected vehicles for export. You will find all export vehicles in a separate overview.",
+                    "short": "Selected vehicles for buyers abroad.",
+                    "cta": "View export vehicles"
+                },
+                "purchase": {
+                    "title": "Buying a vehicle",
+                    "text": "Our stock shows used cars with all key details, photos and the price. From every vehicle page you can send an inquiry or arrange a test drive.",
+                    "short": "Used cars from our stock – view them online and inquire directly.",
+                    "cta": "View vehicles"
+                }
+            },
+            "contactCta": {
+                "title": "Questions about our services?",
+                "text": "Call us or write to us – we are happy to help.",
+                "button": "Get in touch",
+                "call": "Call RBM: {phone}"
+            }
         },
         "fahrzeuge": {
             "metaTitle": "Vehicle Inventory – {name}",
@@ -960,7 +1031,6 @@
         "german": "Deutsch",
         "english": "English",
         "macedonian": "Македонски",
-        "closed": "Closed",
         "orElse": "or",
         "and": "and",
         "yes": "Yes",
@@ -1086,11 +1156,6 @@
         },
         "close": "Close"
     },
-    "hours": {
-        "monFri": "Monday – Friday",
-        "saturday": "Saturday",
-        "sunday": "Sunday"
-    },
     "meta": {
         "title": "{name} – Premium Used Cars",
         "description": "Find your perfect car at {name} – your used-car dealership for inspected premium vehicles.",
@@ -1102,31 +1167,145 @@
             "text": "This page contains placeholder text and fictional example data only. It is neither a legally binding statement nor legal advice."
         },
         "privacy": {
-            "metaDescription": "Sample privacy policy of the {name} demo website.",
-            "title": "Privacy Policy",
-            "intro": "Protecting your personal data matters to us. This sample privacy policy shows how such a page would be laid out on this demo website.",
+            "metaDescription": "Privacy policy of {name}: what data we process, why, and what rights you have.",
+            "title": "Privacy policy",
+            "intro": "This privacy policy explains which personal data we process when you use this website, for which purposes and on which legal basis, and which rights you have.",
             "sections": {
                 "controller": {
                     "title": "Controller",
-                    "body": "The party responsible for data processing on this website is {company}, {address}. You can reach us by email at {email}."
-                },
-                "data": {
-                    "title": "Data we process",
-                    "body": "When you visit the website, technically necessary data is processed, for example your IP address and the date and time of access. If you create a customer account, write to us via the contact form or offer a vehicle, we process the information you enter, such as your name, email address, phone number and vehicle details."
-                },
-                "purposes": {
-                    "title": "Purposes of processing",
-                    "body": "We process your data to provide the website, answer your enquiries, manage your customer account and handle vehicle offers and trade-ins."
+                    "p1": "The controller responsible for data processing on this website within the meaning of the General Data Protection Regulation (GDPR) is:",
+                    "owner": "Owner: {owner}",
+                    "phone": "Phone",
+                    "email": "Email"
                 },
                 "cookies": {
-                    "title": "Cookies and sessions",
-                    "body": "This demo website only uses technically necessary cookies, for example for signing in and for remembering your language setting. Your browsing behaviour is not analysed."
+                    "title": "Cookies",
+                    "p1": "We only use technically necessary cookies:",
+                    "item1": "NEXT_LOCALE – stores the language you have chosen; kept for one year.",
+                    "item2": "sb-…-auth-token – keeps you signed in after login; deleted when you sign out, at the latest after 400 days.",
+                    "item3": "sb-…-code-verifier – short-lived security cookie during sign-in and password reset.",
+                    "p2": "These cookies are strictly necessary for the functions you use and are therefore permitted without consent (§ 25(2) no. 2 TDDDG). The legal basis for the processing is Art. 6(1)(b) or (f) GDPR.",
+                    "p3": "We do not use cookies for analytics, tracking or advertising."
                 },
                 "rights": {
                     "title": "Your rights",
-                    "body": "You have the right of access, rectification, erasure, restriction of processing, data portability and objection. You may also lodge a complaint with a data protection supervisory authority. Please contact {email} for this purpose."
+                    "p1": "Within the statutory framework you have the following rights:",
+                    "item1": "access to your stored data (Art. 15 GDPR)",
+                    "item2": "rectification of inaccurate data (Art. 16 GDPR)",
+                    "item3": "erasure (Art. 17 GDPR)",
+                    "item4": "restriction of processing (Art. 18 GDPR)",
+                    "item5": "data portability (Art. 20 GDPR)",
+                    "item6": "objection to processing (Art. 21 GDPR)",
+                    "item7": "withdrawal of any consent given, with effect for the future (Art. 7(3) GDPR)",
+                    "p2": "Right to object: where we process data on the basis of Art. 6(1)(f) GDPR, you may object at any time on grounds relating to your particular situation.",
+                    "p3": "To exercise your rights, simply send an email to {email}."
+                },
+                "overview": {
+                    "title": "General information and legal bases",
+                    "p1": "We process personal data only to the extent necessary to provide this website and our services. The legal bases are in particular:",
+                    "item1": "Art. 6(1)(b) GDPR – to perform a contract or to take steps prior to entering into a contract, e.g. for customer accounts, inquiries, vehicle offers and trade-ins;",
+                    "item2": "Art. 6(1)(c) GDPR – to comply with legal obligations, in particular retention obligations under commercial and tax law;",
+                    "item3": "Art. 6(1)(f) GDPR – on the basis of our legitimate interests, e.g. in the secure and stable operation of the website and in answering inquiries.",
+                    "p2": "We do not use any analytics, tracking or advertising services and do not create usage profiles."
+                },
+                "hosting": {
+                    "title": "Hosting and server log files",
+                    "p1": "This website is hosted by Vercel Inc. (USA). When you access the website, technical data transmitted by your browser is processed automatically (server log files), in particular:",
+                    "item1": "IP address",
+                    "item2": "date and time of access",
+                    "item3": "page or file accessed",
+                    "item4": "referrer URL (the page visited before)",
+                    "item5": "browser type and operating system",
+                    "p2": "This data is required to deliver the website and to ensure its security and stability, e.g. to fend off attacks. The legal basis is Art. 6(1)(f) GDPR. The data is not combined with other data.",
+                    "p3": "Vercel processes the data on our behalf (Art. 28 GDPR). This may involve a transfer to the USA, which takes place on the basis of the EU-US Data Privacy Framework or the European Commission's standard contractual clauses.",
+                    "policy": "Vercel privacy policy"
+                },
+                "database": {
+                    "title": "Database, sign-in and file storage (Supabase)",
+                    "p1": "For customer accounts, sign-in and the storage of inquiries, vehicle offers, favourites and uploaded photos we use Supabase (Supabase Inc., USA). Supabase provides the database, authentication and file storage and processes the data on our behalf (Art. 28 GDPR).",
+                    "p2": "Passwords are stored in encrypted (hashed) form only; we have no access to your password. Photos of vehicle offers are kept in non-public storage and can only be accessed by you and by us.",
+                    "p3": "Where data is transferred to the USA in this context, this takes place on the basis of the European Commission's standard contractual clauses. The legal basis is Art. 6(1)(b) GDPR, otherwise Art. 6(1)(f) GDPR.",
+                    "policy": "Supabase privacy policy"
+                },
+                "email": {
+                    "title": "Sending emails",
+                    "p1": "System emails, e.g. to confirm your registration or to reset your password, are sent via the email service Resend (Resend, Inc., USA). Your email address and the content of the message are processed for this purpose.",
+                    "p2": "Resend acts on our behalf (Art. 28 GDPR). The legal basis is Art. 6(1)(b) GDPR. Any transfer to the USA takes place on the basis of the European Commission's standard contractual clauses.",
+                    "policy": "Resend privacy policy"
+                },
+                "account": {
+                    "title": "Customer account",
+                    "p1": "You can create a customer account to offer vehicles, request trade-ins, view your inquiries and save favourites. For this we process:",
+                    "item1": "name",
+                    "item2": "email address",
+                    "item3": "password (stored in encrypted form only)",
+                    "item4": "phone number, if you add it to your profile",
+                    "p2": "The processing serves to provide the customer account and to perform the services requested through it (Art. 6(1)(b) GDPR).",
+                    "p3": "You can request the deletion of your account at any time by email to {email}. Data that we must retain for legal reasons is blocked until the retention periods expire."
+                },
+                "inquiries": {
+                    "title": "Contact form, vehicle inquiries and test drives",
+                    "p1": "When you contact us via the contact form, a vehicle inquiry or a test drive request, we process:",
+                    "item1": "name and email address",
+                    "item2": "phone number (optional)",
+                    "item3": "your message",
+                    "item4": "for vehicle inquiries, the vehicle concerned",
+                    "item5": "for test drives, your preferred date",
+                    "p2": "If you are signed in, we link the inquiry to your customer account so that you can view it there.",
+                    "p3": "We use the information solely to handle your inquiry. The legal basis is Art. 6(1)(b) GDPR where your inquiry aims at a contract, otherwise Art. 6(1)(f) GDPR (legitimate interest in answering). The same applies when you contact us by email or phone.",
+                    "p4": "To protect against spam, the forms contain a field that is invisible to people. No additional data is collected for this."
+                },
+                "submissions": {
+                    "title": "Offering a vehicle and trade-in",
+                    "p1": "When you offer us a vehicle or request a trade-in through your customer account, we process:",
+                    "item1": "vehicle details such as make, model, year, mileage, equipment and condition",
+                    "item2": "your asking price or value estimate",
+                    "item3": "the type of sale you choose and, for a trade-in, the vehicle you want",
+                    "item4": "the photos you upload",
+                    "p2": "We use the data to assess your vehicle, make you an offer and handle the purchase, trade-in or sale on your behalf (Art. 6(1)(b) GDPR).",
+                    "p3": "If we take your vehicle into our stock or sell it on your behalf, the vehicle details and photos may appear in the public vehicle listing on this website. Your name and contact details are not published.",
+                    "p4": "Please make sure that no people or other vehicles' number plates can be recognised in the photos."
+                },
+                "favorites": {
+                    "title": "Favourites",
+                    "p1": "When signed in, you can save vehicles as favourites. They are stored with your customer account until you remove them or your account is deleted (Art. 6(1)(b) GDPR)."
+                },
+                "fonts": {
+                    "title": "Fonts",
+                    "p1": "The font used on this website is delivered together with the website by our hosting provider. No connection to servers of Google or other font providers is made when you open the pages."
+                },
+                "social": {
+                    "title": "Links to social networks",
+                    "p1": "We link to our pages on Facebook and Instagram (Meta Platforms Ireland Ltd.). These are simple links, not embedded plugins: no data is sent to these networks when you visit our website.",
+                    "p2": "Only when you click a link are you taken to the respective network's page, where its privacy policy applies."
+                },
+                "recipients": {
+                    "title": "Recipients",
+                    "p1": "Your data is only received by the service providers named in this policy, who act as processors on our behalf. Beyond that, we only pass on data where this is necessary to perform a contract or where we are legally obliged to do so.",
+                    "p2": "We do not sell personal data or pass it on for advertising purposes."
+                },
+                "retention": {
+                    "title": "Retention period",
+                    "p1": "We store personal data only for as long as necessary for the respective purpose:",
+                    "item1": "customer account and favourites: until the account is deleted;",
+                    "item2": "inquiries: until they have been fully handled; we then delete them unless they are needed for a contract;",
+                    "item3": "vehicle offers and trade-ins: until the process is completed or until you request deletion;",
+                    "item4": "server log files: only briefly, as set by our hosting provider;",
+                    "item5": "data subject to statutory retention obligations (e.g. business letters and accounting records under § 257 HGB and § 147 AO): for these periods of six or ten years."
+                },
+                "complaint": {
+                    "title": "Right to lodge a complaint with a supervisory authority",
+                    "p1": "You have the right to lodge a complaint with a data protection supervisory authority. The authority responsible for us is:",
+                    "authority": "Bayerisches Landesamt für Datenschutzaufsicht (BayLDA, Bavarian Data Protection Authority)",
+                    "website": "Website"
+                },
+                "obligation": {
+                    "title": "Obligation to provide data and automated decisions",
+                    "p1": "You are not obliged to provide personal data. Without the information marked as required, however, we cannot set up a customer account or handle your inquiry or offer.",
+                    "p2": "There is no automated decision-making, including profiling (Art. 22 GDPR)."
                 }
-            }
+            },
+            "updated": "Last updated: September 2026"
         },
         "terms": {
             "metaDescription": "Sample terms and conditions of the {name} demo website.",
@@ -1156,39 +1335,34 @@
             }
         },
         "impressum": {
-            "metaDescription": "Sample legal notice (Impressum) of the {name} demo website.",
-            "title": "Impressum",
-            "intro": "Sample details for this demo website.",
+            "metaDescription": "Legal notice (Impressum) of {name} pursuant to § 5 DDG.",
+            "title": "Legal notice (Impressum)",
             "sections": {
                 "provider": {
-                    "title": "Provider"
+                    "title": "Information pursuant to § 5 DDG (German Digital Services Act)",
+                    "owner": "Owner: {owner}"
                 },
                 "contact": {
                     "title": "Contact",
-                    "phone": "Phone: {phone}",
-                    "email": "Email: {email}"
-                },
-                "register": {
-                    "title": "Register and tax",
-                    "registerNumber": "Commercial register number: {number}",
-                    "vatId": "VAT ID: {vatId}"
+                    "phone": "Phone",
+                    "email": "Email"
                 },
                 "responsible": {
-                    "title": "Responsible for content",
-                    "body": "{company} is responsible for the content of this website (address above)."
+                    "title": "Responsible for the content pursuant to § 18 (2) MStV (German Interstate Media Treaty)"
+                },
+                "dispute": {
+                    "title": "Consumer dispute resolution",
+                    "body": "We are neither willing nor obliged to take part in dispute resolution proceedings before a consumer arbitration board."
                 }
             }
-        }
+        },
+        "bindingNote": "This translation is provided for convenience. Only the German version is legally binding.",
+        "contents": "Contents"
     },
     "company": {
         "address": {
-            "street": "Example Street 1",
-            "city": "Example City",
-            "country": "Germany"
-        },
-        "legal": {
-            "ustIdNr": "DE000000000 (example)",
-            "registerNumber": "HRB 000000 (example)"
+            "country": "Germany",
+            "district": "{name} district"
         }
     },
     "adminVehicleForm": {
