@@ -833,9 +833,25 @@ New keys: `admin.submissions.{askingPrice,sendOffer,updateOffer,offerPriceLabel,
 - Read-only DB check confirmed the stuck row (`801e7b66-…`, status `angebot_gesendet`, `offered_price` null; the 3.000 € shown is the customer's asking price `price`). Written by the old approve button on 2026-09-24.
 - `respondToOffer` (accept/reject) now also requires `offered_price` > 0 and returns `INVALID_STATE` otherwise, so a direct server-action call can no longer answer an offer without a price. The check runs before any status update.
 
-## Post-launch audit — status as of 2026-09-26
+## Post-launch audit — status as of 2026-09-28
 
 Documentation-only handoff after live testing. No functional code changed in this pass.
+
+✅ **Post-launch audit complete (2026-09-28).** The owner and I tested all open items on production (https://kfz-rbm-website.vercel.app); every item below is confirmed live. Next phase: **UI/UX polish** (see "UI/UX notes" below), after cleaning up the test data.
+
+### Live test results (2026-09-28)
+| Item | Status |
+| --- | --- |
+| Migration 028 | ✅ **Confirmed live (2026-09-28):** applied in production. All 13 checks passed: `user_id`, `preferred_date`, `vehicle_label`, `customer_phone` varchar(30), `inquiry_type` allows `contact`, `preferred_date` check, both indexes, old public INSERT policy removed, "Customers can view own inquiries" policy, anon/authenticated have no INSERT, authenticated has SELECT. |
+| Inquiries + contact form | ✅ **Confirmed live (2026-09-28):** contact form and test-drive request (with preferred date) sent as a logged-in customer; both appear in the customer dashboard "Anfragen" with type, vehicle and date, correctly translated in de/en/mk. |
+| Fix 4 (wizard details) | ✅ **Confirmed live (2026-09-28):** all fields from a full wizard run (Variante, Farbe, Karosserie, Leistung, Vorbesitzer, HU/AU, Unfall, Scheckheft, Verkaufsart, description) appear correctly on the admin submission detail page. |
+| Fix 5 (photo upload) | ✅ **Confirmed live (2026-09-28):** a submission with 12 photos was sent successfully; admin shows "Bild 1 von 12", and the main photo shows in "Meine Fahrzeuge". |
+| Fix 6 (rejection reason) | ✅ **Confirmed live (2026-09-28):** admin rejected a submission with a reason; the customer sees the reason in "Meine Fahrzeuge" in de/en/mk with translated labels. |
+| Publish flow | ✅ **Confirmed live (2026-09-28):** full cycle (customer submits → admin sends offer with price and conditions → customer accepts via the confirmation dialog → admin "Fahrzeug im Bestand anlegen" with "Sofort veröffentlichen"). The vehicle appears as "Verfügbar" and on public `/de/fahrzeuge` with photos; the detail page works. |
+
+### UI/UX notes (for the polish phase, not bugs)
+- "Mein Auto anbieten" wizard: clicking "Weiter" does not scroll to the top of the next step.
+- Submitting many photos takes ~20–25 s with only "Wird abgesendet…" on the button. Show upload progress (e.g. "Bild 5 von 12").
 
 ### Fixes 1–6 (from "Functional fixes after the full audit")
 | Fix | Status |
@@ -843,9 +859,9 @@ Documentation-only handoff after live testing. No functional code changed in thi
 | 1. Offer flow | ✅ **Confirmed working live.** A real test offer (3.000 €) was sent on the stuck old submission via "Angebot ändern"; the customer's "Meine Fahrzeuge" shows "Angebotspreis: 3.000 €" with working "Annehmen"/"Ablehnen". |
 | 2. Secret key name | ✅ **Confirmed working live (indirectly):** admin submission photos load in production, which needs a valid `SUPABASE_SECRET_KEY`. |
 | 3. Customer photos | ✅ **Confirmed working live (2026-09-28)**, no code change needed — see "Fix 3 live diagnosis" below. |
-| 4. Wizard details | ⏳ Not yet tested live (depends on migration 026, see open issues). |
-| 5. Photo upload failures | ✅ **Fixed** (`43249ff`). Root cause: all photos were sent in a single server action request, which exceeded the server action / Vercel 4.5 MB body limit. **Live test by owner pending.** |
-| 6. Rejection reason | 🟡 **Confirmed via code only; not yet tested live** (no rejected submission with a reason exists yet). |
+| 4. Wizard details | ✅ **Confirmed live (2026-09-28)** — see "Live test results" above. |
+| 5. Photo upload failures | ✅ **Fixed** (`43249ff`). Root cause: all photos were sent in a single server action request, which exceeded the server action / Vercel 4.5 MB body limit. ✅ **Confirmed live (2026-09-28)** with 12 photos. |
+| 6. Rejection reason | ✅ **Confirmed live (2026-09-28)** in de/en/mk — see "Live test results" above. |
 
 Security fix: `respondToOffer` requires `offered_price` > 0 before accept/reject (commit `5d78cac`) — ✅ done and confirmed.
 
@@ -891,7 +907,7 @@ Live test of "Im Fahrzeugbestand veröffentlichen" on an accepted consignment (T
 | 6 | Backfill of VW Golf + TEST-Mercedes | `scripts/backfill-published-submissions.mjs` (dry run by default, `--apply` writes): links `submitted_vehicles.vehicle_id` if missing (vehicle found by the generated VIN `SUBM…`), sets source + `submitted_vehicle_id` + details, copies photos if the vehicle has none. Status/price untouched. ✅ **Run on 2026-09-27** after migration 027: VW Golf (`e9428c9c-…`, `rbm`, now linked to its submission, 2 photos); TEST-Mercedes (`d5210039-…`, `rbm` → `customer`, 5 details, 4 photos). All image URLs return HTTP 200. |
 
 Keys (de/en/mk): changed `admin.submissionDetail.{publishTitle, publish, publishing, publishOnlyAccepted, invalidPrice}`; removed `confirmPublish`; new `admin.submissionDetail.{publishSource, agreedPrice, publishStatusLabel, publishAsDraft, publishAsAvailable, confirmPublishDraft, confirmPublishAvailable, publishPhotosFailed}`.
-Verification: `npm run check:i18n` ✅, `npm run build` ✅, migration 027 applied ✅, backfill ✅. Live test of a new publish pending.
+Verification: `npm run check:i18n` ✅, `npm run build` ✅, migration 027 applied ✅, backfill ✅. ✅ **Live test of a new publish confirmed (2026-09-28)** — full cycle, see "Live test results".
 Open follow-ups: the TEST-Mercedes price is still the customer's asking price (24.900; set the real price in the admin). The Golf's submission has no `offered_price` (accepted before `5d78cac`).
 
 ### Vehicle inquiries + contact form (2026-09-27)
@@ -913,7 +929,7 @@ Before: nothing inserted into `customer_inquiries`; the vehicle page buttons onl
 
 PII logging: the contact form was the only `console.log` with personal data (the remaining ones in `components/search-bar.tsx` / `vehicle-card.tsx` log search filters / a vehicle id; scripts log vehicle ids).
 Keys (de/en/mk): new `inquiryForm.*`, `common.inquiryTypes.contact`, `contact.{sending, messageSentText}`, `admin.inquiries.{allStatuses, categoryAll, categoryVehicle, categoryContact, preferredDate, receivedAt, customerAccount, guest, vehicleNotListed, noMessage, status}`, `dashboard.inquiries.{browseVehicles, sentAt, preferredDate, vehicleNotListed}`; changed `admin.inquiries.description`, `dashboard.inquiries.{description, emptyDescription}`, `dashboard.overview.inquiriesDescription`; removed `admin.inquiries.{markRead, markResponded, close}`, `dashboard.inquiries.submitVehicle`, `contact.testDriveMessage`.
-Verification: `npm run check:i18n` ✅, `npm run build` ✅. Migration 028 pending; live test pending.
+Verification: `npm run check:i18n` ✅, `npm run build` ✅. ✅ Migration 028 applied in production (13/13 checks) and ✅ live test passed (2026-09-28).
 
 ### Favorites + homepage search with URL filters (2026-09-27)
 
@@ -977,20 +993,26 @@ Root cause of "Ungültiger Link" on every reset link: `/[locale]/reset-password`
 
 - **Bug:** "Mein Auto anbieten" failed on submit with about five or more photos; nothing was saved. **Root cause:** the wizard sent all photos (resized 1920 px JPEG, base64) in one `createSubmittedVehicle` server action request, which exceeds the server action `bodySizeLimit` (4 MB; Vercel's hard cap is 4.5 MB). The request was rejected before the action ran. Reproduced on a local production build: 3 photos (2.9 MB body) → reached the action; 6 photos (5.7 MB) → HTTP 500 "Body exceeded 4mb limit".
 - **Fix:** `createSubmittedVehicle(vehicleData)` only creates the submission (no images argument; unused `imageListSchema` removed). The wizard then uploads each photo in its own `uploadSubmissionImages` call (existing action: `requireUser`, ownership + status check, first stored photo becomes main) and collects the failed ones; the existing "Fotos erneut hochladen" retry uses the same per-photo loop. No Supabase change, no new message keys.
-- Verified locally: a single 1.5 MB photo per request is accepted; wizard route redirects to login in de/en/mk. Live test as customer pending.
+- Verified locally: a single 1.5 MB photo per request is accepted; wizard route redirects to login in de/en/mk. ✅ Live test as customer passed (2026-09-28, 12 photos).
 
 ### New open items found during this fix
 | # | Item | Where | Status |
 | --- | --- | --- | --- |
 | A1 | The main photo chosen in the wizard ("Als Hauptbild") is ignored: photos are stored in list order and the first one stored becomes main. | `dashboard/fahrzeug-anbieten` → `uploadPhotos` / `storeSubmissionImages` | open |
 
-### Test data
+### Test data cleanup
+Clean up before the final test:
+- Public listings with screenshots instead of car photos ("fffffffff fffffff", C 300 without photos).
+- TEST vehicles from this audit: **TEST-Opel Astra Publish-Test** (published, publicly visible), **TEST-Skoda Octavia Combi** (rejected submission), and the **TEST-Opel** submission.
+- Test inquiries: "TEST Kontaktformular (Audit 28.09.)" and "TEST Probefahrt (Audit)".
+
+Earlier notes:
 - The stuck test submission ("fffffffff…", `801e7b66-…`) got a real test offer (3.000 €) during live testing and is now in a normal "offer sent" state — no longer inconsistent, but still a fake vehicle that should eventually be deleted.
 - The leftover "sssssssss" test vehicle is still in the live database (see below).
 
 ### Remaining known issues (not addressed yet)
 **High**
-- ~~Inquiries are never created~~ / ~~Contact form does not persist and logs PII~~ — fixed, see "Vehicle inquiries + contact form" (needs migration 028).
+- ~~Inquiries are never created~~ / ~~Contact form does not persist and logs PII~~ — fixed, see "Vehicle inquiries + contact form" (migration 028 applied, confirmed live 2026-09-28).
 
 **Medium**
 - ~~**Favorites** feature has no database table behind it~~ — fixed, see "Favorites + homepage search" (migration 029).
