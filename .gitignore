@@ -38,9 +38,6 @@ next-env.d.ts
 # Claude Code
 .claude/
 
-# documentation (except README)
+# documentation (only README is tracked)
 *.md
 !README.md
-!I18N_PROGRESS.md
-!CLAUDE.md
-!AGENTS.md
