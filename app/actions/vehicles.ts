@@ -8,7 +8,6 @@ import {
   MAX_IMAGES_PER_REQUEST,
   decodeImageDataUrl,
   imageDataUrlSchema,
-  imageListSchema,
 } from "@/lib/image-upload";
 import { revalidateVehiclePages } from "@/lib/revalidate-vehicles";
 import type { SubmittedVehicle } from "@/lib/supabase";
@@ -162,10 +161,14 @@ async function storeSubmissionImages(
   return { uploadedCount: dataUrls.length - failedIndexes.length, failedIndexes };
 }
 
-async function createSubmittedVehicleImpl(vehicleData: unknown, images: unknown) {
+/**
+ * Creates the submission without photos. The wizard then sends each photo in its own
+ * `uploadSubmissionImages` call: all photos in one request exceeded the server action
+ * body limit (4 MB, Vercel max 4.5 MB) from about five photos on, and nothing was saved.
+ */
+async function createSubmittedVehicleImpl(vehicleData: unknown) {
   const { supabase, user } = await requireUser();
   const data = parseOrThrow(submittedVehicleSchema, vehicleData);
-  const imageList = parseOrThrow(imageListSchema, images ?? []);
 
   // Explicit field list: user_id and status are fixed here (the insert RLS check
   // also requires status = 'eingereicht' and empty admin/offer columns).
@@ -204,21 +207,7 @@ async function createSubmittedVehicleImpl(vehicleData: unknown, images: unknown)
     throw new ActionError("CREATE_FAILED");
   }
 
-  const { uploadedCount, failedIndexes } = await storeSubmissionImages(
-    supabase,
-    user.id,
-    vehicle.id,
-    imageList,
-    0,
-    true
-  );
-
-  return {
-    vehicleId: vehicle.id as string,
-    uploadedCount,
-    expectedCount: imageList.length,
-    failedIndexes,
-  };
+  return { vehicleId: vehicle.id as string };
 }
 
 /**
@@ -435,8 +424,8 @@ export async function countSubmittedVehicles() {
   return runAction("countSubmittedVehicles", "LOAD_FAILED", async () => ({ count: await countSubmittedVehiclesImpl() }));
 }
 
-export async function createSubmittedVehicle(vehicleData: unknown, images: unknown) {
-  return runAction("createSubmittedVehicle", "CREATE_FAILED", () => createSubmittedVehicleImpl(vehicleData, images));
+export async function createSubmittedVehicle(vehicleData: unknown) {
+  return runAction("createSubmittedVehicle", "CREATE_FAILED", () => createSubmittedVehicleImpl(vehicleData));
 }
 
 export async function uploadSubmissionImages(submissionId: string, filesData: unknown) {

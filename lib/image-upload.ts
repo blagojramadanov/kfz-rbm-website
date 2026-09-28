@@ -13,8 +13,6 @@ export const imageDataUrlSchema = z
   .max(Math.ceil((MAX_IMAGE_BYTES * 4) / 3) + 64)
   .regex(DATA_URL);
 
-export const imageListSchema = z.array(imageDataUrlSchema).max(MAX_IMAGES_PER_REQUEST);
-
 export interface DecodedImage {
   bytes: Buffer;
   contentType: "image/jpeg" | "image/png" | "image/webp";

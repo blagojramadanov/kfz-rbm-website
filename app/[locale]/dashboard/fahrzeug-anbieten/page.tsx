@@ -317,6 +317,25 @@ export default function SubmitVehicleWizardPage() {
     }
   };
 
+  /**
+   * Uploads the given wizard photos one per request (all photos in one request exceed
+   * the server action body limit) and returns the indexes that could not be stored.
+   */
+  const uploadPhotos = async (vehicleId: string, indexes: number[]): Promise<number[]> => {
+    const { uploadSubmissionImages } = await import("@/app/actions/vehicles");
+    const failed: number[] = [];
+    for (const index of indexes) {
+      try {
+        const result = await uploadSubmissionImages(vehicleId, [{ data: images[index].data }]);
+        if (!result.ok || result.failedIndexes.length > 0) failed.push(index);
+      } catch (err) {
+        console.error("Error uploading photo:", err);
+        failed.push(index);
+      }
+    }
+    return failed;
+  };
+
   const handleSubmit = async () => {
     if (!validateStep() || !user) return;
 
@@ -344,16 +363,16 @@ export default function SubmitVehicleWizardPage() {
           hu_au: formData.huAu,
           accident_history: formData.unfallhistorie,
           service_book: formData.scheckheft,
-        },
-        images.map((img) => img.data)
+        }
       );
       if (!result.ok) {
         setError(errorMessage(result));
         return;
       }
-      if (result.failedIndexes.length > 0) {
+      const failedIndexes = await uploadPhotos(result.vehicleId, images.map((_, index) => index));
+      if (failedIndexes.length > 0) {
         // The vehicle exists; offer to retry only the photos that were not stored.
-        setPartialUpload({ vehicleId: result.vehicleId, failedIndexes: result.failedIndexes });
+        setPartialUpload({ vehicleId: result.vehicleId, failedIndexes });
         return;
       }
 
@@ -371,17 +390,7 @@ export default function SubmitVehicleWizardPage() {
     try {
       setRetryingPhotos(true);
       setError("");
-      const { uploadSubmissionImages } = await import("@/app/actions/vehicles");
-      const result = await uploadSubmissionImages(
-        partialUpload.vehicleId,
-        partialUpload.failedIndexes.map((index) => ({ data: images[index].data }))
-      );
-      if (!result.ok) {
-        setError(errorMessage(result));
-        return;
-      }
-      // failedIndexes of the retry refer to the retried list; map them back to the wizard's photos.
-      const stillFailed = result.failedIndexes.map((i) => partialUpload.failedIndexes[i]);
+      const stillFailed = await uploadPhotos(partialUpload.vehicleId, partialUpload.failedIndexes);
       if (stillFailed.length === 0) {
         router.push("/dashboard/fahrzeug-angeboten");
       } else {

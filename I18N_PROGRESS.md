@@ -844,7 +844,7 @@ Documentation-only handoff after live testing. No functional code changed in thi
 | 2. Secret key name | ✅ **Confirmed working live (indirectly):** admin submission photos load in production, which needs a valid `SUPABASE_SECRET_KEY`. |
 | 3. Customer photos | 🟡 **Confirmed via code only.** Live check showed gray boxes on "Meine Fahrzeuge" — not confirmed as real photos yet (see note below). |
 | 4. Wizard details | ⏳ Not yet tested live (depends on migration 026, see open issues). |
-| 5. Photo upload failures | ⏳ Not yet tested live. |
+| 5. Photo upload failures | ✅ **Fixed** — see "Wizard photo upload: one request per photo" (2026-09-28). Live test pending. |
 | 6. Rejection reason | 🟡 **Confirmed via code only; not yet tested live** (no rejected submission with a reason exists yet). |
 
 Security fix: `respondToOffer` requires `offered_price` > 0 before accept/reject (commit `5d78cac`) — ✅ done and confirmed.
@@ -964,6 +964,17 @@ Root cause of "Ungültiger Link" on every reset link: `/[locale]/reset-password`
 - Keys: new `auth.{resetEmailSentTitle, forgotPasswordDescription, backToLogin, verifyingResetLink, newPasswordTitle, newPasswordDescription, newPassword, repeatPassword, passwordMinLength, passwordTooShort, savePassword, savingPassword, passwordUpdatedTitle, passwordUpdatedRedirect}`; changed `auth.passwordResetSent` (mk used "рестартирање" = restart), `auth.invalidResetLinkDesc`.
 - Tested on a local production build: all three forgot-password locales; reset page without parameters, with a bogus `code`, a bogus `token_hash`, `error_code=otp_expired` in query and in hash, and an old link without locale → invalid screen in the right language, parameters removed. The successful reset with a real email needs a live test.
 - Supabase settings (dashboard): Site URL `https://kfz-rbm-website.vercel.app`; Redirect URLs `https://kfz-rbm-website.vercel.app/de/reset-password`, `…/en/reset-password`, `…/mk/reset-password` (plus `http://localhost:3000/**` for local tests). Optional (links then work in any browser/device): reset-password template link `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery`.
+
+### Wizard photo upload: one request per photo (2026-09-28)
+
+- **Bug:** "Mein Auto anbieten" failed on submit with about five or more photos; nothing was saved. **Root cause:** the wizard sent all photos (resized 1920 px JPEG, base64) in one `createSubmittedVehicle` server action request, which exceeds the server action `bodySizeLimit` (4 MB; Vercel's hard cap is 4.5 MB). The request was rejected before the action ran. Reproduced on a local production build: 3 photos (2.9 MB body) → reached the action; 6 photos (5.7 MB) → HTTP 500 "Body exceeded 4mb limit".
+- **Fix:** `createSubmittedVehicle(vehicleData)` only creates the submission (no images argument; unused `imageListSchema` removed). The wizard then uploads each photo in its own `uploadSubmissionImages` call (existing action: `requireUser`, ownership + status check, first stored photo becomes main) and collects the failed ones; the existing "Fotos erneut hochladen" retry uses the same per-photo loop. No Supabase change, no new message keys.
+- Verified locally: a single 1.5 MB photo per request is accepted; wizard route redirects to login in de/en/mk. Live test as customer pending.
+
+### New open items found during this fix
+| # | Item | Where | Status |
+| --- | --- | --- | --- |
+| A1 | The main photo chosen in the wizard ("Als Hauptbild") is ignored: photos are stored in list order and the first one stored becomes main. | `dashboard/fahrzeug-anbieten` → `uploadPhotos` / `storeSubmissionImages` | open |
 
 ### Test data
 - The stuck test submission ("fffffffff…", `801e7b66-…`) got a real test offer (3.000 €) during live testing and is now in a normal "offer sent" state — no longer inconsistent, but still a fake vehicle that should eventually be deleted.
