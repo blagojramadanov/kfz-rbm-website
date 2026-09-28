@@ -842,9 +842,9 @@ Documentation-only handoff after live testing. No functional code changed in thi
 | --- | --- |
 | 1. Offer flow | ✅ **Confirmed working live.** A real test offer (3.000 €) was sent on the stuck old submission via "Angebot ändern"; the customer's "Meine Fahrzeuge" shows "Angebotspreis: 3.000 €" with working "Annehmen"/"Ablehnen". |
 | 2. Secret key name | ✅ **Confirmed working live (indirectly):** admin submission photos load in production, which needs a valid `SUPABASE_SECRET_KEY`. |
-| 3. Customer photos | 🟡 **Confirmed via code only.** Live check showed gray boxes on "Meine Fahrzeuge" — not confirmed as real photos yet (see note below). |
+| 3. Customer photos | ✅ **Confirmed working live (2026-09-28)**, no code change needed — see "Fix 3 live diagnosis" below. |
 | 4. Wizard details | ⏳ Not yet tested live (depends on migration 026, see open issues). |
-| 5. Photo upload failures | ✅ **Fixed** — see "Wizard photo upload: one request per photo" (2026-09-28). Live test pending. |
+| 5. Photo upload failures | ✅ **Fixed** (`43249ff`). Root cause: all photos were sent in a single server action request, which exceeded the server action / Vercel 4.5 MB body limit. **Live test by owner pending.** |
 | 6. Rejection reason | 🟡 **Confirmed via code only; not yet tested live** (no rejected submission with a reason exists yet). |
 
 Security fix: `respondToOffer` requires `offered_price` > 0 before accept/reject (commit `5d78cac`) — ✅ done and confirmed.
@@ -855,6 +855,12 @@ Security fix: `respondToOffer` requires `offered_price` > 0 before accept/reject
 - Also: cards render first with the placeholder and switch to the photo once signing finishes, so a brief placeholder is expected.
 
 Next check: open "Meine Fahrzeuge" as a customer whose submission has photos (e.g. one created through the wizard with uploads), scroll through, and look in DevTools → Network for requests to `.../storage/v1/object/sign/customer-submitted-photos/...` (200 = working).
+
+**Fix 3 live diagnosis (2026-09-28).** Traced on production as the customer (blaze.ramadanov@gmail.com), without code changes:
+- Upload: private bucket `customer-submitted-photos`, path `{userId}/{submissionId}/{time}-{uuid}.{ext}`; `submitted_vehicle_images.image_url` stores that plain storage path (since `359eef9`; `43249ff` did not change it). Rows from before `359eef9` stored a public URL of the `vehicle-images` bucket; `getSignedImageUrls` returns those unsigned. The customer's 6 submissions all use the storage-path format, so the old format is covered by code only.
+- Read: "Meine Fahrzeuge" does not use `getPublicUrl`; it calls `getSignedImageUrls` (ownership checked via `submitted_vehicle_images` → `submitted_vehicles.user_id`, signed with the session client, service-role fallback) and renders `<Image unoptimized>` (`**.supabase.co` is in `remotePatterns`).
+- Result: on `/de`, `/en` and `/mk` all 6 cards (TEST-Mercedes, TEST-BMW, TEST-Audi, VW Golf, AUDI A8, "fffff…") get a signed URL under the customer's own folder and the image loads (natural width 552–800 px); visually checked on `/de`. Public `/de/fahrzeuge`: 4 of 4 vehicle images load (the C 300 has no photos, known).
+- Conclusion: the gray boxes were seen on 2026-09-26, before `8880ad4` (2026-09-27, which added path normalization and the service-role fallback for signing). It is not reproducible on the current deployment; which part of `8880ad4` resolved it can no longer be determined. Lazy loading still keeps off-screen cards gray until they are scrolled into view (expected).
 
 **Fix 6 code check (ready to test).** Admin `admin/fahrzeuge/eingereicht` → "Ablehnen" requires a non-empty reason (`rejectReasonRequired`) → `rejectSubmittedVehicle` (`requireAdmin`, zod: guid + trimmed 1–2000 chars) sets `status = abgelehnt` and `rejection_reason`, only from `eingereicht`/`in_bearbeitung`, and checks that exactly one row changed. The customer page selects `*`, so `rejection_reason` is loaded, and shows it in a red box "Grund der Ablehnung" (`dashboard.vehicles.rejectionReason`, de/en/mk) with fallback to `status_reason`. The admin card shows it too (filter "Abgelehnt").
 To test: use a submission in `eingereicht` or `in_bearbeitung`. The "fffff…" test submission is now `angebot_gesendet` and **cannot** be rejected by the admin (the customer can still decline its offer, which sets it back to `eingereicht`, not `abgelehnt`; see "Submission workflow gaps" below).
@@ -954,6 +960,8 @@ Verification: `npm run check:i18n` ✅, `npm run build` ✅.
 - No message keys changed.
 
 ### Password reset fix (2026-09-27)
+
+✅ **Confirmed live end to end by the owner (2026-09-28)** (`e5b70dc`).
 
 Root cause of "Ungültiger Link" on every reset link: `/[locale]/reset-password` only accepted a `?token=` parameter, which Supabase never sends. The browser client (`@supabase/ssr` `createBrowserClient`) uses the **PKCE** flow: the email link goes to `/auth/v1/verify`, which redirects to `redirect_to?code=…`. The i18n middleware redirect `/reset-password` → `/de/reset-password` keeps the query (checked live: `Location: /de/reset-password?code=abc123`), so the code arrived but was ignored.
 
